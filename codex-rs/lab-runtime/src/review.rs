@@ -39,7 +39,7 @@ impl HumanReviewer for TerminalReviewer {
     }
 }
 
-fn review_prompt(target: &ApprovalTarget, rendered: &RenderedPlan) -> Result<String> {
+pub(crate) fn review_prompt(target: &ApprovalTarget, rendered: &RenderedPlan) -> Result<String> {
     if rendered.content.len() > 512 * 1024 {
         bail!("rendered review plan exceeds limit");
     }
