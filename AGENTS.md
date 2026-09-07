@@ -320,3 +320,10 @@ Tests and features must support Linux, macOS and Windows unless feature is expli
 
 Codex supports running connected app-server and exec-server on different operating systems. See the
 `$remote-tests` skill for details about integration testing these configurations.
+
+## Lab experiment concurrency
+
+- Run independent, explicitly approved experiment conditions concurrently with a bounded concurrency limit. This is concurrency between isolated lab host processes; it does not require parallel agents within a condition.
+- Give each condition its own checkout, run ID, artifacts and decision channel. Preserve the repository launch lock and each run's exact plan approval/amendment gate. A waiting decision or failure in one condition must not serialize unrelated approved conditions.
+- Do not add predecessor-exit barriers or silently choose serial execution for reproducibility. Record concurrency, launch/finish timing and resource/provider limits as experiment metadata. Use serial execution only for a real dependency, a concrete resource limitation or an explicitly selected serial experiment.
+- Never reuse old approvals to retry completed runs. Historical serial results stay labelled serial. A reusable bounded batch scheduler is still follow-up work; separate existing run-prepared processes can be launched independently today, but live concurrent execution has not yet been validated by the recorded pilots.
