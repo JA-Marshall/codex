@@ -24,6 +24,7 @@ def evaluator_fingerprint():
         "evaluate_fixture.py",
         "evaluation_worker.py",
         "terminal_run.py",
+        "scope_observation.py",
         "setup_fixture.py",
         "fixture_registry.py",
         "structured_cases.py",

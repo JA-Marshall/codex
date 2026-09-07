@@ -8,6 +8,8 @@ import resource
 import subprocess
 import tempfile
 
+import scope_observation
+
 MAX_FILE = 8 * 1024 * 1024
 MAX_TOTAL = 64 * 1024 * 1024
 
@@ -67,9 +69,14 @@ def observe_terminal(run: Path):
     runtime = snapshot.journal("runtime-events.jsonl")
     phases, active, calls, threads = [], None, set(), set()
     faulted = False
+    scope_sha256 = None
     for event in runtime:
         kind = event.get("type")
-        if kind == "phase_started":
+        if kind == "task_scope_bound":
+            if active is not None or phases or faulted or scope_sha256 is not None:
+                raise ValueError("scope must bind once before phases")
+            scope_sha256 = scope_observation.bind(snapshot, event)
+        elif kind == "phase_started":
             if active is not None or faulted or event.get("epoch") != len(phases) + 1:
                 raise ValueError("invalid phase start")
             if len(phases) >= 32 or event.get("phase") not in (
@@ -92,13 +99,21 @@ def observe_terminal(run: Path):
         else:
             if active is None or event.get("epoch") != active["epoch"]:
                 raise ValueError("runtime event outside active phase")
-            if kind == "phase_thread_bound":
+            if kind in ("phase_scope_permissions", "phase_scope_audit"):
+                if calls:
+                    raise ValueError("scope transition with active dispatches")
+                scope_observation.record(active, event, scope_sha256)
+            elif kind == "phase_thread_bound":
+                if scope_sha256 and "scope_permissions" not in active:
+                    raise ValueError("missing scope permissions before thread")
                 thread = event.get("thread_id")
                 if not thread or thread in threads or "thread_id" in active:
                     raise ValueError("invalid phase thread binding")
                 threads.add(thread)
                 active["thread_id"] = thread
             elif kind in ("tool_admitted", "tool_finished"):
+                if "scope_audit" in active:
+                    raise ValueError("tool dispatch after scope audit")
                 call = (event.get("turn_id"), event.get("call_id"))
                 if not all(call) or "thread_id" not in active:
                     raise ValueError("invalid tool identity")
@@ -115,6 +130,8 @@ def observe_terminal(run: Path):
             elif kind == "phase_stopped":
                 if calls or "thread_id" not in active:
                     raise ValueError("incomplete phase shutdown")
+                if scope_sha256 and "scope_audit" not in active:
+                    raise ValueError("missing scope audit")
                 phases.append(active)
                 active = None
             else:
@@ -125,6 +142,7 @@ def observe_terminal(run: Path):
         key: 0 for key in ("input_tokens", "output_tokens", "cached_input_tokens")
     }
     repositories = set()
+    scope_definition = snapshot.json("evidence/task-scope.json")["scope"] if scope_sha256 else None
     for index, phase in enumerate(phases, 1):
         snapshot.json(f"evidence/input-{index:02}.json")
         output = snapshot.json(f"evidence/phase-{index:02}.json")
@@ -145,6 +163,8 @@ def observe_terminal(run: Path):
         ):
             raise ValueError("missing phase repository binding")
         repositories.add(str(Path(configured[0]["cwd"]).resolve()))
+        if scope_sha256:
+            scope_observation.verify_phase(phase, output, configured[0], events[-1]["state"], scope_definition)
         usage = (output.get("token_usage") or {}).get("total_token_usage", {})
         for key in totals:
             value = usage.get(key)
@@ -195,6 +215,7 @@ def observe_terminal(run: Path):
         "plan_deviations": None,
         "source_artifact_sha256": snapshot.hashes,
         "authority_restored": False,
+        "task_scope_sha256": scope_sha256,
     }
     return snapshot, spec, observation
 

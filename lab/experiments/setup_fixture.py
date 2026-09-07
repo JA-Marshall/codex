@@ -28,6 +28,7 @@ def evaluator_fingerprint(fixture_name="csv-summary-v1") -> str:
             "fixture_cases.py",
             "setup_fixture.py",
             "terminal_run.py",
+            "scope_observation.py",
             "fixture_registry.py",
             "structured_cases.py",
         ]
