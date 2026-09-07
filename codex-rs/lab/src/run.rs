@@ -63,6 +63,8 @@ pub struct RunSpec {
     inheritance_chain: Vec<String>,
     workflow: ResolvedWorkflow,
     instructions: RoleInstructions,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    verification_input_sha256: Option<String>,
     #[serde(skip)]
     source: String,
 }
@@ -119,12 +121,20 @@ impl RunSpec {
             inheritance_chain: catalog.inheritance_chain(workflow_name)?,
             workflow,
             instructions,
+            verification_input_sha256: None,
             source: catalog.source().into(),
         })
     }
 
     pub fn workflow(&self) -> &ResolvedWorkflow {
         &self.workflow
+    }
+
+    /// Bind host-supplied verifier-only evidence to approval without importing
+    /// authority. Ordinary runs omit this field and retain their existing digest.
+    pub fn with_verification_input(mut self, canonical_input: &[u8]) -> Self {
+        self.verification_input_sha256 = Some(digest_bytes(canonical_input));
+        self
     }
 
     pub fn instructions(&self) -> &RoleInstructions {

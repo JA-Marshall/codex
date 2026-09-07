@@ -145,6 +145,7 @@ impl Fixture {
             instruction_root: self.instruction_root.clone(),
             workflow: workflow.to_string(),
             plan,
+            verification_input: None,
         }
     }
 }

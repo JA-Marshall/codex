@@ -1,0 +1,1 @@
+{"schema_version":1,"candidate_commit":"89d79045aa82411ec7368ecca643562b254ac1f8","plan_sha256":"0eadb6d14529a2989108b40ffbbb8e44bbca0b0be88e776b8424730c74449a53","source_run":"verifier-v1-execution","source_phase_sha256":"c7b6337bfd44efff27009860084f571a5b190239a0f8166adae09279548b74a3","implementation_report":{"completed_steps":["s1","s2","s3"]}}

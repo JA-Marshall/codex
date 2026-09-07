@@ -75,6 +75,8 @@ fn help_displays_required_inputs_and_explicit_unapproved_plan_option() -> anyhow
 
           --plan-file <PLAN_FILE>
               Reuse canonical JSON; this does not approve the plan
+          --verification-input <VERIFICATION_INPUT>
+              Verify a frozen candidate and imported report without planner/executor calls
       -h, --help
               Print help
     "###);

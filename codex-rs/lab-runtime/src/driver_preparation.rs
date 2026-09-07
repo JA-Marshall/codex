@@ -59,7 +59,7 @@ pub(crate) async fn initialize(
         )?)),
         effective_config_sha256: Some(digest(&settings_bytes)),
     };
-    let spec = RunSpec::resolve(
+    let mut spec = RunSpec::resolve(
         &catalog,
         &options.instruction_root,
         &options.workflow,
@@ -70,6 +70,16 @@ pub(crate) async fn initialize(
         },
         Some(model),
     )?;
+    if let Some(input) = &options.verification_input {
+        input.validate(
+            options
+                .plan
+                .as_ref()
+                .context("verifier-only trials require an imported plan")?,
+            &options.repository_commit,
+        )?;
+        spec = spec.with_verification_input(&input.bytes()?);
+    }
     if let Some((expected_settings, expected_spec)) = expected {
         ensure!(
             &settings == expected_settings,
@@ -84,6 +94,9 @@ pub(crate) async fn initialize(
     let run = LabRun::create(&options.runs_directory, &options.run_id, spec)?;
     let authority = RunAuthority::new(run)?;
     let evidence = EvidenceStore::new(authority.artifacts()?)?;
+    if let Some(input) = &options.verification_input {
+        evidence.write_bytes("verification-input.json", &input.bytes()?)?;
+    }
     evidence.write_bytes("effective-settings.json", &settings_bytes)?;
     evidence.write_json("environment.json", &serde_json::json!({
         "os":std::env::consts::OS,"arch":std::env::consts::ARCH,

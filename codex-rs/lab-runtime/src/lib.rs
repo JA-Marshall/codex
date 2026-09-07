@@ -23,6 +23,7 @@ mod repository_tools;
 mod review;
 mod review_channel;
 mod settings;
+mod verification_input;
 
 #[cfg(test)]
 #[path = "../tests/authority_support/mod.rs"]
@@ -61,3 +62,4 @@ pub use review::HumanReviewer;
 pub use review::TerminalReviewer;
 pub use review::parse_decision;
 pub use review_channel::JsonReviewer;
+pub use verification_input::VerificationInput;
