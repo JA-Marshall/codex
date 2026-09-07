@@ -11,8 +11,8 @@ import sys
 import tempfile
 import time
 
-from fixture_cases import CASES
-from setup_fixture import FIXTURE, evaluator_fingerprint, git, sha256
+from fixture_registry import fixture
+from setup_fixture import evaluator_fingerprint, git, sha256
 from terminal_run import capture_diff, observe_terminal
 
 WORKER = Path(__file__).resolve().with_name("evaluation_worker.py")
@@ -69,7 +69,7 @@ def observe(
         repository,
     ]
     if mode == "public":
-        reads.append(FIXTURE / "project/tests")
+        reads.append(argument)
     entries = [
         {"path": {"type": "path", "path": str(path)}, "access": "read"}
         for path in reads
@@ -178,11 +178,14 @@ def evaluate_locked(
     if sandbox.name != "codex-linux-sandbox":
         raise ValueError("use the existing codex-linux-sandbox dispatch alias")
     metadata = bounded_json(fixture_manifest)
+    selected = fixture(metadata["fixture"])
     if git(repository, "rev-parse", "HEAD") != metadata["commit"]:
         raise ValueError("candidate commit differs from fixture baseline")
     if metadata["python"]["sha256"] != sha256(Path(sys.executable).resolve()):
         raise ValueError("fixture Python changed")
-    current_evaluator = evaluator_fingerprint()
+    if metadata["task_sha256"] != sha256(selected.root / "task.txt"):
+        raise ValueError("fixture task changed")
+    current_evaluator = evaluator_fingerprint(selected.name)
     if (evaluator_sha256 or metadata["evaluator_sha256"]) != current_evaluator:
         raise ValueError("evaluator changed; explicitly pin the new evaluator SHA-256 for a new evaluation")
     snapshot, observation = None, None
@@ -190,7 +193,7 @@ def evaluate_locked(
         snapshot, spec, observation = observe_terminal(run)
         if (
             spec["repository"]["commit"] != metadata["commit"]
-            or spec["task"].encode() != (FIXTURE / "task.txt").read_bytes()
+            or spec["task"].encode() != (selected.root / "task.txt").read_bytes()
         ):
             raise ValueError("run does not match fixture task and baseline")
     before = candidate_files(repository)
@@ -210,25 +213,26 @@ def evaluate_locked(
             repository,
             scratch,
             "api",
-            json.dumps([case[1] for case in CASES]).encode(),
+            json.dumps({"module": selected.module, "function": selected.function,
+                        "arguments": [selected.arguments(case[1]) for case in selected.cases]}).encode(),
         )
         try:
             values = json.loads(api["stdout"]) if api["exit_code"] == 0 else []
         except ValueError:
             values = []
         checks = []
-        for index, (name, text, expected) in enumerate(CASES):
+        for index, (name, value, expected) in enumerate(selected.cases):
             wanted = (
                 {"error": "ValueError"} if expected is None else {"value": expected}
             )
             api_passed = (
                 isinstance(values, list)
-                and len(values) == len(CASES)
+                and len(values) == len(selected.cases)
                 and json.dumps(values[index], sort_keys=True)
                 == json.dumps(wanted, sort_keys=True)
             )
             source = scratch / "input.csv"
-            source.write_bytes(text.encode("utf-8"))
+            source.write_bytes(selected.input_bytes(value))
             cli = observe(sandbox, repository, scratch, "cli", argument=source)
             expected_stdout = (
                 "" if expected is None else json.dumps(expected, sort_keys=True) + "\n"
@@ -246,7 +250,7 @@ def evaluate_locked(
                 }
             )
         public = observe(
-            sandbox, repository, scratch, "public", argument=FIXTURE / "project/tests"
+            sandbox, repository, scratch, "public", argument=selected.root / "project/tests"
         )
     result = {
         "schema_version": 1,

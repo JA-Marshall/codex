@@ -9,6 +9,8 @@ import shutil
 import subprocess
 import sys
 
+from fixture_registry import FIXTURES, fixture
+
 FIXTURE = Path(__file__).resolve().parents[1] / "fixtures" / "csv-summary-v1"
 
 
@@ -16,7 +18,7 @@ def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def evaluator_fingerprint() -> str:
+def evaluator_fingerprint(fixture_name="csv-summary-v1") -> str:
     scripts = Path(__file__).resolve().parent
     files = [
         scripts / name
@@ -26,8 +28,10 @@ def evaluator_fingerprint() -> str:
             "fixture_cases.py",
             "setup_fixture.py",
             "terminal_run.py",
+            "fixture_registry.py",
+            "structured_cases.py",
         ]
-    ] + [FIXTURE / "project/tests/test_public.py"]
+    ] + [fixture(fixture_name).root / "project/tests/test_public.py"]
     content = {
         str(path.relative_to(FIXTURE.parents[1])): sha256(path) for path in files
     }
@@ -67,18 +71,19 @@ def git(repository: Path, *arguments: str) -> str:
     return result.stdout.strip()
 
 
-def setup(destination: Path) -> dict:
+def setup(destination: Path, fixture_name="csv-summary-v1") -> dict:
     if sys.version_info[:2] != (3, 12):
         raise ValueError("fixture setup requires Python 3.12")
+    selected = fixture(fixture_name)
     destination = destination.resolve()
     destination.mkdir(parents=False, exist_ok=False)
     repository = destination / "repository"
     shutil.copytree(
-        FIXTURE / "project",
+        selected.root / "project",
         repository,
         ignore=shutil.ignore_patterns("__pycache__", "*.pyc"),
     )
-    shutil.copyfile(FIXTURE / "task.txt", repository / "TASK.md")
+    shutil.copyfile(selected.root / "task.txt", repository / "TASK.md")
     (repository / ".gitignore").write_text("__pycache__/\n*.pyc\n", encoding="utf-8")
     files = {
         str(path.relative_to(repository)): sha256(path)
@@ -87,16 +92,16 @@ def setup(destination: Path) -> dict:
     }
     git(repository, "init", "--quiet", "--initial-branch=main", "--object-format=sha1")
     git(repository, "add", ".")
-    git(repository, "commit", "--quiet", "-m", "csv-summary-v1 baseline")
+    git(repository, "commit", "--quiet", "-m", fixture_name + " baseline")
     metadata = {
         "schema_version": 1,
-        "fixture": "csv-summary-v1",
+        "fixture": fixture_name,
         "repository": str(repository),
         "commit": git(repository, "rev-parse", "HEAD"),
         "tree": git(repository, "rev-parse", "HEAD^{tree}"),
         "files": files,
-        "task_sha256": sha256(FIXTURE / "task.txt"),
-        "evaluator_sha256": evaluator_fingerprint(),
+        "task_sha256": sha256(selected.root / "task.txt"),
+        "evaluator_sha256": evaluator_fingerprint(fixture_name),
         "python": {
             "path": str(Path(sys.executable).resolve()),
             "version": sys.version,
@@ -112,5 +117,6 @@ def setup(destination: Path) -> dict:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("destination", type=Path)
+    parser.add_argument("--fixture", choices=FIXTURES, default="csv-summary-v1")
     args = parser.parse_args()
-    print(json.dumps(setup(args.destination), indent=2))
+    print(json.dumps(setup(args.destination, args.fixture), indent=2))

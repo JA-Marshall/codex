@@ -1,0 +1,5 @@
+Fix the dependency-ordering API and CLI, preserving their entry points. Research the repository, produce a concrete implementation plan and wait for explicit human approval before making changes. Add focused regression tests.
+
+Contract: order_tasks(graph: dict[str, list[str]]) -> list[str] returns every task exactly once, with each dependency before its dependent. At each step choose the lexicographically smallest task among all currently available tasks, using Python string ordering. Graph keys are nonempty strings; values are lists of nonempty string keys present in the graph. Duplicate dependencies count once. Empty graph returns []. Reject invalid graph shape, unknown dependencies and any cycle (including disconnected cycles) with ValueError. Do not mutate the input graph.
+
+The CLI takes one UTF-8 JSON file containing the graph, prints the ordered list as JSON followed by exactly one newline, and exits 2 with empty stdout for invalid input or usage. Use Python 3.12 standard library only. Keep the implementation small and verify API and CLI with python3.12 -m unittest discover -s tests -v.
