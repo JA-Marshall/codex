@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "binary": "/home/james/.cache/codex-lab-binaries/parallel-v1-20260907/codex-lab",
+  "binary_sha256": "9a75fbe6671079eb1eac3436934a5a4a847e24f331cb02b490015b5ef27e7529",
+  "runs": [
+    {
+      "run_id": "verifier-v1-execution",
+      "prepared": "/home/james/.cache/codex-lab-verifier-pilot/20260907T153300Z/runs/verifier-v1-prepared/evidence/prepared.json",
+      "prepared_sha256": "8683478d5e11c41a7afec4f23fa02b6c19966adac7b7359bc0a6a4d520386190"
+    },
+    {
+      "run_id": "verifier-single-v2-execution",
+      "prepared": "/home/james/.cache/codex-lab-verifier-pilot/20260907T153300Z/runs/verifier-single-v2-prepared/evidence/prepared.json",
+      "prepared_sha256": "382ec0f18019fa2490669b6c0e7c24b90a970bc38d5fcbec06f30d170d4888d4"
+    }
+  ]
+}
