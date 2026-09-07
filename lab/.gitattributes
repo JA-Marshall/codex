@@ -14,3 +14,4 @@ instructions/** text eol=lf
 workflows/** text eol=lf
 queue-matrix/** text eol=lf
 queue-rerun-v2/** text eol=lf
+queue-repair-v1/** text eol=lf
