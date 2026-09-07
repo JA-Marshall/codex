@@ -9,7 +9,7 @@
 - User requirement: implementation starts only after explicit human approval; material changes require a plan amendment.
 - Current test policy: focused tests by default. The full workspace suite requires an explicit user request for the current change, including for merges and shared/core/protocol changes. Older authorization and roadmap wording do not override this newer instruction; see root `AGENTS.md`.
 - Active follow-up: complete. Correction `3701f17` passed 106 focused tests and live approved-plan execution. The user's “Yes” approved the unchanged generated plan; replacement run `muse-interface-v2-approved-replacement` completed with exit 0. No live host or approval is pending. Preserve the original interrupted run and the successful replacement as separate records.
-- Next implementation proposal: N01–N04 in `next-steps-plan.json`, with concise guide `NEXT_STEPS.md` and generated `NEXT_STEPS_PLAN.md`. All four steps are pending implementation approval; the current request authorizes planning and merging completed work, not automatic approval of future experimental plans.
+- Active implementation: N01–N04 in `next-steps-plan.json` are explicitly approved by “Ok now execute on the plan made”; exact digest and scope are in `next-steps-approval.json`. Working branch `lab/prepared-review-v1`. N01 in progress; N02–N04 pending implementation. Future live experimental plans still require separate approval.
 - Checkout: `C:/Users/james/Desktop/Code/trees/codex-lab`.
 - Upstream: `https://github.com/openai/codex.git`, remote `upstream`, shallow clone of `main`.
 - Inspected commit: `112be0bd74ce327788613f4f8f92e8b7c92447c7` (2026-09-07T01:40:45Z).
@@ -228,3 +228,9 @@ The approved foundation and restricted live host are complete with the recorded 
 - User explicitly requested a rule against routinely running all 17,000-plus tests. Updated root `AGENTS.md`: start with affected tests/modules, broaden only for a concrete reason, and run the full workspace suite only if the user explicitly requests it for the current change. Merges, shared/core/protocol edits and historical full-suite approval are not exceptions. Do not emulate a full run by enumerating all crates or routinely ask for expanded scope.
 - This newer user instruction supersedes earlier full-suite clauses in the retained canonical plans and historical ledger. Those records remain unchanged; `NEXT_STEPS.md` points to the current policy. N01–N04 still require implementation approval.
 - This update changes instructions/documentation only. Validation is diff review and link checks; no Rust tests, builds, formatter or live model calls are needed.
+
+## Approved N01–N04 implementation — 2026-09-07
+
+- User explicitly approved the retained plan; recorded approval before implementation. Starting commit `1b83643b4c3e438b345753dc9531d50bf55c16c3`, branch `lab/prepared-review-v1`. Both canonical and file-byte plan digests remain unchanged.
+- Rechecked the actual driver/reviewer, single-writer storage, runtime preflight and mirror synchronization boundaries. Keep all new production code in private lab-runtime modules; no upstream core/provider/TUI/session/sandbox changes. Use the scoped tests required by the newer policy, not the old full-suite clause.
+- Implement in order: sealed data checkpoint (N01), independent-process delayed review (N02), fixture/evaluator (N03), comparison and exact-approved live pilot (N04). Persist checkpoints and results through reviewable commits; the separate live human gate remains mandatory.
