@@ -5,6 +5,7 @@
 - Phase: **approved milestone complete**. F01–F06 foundation and G01–G06 restricted live integration are implemented and verified with the documented upstream/environment exceptions. The three implementation checkpoints are listed in the publication follow-up below.
 - Implementation authorization: see `APPROVAL.json` for foundation and `live-integration-approval.json` for the separately approved integration scope and immutable reviewed digests.
 - Working branch: `lab/foundation-v1`.
+- Provider setup: direct `muse-spark-1.3-contributor` routing and authenticated metadata access confirmed; dedicated credential stored locally. Inference/tool compatibility and the exact runtime capability catalog remain pending. See the account-setup follow-up below.
 - User requirement: implementation starts only after explicit human approval; material changes require a plan amendment.
 - Checkout: `C:/Users/james/Desktop/Code/trees/codex-lab`.
 - Upstream: `https://github.com/openai/codex.git`, remote `upstream`, shallow clone of `main`.
@@ -156,3 +157,13 @@ The approved foundation and restricted live host are complete with the recorded 
 - Created and verified the GitHub fork `https://github.com/JA-Marshall/codex`, whose parent and source are `openai/codex`. Added it as `origin`; `upstream` remains `https://github.com/openai/codex.git`.
 - Publication target: `origin/lab/foundation-v1`. Implementation checkpoints: `c53d2da` (domain foundation), `431693d` (tool admission seam), and `f9d2a83` (restricted runtime and handoff). This additional ledger commit records publication authorization and destination.
 - This follow-up changes documentation and Git hosting only. Existing code validation results still apply; no live model request or further implementation is included. Verify publication by comparing `git rev-parse HEAD` with `git ls-remote origin refs/heads/lab/foundation-v1`.
+
+## Meta account setup — 2026-09-07
+
+- The user registered the Meta developer account and explicitly approved creating a dedicated `codex-lab` API key and storing it locally, with Contributor required. Created the key and verified it appears in the account's key list. No credential value, authentication code, account identifier or credential-bearing header belongs in this repository.
+- Stored the credential outside the repository in the prepared Ubuntu WSL environment with owner-only file/directory permissions. Only its `MODEL_API_KEY` environment-variable reference enters provider configuration. The local `C:/Users/james/.codex-lab/MUSE-SETUP.md` note records private paths and the next integration step.
+- Meta's dashboard Codex guide and authenticated model documentation establish direct `muse-spark-1.3-contributor`, `https://api.meta.ai/v1`, Responses transport, high reasoning, automatic reasoning summaries, 1,048,576-token context and a recommended 900,000-token compaction threshold. Contributor is selected by model ID; API keys are not tier-scoped.
+- Read-only credential check: `GET /v1/models/muse-spark-1.3-contributor` succeeded and returned the exact requested ID, `object = "model"`, `owned_by = "meta"`, and `created = 0`. Do not interpret this as a serving revision, verified inference entitlement, or a completed inference test.
+- Prepared a dedicated local Contributor configuration. It still requires an exact capability catalog; missing catalog data must fail closed. Did not fabricate Muse tool metadata, alter the normal Codex home, run an inference/task, approve a generated plan, or change Codex core.
+- Updated provider/setup research to replace the now-resolved routing placeholders. Meta's guide includes `model_supports_reasoning_summaries`, absent from this checkout's schema; omitted it and documented that support must be represented in the exact catalog.
+- TOML/schema validation, pinned Contributor/provider checks, credential permissions, authenticated model metadata, and Git diff review passed. Both approved plan digests are unchanged. Production code and prior test results are unchanged; no Rust test rerun is needed for this configuration/documentation follow-up. Publish these non-secret updates to the already-authorized `origin/lab/foundation-v1` branch; keep local credential/setup files outside Git.

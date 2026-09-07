@@ -1,10 +1,12 @@
-# Candidate direct Meta API configuration, not a tested working preset.
-# Confirm your account's Contributor identifier first: the public cookbook
-# documents the standard model, not the direct Contributor tier identifier.
-# The Vercel Contributor slug is not assumed to be a direct Meta API slug.
-model = "<verified-direct-meta-contributor-model-id>"
+# Direct Contributor routing verified against Meta's portal and model API.
+# End-to-end lab compatibility still requires a verified exact model catalog.
+model = "muse-spark-1.3-contributor"
 model_provider = "muse-lab"
 model_catalog_json = "<absolute-path-to-verified-exact-model-catalog.json>"
+model_reasoning_effort = "high"
+model_reasoning_summary = "auto"
+model_context_window = 1048576
+model_auto_compact_token_limit = 900000
 
 [model_providers.muse-lab]
 name = "Muse lab provider"
@@ -14,6 +16,8 @@ wire_api = "responses"
 requires_openai_auth = false
 supports_websockets = false
 
-# Add verified reasoning/context/output settings to the exact catalog and pin
-# them for the experiment batch. Do not fill these from Codex's unknown-model
-# fallback. Keep API keys in the environment, never in a run configuration.
+# Context/reasoning/compaction settings follow Meta's Codex setup guide.
+# This upstream revision represents reasoning-summary support in the model
+# catalog; it rejects the old model_supports_reasoning_summaries config key.
+# Pin the remaining tool/output metadata after contract verification. Do not
+# use unknown-model fallback. Keep API keys in the environment, never here.

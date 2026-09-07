@@ -206,27 +206,29 @@ Do not serialize API keys, auth files, arbitrary environment dumps, secret heade
 
 ## Muse feasibility
 
-Target clarified on 2026-09-07: the user wants the latest Muse release on the data-sharing tier. This identifies **Meta Muse Spark 1.3 Contributor** as the current target. Meta announced [Muse Spark 1.3 on September 2](https://research.meta.ai/blog/introducing-muse-spark-1-3). Vercel's [Contributor announcement](https://vercel.com/changelog/muse-spark-1-3-now-available-on-ai-gateway) lists `meta/muse-spark-1.3-contributor` and explains that Meta uses submitted inputs and outputs for training. This is tier selection, not an instruction to collect unrelated files or account data. The user has not selected a gateway or supplied API credentials.
+Target clarified on 2026-09-07: the user wants the latest Muse release on the data-sharing tier. This identifies **Meta Muse Spark 1.3 Contributor** as the current target. Meta announced [Muse Spark 1.3 on September 2](https://research.meta.ai/blog/introducing-muse-spark-1-3). Vercel's [Contributor announcement](https://vercel.com/changelog/muse-spark-1-3-now-available-on-ai-gateway) lists its gateway identifier `meta/muse-spark-1.3-contributor` and explains that Meta uses submitted inputs and outputs for training. This is tier selection, not an instruction to collect unrelated files or account data. The account-setup follow-up below establishes direct Meta routing and local credentials without a gateway.
 
 Prefer the direct Meta API for feasibility testing. The [Meta Model API cookbook](https://github.com/meta-models/meta-model-cookbook/blob/main/01_api_fundamentals/README.md) documents `https://api.meta.ai/v1`, `MODEL_API_KEY`, the standard model ID `muse-spark-1.3`, and both Responses and Chat Completions. Its [reasoning recipe](https://github.com/meta-models/meta-model-cookbook/blob/main/01_api_fundamentals/06_reasoning_tokens.ipynb) demonstrates Responses with `store=False` and encrypted reasoning replay; its [search recipe](https://github.com/meta-models/meta-model-cookbook/blob/main/01_api_fundamentals/10_search_grounding.ipynb) demonstrates Responses streaming. This establishes documented feasibility, not tested compatibility. An external protocol adapter is not presently justified.
 
-Remaining contract checks: confirm the direct API's Contributor identifier and access, Responses function-call/result pairing and terminal SSE events, structured output, accepted request fields/custom tool formats, reasoning settings, usage accounting, and context limits. The accessible cookbook's function-tool example uses Chat Completions. Meta's [Responses guide](https://dev.meta.ai/docs/features/responses) and [model catalog](https://dev.meta.ai/docs/getting-started/models) returned login walls during this research; Contributor Responses parity was not independently verified. No live/model request or account setting change was made.
+Account-setup follow-up, 2026-09-07: Meta's authenticated dashboard Codex guide and [model documentation](https://dev.meta.ai/docs/models/) establish `muse-spark-1.3-contributor`, Responses transport and a 1,048,576-token context window. With explicit user approval, a dedicated key was created and stored locally outside the repository. An authenticated `GET /v1/models/muse-spark-1.3-contributor` returned that exact ID. It reported `created = 0`, which supplies no serving-version evidence. The key is general API access; the model identifier selects Contributor. No inference was performed. See [provider notes](providers/README.md) for the verified configuration and the upstream setting that Meta's example no longer matches.
+
+Remaining contract checks: inference entitlement, Responses function-call/result pairing and terminal SSE events, structured output, accepted request fields/custom tool formats, reasoning replay, usage accounting, output limits and context-pressure behavior. The initial research encountered login walls; subsequent authenticated documentation resolves direct routing and documented context size, but does not establish tested Contributor Responses parity.
 
 Resolve the latest model at experiment setup, then freeze its explicit identifier, tier, endpoint, reported version and capability metadata for the run batch. An explicit release name still does not prove an immutable weights snapshot; record any provider-side version uncertainty. Keep provider and reasoning settings outside workflow/renderer configuration, and verify reasoning settings rather than inherit an unspecified provider default.
 
 At this commit `model-provider-info/src/lib.rs:65` defines only `WireApi::Responses`; line 85 explicitly rejects `wire_api = "chat"`. A Chat Completions-compatible endpoint alone will not work. Configuration-only integration is feasible if Muse implements the Responses/tool-call/streaming contract that this checkout actually uses. The SSE parser requires a terminal `response.completed` event. Structured output, function/custom tools, text-role semantics, usage reporting, retries, and compaction behavior need contract verification.
 
-Conditional configuration shape (placeholders, not a tested Muse setup):
+Direct configuration shape (catalog still requires contract verification):
 
 ```toml
-model = "<exact-muse-model-id>"
+model = "muse-spark-1.3-contributor"
 model_provider = "muse-lab"
 model_catalog_json = "<absolute-path-to-verified-catalog.json>"
 
 [model_providers.muse-lab]
 name = "Muse lab provider"
-base_url = "<documented-responses-base-url>"
-env_key = "MUSE_API_KEY"
+base_url = "https://api.meta.ai/v1"
+env_key = "MODEL_API_KEY"
 wire_api = "responses"
 requires_openai_auth = false
 supports_websockets = false
@@ -234,7 +236,7 @@ supports_websockets = false
 
 Do not name the custom provider `OpenAI`: this revision checks that name in provider capability selection. Ordinary custom providers use local rather than remote compaction. Unknown model slugs can fall back to GPT-oriented metadata including a 272,000-token context assumption; supply and verify an exact static catalog entry rather than trust that fallback. Also pin or disable memory/approval-review auxiliary models so a nominal fixed-model run does not quietly use others.
 
-If the remaining contract checks expose a protocol mismatch, evaluate an external, independently versioned Responses adapter. Record its translations and version as an experimental control. No Muse-specific changes to workflow code or Codex core are proposed. A real smoke test awaits confirmed Contributor access and identifier, credentials through existing auth, and an approved integration milestone.
+If the remaining contract checks expose a protocol mismatch, evaluate an external, independently versioned Responses adapter. Record its translations and version as an experimental control. No Muse-specific changes to workflow code or Codex core are proposed. Inference smoke testing and a verified catalog remain separate from account setup; future task plans still require their own exact human approval.
 
 Official configuration reference consulted: [Advanced Configuration](https://learn.chatgpt.com/docs/config-file/config-advanced). Source at the pinned commit remains authoritative for this implementation plan.
 
