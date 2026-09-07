@@ -1,18 +1,25 @@
 **Implementation plan: useful unattended workflow experiments**
 
-Prepared 7 September 2026. Status: the integration stage is complete; the remaining
-stages below are proposed implementation. The installed release and its focused
+Prepared 7 September 2026. Updated implementation status: integration is complete;
+the current increment adds a 20-task Python/Rust library, repository-task adapters,
+scope controls, and two generic workflows with zero or one repair. Final shared
+WSL sandbox calibration passed all 80 expected variant outcomes with zero model calls.
+Final release formatting/build, bundle identity, and the 200-trial offline preparation remain pending.
+The actual inventory, interfaces, evidence limits, and pending artifact locations
+are recorded in [TASK_LIBRARY.md](TASK_LIBRARY.md). The earlier installed release and its focused
 checks are recorded in
 [unattended-integration-2026-09-07.json](unattended-integration-2026-09-07.json).
-No live study has started. Next implement the scope and context controls.
+No live study has started. The larger handover/context study described below remains
+proposed work; it is not the two-workflow task-library preparation.
 
 The objective is to identify which working methods finish repository tasks
 correctly, how much additional checking and repair costs, and how reliably those
 methods work without human intervention. A plan is one input to that process.
 
 Revised after the user's scope-creep clarification: keep separate, bounded agents
-as a design requirement. The first study now compares handover information and
-repair, replacing the earlier tests-first/implementation-first matrix. A single
+as a design requirement. The broader proposed study compares handover information and
+repair, replacing the earlier tests-first/implementation-first matrix. The current
+increment holds generic role instructions fixed and varies only zero versus one repair. A single
 continuous agent is outside this study. Give workers enough information to do
 their assigned job while keeping their authority narrow and independently defined.
 
@@ -51,15 +58,17 @@ and source hashes. The Windows launcher froze 200 trials with concurrency 16;
 all 71 input pins matched and the existing service reported ready. This made no
 live model calls and started no trial hosts.
 
-**Next: scope and context controls**
+**Scope and context controls: current increment and remaining work**
 
-Implement scope boundaries before testing richer handovers. The current runtime
-uses read-only access for research/planning and workspace-wide write access for
-both implementation and verification. Separate threads and approved plan hashes
-do not enforce the plan's individual affected-file list or its semantic scope.
-Add a trusted task contract containing the fixed goal, acceptance criteria,
-permitted write paths and explicit exclusions. Bind its digest into the campaign
-policy and every phase's evidence. A generated plan or handover cannot widen it.
+Scope boundaries precede richer handovers. The repository-task path now supplies a
+fixed task contract and campaign-bound write scope. Its runtime implementation gives
+executors declared source/test write roots plus scratch, and verifiers read-only
+candidates plus scratch; it also denies access to archived private task assets and
+audits candidate changes. The affected runtime crate passed 104 tests and four subsequent
+focused context-bound regressions; final release formatting/build remains pending.
+Separate threads and approved plan hashes alone do not establish semantic scope.
+A generated plan or handover cannot widen the contract. The remaining context-budget
+and retrieval work below is still proposed and must not be inferred from these scope changes.
 
 Research/planning may inspect the repository. Implementation receives write access
 only to declared task paths plus separate build/test scratch directories; enforce
@@ -95,6 +104,18 @@ worker's write permissions. Calibration should demonstrate that relevant failure
 beyond the initial output excerpt can still be retrieved.
 
 **2. Introduce a versioned task interface and a varied task library**
+
+Current implementation: [the registry](experiments/task_registry.py),
+[independent evaluator](experiments/evaluate_task.py),
+[calibration CLI](experiments/task_library.py), and campaign adapter cover 20
+synthetic repository tasks: 12 Python, eight Rust, five per family, with 149 private
+cases and two mutants per task. All are in the study split. Final shared calibration
+passed: 20 references accepted, 20 starters and 40 mutants rejected, zero model calls.
+Evidence paths are in [TASK_LIBRARY.md](TASK_LIBRARY.md); earlier language-local
+self-checks are not the final acceptance record.
+Four development tasks and eight confirmation tasks remain unimplemented. The
+selection guidance below describes the broader intended collection, not extra assets
+already present. See [TASK_LIBRARY.md](TASK_LIBRARY.md) for every actual assignment.
 
 Replace the hard-coded choice between three function fixtures and the queue
 fixture with an explicit task registry. Preserve adapters for those existing
@@ -180,6 +201,12 @@ regressions, protect private grading material and leave candidate snapshots inta
 
 **3. Define understandable workflow conditions and measure their execution**
 
+Current implementation: [repository-v1.toml](workflows/repository-v1.toml) defines
+`repository-v1` and `repository-repair-v1`, sharing generic repository roles and
+Markdown plans with maximum repairs 0 and 1 respectively. The four handover
+conditions below are a future matrix; richer handover payloads and their comparative
+measurement are not implemented by the current task-library increment.
+
 Add generic, versioned research/planner/executor/verifier instructions, removing
 queue-specific assumptions. Keep the same separate phase threads, role instructions,
 scope contract, tools, renderer and model settings in all four initial conditions.
@@ -221,6 +248,17 @@ read-only verification, and repair under the unchanged contract. Both repair lim
 and the queue's no-prompt behavior must hold with stdin closed.
 
 **4. Extend the queue into a study runner**
+
+Current increment extends the existing freezer with task-library/split, pinned
+toolchain, and `--task-just` selection. The just executable is frozen in the archive's
+`task-tools/` directory; only that helper directory becomes readable to workers.
+The Windows launcher `C:/Users/james/.codex-lab/queue-varied-tasks.ps1` defaults to
+20 tasks × two generic workflows × five repetitions = 200 trials, `jobs=8`, `max_amendments=0`, and uses
+`-PrepareOnly` for offline freezing or `-Execute <Linuxcampaign.json>` for an existing
+freeze. Final task calibration passed; its evidence paths and the still-pending bundle/preparation are recorded
+in [TASK_LIBRARY.md](TASK_LIBRARY.md). No live launch is included. The following randomized 240-trial
+handover study, additional deadline/reporting controls, and study-specific interface
+remain a roadmap, not claims about this preparation.
 
 Add a study manifest above the existing workflow catalog. It selects a task suite,
 named conditions, repetitions, a scheduling seed, concurrency, runtime limits and
@@ -320,14 +358,16 @@ links resolve and a reader can trace any aggregate failure back to its trial.
 | Stage | Work delivered | Evidence required before advancing |
 | --- | --- | --- |
 | Integration — complete | New versioned unattended host with latest fixes and limited provider profile | 36 selected Rust tests, 27 unique Python tests and a 200-trial offline package check passed; see the integration receipt. |
-| Scope and context controls | Fixed task authority, bounded executor writes, read-only verification, separate size policies and log retrieval | Real-sandbox boundaries and long-evidence retrieval tests. |
-| Task interface | Legacy adapters plus Python/Rust repository adapters | Trusted solutions pass; deliberately wrong solutions fail; sandbox and snapshot checks pass. |
-| Conditions | Four handover/repair workflows with separate agents | Real-host mocked context, scope and repair coverage. |
-| Study runner | Frozen 240-trial expansion, bounded scheduling and progress | Offline queue, cancellation, deadline and duplicate-admission coverage. |
+| Scope controls — runtime tested, release build pending | Fixed task authority, bounded executor writes, read-only verification and candidate audits | 104 affected-crate tests and four subsequent context-bound regressions passed; richer context policies and long-evidence retrieval remain future work. |
+| Task interface — calibrated | 20 Python/Rust synthetic tasks, 149 private cases, legacy selection retained | All 80 expected starter/reference/mutant outcomes matched in the shared sandbox, with zero model calls. |
+| Initial conditions — implemented | Two generic repository workflows, maximum repairs 0/1 | Final runtime validation under the same task authority. |
+| Offline preparation — pending | 20 tasks × two workflows × five repetitions = 200 entries | Frozen inputs and prepare-only receipt; no model calls or live launch. |
+| Handover conditions — proposed | Four handover/repair workflows with separate agents | Real-host mocked context, scope and repair coverage. |
+| Broader study runner — proposed | Frozen randomized 240-trial expansion, bounded scheduling and progress | Offline queue, cancellation, deadline and duplicate-admission coverage. |
 | Report | Correctness, reliability, usage and paired comparisons | Synthetic-result tests and verified local evidence links. |
-| Calibration | Four development tasks across four conditions, one attempt each: 16 live trials | End-to-end evidence is sound; grader/protocol defects are resolved in a newly versioned release if found. |
-| Main study | Twenty fresh tasks across four conditions and three attempts: 240 live trials | Frozen inputs, calibrated graders, validated bundle and a recorded usage estimate. |
-| Confirmation | Eight reserved tasks, baseline versus one selected workflow, three attempts: 48 trials | Candidate and acceptance rule fixed before reading confirmation outcomes. |
+| Live calibration — proposed | Four development tasks across four conditions, one attempt each: 16 live trials; tasks not yet created | End-to-end evidence is sound; grader/protocol defects are resolved in a newly versioned release if found. |
+| Broader main study — proposed | Twenty tasks across four handover conditions and three attempts: 240 live trials | Frozen inputs, calibrated graders, validated bundle and a recorded usage estimate. |
+| Confirmation — proposed | Eight reserved tasks, baseline versus one selected workflow, three attempts: 48 trials; tasks not yet created | Candidate and acceptance rule fixed before reading confirmation outcomes. |
 
 Implement the task packs alongside the runner/report stages locally. Split code
 into reviewable changes, normally below the repository's 800-line guidance and

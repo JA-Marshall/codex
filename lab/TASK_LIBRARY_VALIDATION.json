@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-07",
+  "status": "validated_pending_release_build",
+  "task_library": {
+    "tasks": 20,
+    "languages": {"python": 12, "rust": 8},
+    "families": {"greenfield": 5, "extension": 5, "bug_fix": 5, "maintenance": 5},
+    "private_cases": 149,
+    "calibration_variants": 80,
+    "reference_solutions_passed": 20,
+    "starters_rejected": 20,
+    "mutants_rejected": 40,
+    "calibration_artifacts": [
+      "/home/james/.cache/codex-lab-task-calibration/python-final-v1-20260907/calibration.json",
+      "/home/james/.cache/codex-lab-task-calibration/rust-final-v1-20260907/calibration.json"
+    ]
+  },
+  "python_tests": {
+    "unique_selected_tests_passed": 37,
+    "modules": {
+      "test_repository_tasks": 11,
+      "test_scope_observation": 1,
+      "test_terminal_run": 5,
+      "test_campaign_inputs": 2,
+      "test_campaign": 4,
+      "test_campaign_service": 4,
+      "test_queue": 5,
+      "test_task_helpers": 5
+    },
+    "real_linux_sandbox": true,
+    "archived_just_with_pinned_rust_recipe_passed": true
+  },
+  "runtime_tests": {
+    "affected_crate_tests_passed": 104,
+    "final_context_bound_regressions_passed": 4,
+    "full_workspace_suite": false,
+    "existing_timeout_retry": "prepared_completed_cli_pair_compares_only_renderer passed on its retry",
+    "logs": [
+      "/tmp/lab-runtime-final-tests.log",
+      "/tmp/lab-scoped-final-tests.log",
+      "/tmp/lab-scoped-reviewed-tests.log",
+      "/tmp/lab-scoped-context-tests.log"
+    ],
+    "mock_repair_artifact": "/tmp/lab-scoped-mock-export-reviewed",
+    "independent_scope_observer_passed": true
+  },
+  "manual_context_review": {
+    "per_fragment_byte_limit": 8192,
+    "xml_escaping_and_repeated_paths_accounted_for": true,
+    "typical_scope_instruction_bytes": 359,
+    "typical_permission_profile_bytes": 1398,
+    "conservative_environment_bytes": 3091,
+    "conservative_permission_instruction_bytes": 1295,
+    "exact_provider_token_count_measured": false,
+    "upstream_formatter_changes_require_bound_review": true
+  },
+  "formatting": {"fix": "passed", "fmt": "passed", "fmt_check": "passed", "tests_rerun_after_format": false},
+  "live_model_calls": 0,
+  "old_campaigns_modified": false,
+  "limitations": [
+    "Linux and Python 3.12 execution; pinned Rust 1.95.0 for Rust tasks",
+    "Small synthetic CLI projects; size labels are relative scope, not measured difficulty",
+    "All current tasks are study tasks; development and confirmation packs remain future work",
+    "Generic zero/one repair comparison only; richer handover matrix remains future work",
+    "No live Muse smoke run or comparative result is claimed"
+  ]
+}

@@ -454,5 +454,6 @@
   },
   "status": "initial-self-calibration-superseded-by-contract-review",
   "current_private_case_total": 82,
-  "pending_shared_calibration": "Two repeated-ID invalid-amount regressions and reference validation were added after the recorded 80-case self-check. The shared evaluator will recalibrate the current assets."
+  "superseding_shared_calibration": "/home/james/.cache/codex-lab-task-calibration/python-final-v1-20260907/calibration.json",
+  "shared_calibration_outcomes": "All 48 variants matched expectations after the two new repeated-ID regressions and contract/grader corrections."
 }
