@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "run": "/home/james/.cache/codex-lab-verifier-pilot/20260907T153300Z/runs/verifier-single-v2-execution",
+  "workflow_state": "completed",
+  "terminal_change": {
+    "type": "completed"
+  },
+  "all_started_phases_shutdown": true,
+  "repository": "/home/james/.cache/codex-lab-verifier-pilot/20260907T153300Z/tasks/verifier-single-v2/repository",
+  "first_plan_human_approval": true,
+  "phase_turns": 2,
+  "planner_phases": 0,
+  "tool_admissions": 29,
+  "usage": {
+    "input_tokens": 209762,
+    "output_tokens": 14747,
+    "cached_input_tokens": 174902
+  },
+  "workflow_terminal_elapsed_ms": 151713,
+  "human_plan_edits": 0,
+  "plan_amendments": 0,
+  "plan_deviations": null,
+  "source_artifact_sha256": {
+    "events.jsonl": "aa2d9f0408ad27e81d33b00283738098dbb3a40be77af8b5ebc519d66d5291eb",
+    "runtime-events.jsonl": "e725d2801b9a0f16b108992e797478e8df00d43a4ab66e2e3284466a127f5ed1",
+    "evidence/input-01.json": "167b9b210848964aa839697e85f7827ca8f3efdf1e1c47b3ebfc7dafbf906205",
+    "evidence/phase-01.json": "c6d9234c81d93e109ad886120fbb746bf9953a8ff87f0b32f37ac7d340dd1274",
+    "evidence/input-02.json": "62a57360eaf707d4fb040afb8d5b2207ca7d66dcd44c55fb708ef6b429928e8b",
+    "evidence/phase-02.json": "b1cf319a0bf66fede65cb4212d919a351e77a66f2801562287cdf9aaa7a4dee6",
+    "config/run-spec.json": "3554fb6b10785d6fa7b7f9afe8ed2d4a1a80f2137acbeb46951d93ad1ef5e1ea"
+  },
+  "authority_restored": false,
+  "git": {
+    "base_commit": "8e166376f2a0a057c828d33d7fee32170ab136b4",
+    "final_commit": "8e166376f2a0a057c828d33d7fee32170ab136b4",
+    "files_changed": 24,
+    "changed_files": [
+      ".tmp_cli_verify/bad.json",
+      ".tmp_cli_verify/cycle.json",
+      ".tmp_cli_verify/e2.txt",
+      ".tmp_cli_verify/e3.txt",
+      ".tmp_cli_verify/e4.txt",
+      ".tmp_cli_verify/e5.txt",
+      ".tmp_cli_verify/e6.txt",
+      ".tmp_cli_verify/e7.txt",
+      ".tmp_cli_verify/e8.txt",
+      ".tmp_cli_verify/err.txt",
+      ".tmp_cli_verify/nondict.json",
+      ".tmp_cli_verify/o2.txt",
+      ".tmp_cli_verify/o3.txt",
+      ".tmp_cli_verify/o4.txt",
+      ".tmp_cli_verify/o5.txt",
+      ".tmp_cli_verify/o6.txt",
+      ".tmp_cli_verify/o7.txt",
+      ".tmp_cli_verify/o8.txt",
+      ".tmp_cli_verify/out.txt",
+      ".tmp_cli_verify/unknown.json",
+      ".tmp_cli_verify/valid.json",
+      "cli.py",
+      "dependency_order.py",
+      "tests/test_regression.py"
+    ],
+    "diff_bytes": 10773,
+    "diff_sha256": "f97894240ecd5e36f63853911976f769986d6f95e60fe55d64bb10e30a73c5a9"
+  }
+}
