@@ -1,0 +1,170 @@
+"""Sandboxed observation worker: inputs and candidate only, no expected answers."""
+
+from copy import deepcopy
+import json
+import multiprocessing
+import os
+from pathlib import Path
+import subprocess
+import sys
+
+
+def race_child(repository, database, worker, barrier, output):
+    sys.path.insert(0, str(repository))
+    from durable_queue import Queue
+
+    try:
+        queue = Queue(database)
+        barrier.wait(timeout=5)
+        result = queue.claim(worker, 0, 10)
+        output.put({"pid": os.getpid(), "claim": result})
+    except Exception as error:
+        output.put({"pid": os.getpid(), "error": type(error).__name__})
+
+
+def race(repository, scratch, count):
+    from durable_queue import Queue
+
+    database = scratch / "race.db"
+    queue = Queue(database)
+    queue.submit([{"id": chr(97 + i)} for i in range(count)])
+    context = multiprocessing.get_context("fork")
+    barrier, output = context.Barrier(3), context.Queue()
+    children = [
+        context.Process(
+            target=race_child, args=(repository, database, f"w{i}", barrier, output)
+        )
+        for i in range(2)
+    ]
+    try:
+        for child in children:
+            child.start()
+        barrier.wait(timeout=5)
+        values = [output.get(timeout=5) for _ in children]
+        for child in children:
+            child.join(timeout=5)
+        claims = [v["claim"]["id"] for v in values if v.get("claim")]
+        return {
+            "claims": sorted(claims),
+            "unique": len(set(claims)) == len(claims),
+            "processes": len({v["pid"] for v in values}),
+            "errors": [v["error"] for v in values if "error" in v],
+            "exits": [c.exitcode for c in children],
+            "attempts": {r["id"]: r["attempts"] for r in queue.list()},
+        }
+    finally:
+        for child in children:
+            if child.is_alive():
+                child.terminate()
+            if child.pid:
+                child.join(timeout=5)
+        output.close()
+
+
+def cli(repository, scratch, request_bytes, variant=None):
+    request_path = scratch / "request.json"
+    request_path.write_bytes(request_bytes)
+    command = [
+        sys.executable,
+        "-B",
+        "-m",
+        "durable_queue",
+        "--db",
+        str(scratch if variant == "database" else scratch / "queue.db"),
+    ]
+    if variant != "usage":
+        command += [
+            "--request",
+            str(scratch / "absent.json" if variant == "missing_file" else request_path),
+        ]
+    if variant == "extra":
+        command += ["unexpected"]
+    result = subprocess.run(command, cwd=repository, capture_output=True, timeout=5)
+    if result.returncode == 2 and result.stdout == b"":
+        return {"error": "ValueError"}
+    if result.returncode != 0:
+        return {"error": "CLIExit", "exit_code": result.returncode}
+    try:
+        value = json.loads(result.stdout)
+    except (ValueError, UnicodeError):
+        return {"error": "CLIOutput"}
+    if result.stdout != (json.dumps(value, sort_keys=True) + "\n").encode():
+        return {"error": "CLIOutputBytes"}
+    return {"ok": value}
+
+
+def main():
+    repository, scratch, mode = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3]
+    sys.path.insert(0, str(repository))
+    request = json.load(sys.stdin)
+    if mode == "probe":
+        import socket
+
+        assert "MODEL_API_KEY" not in os.environ
+        for path, operation in [
+            (Path(request["private"]), "read"),
+            (repository / "forbidden-write", "write"),
+        ]:
+            try:
+                path.read_bytes() if operation == "read" else path.write_text(
+                    "forbidden"
+                )
+            except OSError:
+                pass
+            else:
+                raise RuntimeError("sandbox isolation failed")
+        try:
+            socket.create_connection(("1.1.1.1", 443), timeout=0.2).close()
+        except OSError:
+            pass
+        else:
+            raise RuntimeError("network available")
+        print(json.dumps("isolated"))
+        return
+    if mode == "race":
+        print(json.dumps(race(repository, scratch, request["jobs"]), sort_keys=True))
+        return
+    if mode == "cli_invalid":
+        from durable_queue import Queue
+
+        database = scratch / "queue.db"
+        Queue(database).submit([{"id": "keep"}])
+        result = cli(
+            repository, scratch, bytes(request["bytes"]), request.get("variant")
+        )
+        print(
+            json.dumps(
+                {"result": result, "preserved": Queue(database).get("keep")},
+                sort_keys=True,
+            )
+        )
+        return
+    from durable_queue import Queue
+
+    results = []
+    for step in request["steps"]:
+        args = deepcopy(step["args"])
+        before = json.dumps(args, sort_keys=True)
+        if mode == "cli":
+            results.append(
+                cli(
+                    repository,
+                    scratch,
+                    json.dumps(dict(op=step["op"], **args)).encode(),
+                )
+            )
+            continue
+        try:
+            # Reopen for every step: durable state must survive object lifetime.
+            value = getattr(Queue(scratch / "queue.db"), step["op"])(**args)
+            result = {"ok": value}
+        except Exception as error:
+            result = {"error": type(error).__name__}
+        if json.dumps(args, sort_keys=True) != before:
+            result = {"error": "InputMutated"}
+        results.append(result)
+    print(json.dumps(results, sort_keys=True))
+
+
+if __name__ == "__main__":
+    main()
