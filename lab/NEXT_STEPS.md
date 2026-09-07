@@ -68,6 +68,8 @@ Prepare one canonical plan with the fixed planner; derive two prepared condition
 
 ## Validation and handoff
 
+The user's newer test-scope rule in [AGENTS.md](../AGENTS.md) governs this plan: use focused tests, and run the full workspace suite only when explicitly requested for the current change. It supersedes V01's earlier reference to historical full-suite authorization; the canonical review artifact remains unchanged.
+
 The canonical plan passed the actual Rust `PlanRevision` validator and existing Markdown renderer through the offline `inspect` example. Its local review artifact is `/home/james/.cache/codex-lab-next-plan/next-steps-review-v1`; it has no approval or model/tool execution. This development roadmap is larger than the runtime's 8 KiB phase budget: implement/review the bounded stages, rather than injecting the whole roadmap into a task phase.
 
 For implementation, follow the plan's V01–V07 checks: focused `just test`, process/sandbox approval tests, fixture/evaluator tests, comparison mismatch tests, scoped lint/fix/format, then the task-approved live checks. Core changes require an amendment and full relevant regression coverage. No Rust changes are made by this planning document. The current merge's separate validation record belongs in `PROGRESS.md`.
