@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "run": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r1-baa-edited-execution",
+  "workflow_state": "completed",
+  "terminal_change": {
+    "type": "completed"
+  },
+  "all_started_phases_shutdown": true,
+  "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r1-baa/repository",
+  "first_plan_human_approval": true,
+  "phase_turns": 2,
+  "planner_phases": 0,
+  "tool_admissions": 47,
+  "usage": {
+    "input_tokens": 597265,
+    "output_tokens": 36051,
+    "cached_input_tokens": 535200
+  },
+  "workflow_terminal_elapsed_ms": 380925,
+  "human_plan_edits": 0,
+  "plan_amendments": 0,
+  "plan_deviations": null,
+  "source_artifact_sha256": {
+    "events.jsonl": "387112fbb10c51a36ce411e8a4b27880c854027752c8d0b930c4417dc9f27a78",
+    "runtime-events.jsonl": "c09d2921c4fc507c88d574c7cce22d12518e7132b049b315efaaaafea333baee",
+    "evidence/input-01.json": "a4ca8f6659e1e0b3582cf63c17a6af8dc6f52f35c89361e607a17d6887590cab",
+    "evidence/phase-01.json": "dbf46e957b3f7a7119268ab945f830ba76d1220aee6f9002e7bd40793051f468",
+    "evidence/input-02.json": "b046f0bab6c3b3e5a45baa63ea672693b9437abd34eb14ee8dc7df08849070bf",
+    "evidence/phase-02.json": "4dbf5b415c92d9c3073e4099a2f41e6e46c58d006d4a8cad9733c093c18d76c6",
+    "config/run-spec.json": "510cf37a07c4a42b4751d1d9a449a9b9476e7bfaed418a61f0cda28b01974da5"
+  },
+  "authority_restored": false,
+  "git": {
+    "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "files_changed": 24,
+    "changed_files": [
+      "durable_queue/__main__.py",
+      "durable_queue/queue.py",
+      "durable_queue/storage.py",
+      "tests/test_regress.py",
+      "tmpdlzo8zdi/a.json",
+      "tmpdlzo8zdi/arr.json",
+      "tmpdlzo8zdi/badop.json",
+      "tmpdlzo8zdi/c.json",
+      "tmpdlzo8zdi/cb.json",
+      "tmpdlzo8zdi/done.json",
+      "tmpdlzo8zdi/extra.json",
+      "tmpdlzo8zdi/fb.json",
+      "tmpdlzo8zdi/g.json",
+      "tmpdlzo8zdi/l.json",
+      "tmpdlzo8zdi/mal.json",
+      "tmpdlzo8zdi/miss.json",
+      "tmpdlzo8zdi/q.db",
+      "tmpdlzo8zdi/rec.json",
+      "tmpdlzo8zdi/sb.json",
+      "tmpdlzo8zdi/utf8.json",
+      "tmpdlzo8zdi/val.json",
+      "tmpe0b0ifnv/q.db",
+      "tmpe0b0ifnv/req.json",
+      "tmpy1issa8c/a.json"
+    ],
+    "diff_bytes": 49804,
+    "diff_sha256": "e1e85f4ce0c83f0f2484de40a8644dee13f8f49d9222f46c1f0167123f053621"
+  }
+}

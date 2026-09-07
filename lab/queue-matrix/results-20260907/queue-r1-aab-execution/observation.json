@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "run": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/runs/queue-r1-aab-execution",
+  "workflow_state": "completed",
+  "terminal_change": {
+    "type": "completed"
+  },
+  "all_started_phases_shutdown": true,
+  "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r1-aab/repository",
+  "first_plan_human_approval": true,
+  "phase_turns": 2,
+  "planner_phases": 0,
+  "tool_admissions": 62,
+  "usage": {
+    "input_tokens": 1656721,
+    "output_tokens": 50685,
+    "cached_input_tokens": 1572679
+  },
+  "workflow_terminal_elapsed_ms": 496058,
+  "human_plan_edits": 0,
+  "plan_amendments": 0,
+  "plan_deviations": null,
+  "source_artifact_sha256": {
+    "events.jsonl": "69bce0b1eb617b63f812087290a308c90cb77ce9860c4563a1c3b3dd70368eb1",
+    "runtime-events.jsonl": "66ca0d947d7fe0a1b282bd9918db602581dc171bd655b28a08942ba3c1afab48",
+    "evidence/input-01.json": "3b55477d0de36233e1ab79090a72eeebed3bbb389aa97087be7214aaa8877a55",
+    "evidence/phase-01.json": "2a5a1b3113ce3c2d6a7dcb75e21c23d79c183e3efc6c831eea82cf3d46bffa71",
+    "evidence/input-02.json": "e340f82cebc364e7f49f4af0b0e48859cdf6cef0378fe13bcc0e00eb78820cce",
+    "evidence/phase-02.json": "5138149e6ecd27ba8a09044f9b80a3b29f174452fb569156df93ed994374182e",
+    "config/run-spec.json": "28194df5a5e934f435709b12432db28cdb50475b5a40e0c463420e62110d41d4"
+  },
+  "authority_restored": false,
+  "git": {
+    "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "files_changed": 18,
+    "changed_files": [
+      ".tmp-cli/tmp.8N1tX0nRry/err.txt",
+      ".tmp-cli/tmp.8N1tX0nRry/out.txt",
+      ".tmp-cli/tmp.8N1tX0nRry/q.db",
+      ".tmp-cli/tmp.8N1tX0nRry/req.json",
+      ".tmp-cli/tmp.tvKEe16J13/err.txt",
+      ".tmp-cli/tmp.tvKEe16J13/out.txt",
+      ".tmp-cli/tmp.tvKEe16J13/q.db",
+      ".tmp-cli/tmp.tvKEe16J13/req.json",
+      "durable_queue/__main__.py",
+      "durable_queue/queue.py",
+      "durable_queue/storage.py",
+      "tests/test_processes.py",
+      "tests/test_regression.py",
+      "tmp0ct646v1/q.db",
+      "tmp3ot8vn9v/q.db",
+      "tmp45rxofav/q.db",
+      "tmpnm1rrk5s/q.db",
+      "tmpuj1u203e/q.db"
+    ],
+    "diff_bytes": 62074,
+    "diff_sha256": "5afef21dcbd382d39ad952c3c2896fea05ea57d53a39d10d2d98ff349abd5e54"
+  }
+}

@@ -1,0 +1,762 @@
+{
+  "schema_version": 1,
+  "fixture": "durable-queue-v1",
+  "fixture_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+  "task_sha256": "83388e667e6c1a65e2378f3dc9aed92432db88f93845a2ada3ee5a89f1ea4bc1",
+  "evaluator_sha256": "a12c34af5aa99e01af4504cab0219c8cdc992d3a14f7cdedb86055079407793f",
+  "sandbox_sha256": "dc5b99261abbfb0831836c1586125a3db0a2a4b6f54d51ac26243dedfcfd01d1",
+  "python": {
+    "path": "/home/james/.local/share/codex-lab-toolchain/python/cpython-3.12.14-linux-x86_64-gnu/bin/python3.12",
+    "version": "3.12.14 (main, Sep  1 2026, 14:16:52) [Clang 22.1.3 ]",
+    "sha256": "f7c6210eb40fadcd3c2889dddd24a15fc2c9f926aec5a03bf9da66e12d581526"
+  },
+  "candidate_files": {
+    "durable_queue/__init__.py": "39448ab39d64659f7d82b955333b9aee654efe632e4b21349adccb72c34ce299",
+    "durable_queue/__main__.py": "9fd4d5989ef723bc4b0a9184f967dc657187bfddf09e12734caf3fd3718ddb7f",
+    "durable_queue/queue.py": "c8a4f13a3611e60a5e173fb7ff0fddff22b86400de06bbb7110ab4e3c42c10c3",
+    "durable_queue/storage.py": "1eebc67ac1e6fce004d9bb62b0ea58338aa8350bddcb401fbe929605bdd1b87e",
+    "tests/test_processes.py": "9a960da6723bc38910d5c728fc405df538eab68369bc8b1bd98c41861a567028",
+    "tests/test_public.py": "42faa585c342eefcd7a0b8899f1e1cf1ee6e16a19868b5e25cabf9918cdf8134",
+    "tests/test_regression.py": "9d5db5f1148b36e16be2f041ef20900a07c1c448d15aad6dafd2242465d25849"
+  },
+  "public_test_success": true,
+  "hidden_test_success": false,
+  "task_success": false,
+  "public": {
+    "exit_code": 0,
+    "timeout": false,
+    "stdout": "",
+    "stderr": "test_claim_dependency_and_complete (test_public.QueueTests.test_claim_dependency_and_complete) ... ok\ntest_empty (test_public.QueueTests.test_empty) ... ok\ntest_submission_survives_reopen (test_public.QueueTests.test_submission_survives_reopen) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 0.471s\n\nOK\n",
+    "wall_clock_ms": 567
+  },
+  "git": {
+    "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "files_changed": 11,
+    "changed_files": [
+      "durable_queue/__main__.py",
+      "durable_queue/queue.py",
+      "durable_queue/storage.py",
+      "tests/test_processes.py",
+      "tests/test_regression.py",
+      "tmp031d_kql/q.db",
+      "tmp031d_kql/req.json",
+      "tmp031d_kql/req2.json",
+      "tmp031d_kql/req3.json",
+      "tmp_v3check/q.db",
+      "tmp_v3check/req.json"
+    ],
+    "diff_bytes": 54449,
+    "diff_sha256": "d9cc9e943c7e7aed130d1b6efb225bdc40452e1c3dcfeaf4c312541ff661e059"
+  },
+  "full_evaluation_path": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/evaluations/queue-r2-baa-edited-execution/evaluation.json",
+  "full_evaluation_sha256": "1446d5398a404a1bbfa312f82baa29ac5eca00d9b5ff330784a43f17fdd2c77d",
+  "checks": [
+    {
+      "case": "empty",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 165
+    },
+    {
+      "case": "empty",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 266
+    },
+    {
+      "case": "durable_views",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "durable_views",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 266
+    },
+    {
+      "case": "priority_and_ties",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 316
+    },
+    {
+      "case": "priority_and_ties",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 416
+    },
+    {
+      "case": "dependency_diamond",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 416
+    },
+    {
+      "case": "dependency_diamond",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 566
+    },
+    {
+      "case": "expiry_boundary",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 366
+    },
+    {
+      "case": "expiry_boundary",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 417
+    },
+    {
+      "case": "same_worker_stale_attempt",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 366
+    },
+    {
+      "case": "same_worker_stale_attempt",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 466
+    },
+    {
+      "case": "retry_delay_and_limit",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 416
+    },
+    {
+      "case": "retry_delay_and_limit",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 567
+    },
+    {
+      "case": "exhausted_expiry_blocks_dependent",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 316
+    },
+    {
+      "case": "exhausted_expiry_blocks_dependent",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 366
+    },
+    {
+      "case": "idempotency_after_retry",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 316
+    },
+    {
+      "case": "idempotency_after_retry",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 416
+    },
+    {
+      "case": "invalid_completion_no_recovery",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 266
+    },
+    {
+      "case": "invalid_completion_no_recovery",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 366
+    },
+    {
+      "case": "rollback_unknown",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 166
+    },
+    {
+      "case": "rollback_unknown",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "rollback_cycle",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 166
+    },
+    {
+      "case": "rollback_cycle",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "rollback_self",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 166
+    },
+    {
+      "case": "rollback_self",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "rollback_duplicate",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 166
+    },
+    {
+      "case": "rollback_duplicate",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "rollback_bool_priority",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 166
+    },
+    {
+      "case": "rollback_bool_priority",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "rollback_bool_attempts",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 166
+    },
+    {
+      "case": "rollback_bool_attempts",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "rollback_negative_ready",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 166
+    },
+    {
+      "case": "rollback_negative_ready",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "rollback_empty_id",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 166
+    },
+    {
+      "case": "rollback_empty_id",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "rollback_numeric_id",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "rollback_numeric_id",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "rollback_unknown_field",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 166
+    },
+    {
+      "case": "rollback_unknown_field",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "rollback_payload_array",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 166
+    },
+    {
+      "case": "rollback_payload_array",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 266
+    },
+    {
+      "case": "rollback_nonfinite_payload",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 165
+    },
+    {
+      "case": "rollback_nonfinite_payload",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "rollback_dependencies_string",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 166
+    },
+    {
+      "case": "rollback_dependencies_string",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "rollback_attempts_limit",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 166
+    },
+    {
+      "case": "rollback_attempts_limit",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "rollback_batch_object",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 166
+    },
+    {
+      "case": "rollback_batch_object",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "invalid_claim_no_recovery",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 416
+    },
+    {
+      "case": "invalid_claim_no_recovery",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 366
+    },
+    {
+      "case": "json_type_idempotency",
+      "mode": "api",
+      "passed": false,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 266,
+      "observation": {
+        "value": [
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "v": 1
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "v": 1
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": {
+              "attempts": 0,
+              "dependencies": [],
+              "id": "a",
+              "lease_until": null,
+              "max_attempts": 3,
+              "payload": {
+                "v": 1
+              },
+              "priority": 0,
+              "ready_at": 0,
+              "state": "pending",
+              "worker": null
+            }
+          }
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[{\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"v\": 1}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"v\": 1}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": {\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"v\": 1}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}}]\n",
+        "stderr": "",
+        "wall_clock_ms": 266
+      }
+    },
+    {
+      "case": "json_type_idempotency",
+      "mode": "cli",
+      "passed": false,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 266,
+      "observation": {
+        "value": [
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "v": 1
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "v": 1
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": {
+              "attempts": 0,
+              "dependencies": [],
+              "id": "a",
+              "lease_until": null,
+              "max_attempts": 3,
+              "payload": {
+                "v": 1
+              },
+              "priority": 0,
+              "ready_at": 0,
+              "state": "pending",
+              "worker": null
+            }
+          }
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[{\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"v\": 1}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"v\": 1}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": {\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"v\": 1}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}}]\n",
+        "stderr": "",
+        "wall_clock_ms": 266
+      }
+    },
+    {
+      "case": "terminal_and_invalid_fail",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 316
+    },
+    {
+      "case": "terminal_and_invalid_fail",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 417
+    },
+    {
+      "case": "invalid-request-0",
+      "mode": "cli_invalid",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "invalid-request-1",
+      "mode": "cli_invalid",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 266
+    },
+    {
+      "case": "invalid-request-2",
+      "mode": "cli_invalid",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 266
+    },
+    {
+      "case": "invalid-request-3",
+      "mode": "cli_invalid",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 266
+    },
+    {
+      "case": "invalid-request-4",
+      "mode": "cli_invalid",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "invalid-request-5",
+      "mode": "cli_invalid",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 266
+    },
+    {
+      "case": "invalid-request-6",
+      "mode": "cli_invalid",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 266
+    },
+    {
+      "case": "invalid-request-7",
+      "mode": "cli_invalid",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 266
+    },
+    {
+      "case": "invalid-request-8",
+      "mode": "cli_invalid",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 266
+    },
+    {
+      "case": "invalid-request-9",
+      "mode": "cli_invalid",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 266
+    },
+    {
+      "case": "invalid-request-10",
+      "mode": "cli_invalid",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "atomic-claim-1-0",
+      "mode": "race",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 266
+    },
+    {
+      "case": "atomic-claim-1-1",
+      "mode": "race",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 266
+    },
+    {
+      "case": "atomic-claim-1-2",
+      "mode": "race",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 316
+    },
+    {
+      "case": "atomic-claim-2-0",
+      "mode": "race",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 316
+    },
+    {
+      "case": "atomic-claim-2-1",
+      "mode": "race",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 316
+    },
+    {
+      "case": "atomic-claim-2-2",
+      "mode": "race",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 316
+    }
+  ]
+}

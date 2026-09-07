@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "manifest_sha256": "09c43895ae2e3d99f9be0263400c5de426083bc8a733df6675ac9a12e3b7b1e3",
+  "binary": "/home/james/.cache/codex-lab-binaries/verifier-replay-v1-20260907/codex-lab",
+  "binary_sha256": "dc5b99261abbfb0831836c1586125a3db0a2a4b6f54d51ac26243dedfcfd01d1",
+  "jobs": 8,
+  "max_hosts": 32,
+  "runs": [
+    {
+      "run_id": "queue-r1-aaa-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/runs/queue-r1-aaa-prepared/evidence/prepared.json",
+      "prepared_sha256": "e314138cd0704cf447c181b91039dee3ceceed490f47af2c7217fbcac12fb3c4",
+      "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r1-aaa/repository",
+      "artifacts": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/runs/queue-r1-aaa-execution"
+    },
+    {
+      "run_id": "queue-r1-aab-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/runs/queue-r1-aab-prepared/evidence/prepared.json",
+      "prepared_sha256": "d333fb46cdb5e1237b02db64fd96571d3dc546e6a4859f3e424781e0f635fe7e",
+      "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r1-aab/repository",
+      "artifacts": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/runs/queue-r1-aab-execution"
+    },
+    {
+      "run_id": "queue-r1-aba-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/runs/queue-r1-aba-prepared/evidence/prepared.json",
+      "prepared_sha256": "23349d3a2b7d608fcd52b18cda2a9878bb987280386d9fcf9e7fb2c25c2830d8",
+      "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r1-aba/repository",
+      "artifacts": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/runs/queue-r1-aba-execution"
+    },
+    {
+      "run_id": "queue-r1-abb-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/runs/queue-r1-abb-prepared/evidence/prepared.json",
+      "prepared_sha256": "73cbfd18ccb595a176ec573015a7a638adc6c4711a558191839c7e9ee327614b",
+      "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r1-abb/repository",
+      "artifacts": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/runs/queue-r1-abb-execution"
+    },
+    {
+      "run_id": "queue-r1-baa-edited-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r1-baa-edited-prepared/evidence/prepared.json",
+      "prepared_sha256": "a9091bb0fcdd4187f1a07f9ac38e68eba845bedca4e59a295d3ccbb8ad22ff18",
+      "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r1-baa/repository",
+      "artifacts": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r1-baa-edited-execution"
+    },
+    {
+      "run_id": "queue-r1-bab-edited-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r1-bab-edited-prepared/evidence/prepared.json",
+      "prepared_sha256": "c4ad3cb206fc17fb5658e5657ec2a2492d04c7746b348a021900dbe0b54d3be6",
+      "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r1-bab/repository",
+      "artifacts": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r1-bab-edited-execution"
+    },
+    {
+      "run_id": "queue-r1-bba-edited-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r1-bba-edited-prepared/evidence/prepared.json",
+      "prepared_sha256": "aa8cdeca502debd603f47c09918a35f501f3853dec5f534dffd22feff0d8a3af",
+      "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r1-bba/repository",
+      "artifacts": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r1-bba-edited-execution"
+    },
+    {
+      "run_id": "queue-r1-bbb-edited-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r1-bbb-edited-prepared/evidence/prepared.json",
+      "prepared_sha256": "1d5d4073701fd30500867210bce48614c81c039a34c6f77ce80dd6a7476da6c3",
+      "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r1-bbb/repository",
+      "artifacts": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r1-bbb-edited-execution"
+    },
+    {
+      "run_id": "queue-r2-aab-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/runs/queue-r2-aab-prepared/evidence/prepared.json",
+      "prepared_sha256": "1bae44c459db17522b1e7858cd1fa7ba077121af1ea4e2966bf4b7e918c73b85",
+      "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r2-aab/repository",
+      "artifacts": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/runs/queue-r2-aab-execution"
+    },
+    {
+      "run_id": "queue-r2-aba-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/runs/queue-r2-aba-prepared/evidence/prepared.json",
+      "prepared_sha256": "a33dd4c1435464d7f99918bdea6863906413abe7189671d24d088fd966fc4591",
+      "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r2-aba/repository",
+      "artifacts": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/runs/queue-r2-aba-execution"
+    },
+    {
+      "run_id": "queue-r2-abb-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/runs/queue-r2-abb-prepared/evidence/prepared.json",
+      "prepared_sha256": "6b8bd45fc305f815a8363f0c1889394955ed628621b6c76d4c37bbc4175238d7",
+      "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r2-abb/repository",
+      "artifacts": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/runs/queue-r2-abb-execution"
+    },
+    {
+      "run_id": "queue-r2-baa-edited-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r2-baa-edited-prepared/evidence/prepared.json",
+      "prepared_sha256": "d10f660aea200f77fdc3279d15cecd14c57d6fe913556f4c24e016c19fb9418b",
+      "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r2-baa/repository",
+      "artifacts": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r2-baa-edited-execution"
+    },
+    {
+      "run_id": "queue-r2-bab-edited-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r2-bab-edited-prepared/evidence/prepared.json",
+      "prepared_sha256": "6cea1b877e352ab23fd7898a12844315155399af5d41484c5dec764996cba550",
+      "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r2-bab/repository",
+      "artifacts": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r2-bab-edited-execution"
+    },
+    {
+      "run_id": "queue-r2-bba-edited-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r2-bba-edited-prepared/evidence/prepared.json",
+      "prepared_sha256": "1b55815c9813d490d7283abec64bfe872ec59609fcfc398e5345649420413633",
+      "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r2-bba/repository",
+      "artifacts": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r2-bba-edited-execution"
+    },
+    {
+      "run_id": "queue-r2-bbb-edited-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r2-bbb-edited-prepared/evidence/prepared.json",
+      "prepared_sha256": "b562bf00019de9cb175995860db878593328163747dc935ee9b90fc6363f93d3",
+      "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r2-bbb/repository",
+      "artifacts": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r2-bbb-edited-execution"
+    },
+    {
+      "run_id": "queue-r2-aaa-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/runs/queue-r2-aaa-prepared/evidence/prepared.json",
+      "prepared_sha256": "0cd672d35ba6a53595d1ee75309428e33a22dd378618821ebb35b2b1645525cf",
+      "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r2-aaa/repository",
+      "artifacts": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/runs/queue-r2-aaa-execution"
+    },
+    {
+      "run_id": "queue-r3-baa-edited-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r3-baa-edited-prepared/evidence/prepared.json",
+      "prepared_sha256": "cc6ba900595b32ec69ab5539f036611b5a5c75fe4c67be513e335518c82971e7",
+      "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r3-baa/repository",
+      "artifacts": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r3-baa-edited-execution"
+    },
+    {
+      "run_id": "queue-r3-bab-edited-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r3-bab-edited-prepared/evidence/prepared.json",
+      "prepared_sha256": "c3e776226bebf6d73b0c8e849d8618544e15bc06072dec24513a4d2266efc5bd",
+      "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r3-bab/repository",
+      "artifacts": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r3-bab-edited-execution"
+    },
+    {
+      "run_id": "queue-r3-bba-edited-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r3-bba-edited-prepared/evidence/prepared.json",
+      "prepared_sha256": "c6c145d4f6bb685843220b9c3c82d2bf4dab15d95d0e9a2e7c539e00b348054c",
+      "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r3-bba/repository",
+      "artifacts": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r3-bba-edited-execution"
+    },
+    {
+      "run_id": "queue-r3-bbb-edited-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r3-bbb-edited-prepared/evidence/prepared.json",
+      "prepared_sha256": "c7d6a8160cc673cf1a99bd3e277390fa493a2e0a9e8b8bf9bfad1807eb13483b",
+      "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r3-bbb/repository",
+      "artifacts": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r3-bbb-edited-execution"
+    },
+    {
+      "run_id": "queue-r4-abb-edited-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r4-abb-edited-prepared/evidence/prepared.json",
+      "prepared_sha256": "3a8d9b9b45cd567790d6d6b636dac6b369ffc1796e5330940f01bc15ce8ab57e",
+      "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r4-abb/repository",
+      "artifacts": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r4-abb-edited-execution"
+    },
+    {
+      "run_id": "queue-r4-baa-edited-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r4-baa-edited-prepared/evidence/prepared.json",
+      "prepared_sha256": "7d1c910082c741f34852dbb1c3b079460cc777ff27519c7b2cbce1a65116d708",
+      "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r4-baa/repository",
+      "artifacts": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r4-baa-edited-execution"
+    },
+    {
+      "run_id": "queue-r4-bab-edited-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r4-bab-edited-prepared/evidence/prepared.json",
+      "prepared_sha256": "a6e68042e0aed5617c5d1349a07fd5611cdf27d6c56b3d7340735c2b37039b21",
+      "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r4-bab/repository",
+      "artifacts": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r4-bab-edited-execution"
+    },
+    {
+      "run_id": "queue-r4-bba-edited-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r4-bba-edited-prepared/evidence/prepared.json",
+      "prepared_sha256": "f57704bd156671c74f42a1f36d3d75f03755daafe31bbb7b25c226a3c8a93a71",
+      "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r4-bba/repository",
+      "artifacts": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r4-bba-edited-execution"
+    },
+    {
+      "run_id": "queue-r4-bbb-edited-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r4-bbb-edited-prepared/evidence/prepared.json",
+      "prepared_sha256": "6a5087612923c79e59cd2c7cdbf53a620992257ad9296661809c801d2d11131b",
+      "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r4-bbb/repository",
+      "artifacts": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r4-bbb-edited-execution"
+    },
+    {
+      "run_id": "queue-r4-aaa-edited-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r4-aaa-edited-prepared/evidence/prepared.json",
+      "prepared_sha256": "3197a6899ce3e7cccc8f7858f79495b6e14450c1fe241801d2aba010d037a766",
+      "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r4-aaa/repository",
+      "artifacts": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r4-aaa-edited-execution"
+    },
+    {
+      "run_id": "queue-r4-aab-edited-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r4-aab-edited-prepared/evidence/prepared.json",
+      "prepared_sha256": "9aaa8bbe37f801311fa5a7f8e5c16d1609c05a3ee494d1fbf956a41192a18be5",
+      "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r4-aab/repository",
+      "artifacts": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r4-aab-edited-execution"
+    },
+    {
+      "run_id": "queue-r4-aba-edited-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r4-aba-edited-prepared/evidence/prepared.json",
+      "prepared_sha256": "a5cfdd227497c46b1f5d6341cda378d4fb51317bd5b10e01f946e0a4cc2c6b76",
+      "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r4-aba/repository",
+      "artifacts": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r4-aba-edited-execution"
+    }
+  ],
+  "scheduler_sha256": {
+    "run_batch.py": "8aa5ea98beca1a32efd28e60abaf8ad3b819f2f0837d6b98ed26568061fd3c3c",
+    "batch_inputs.py": "eb8f129b1938ff1db0171f9f11be2568daac1f63dbbd2944bd188e4c9cd7ce24"
+  },
+  "python": {
+    "path": "/home/james/.local/bin/python3.12",
+    "version": "3.12.14 (main, Sep  1 2026, 14:16:52) [Clang 22.1.3 ]",
+    "sha256": "f7c6210eb40fadcd3c2889dddd24a15fc2c9f926aec5a03bf9da66e12d581526"
+  }
+}

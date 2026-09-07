@@ -1,0 +1,2536 @@
+{
+  "schema_version": 1,
+  "classification": "post-hoc contract audit, not the preregistered score",
+  "reason": "The frozen CLI worker prescribed json.dumps default ASCII escaping and whitespace although the task only required a sorted-key JSON value and one final newline.",
+  "scope": "Replace only durable_views/cli in a separate secondary score, applying the same audit to every unchanged candidate. All original scores/cases remain untouched.",
+  "original_worker_sha256": "acb65807fdf3f5ad3e3785318ed109fb9da728b4ed8f2d01f30c33547bc96224",
+  "audit_worker_sha256": "8827d320c48dc06715078ad7298b9c7ee02dce2019cbe64902f500a54c91e306",
+  "validator_sha256": "7551193602455bdce1f1004823390814bafcbf059dab18ca295b89e25a4b1a57",
+  "model_calls": 0,
+  "candidate_changes": 0,
+  "original_task_passed": 9,
+  "audited_task_passed": 11,
+  "checks_changed": 5,
+  "results": [
+    {
+      "run_id": "queue-r1-aaa-execution",
+      "case": "durable_views",
+      "mode": "cli",
+      "original_passed": false,
+      "audit_passed": true,
+      "original_task_success": false,
+      "audited_task_success": true,
+      "original_evaluation_sha256": "c8b941d67b74e1f05a65d7e87cb7776f26610fae871d5f48d695212f12277374",
+      "candidate_diff_sha256": "ef18ddd7f64c8b3a8fcd294fb19fc27c76240d241ec34f776afab12b0b85f785",
+      "observation": {
+        "value": [
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          }
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[{\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}]\n",
+        "stderr": "",
+        "wall_clock_ms": 267
+      }
+    },
+    {
+      "run_id": "queue-r1-aab-execution",
+      "case": "durable_views",
+      "mode": "cli",
+      "original_passed": true,
+      "audit_passed": true,
+      "original_task_success": false,
+      "audited_task_success": false,
+      "original_evaluation_sha256": "a4b398f2e423bf778b02b79362dc92fed11516c292e037cd3ef4aa448c945619",
+      "candidate_diff_sha256": "5afef21dcbd382d39ad952c3c2896fea05ea57d53a39d10d2d98ff349abd5e54",
+      "observation": {
+        "value": [
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          }
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[{\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}]\n",
+        "stderr": "",
+        "wall_clock_ms": 317
+      }
+    },
+    {
+      "run_id": "queue-r1-aba-execution",
+      "case": "durable_views",
+      "mode": "cli",
+      "original_passed": false,
+      "audit_passed": true,
+      "original_task_success": false,
+      "audited_task_success": false,
+      "original_evaluation_sha256": "c09c703f9efa2d4e4e827cabbbf0620fc2b811da5970fed59cfd4274c5af86ba",
+      "candidate_diff_sha256": "35f30c43ddfc4048abacca177d67aed8ab02511037e221cbc2e0eb0235bdf01e",
+      "observation": {
+        "value": [
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          }
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[{\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}]\n",
+        "stderr": "",
+        "wall_clock_ms": 318
+      }
+    },
+    {
+      "run_id": "queue-r1-abb-execution",
+      "case": "durable_views",
+      "mode": "cli",
+      "original_passed": false,
+      "audit_passed": true,
+      "original_task_success": false,
+      "audited_task_success": true,
+      "original_evaluation_sha256": "762ac888f9e26823881b5cb68917350976c5382b753d8bd8d6b3c257f9398e3a",
+      "candidate_diff_sha256": "2cb3f68e0d585f0f8ce5c43ad296b70a83a58c630eff35cb437bd2dc8d231caa",
+      "observation": {
+        "value": [
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          }
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[{\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}]\n",
+        "stderr": "",
+        "wall_clock_ms": 270
+      }
+    },
+    {
+      "run_id": "queue-r1-baa-edited-execution",
+      "case": "durable_views",
+      "mode": "cli",
+      "original_passed": true,
+      "audit_passed": true,
+      "original_task_success": true,
+      "audited_task_success": true,
+      "original_evaluation_sha256": "7f961acd24f0de43149a9e97eb1e0742ed22cd8341ac7e0a6977aa3427011415",
+      "candidate_diff_sha256": "e1e85f4ce0c83f0f2484de40a8644dee13f8f49d9222f46c1f0167123f053621",
+      "observation": {
+        "value": [
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          }
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[{\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}]\n",
+        "stderr": "",
+        "wall_clock_ms": 217
+      }
+    },
+    {
+      "run_id": "queue-r1-bab-edited-execution",
+      "case": "durable_views",
+      "mode": "cli",
+      "original_passed": true,
+      "audit_passed": true,
+      "original_task_success": true,
+      "audited_task_success": true,
+      "original_evaluation_sha256": "a135e5712a379b826fe0118c32e5d440a71709ba01519e9f0aa706fee4146ce4",
+      "candidate_diff_sha256": "7cbc3fdd9eaa6efc619b5e2788841069f2a6ef455cb9e0c27adbd129f89889cf",
+      "observation": {
+        "value": [
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          }
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[{\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}]\n",
+        "stderr": "",
+        "wall_clock_ms": 267
+      }
+    },
+    {
+      "run_id": "queue-r1-bba-edited-execution",
+      "case": "durable_views",
+      "mode": "cli",
+      "original_passed": true,
+      "audit_passed": true,
+      "original_task_success": false,
+      "audited_task_success": false,
+      "original_evaluation_sha256": "ee72610729455bb22d63f9a2f40ad54ddbb7002570cd4dbcaf4d5934ab0635df",
+      "candidate_diff_sha256": "5f4bb0bdccca4424e359f5caaaf6d8f9d03d7790855fbe4647a936b1a9ad2bf6",
+      "observation": {
+        "value": [
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          }
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[{\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}]\n",
+        "stderr": "",
+        "wall_clock_ms": 267
+      }
+    },
+    {
+      "run_id": "queue-r1-bbb-edited-execution",
+      "case": "durable_views",
+      "mode": "cli",
+      "original_passed": true,
+      "audit_passed": true,
+      "original_task_success": true,
+      "audited_task_success": true,
+      "original_evaluation_sha256": "7371ebc705e89442662e41ffa920566a520d4051de916ccbe69e553e00e7af60",
+      "candidate_diff_sha256": "2602f61a7c24288c876f3fa2f936e2038bf1bedabe79d933cbad16e507700398",
+      "observation": {
+        "value": [
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          }
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[{\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}]\n",
+        "stderr": "",
+        "wall_clock_ms": 267
+      }
+    },
+    {
+      "run_id": "queue-r2-aab-execution",
+      "case": "durable_views",
+      "mode": "cli",
+      "original_passed": true,
+      "audit_passed": true,
+      "original_task_success": true,
+      "audited_task_success": true,
+      "original_evaluation_sha256": "74889bd68e98a5d8c6cfda1be74c37a06af78b6e9934ac02a711790931233ab3",
+      "candidate_diff_sha256": "a8577797d8265d699420ff4ab097561a8383757152e91469e0af47253b84cd47",
+      "observation": {
+        "value": [
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          }
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[{\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}]\n",
+        "stderr": "",
+        "wall_clock_ms": 216
+      }
+    },
+    {
+      "run_id": "queue-r2-aba-execution",
+      "case": "durable_views",
+      "mode": "cli",
+      "original_passed": true,
+      "audit_passed": true,
+      "original_task_success": true,
+      "audited_task_success": true,
+      "original_evaluation_sha256": "92b12a1f8a32d26234e61fa4372eea81c4b52b5b4d5f818809d0638e145456f4",
+      "candidate_diff_sha256": "e6e83a7f1ed48a83d77d01fe80008607fa4d15f44dfa5bc06b40674908f752e8",
+      "observation": {
+        "value": [
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          }
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[{\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}]\n",
+        "stderr": "",
+        "wall_clock_ms": 217
+      }
+    },
+    {
+      "run_id": "queue-r2-abb-execution",
+      "case": "durable_views",
+      "mode": "cli",
+      "original_passed": true,
+      "audit_passed": true,
+      "original_task_success": false,
+      "audited_task_success": false,
+      "original_evaluation_sha256": "6da42d6904d60c23983eb771de26c5b70d9fc179d097050b13a7ad9753978771",
+      "candidate_diff_sha256": "9eddb4619355966928dc2601f984887328351910c514a3cdf6e9ba6f97e2ba33",
+      "observation": {
+        "value": [
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          }
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[{\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}]\n",
+        "stderr": "",
+        "wall_clock_ms": 217
+      }
+    },
+    {
+      "run_id": "queue-r2-baa-edited-execution",
+      "case": "durable_views",
+      "mode": "cli",
+      "original_passed": true,
+      "audit_passed": true,
+      "original_task_success": false,
+      "audited_task_success": false,
+      "original_evaluation_sha256": "1446d5398a404a1bbfa312f82baa29ac5eca00d9b5ff330784a43f17fdd2c77d",
+      "candidate_diff_sha256": "d9cc9e943c7e7aed130d1b6efb225bdc40452e1c3dcfeaf4c312541ff661e059",
+      "observation": {
+        "value": [
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          }
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[{\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}]\n",
+        "stderr": "",
+        "wall_clock_ms": 266
+      }
+    },
+    {
+      "run_id": "queue-r2-bab-edited-execution",
+      "case": "durable_views",
+      "mode": "cli",
+      "original_passed": true,
+      "audit_passed": true,
+      "original_task_success": false,
+      "audited_task_success": false,
+      "original_evaluation_sha256": "ace629d55f4b308f6f6c13987b59c3de12c675f9bbdd97b92d9813f1b18c6be0",
+      "candidate_diff_sha256": "eb2be6f83ca95a9c24d4fbba4c49881f4963c78a5c1053f1cee40d3e752649be",
+      "observation": {
+        "value": [
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          }
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[{\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}]\n",
+        "stderr": "",
+        "wall_clock_ms": 266
+      }
+    },
+    {
+      "run_id": "queue-r2-bba-edited-execution",
+      "case": "durable_views",
+      "mode": "cli",
+      "original_passed": false,
+      "audit_passed": true,
+      "original_task_success": false,
+      "audited_task_success": false,
+      "original_evaluation_sha256": "93ce2257e9bc70dbe79feb4ea033dcd70e3580fcff2ed67ef6deb80a108fa85b",
+      "candidate_diff_sha256": "a76c0a6bd5d3ee2271c1ae24c2512f57cb8792d53adcced0b78aeab455e9fcf3",
+      "observation": {
+        "value": [
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          }
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[{\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}]\n",
+        "stderr": "",
+        "wall_clock_ms": 266
+      }
+    },
+    {
+      "run_id": "queue-r2-bbb-edited-execution",
+      "case": "durable_views",
+      "mode": "cli",
+      "original_passed": true,
+      "audit_passed": true,
+      "original_task_success": false,
+      "audited_task_success": false,
+      "original_evaluation_sha256": "8a5d19850969b0acbc1263082d0520189d0d3e1bf317b451f714f31b25fbfcf4",
+      "candidate_diff_sha256": "99756557d4edb42e4ebab93e678885df7afb673c43fb6f6cc9f82437d8353db8",
+      "observation": {
+        "value": [
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          }
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[{\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}]\n",
+        "stderr": "",
+        "wall_clock_ms": 216
+      }
+    },
+    {
+      "run_id": "queue-r2-aaa-execution",
+      "case": "durable_views",
+      "mode": "cli",
+      "original_passed": true,
+      "audit_passed": true,
+      "original_task_success": false,
+      "audited_task_success": false,
+      "original_evaluation_sha256": "86d0239e639b6ce367a6dbbb930dd2270f692169b0434855460d1774e68a1fe6",
+      "candidate_diff_sha256": "e9f0339068915cfe6fedba5918f64f2c23c00e83261c6e5c2bdc49be90ac4b5b",
+      "observation": {
+        "value": [
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          }
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[{\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}]\n",
+        "stderr": "",
+        "wall_clock_ms": 267
+      }
+    },
+    {
+      "run_id": "queue-r3-baa-edited-execution",
+      "case": "durable_views",
+      "mode": "cli",
+      "original_passed": true,
+      "audit_passed": true,
+      "original_task_success": true,
+      "audited_task_success": true,
+      "original_evaluation_sha256": "fe51096b0245af19c2edb35799964fceb49d5ca4ccedf827adccaa0b48a53075",
+      "candidate_diff_sha256": "f9b26b572cac649e71dbc5789cfe6734462e44a7fc8a7720d199a58bcb425bdb",
+      "observation": {
+        "value": [
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          }
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[{\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}]\n",
+        "stderr": "",
+        "wall_clock_ms": 267
+      }
+    },
+    {
+      "run_id": "queue-r3-bab-edited-execution",
+      "case": "durable_views",
+      "mode": "cli",
+      "original_passed": true,
+      "audit_passed": true,
+      "original_task_success": true,
+      "audited_task_success": true,
+      "original_evaluation_sha256": "a20a643ce7bf077e7ebddc3138329e272f850be06791c5c0280ae63a056cdc61",
+      "candidate_diff_sha256": "eadc1e14460c1cb35682180697e7a7733ff412562442747bb987c83ed26a26e2",
+      "observation": {
+        "value": [
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          }
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[{\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}]\n",
+        "stderr": "",
+        "wall_clock_ms": 268
+      }
+    },
+    {
+      "run_id": "queue-r3-bba-edited-execution",
+      "case": "durable_views",
+      "mode": "cli",
+      "original_passed": true,
+      "audit_passed": true,
+      "original_task_success": false,
+      "audited_task_success": false,
+      "original_evaluation_sha256": "cbda97c078ea75c285ed8a3c3e3b81d5e565f3e2acd4b366631b70355f7dca21",
+      "candidate_diff_sha256": "9e38cc7c4645e411293ebe077bb74431cbdd63b98166cd5a8e6f9d964210d8b4",
+      "observation": {
+        "value": [
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          }
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[{\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}]\n",
+        "stderr": "",
+        "wall_clock_ms": 266
+      }
+    },
+    {
+      "run_id": "queue-r3-bbb-edited-execution",
+      "case": "durable_views",
+      "mode": "cli",
+      "original_passed": true,
+      "audit_passed": true,
+      "original_task_success": false,
+      "audited_task_success": false,
+      "original_evaluation_sha256": "300dfbb8afa6ad2b1cbd46033616a6dedac13db4fc11345680a9195ab0db6496",
+      "candidate_diff_sha256": "7644ae77006d5762e1f7e6ade95935709f002bb695fdec0e6bfa3dc8f9c64ada",
+      "observation": {
+        "value": [
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          }
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[{\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}]\n",
+        "stderr": "",
+        "wall_clock_ms": 267
+      }
+    },
+    {
+      "run_id": "queue-r4-abb-edited-execution",
+      "case": "durable_views",
+      "mode": "cli",
+      "original_passed": true,
+      "audit_passed": true,
+      "original_task_success": true,
+      "audited_task_success": true,
+      "original_evaluation_sha256": "b6031298bfb85bb3279d3fe3830bc2f0c6315a8de514df0116257bc2e63cb599",
+      "candidate_diff_sha256": "61111abe671a83c3c20410d00f3be6d7108b1b733b5c93c8cb162701becbc81b",
+      "observation": {
+        "value": [
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          }
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[{\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}]\n",
+        "stderr": "",
+        "wall_clock_ms": 316
+      }
+    },
+    {
+      "run_id": "queue-r4-baa-edited-execution",
+      "case": "durable_views",
+      "mode": "cli",
+      "original_passed": true,
+      "audit_passed": true,
+      "original_task_success": true,
+      "audited_task_success": true,
+      "original_evaluation_sha256": "c9c2ecd82266a907e9e9f3d68a97e2a198ecad7499448f421978f3a976fa1474",
+      "candidate_diff_sha256": "5b7d3aa7e91bb9dd3b2b8c7c6b7a128a5a0599f01c6b2f341c8af6762aed3a55",
+      "observation": {
+        "value": [
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          }
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[{\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}]\n",
+        "stderr": "",
+        "wall_clock_ms": 266
+      }
+    },
+    {
+      "run_id": "queue-r4-bab-edited-execution",
+      "case": "durable_views",
+      "mode": "cli",
+      "original_passed": true,
+      "audit_passed": true,
+      "original_task_success": false,
+      "audited_task_success": false,
+      "original_evaluation_sha256": "9d693648da40b4ad9aa8338328c3de16c12f212b5145b96786b45cbba873f417",
+      "candidate_diff_sha256": "17f15d3643b90c182955119afb555b4afea7669cfaf9023bccd450765f07b1a8",
+      "observation": {
+        "value": [
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          }
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[{\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}]\n",
+        "stderr": "",
+        "wall_clock_ms": 267
+      }
+    },
+    {
+      "run_id": "queue-r4-bba-edited-execution",
+      "case": "durable_views",
+      "mode": "cli",
+      "original_passed": true,
+      "audit_passed": true,
+      "original_task_success": false,
+      "audited_task_success": false,
+      "original_evaluation_sha256": "5e767864ba7010129fd1571a858b265e6bc06c5506fc3a83c653405478ef5054",
+      "candidate_diff_sha256": "2e29a51e0f9967e5baf40d361d1c119ca9aefcff78c7c6a205b54cb87351d0d3",
+      "observation": {
+        "value": [
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          }
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[{\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}]\n",
+        "stderr": "",
+        "wall_clock_ms": 216
+      }
+    },
+    {
+      "run_id": "queue-r4-bbb-edited-execution",
+      "case": "durable_views",
+      "mode": "cli",
+      "original_passed": true,
+      "audit_passed": true,
+      "original_task_success": false,
+      "audited_task_success": false,
+      "original_evaluation_sha256": "dbb5a82d3434a26751859cfd0c7c2cb209139ebf5cdea503fdf95f07b868f981",
+      "candidate_diff_sha256": "e04e8897ec343d9f281446b759e040d4e66435161ea2f7b8ad8efa35bf36dc94",
+      "observation": {
+        "value": [
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          }
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[{\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}]\n",
+        "stderr": "",
+        "wall_clock_ms": 217
+      }
+    },
+    {
+      "run_id": "queue-r4-aaa-edited-execution",
+      "case": "durable_views",
+      "mode": "cli",
+      "original_passed": true,
+      "audit_passed": true,
+      "original_task_success": false,
+      "audited_task_success": false,
+      "original_evaluation_sha256": "1f32211fe6f53e0414353c7253185455c398b8417f6919d1d10d532ff48ae3a5",
+      "candidate_diff_sha256": "2e46bde07db4c960e94b0e45a30fedf6042ff0c0f383c8ca869f5f49164f292f",
+      "observation": {
+        "value": [
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          }
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[{\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}]\n",
+        "stderr": "",
+        "wall_clock_ms": 216
+      }
+    },
+    {
+      "run_id": "queue-r4-aab-edited-execution",
+      "case": "durable_views",
+      "mode": "cli",
+      "original_passed": true,
+      "audit_passed": true,
+      "original_task_success": false,
+      "audited_task_success": false,
+      "original_evaluation_sha256": "bfc28c2dbd14a5a54a9348e623f667b124f7fe72bae9a40a608f2de8ff78d7ad",
+      "candidate_diff_sha256": "ad06729e56cd582c92ee826fccb149aa68bb2239c08423ea8cd0495db83aa33b",
+      "observation": {
+        "value": [
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          }
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[{\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}]\n",
+        "stderr": "",
+        "wall_clock_ms": 266
+      }
+    },
+    {
+      "run_id": "queue-r4-aba-edited-execution",
+      "case": "durable_views",
+      "mode": "cli",
+      "original_passed": false,
+      "audit_passed": true,
+      "original_task_success": false,
+      "audited_task_success": false,
+      "original_evaluation_sha256": "c8ffc247b4d1e405969dfed3cbaba3b172f3b63b5ec8caea1aef531275371b13",
+      "candidate_diff_sha256": "67b53ae780c681115b6d3d51da83d4834888a75260ea79bfac454b74835c3b4b",
+      "observation": {
+        "value": [
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          },
+          {
+            "ok": [
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "a",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {},
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              },
+              {
+                "attempts": 0,
+                "dependencies": [],
+                "id": "z",
+                "lease_until": null,
+                "max_attempts": 3,
+                "payload": {
+                  "nested": [
+                    1,
+                    true,
+                    null,
+                    "\u00e9"
+                  ]
+                },
+                "priority": 0,
+                "ready_at": 0,
+                "state": "pending",
+                "worker": null
+              }
+            ]
+          }
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[{\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}, {\"ok\": [{\"attempts\": 0, \"dependencies\": [], \"id\": \"a\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}, {\"attempts\": 0, \"dependencies\": [], \"id\": \"z\", \"lease_until\": null, \"max_attempts\": 3, \"payload\": {\"nested\": [1, true, null, \"\\u00e9\"]}, \"priority\": 0, \"ready_at\": 0, \"state\": \"pending\", \"worker\": null}]}]\n",
+        "stderr": "",
+        "wall_clock_ms": 266
+      }
+    }
+  ]
+}

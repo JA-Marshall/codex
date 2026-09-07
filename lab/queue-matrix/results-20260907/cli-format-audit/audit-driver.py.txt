@@ -1,0 +1,63 @@
+"""Post-hoc audit of one frozen check; never replace original scores or candidate files."""
+from concurrent.futures import ThreadPoolExecutor
+import json
+from pathlib import Path
+import shutil
+import sys
+import tempfile
+
+root=Path('/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z')
+source=Path('/mnt/c/Users/james/Desktop/Code/trees/codex-lab/lab/experiments')
+sys.path.insert(0,str(root/'inputs/lab/experiments'))
+import queue_sandbox
+from queue_cases import CASES
+from evaluate_fixture import candidate_files
+from setup_fixture import sha256
+from terminal_run import capture_diff
+
+assert (root/'evaluations/index.json').exists()
+audit=root/'cli-format-audit'
+audit.mkdir(exist_ok=False)
+worker=root/'inputs/lab/experiments/queue_worker.py'
+validator=source/'queue_cli_format.py'
+old='    if result.stdout != (json.dumps(value, sort_keys=True) + "\\n").encode():\n        return {"error": "CLIOutputBytes"}\n'
+new='    try:\n        value = parse_cli_output(result.stdout)\n    except (ValueError, UnicodeError):\n        return {"error": "CLIOutputBytes"}\n'
+text=worker.read_text()
+assert text.count(old)==1
+(audit/'worker.py').write_text(validator.read_text()+'\n\n'+text.replace(old,new))
+shutil.copyfile(validator,audit/'queue_cli_format.py')
+queue_sandbox.WORKER=audit/'worker.py'
+case=next(c for c in CASES if c['name']=='durable_views')
+batch=json.loads((root/'batch/batch.json').read_text())
+def check(entry):
+    repository=Path(entry['repository'])
+    original=json.loads((root/'evaluations'/entry['run_id']/'evaluation.json').read_text())
+    before=candidate_files(repository)
+    diff,metadata=capture_diff(repository,original['fixture_commit'])
+    with tempfile.TemporaryDirectory(prefix='queue-format-audit-') as temporary:
+        observed=queue_sandbox.observe(root/'codex-linux-sandbox',repository,Path(temporary),'cli',{'steps':case['steps']})
+    assert candidate_files(repository)==before
+    assert capture_diff(repository,original['fixture_commit'])==(diff,metadata)
+    passed=observed['exit_code']==0 and json.dumps(observed['value'],sort_keys=True)==json.dumps(case['expected'],sort_keys=True)
+    initial=next(c for c in original['checks'] if c['case']=='durable_views' and c['mode']=='cli')
+    rest=[c for c in original['checks'] if c is not initial]
+    result={'run_id':entry['run_id'],'case':'durable_views','mode':'cli','original_passed':initial['passed'],
+        'audit_passed':passed,'original_task_success':original['task_success'],
+        'audited_task_success':original['public_test_success'] and passed and all(c['passed'] for c in rest),
+        'original_evaluation_sha256':sha256(root/'evaluations'/entry['run_id']/'evaluation.json'),
+        'candidate_diff_sha256':metadata['diff_sha256'],'observation':observed}
+    (audit/(entry['run_id']+'.json')).write_text(json.dumps(result,indent=2)+'\n')
+    return result
+with ThreadPoolExecutor(max_workers=4) as pool: results=list(pool.map(check,batch['runs']))
+record={'schema_version':1,'classification':'post-hoc contract audit, not the preregistered score',
+    'reason':'The frozen CLI worker prescribed json.dumps default ASCII escaping and whitespace although the task only required a sorted-key JSON value and one final newline.',
+    'scope':'Replace only durable_views/cli in a separate secondary score, applying the same audit to every unchanged candidate. All original scores/cases remain untouched.',
+    'original_worker_sha256':sha256(worker),'audit_worker_sha256':sha256(audit/'worker.py'),
+    'validator_sha256':sha256(validator),'model_calls':0,'candidate_changes':0,
+    'original_task_passed':sum(r['original_task_success'] for r in results),
+    'audited_task_passed':sum(r['audited_task_success'] for r in results),
+    'checks_changed':sum(r['audit_passed']!=r['original_passed'] for r in results),
+    'results':results}
+(audit/'audit.json').write_text(json.dumps(record,indent=2)+'\n')
+shutil.copyfile(__file__,audit/'audit-driver.py')
+print(json.dumps({k:v for k,v in record.items() if k!='results'},indent=2))

@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "experiment": "queue instruction matrix, exploratory",
+  "runs": 28,
+  "task_passed": 9,
+  "audited_task_passed": 11,
+  "cli_format_audit": "Separate post-hoc check, applied uniformly; original scores remain unchanged.",
+  "workflow_states": {
+    "completed": 22,
+    "failed": 6
+  },
+  "execution_usage": {
+    "input_tokens": 35458556,
+    "output_tokens": 1337193,
+    "cached_input_tokens": 33093541,
+    "total_tokens": 36795749
+  },
+  "preparation_tokens": 251977,
+  "campaign_total_tokens": 37047726,
+  "execution_wall_clock_ms": 1995200,
+  "aggregate_token_allocation": 35000000,
+  "hard_cumulative_token_limit": null,
+  "concurrency": {
+    "host": {
+      "peak": 8,
+      "eight_active_ms": 1449669
+    },
+    "phase": {
+      "peak": 8,
+      "eight_active_ms": 1443816
+    },
+    "model_requests": {
+      "peak": 8,
+      "eight_active_ms": 606905
+    }
+  },
+  "model_calls": 1459,
+  "combinations": [
+    {
+      "combination": "aaa",
+      "executed": 3,
+      "planned_slots": 4,
+      "task_passed": 0,
+      "audited_task_passed": 1,
+      "evaluation_unavailable": 0,
+      "workflow_completed": 2,
+      "input_tokens": 3346425,
+      "output_tokens": 141573,
+      "median_decision_to_exit_ms": 444698
+    },
+    {
+      "combination": "aab",
+      "executed": 3,
+      "planned_slots": 4,
+      "task_passed": 1,
+      "audited_task_passed": 1,
+      "evaluation_unavailable": 0,
+      "workflow_completed": 3,
+      "input_tokens": 4036399,
+      "output_tokens": 148093,
+      "median_decision_to_exit_ms": 482481
+    },
+    {
+      "combination": "aba",
+      "executed": 3,
+      "planned_slots": 4,
+      "task_passed": 1,
+      "audited_task_passed": 1,
+      "evaluation_unavailable": 0,
+      "workflow_completed": 3,
+      "input_tokens": 3454642,
+      "output_tokens": 138103,
+      "median_decision_to_exit_ms": 384842
+    },
+    {
+      "combination": "abb",
+      "executed": 3,
+      "planned_slots": 4,
+      "task_passed": 1,
+      "audited_task_passed": 2,
+      "evaluation_unavailable": 0,
+      "workflow_completed": 2,
+      "input_tokens": 5126596,
+      "output_tokens": 162463,
+      "median_decision_to_exit_ms": 554507
+    },
+    {
+      "combination": "baa",
+      "executed": 4,
+      "planned_slots": 4,
+      "task_passed": 3,
+      "audited_task_passed": 3,
+      "evaluation_unavailable": 0,
+      "workflow_completed": 4,
+      "input_tokens": 2092973,
+      "output_tokens": 138473,
+      "median_decision_to_exit_ms": 343943.0
+    },
+    {
+      "combination": "bab",
+      "executed": 4,
+      "planned_slots": 4,
+      "task_passed": 2,
+      "audited_task_passed": 2,
+      "evaluation_unavailable": 0,
+      "workflow_completed": 2,
+      "input_tokens": 6603802,
+      "output_tokens": 227000,
+      "median_decision_to_exit_ms": 608296.5
+    },
+    {
+      "combination": "bba",
+      "executed": 4,
+      "planned_slots": 4,
+      "task_passed": 0,
+      "audited_task_passed": 0,
+      "evaluation_unavailable": 0,
+      "workflow_completed": 4,
+      "input_tokens": 4570965,
+      "output_tokens": 171270,
+      "median_decision_to_exit_ms": 419366.0
+    },
+    {
+      "combination": "bbb",
+      "executed": 4,
+      "planned_slots": 4,
+      "task_passed": 1,
+      "audited_task_passed": 1,
+      "evaluation_unavailable": 0,
+      "workflow_completed": 2,
+      "input_tokens": 6226754,
+      "output_tokens": 210218,
+      "median_decision_to_exit_ms": 569842.0
+    }
+  ],
+  "paired_executor_verifier": {
+    "executor": {
+      "pairs": 14,
+      "outcomes": {
+        "tie": 7,
+        "a_only_passed": 5,
+        "b_only_passed": 2
+      },
+      "independent_plan_blocks": 7,
+      "audited_outcomes": {
+        "a_only_passed": 6,
+        "b_only_passed": 3,
+        "tie": 5
+      },
+      "interpretation": "Full-pipeline outcomes, not a fixed-candidate causal verifier estimate; executor samples differ."
+    },
+    "verifier": {
+      "pairs": 14,
+      "outcomes": {
+        "tie": 9,
+        "b_only_passed": 3,
+        "a_only_passed": 2
+      },
+      "independent_plan_blocks": 7,
+      "audited_outcomes": {
+        "a_only_passed": 3,
+        "b_only_passed": 4,
+        "tie": 7
+      },
+      "interpretation": "Full-pipeline outcomes, not a fixed-candidate causal verifier estimate; executor samples differ."
+    }
+  },
+  "planner_samples": {
+    "total": 8,
+    "schema_valid": 7,
+    "failed": 1,
+    "original_plans_approved_without_edit": 2,
+    "plans_with_accepted_corrections": 5,
+    "accepted_text_changes": 11,
+    "dependent_conditions_blocked": 3
+  },
+  "automatic_retries": 0,
+  "automatic_amendment_approvals": 0,
+  "plan_deviations": null,
+  "limitations": [
+    "One task, seven shared plan blocks and an incomplete factorial matrix.",
+    "Planner outcomes include explicitly accepted corrections; do not attribute those to raw planner quality.",
+    "Request overlap includes network/provider queueing, not proof of simultaneous backend computation.",
+    "Finite frozen evaluator corpus; no universal workflow winner or unobserved-test claim.",
+    "Frozen CLI serialization check was too strict; a separate audit corrects five check outcomes and two task scores.",
+    "Immutable model serving revision unavailable; token allocation is not a hard cap."
+  ]
+}
