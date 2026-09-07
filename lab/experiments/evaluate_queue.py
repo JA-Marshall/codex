@@ -8,7 +8,7 @@ import tempfile
 
 from evaluate_fixture import bounded_json, candidate_files
 from evaluate_fixture import observe as public_observe
-from queue_cases import CASES, CLI_INVALID, ERROR
+from queue_cases import CASES, CLI_INVALID, ERROR, job
 from queue_fixture import FIXTURE, evaluator_fingerprint
 from queue_sandbox import observe
 from setup_fixture import git, sha256
@@ -65,12 +65,14 @@ def evaluate_locked(repository, sandbox, output, fixture_manifest, run):
                 result = observe(sandbox, repository, scratch, mode, {"steps": case["steps"]})
                 checks.append({"case": case["name"], "mode": mode,
                     "passed": result["exit_code"] == 0 and equal(result["value"], case["expected"]), "observation": result})
-        for index, request in enumerate(CLI_INVALID):
+        invalid_requests = [{"bytes": list(value)} for value in CLI_INVALID]
+        invalid_requests += [{"bytes": list(b'{"op":"list"}'), "variant": variant} for variant in ("missing_file", "usage", "extra", "database")]
+        for index, request in enumerate(invalid_requests):
             scratch = base / f"invalid-{index}"
             scratch.mkdir()
-            result = observe(sandbox, repository, scratch, "cli_invalid", {"bytes": list(request)})
+            result = observe(sandbox, repository, scratch, "cli_invalid", request)
             checks.append({"case": f"invalid-request-{index}", "mode": "cli_invalid",
-                "passed": result["exit_code"] == 0 and equal(result["value"], ERROR), "observation": result})
+                "passed": result["exit_code"] == 0 and equal(result["value"], {"result": ERROR, "preserved": job("keep")}), "observation": result})
         for count in (1, 2):
             for repeat in range(3):
                 scratch = base / f"race-{count}-{repeat}"

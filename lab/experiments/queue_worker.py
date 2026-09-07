@@ -50,11 +50,15 @@ def race(repository, scratch, count):
         output.close()
 
 
-def cli(repository, scratch, request_bytes):
+def cli(repository, scratch, request_bytes, variant=None):
     request_path = scratch / "request.json"
     request_path.write_bytes(request_bytes)
-    result = subprocess.run([sys.executable, "-B", "-m", "durable_queue", "--db", str(scratch / "queue.db"),
-                             "--request", str(request_path)], cwd=repository, capture_output=True, timeout=5)
+    command = [sys.executable, "-B", "-m", "durable_queue", "--db", str(scratch if variant == "database" else scratch / "queue.db")]
+    if variant != "usage":
+        command += ["--request", str(scratch / "absent.json" if variant == "missing_file" else request_path)]
+    if variant == "extra":
+        command += ["unexpected"]
+    result = subprocess.run(command, cwd=repository, capture_output=True, timeout=5)
     if result.returncode == 2 and result.stdout == b"":
         return {"error": "ValueError"}
     if result.returncode != 0:
@@ -94,7 +98,11 @@ def main():
         print(json.dumps(race(repository, scratch, request["jobs"]), sort_keys=True))
         return
     if mode == "cli_invalid":
-        print(json.dumps(cli(repository, scratch, bytes(request["bytes"])), sort_keys=True))
+        from durable_queue import Queue
+        database = scratch / "queue.db"
+        Queue(database).submit([{"id": "keep"}])
+        result = cli(repository, scratch, bytes(request["bytes"]), request.get("variant"))
+        print(json.dumps({"result": result, "preserved": Queue(database).get("keep")}, sort_keys=True))
         return
     from durable_queue import Queue
     results = []

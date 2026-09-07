@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 import shutil
 import sys
@@ -22,7 +23,7 @@ class QueueEvaluationTests(unittest.TestCase):
         self.metadata = setup(self.root / "fixture")
         self.repository = Path(self.metadata["repository"])
         self.sandbox = self.root / "codex-linux-sandbox"
-        self.sandbox.symlink_to("/home/james/.cache/codex-lab-binaries/verifier-replay-v1-20260907/codex-lab")
+        self.sandbox.symlink_to(Path(os.environ["CODEX_LAB_TEST_BINARY"]).resolve())
         source = Path(__file__).parent
         self.reference = (source / "queue_reference.py").read_text()
         shutil.copyfile(source / "queue_reference_cli.py", self.repository / "durable_queue/__main__.py")
@@ -53,6 +54,11 @@ class QueueEvaluationTests(unittest.TestCase):
                 scratch.mkdir()
                 result = observe(self.sandbox, self.repository, scratch, "api", {"steps": case["steps"]})
                 self.assertNotEqual(json.dumps(result["value"], sort_keys=True), json.dumps(case["expected"], sort_keys=True))
+        (self.repository / "durable_queue/queue.py").write_text(self.reference.replace('view["state"] == "pending"', 'True'))
+        scratch = self.root / "broken-exclusivity"
+        scratch.mkdir()
+        result = observe(self.sandbox, self.repository, scratch, "race", {"jobs": 1})
+        self.assertFalse(result["value"]["unique"], result)
 
     def test_setup_keeps_private_evaluator_out_and_preserves_contract(self):
         other = setup(self.root / "other")

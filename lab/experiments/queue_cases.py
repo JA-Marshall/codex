@@ -61,8 +61,10 @@ for name, bad in [
     ("bool_attempts", [{"id":"a","max_attempts":True}]),
     ("negative_ready", [{"id":"a","ready_at":-1}]),
     ("empty_id", [{"id":""}]),
+    ("numeric_id", [{"id":1}]),
     ("unknown_field", [{"id":"a","unknown":1}]),
     ("payload_array", [{"id":"a","payload":[]}]),
+    ("nonfinite_payload", [{"id":"a","payload":{"value":float('nan')}}]),
     ("dependencies_string", [{"id":"a","dependencies":"x"}]),
     ("attempts_limit", [{"id":"a","max_attempts":101}]),
     ("batch_object", {"id":"a"}),
@@ -73,3 +75,8 @@ CASES.append(scenario("invalid_claim_no_recovery", [step("submit",jobs=[{"id":"a
     [ok([job("a")]),ok(job("a",state="running",attempts=1,worker="w",lease_until=2)),ERROR,ERROR,ERROR,ok(job("a",state="running",attempts=1,worker="w",lease_until=2))]))
 
 CLI_INVALID = [b'{', b'[]', b'\xff', b'{"op":"unknown"}', b'{"op":"list","extra":1}', b'{"op":"claim"}', b'{"op":"__getattribute__","name":"db_path"}']
+
+CASES.append(scenario("json_type_idempotency", [step("submit",jobs=[{"id":"a","payload":{"v":1}}]),step("submit",jobs=[{"id":"a","payload":{"v":True}}]),step("get",id="a")],
+    [ok([job("a",payload={"v":1})]),ERROR,ok(job("a",payload={"v":1}))]))
+CASES.append(scenario("terminal_and_invalid_fail", [step("submit",jobs=[{"id":"a"}]),step("claim",worker="w",now=0,lease_seconds=5),step("fail",id="a",worker="w",attempt=1,now=1,retry_delay=True),step("complete",id="a",worker="w",attempt=1,now=1),step("complete",id="a",worker="w",attempt=1,now=2),step("claim",worker="x",now=9,lease_seconds=5)],
+    [ok([job("a")]),ok(job("a",state="running",attempts=1,worker="w",lease_until=5)),ERROR,ok(job("a",state="succeeded",attempts=1)),ERROR,ok(None)]))

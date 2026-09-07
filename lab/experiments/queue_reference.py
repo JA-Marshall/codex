@@ -74,7 +74,7 @@ class Queue:
             for original in normalized:
                 key = original["id"]
                 if key in rows:
-                    if rows[key][0] != original:
+                    if json.dumps(rows[key][0], sort_keys=True) != json.dumps(original, sort_keys=True):
                         raise ValueError("conflicting job")
                 else:
                     current = dict(original, state="pending", attempts=0, worker=None, lease_until=None)
