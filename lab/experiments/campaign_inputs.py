@@ -12,6 +12,7 @@ import uuid
 
 from fixture_registry import FIXTURES
 from campaign_service import freeze_service
+from campaign_tasks import archive_just, archive_tasks, just_helper, selections, toolchain_pins
 
 MAX_RUNS = 1000
 FIXTURE_NAMES = (*FIXTURES, "durable-queue-v1")
@@ -65,12 +66,13 @@ def delegated_catalog(text, workflows):
 
 def freeze(args):
     workflows, fixtures = args.workflow, args.fixture
+    tasks, toolchain = selections(args, FIXTURE_NAMES)
+    task_just = just_helper(args, tasks)
     count = len(workflows) * len(fixtures) * args.repetitions
     if (
         not 1 <= count <= MAX_RUNS
         or not 1 <= args.jobs <= 32
         or not 0 <= args.max_amendments <= 4
-        or any(name not in FIXTURE_NAMES for name in fixtures)
         or len(set(workflows)) != len(workflows)
         or len(set(fixtures)) != len(fixtures)
     ):
@@ -93,6 +95,12 @@ def freeze(args):
     source = Path(__file__).resolve().parents[1]
     output = args.output.resolve()
     protected = (source, home, instruction_root, binary, sandbox, catalog)
+    if tasks:
+        protected += (Path(args.task_root).resolve(),)
+    if toolchain:
+        protected += (toolchain,)
+    if task_just:
+        protected += (task_just,)
     if output.exists() or any(
         output.is_relative_to(p) or p.is_relative_to(output) for p in protected
     ):
@@ -120,6 +128,8 @@ def freeze(args):
         shutil.copytree(origin, archive / relative, dirs_exist_ok=True)
     frozen_catalog = archive / "campaign-workflows.toml"
     frozen_catalog.write_text(effective, encoding="utf-8")
+    task_metadata = archive_tasks(archive, tasks)
+    helper_metadata = archive_just(archive, task_just)
     pins = [binary, sandbox, config_file, Path(sys.executable).resolve()]
     if config.get("model_catalog_json"):
         model_catalog = Path(config["model_catalog_json"])
@@ -128,6 +138,7 @@ def freeze(args):
     if bundled_sandbox.is_file():
         pins.append(bundled_sandbox)
     pins.extend(path for path in archive.rglob("*") if path.is_file())
+    pins.extend(toolchain_pins(toolchain))
     trials = []
     for repetition in range(1, args.repetitions + 1):
         for fixture_name in fixtures:
@@ -140,6 +151,7 @@ def freeze(args):
                         "fixture": fixture_name,
                         "workflow": workflow,
                         "repetition": repetition,
+                        **(tasks[fixture_name].facets() if fixture_name in tasks else {}),
                     }
                 )
     manifest = {
@@ -154,6 +166,9 @@ def freeze(args):
         "python": str(Path(sys.executable).resolve()),
         "requested_model": config.get("model"),
         "provider_service": service,
+        **task_metadata,
+        **helper_metadata,
+        **({"task_toolchain": str(toolchain)} if toolchain else {}),
         "jobs": args.jobs,
         "max_amendments": args.max_amendments,
         "trials": trials,
@@ -210,11 +225,19 @@ def load_campaign(path, expected_digest=None):
             not isinstance(name, str)
             or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,79}", name)
             or name in ids
-            or entry["fixture"] not in FIXTURE_NAMES
+            or entry["fixture"] not in (*FIXTURE_NAMES, *manifest.get("task_ids", []))
             or not isinstance(entry["workflow"], str)
         ):
             raise ValueError("invalid or duplicate campaign trial")
         ids.add(name)
+    if manifest.get("task_ids"):
+        if Path(manifest["task_root"]).resolve() != path.parent / "inputs/lab/tasks":
+            raise ValueError("task archive must belong to the frozen campaign")
+    if any(entry.get("language") == "rust" for entry in trials):
+        helper = path.parent / "inputs/lab/task-tools/just"
+        if (manifest.get("task_just") != str(helper)
+                or str(helper) not in manifest["pins"]):
+            raise ValueError("Rust task helper must be pinned in the frozen campaign")
     validate_pins(manifest)
     manifest["manifest_sha256"] = fingerprint
     return manifest
