@@ -8,3 +8,5 @@ providers/muse-contributor.models.json text eol=lf
 fixtures/** text eol=lf
 experiments/** text eol=lf
 pilot/** text eol=lf
+measurement-plan.json text eol=lf
+measurement/** text eol=lf

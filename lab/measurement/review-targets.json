@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "status": "unapproved; separate exact human decisions required",
+  "suite_root": "/home/james/.cache/codex-lab-varied-pilot/20260907T134224Z",
+  "source_commit": "6d0530fb92515be69c01238d9c2c4c4775c9715f",
+  "targets": [
+    {
+      "run_id": "csv-summary-v1-md-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "2e3d79f50c0e6b9845592c5ce006a49f3dc13834207b46951173743794606533",
+      "run_spec_sha256": "eca316333b7818b4f273a203b2ae3b587702f1cceb761f1c5ab756dbd07b99cf"
+    },
+    {
+      "run_id": "csv-summary-v1-json-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "2e3d79f50c0e6b9845592c5ce006a49f3dc13834207b46951173743794606533",
+      "run_spec_sha256": "728916318b45ed1f12a8150f196577419c4c8cc2b88e531c01d05cf83e557242"
+    },
+    {
+      "run_id": "dependency-order-v1-md-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "0eadb6d14529a2989108b40ffbbb8e44bbca0b0be88e776b8424730c74449a53",
+      "run_spec_sha256": "962f680837d9e87097eb5a2c6fe62b0ff7a62fc80f7831e7035871da9aa915a6"
+    },
+    {
+      "run_id": "dependency-order-v1-json-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "0eadb6d14529a2989108b40ffbbb8e44bbca0b0be88e776b8424730c74449a53",
+      "run_spec_sha256": "3e020acf3392512db0678112a233e863d69d09848c00bdc1a6a038bee2e0e59a"
+    },
+    {
+      "run_id": "config-merge-v1-md-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "0435406d6f40cc74eb0a175cf5415d58c68c0f13b573842d0346f85bbba471bd",
+      "run_spec_sha256": "5efe7f000ae71c0e87751aa1157249eb9898d397c577ef3ae884b02f86107a63"
+    },
+    {
+      "run_id": "config-merge-v1-json-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "0435406d6f40cc74eb0a175cf5415d58c68c0f13b573842d0346f85bbba471bd",
+      "run_spec_sha256": "95d46048347504153625fd7d3775009386baa8c3332394eb8b21c3ef401d2be1"
+    }
+  ],
+  "recommended_execution_run_ids": [
+    "dependency-order-v1-md-execution",
+    "dependency-order-v1-json-execution",
+    "config-merge-v1-md-execution",
+    "config-merge-v1-json-execution"
+  ],
+  "csv_recommendation": "Use the historical pair reevaluated with this evaluator as a labelled anchor; do not run the new CSV plan as written.",
+  "tasks": [
+    {
+      "fixture": "csv-summary-v1",
+      "baseline": "55fb025d812a1edff454d2f5c8cd90fdedc717e9",
+      "preparation": [
+        {
+          "condition": "md",
+          "phase_turns": 2,
+          "input_tokens": 20922,
+          "output_tokens": 4922,
+          "prepared_sha256": "165e40880720bba41cb6a3f9b0428fbd4d817ab0a770f513bced5d0f82afb7a2"
+        },
+        {
+          "condition": "json",
+          "phase_turns": 0,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "prepared_sha256": "492b258415b4870e178673d3ee29388c929c22b260570853c0e24f7921a90aaa"
+        }
+      ],
+      "canonical_sha256": "2e3d79f50c0e6b9845592c5ce006a49f3dc13834207b46951173743794606533",
+      "within_pair_controls_equal_except_renderer": true
+    },
+    {
+      "fixture": "dependency-order-v1",
+      "baseline": "8e166376f2a0a057c828d33d7fee32170ab136b4",
+      "preparation": [
+        {
+          "condition": "md",
+          "phase_turns": 2,
+          "input_tokens": 19300,
+          "output_tokens": 3271,
+          "prepared_sha256": "45bae53c05dcc4390b2dd4884bd6b1306de9476e633c2db533694b68e8fd564e"
+        },
+        {
+          "condition": "json",
+          "phase_turns": 0,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "prepared_sha256": "efb9a00655ff56dbe2fb5ffe1792de8400e0f9a951162814aee4df7f6fa131a2"
+        }
+      ],
+      "canonical_sha256": "0eadb6d14529a2989108b40ffbbb8e44bbca0b0be88e776b8424730c74449a53",
+      "within_pair_controls_equal_except_renderer": true
+    },
+    {
+      "fixture": "config-merge-v1",
+      "baseline": "01b53c7dd2d4f0c58e130aa3dd1b27a75f82d48c",
+      "preparation": [
+        {
+          "condition": "md",
+          "phase_turns": 2,
+          "input_tokens": 20685,
+          "output_tokens": 4343,
+          "prepared_sha256": "d2d0adc2bb0bd34b1a761411014a36280c4211b799c1b097198cd87cffd4861c"
+        },
+        {
+          "condition": "json",
+          "phase_turns": 0,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "prepared_sha256": "5ebf20e364f427c65c6918232e02651813d21c45ca8f32822c403d5894a3c701"
+        }
+      ],
+      "canonical_sha256": "0435406d6f40cc74eb0a175cf5415d58c68c0f13b573842d0346f85bbba471bd",
+      "within_pair_controls_equal_except_renderer": true
+    }
+  ],
+  "model": "muse-spark-1.3-contributor",
+  "limits": {
+    "execution_attempts_per_condition": 1,
+    "execution_attempts_total": 6,
+    "automatic_retries": 0,
+    "automatic_amendment_approvals": 0,
+    "existing_host_max_phases": 32,
+    "existing_host_max_phase_seconds": 1800,
+    "existing_host_max_phase_events": 10000,
+    "existing_host_max_phase_event_bytes": 4194304,
+    "existing_context_fragment_bytes": 8192,
+    "existing_combined_context_bytes": 16384,
+    "model_context_window": 1048576,
+    "model_auto_compact_token_limit": 900000,
+    "hard_cumulative_token_limit": null,
+    "hard_spend_limit": null
+  },
+  "suite_manifest_sha256": "adf67a475e9e296adc81570f4c8280e44811c325bc456816e886a54fc231797c"
+}

@@ -7,9 +7,66 @@ import unittest
 
 from evaluate_fixture import evaluate
 from setup_fixture import FIXTURE, setup
+from fixture_registry import fixture
 
 
 class FixtureTests(unittest.TestCase):
+    def test_structured_tasks_are_deterministic_and_calibrated(self):
+        binary = Path(os.environ["CODEX_LAB_TEST_BINARY"]).resolve()
+        for name in ("dependency-order-v1", "config-merge-v1"):
+            with self.subTest(fixture=name), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                selected = fixture(name)
+                first = setup(root / "fixture", name)
+                second = setup(root / "repeat", name)
+                self.assertEqual(
+                    (first["commit"], first["files"]),
+                    (second["commit"], second["files"]),
+                )
+                self.assertEqual(
+                    set(first["files"]),
+                    {
+                        ".gitignore",
+                        "TASK.md",
+                        "cli.py",
+                        selected.module + ".py",
+                        "tests/test_public.py",
+                    },
+                )
+                repository = root / "fixture/repository"
+                module = repository / (selected.module + ".py")
+                original = module.read_bytes()
+                sandbox = root / "codex-linux-sandbox"
+                sandbox.symlink_to(binary)
+                for variant in ("baseline", "noop", "partial", "reference"):
+                    if variant == "noop":
+                        module.write_bytes(original + b"\n# Cosmetic change.\n")
+                    elif variant == "partial":
+                        module.write_text(
+                            "def order_tasks(graph):\n    return sorted(graph, key=lambda n: len(graph[n]))\n"
+                            if name == "dependency-order-v1"
+                            else "def merge_config(base, override):\n    return dict(base, **override)\n"
+                        )
+                    elif variant == "reference":
+                        shutil.copyfile(
+                            Path(__file__).with_name("reference_structured.py"), module
+                        )
+                    result = evaluate(
+                        repository,
+                        sandbox,
+                        root / variant,
+                        root / "fixture/fixture.json",
+                    )
+                    self.assertEqual(
+                        result["task_success"],
+                        variant == "reference",
+                        json.dumps(result, indent=2),
+                    )
+                    self.assertEqual(
+                        result["hidden_test_success"], variant == "reference"
+                    )
+                    self.assertEqual(len(result["checks"]), len(selected.cases))
+
     def test_setup_pins_identical_commits_and_excludes_evaluator(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

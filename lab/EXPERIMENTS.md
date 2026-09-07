@@ -39,7 +39,7 @@ python3.12 lab/experiments/setup_fixture.py /absolute/fixture-001
 
 The new destination contains `repository/` and `fixture.json`. The checkout contains the task, an intentionally broken CSV API/CLI, and public tests. Its Git commit is deterministic. Setup records task/tree/file hashes, interpreter identity and the evaluator fingerprint. Hidden expected answers and the calibration reference stay outside the model checkout and prompt. They are local experiment inputs, not a secret benchmark service.
 
-After the live workflow completes and shuts down:
+After the live workflow reaches `completed` or `failed` and every phase has confirmed shutdown:
 
 ```sh
 python3.12 lab/experiments/evaluate_fixture.py \
@@ -67,4 +67,4 @@ Only one differing control, `plan.renderer`, can receive `controlled_recorded_pa
 
 For a live pair, generate one canonical plan, prepare a Markdown condition and a JSON condition from those exact bytes, and obtain a distinct human approval for each execution. Fresh baseline checkouts and unchanged model/catalog/roles/settings are required. Development approval does not substitute for task-specific human decisions.
 
-The first approved pair has finished; see [pilot results](pilot/RESULTS.md). Markdown failed the verifier-report contract, while JSON completed but failed one independent CLI case. Comparison correctly returned `descriptive_only`. The current evaluator refuses terminal failed workflows, so their candidate correctness remains unknown; this limitation and concrete follow-up proposals are retained in the results.
+The first approved pair has finished; see [pilot results](pilot/RESULTS.md). Markdown failed the verifier-report contract, while JSON completed but failed one independent CLI case. Comparison correctly returned `descriptive_only`. The original evaluator refused failed workflows, leaving Markdown correctness unknown in that historical report. [Failure measurement](MEASUREMENT.md) now supports separate evaluations of safely stopped failed runs and introduces two additional calibrated task types; old reports remain unchanged.

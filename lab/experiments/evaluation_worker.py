@@ -1,6 +1,7 @@
 """Unprivileged observation worker; expected answers stay in the host evaluator."""
 
 import importlib.util
+from copy import deepcopy
 import json
 import os
 from pathlib import Path
@@ -35,19 +36,26 @@ if mode == "probe":
         raise RuntimeError("evaluator networking is available")
     print("isolated")
 elif mode == "api":
+    request = json.load(sys.stdin)
+    module_name = request["module"]
     spec = importlib.util.spec_from_file_location(
-        "csv_summary", repository / "csv_summary.py"
+        module_name, repository / (module_name + ".py")
     )
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     observations = []
-    for text in json.load(sys.stdin):
+    for arguments in request["arguments"]:
+        before = deepcopy(arguments)
         try:
-            observations.append({"value": module.summarize(text)})
+            observation = {"value": getattr(module, request["function"])(*arguments)}
         except ValueError:
-            observations.append({"error": "ValueError"})
+            observation = {"error": "ValueError"}
         except Exception as error:
-            observations.append({"error": type(error).__name__})
+            observation = {"error": type(error).__name__}
+        # Use serialized equality so Python's True == 1 does not mask mutation.
+        if json.dumps(before, sort_keys=True) != json.dumps(arguments, sort_keys=True):
+            observation = {"error": "InputMutated"}
+        observations.append(observation)
     print(json.dumps(observations, sort_keys=True))
 elif mode == "cli":
     sys.argv = [str(repository / "cli.py"), sys.argv[3]]
