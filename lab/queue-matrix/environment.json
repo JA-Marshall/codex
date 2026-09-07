@@ -1,0 +1,11 @@
+{
+  "arch": "x86_64",
+  "lab_version": "0.0.0",
+  "native_skills": "disabled; frozen procedural modules use developer instructions",
+  "os": "linux",
+  "phase_threads": "fresh per phase",
+  "repository_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+  "tool_path": "/usr/local/bin:/usr/bin:/bin",
+  "trace_completeness": "best effort; local compaction inference may be absent",
+  "trace_root": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/traces"
+}
