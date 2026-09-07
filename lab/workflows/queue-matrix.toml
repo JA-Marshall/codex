@@ -1,0 +1,70 @@
+schema_version = 1
+
+[skills."planner/queue-concise-v1"]
+path = "instructions/planner/queue-concise-v1"
+sha256 = "43b125a14cfedd5ee4fcb8e45f2fc75663ba65658706757216b91764c2052978"
+
+[skills."planner/queue-architecture-v1"]
+path = "instructions/planner/queue-architecture-v1"
+sha256 = "caae1863a3e8f91f99fbd0f372c78e5ce2b8b76315fa3eb000d6ca699b8f9655"
+
+[skills."executor/queue-conservative-v1"]
+path = "instructions/executor/queue-conservative-v1"
+sha256 = "31568b6537ec10770b55eabeaf48332a7c8821ededabc2cd33959b2c2e2f13e8"
+
+[skills."executor/queue-tdd-v1"]
+path = "instructions/executor/queue-tdd-v1"
+sha256 = "8c0c8dac429fe58e0176c64dcc67455e743d110bb9f9225efe4329ef8dc86401"
+
+[skills."verifier/queue-tests-v1"]
+path = "instructions/verifier/queue-tests-v1"
+sha256 = "e0d51bd370c3d7a20ec63f18d721e862d4afc679618b6b914d5d9b8eb0e44ad9"
+
+[skills."verifier/queue-adversarial-v1"]
+path = "instructions/verifier/queue-adversarial-v1"
+sha256 = "c73e3d9b0cddd829b749fefba10a32988d060e7d94e501c4716605a1a299dfd6"
+
+[workflows.queue-base]
+approval = "human_required"
+plan.renderer = "markdown"
+roles.planner = "planner/queue-concise-v1"
+roles.executor = "executor/queue-conservative-v1"
+roles.verifier = "verifier/queue-tests-v1"
+
+[workflows.queue-aaa-v1]
+extends = "queue-base"
+
+[workflows.queue-aab-v1]
+extends = "queue-base"
+roles.verifier = "verifier/queue-adversarial-v1"
+
+[workflows.queue-aba-v1]
+extends = "queue-base"
+roles.executor = "executor/queue-tdd-v1"
+
+[workflows.queue-abb-v1]
+extends = "queue-base"
+roles.executor = "executor/queue-tdd-v1"
+roles.verifier = "verifier/queue-adversarial-v1"
+
+[workflows.queue-baa-v1]
+extends = "queue-base"
+roles.planner = "planner/queue-architecture-v1"
+
+[workflows.queue-bab-v1]
+extends = "queue-base"
+roles.planner = "planner/queue-architecture-v1"
+roles.verifier = "verifier/queue-adversarial-v1"
+
+[workflows.queue-bba-v1]
+extends = "queue-base"
+roles.planner = "planner/queue-architecture-v1"
+roles.executor = "executor/queue-tdd-v1"
+
+[workflows.queue-bbb-v1]
+extends = "queue-base"
+roles.planner = "planner/queue-architecture-v1"
+roles.executor = "executor/queue-tdd-v1"
+roles.verifier = "verifier/queue-adversarial-v1"
+
+
