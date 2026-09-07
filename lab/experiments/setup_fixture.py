@@ -25,6 +25,7 @@ def evaluator_fingerprint() -> str:
             "evaluation_worker.py",
             "fixture_cases.py",
             "setup_fixture.py",
+            "terminal_run.py",
         ]
     ] + [FIXTURE / "project/tests/test_public.py"]
     content = {
