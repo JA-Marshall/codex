@@ -24,19 +24,20 @@ def collect_output(process, name, directory, inbox):
         try:
             with (directory / "stderr.log").open("xb") as log:
                 while data := process.stderr.read(65536):
-                    log.write(data[:max(0, 1024 * 1024 - size)])
+                    log.write(data[: max(0, 1024 * 1024 - size)])
                     size += len(data)
         except OSError:
             inbox.put((name, "error", "stderr capture failed"))
             while process.stderr.read(65536):
                 pass
+
     error_reader = threading.Thread(target=stderr, daemon=True)
     error_reader.start()
     size = 0
     try:
         with (directory / "stdout.log").open("xb") as log:
             while line := process.stdout.readline(MAX_FRAME + 1):
-                log.write(line[:max(0, MAX_LOG - size)])
+                log.write(line[: max(0, MAX_LOG - size)])
                 size += len(line)
                 if len(line) > MAX_FRAME or size > MAX_LOG:
                     if size - len(line) <= MAX_LOG:
@@ -83,9 +84,14 @@ class Batch:
         self.started = time.monotonic()
 
     def event(self, kind, **fields):
-        value = {"schema_version": 1, "sequence": self.sequence, "type": kind,
-                 "unix_ms": time.time_ns() // 1000000,
-                 "elapsed_ms": int((time.monotonic() - self.started) * 1000), **fields}
+        value = {
+            "schema_version": 1,
+            "sequence": self.sequence,
+            "type": kind,
+            "unix_ms": time.time_ns() // 1000000,
+            "elapsed_ms": int((time.monotonic() - self.started) * 1000),
+            **fields,
+        }
         self.sequence += 1
         self.trace.write(json.dumps(value) + "\n")
         self.trace.flush()
@@ -95,20 +101,33 @@ class Batch:
         if child["broken"]:
             return
         target, rendered = value["target"], value["rendered"]
-        if (value["schema_version"] != 1 or type(value["request_id"]) is not int
-                or value["request_id"] != child["sequence"] + 1
-                or value["request_id"] > 32 or child["request"] is not None
-                or target["run_id"] != name or not isinstance(rendered["content"], str)
-                or len(rendered["content"].encode()) > 512 * 1024):
+        if (
+            value["schema_version"] != 1
+            or type(value["request_id"]) is not int
+            or value["request_id"] != child["sequence"] + 1
+            or value["request_id"] > 32
+            or child["request"] is not None
+            or target["run_id"] != name
+            or not isinstance(rendered["content"], str)
+            or len(rendered["content"].encode()) > 512 * 1024
+        ):
             raise ValueError("invalid or stale child review request")
         # Only the trusted JsonReviewer emits this frame, after phase shutdown.
         child.update(active=False, sequence=value["request_id"], request=value)
         request_file = self.output / name / f"review-{value['request_id']:02}.json"
         with request_file.open("x") as file:
             json.dump(value, file, indent=2)
-        self.event("review_requested", run_id=name, request_id=value["request_id"], target=target,
-                   review=str(request_file))
-        print(f"REVIEW {name} {value['request_id']} {json.dumps(target)}\nPlan: {request_file}", flush=True)
+        self.event(
+            "review_requested",
+            run_id=name,
+            request_id=value["request_id"],
+            target=target,
+            review=str(request_file),
+        )
+        print(
+            f"REVIEW {name} {value['request_id']} {json.dumps(target)}\nPlan: {request_file}",
+            flush=True,
+        )
         if self.draining:
             child["process"].stdin.close()
 
@@ -116,17 +135,30 @@ class Batch:
         name, request_id, command = line.split(" ", 2)
         child = self.children[name]
         request = child["request"]
-        if self.draining or request is None or request["request_id"] != int(request_id) or child["queued"]:
+        if (
+            self.draining
+            or request is None
+            or request["request_id"] != int(request_id)
+            or child["queued"]
+        ):
             raise ValueError("decision has no current unqueued review request")
         if command.startswith("approve "):
             if command != "approve " + request["target"]["content_sha256"]:
                 raise ValueError("approval digest does not match current target")
-        elif command != "abort" and not (command.startswith("reject ") or command.startswith("edit ")):
-            raise ValueError("expected approve DIGEST, reject REASON, edit PATH, or abort")
+        elif command != "abort" and not (
+            command.startswith("reject ") or command.startswith("edit ")
+        ):
+            raise ValueError(
+                "expected approve DIGEST, reject REASON, edit PATH, or abort"
+            )
         if len(command.encode()) > 8192 or any(ord(c) < 32 for c in command):
             raise ValueError("invalid decision command")
-        response = {"schema_version": 1, "request_id": request["request_id"],
-                    "target": request["target"], "command": command}
+        response = {
+            "schema_version": 1,
+            "request_id": request["request_id"],
+            "target": request["target"],
+            "command": command,
+        }
         self.event("human_decision_queued", run_id=name, response=response)
         child["queued"] = True
         self.waiting.append((name, response))
@@ -148,9 +180,15 @@ class Batch:
             except (BrokenPipeError, OSError):
                 self.fail_child(name, "review channel closed")
                 continue
-            child.update(active=response["command"] != "abort", request=None, queued=False)
-            self.event("decision_sent", run_id=name, request_id=response["request_id"],
-                       active_jobs=sum(c["active"] for c in self.children.values()))
+            child.update(
+                active=response["command"] != "abort", request=None, queued=False
+            )
+            self.event(
+                "decision_sent",
+                run_id=name,
+                request_id=response["request_id"],
+                active_jobs=sum(c["active"] for c in self.children.values()),
+            )
 
     def fail_child(self, name, reason):
         self.failed = True
@@ -168,7 +206,10 @@ class Batch:
             self.waiting.clear()
             for child in self.children.values():
                 child["process"].stdin.close()
-            print("Input closed: no further decisions; waiting for existing hosts to exit.", flush=True)
+            print(
+                "Input closed: no further decisions; waiting for existing hosts to exit.",
+                flush=True,
+            )
 
     def run(self):
         try:
@@ -186,12 +227,21 @@ class Batch:
 
     def coordinate(self):
         self.output.mkdir(exist_ok=False)
-        (self.output / "batch.json").write_text(json.dumps(self.config, indent=2) + "\n")
+        (self.output / "batch.json").write_text(
+            json.dumps(self.config, indent=2) + "\n"
+        )
         self.sequence = 1
         with (self.output / "events.jsonl").open("x") as self.trace:
-            self.event("batch_started", jobs=self.config["jobs"], max_hosts=32,
-                       cpu_count=os.cpu_count(), platform=sys.platform,
-                       python=sys.version, automatic_retries=0, authority_restored=False)
+            self.event(
+                "batch_started",
+                jobs=self.config["jobs"],
+                max_hosts=32,
+                cpu_count=os.cpu_count(),
+                platform=sys.platform,
+                python=sys.version,
+                automatic_retries=0,
+                authority_restored=False,
+            )
             for entry in self.config["runs"]:
                 if self.cancel_requested:
                     self.drain()
@@ -200,23 +250,55 @@ class Batch:
                 try:
                     if fingerprint(Path(entry["prepared"])) != entry["prepared_sha256"]:
                         raise ValueError("prepared descriptor changed before launch")
-                    if fingerprint(Path(self.config["binary"])) != self.config["binary_sha256"]:
+                    if (
+                        fingerprint(Path(self.config["binary"]))
+                        != self.config["binary_sha256"]
+                    ):
                         raise ValueError("batch binary changed before launch")
                     directory = self.output / name
                     directory.mkdir()
-                    process = subprocess.Popen([self.config["binary"], "run-prepared", "--prepared",
-                                                entry["prepared"], "--run-id", name, "--review-json"],
-                                               stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                               start_new_session=os.name != "nt",
-                                               creationflags=0x08000200 if os.name == "nt" else 0)
-                    self.children[name] = {"process": process, "active": False, "sequence": 0,
-                                           "request": None, "queued": False, "exit": None, "broken": False}
-                    self.event("host_started", run_id=name, pid=process.pid, artifacts=entry["artifacts"])
-                    threading.Thread(target=collect_output, args=(process, name, directory, self.inbox), daemon=True).start()
+                    process = subprocess.Popen(
+                        [
+                            self.config["binary"],
+                            "run-prepared",
+                            "--prepared",
+                            entry["prepared"],
+                            "--run-id",
+                            name,
+                            "--review-json",
+                        ],
+                        stdin=subprocess.PIPE,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                        start_new_session=os.name != "nt",
+                        creationflags=0x08000200 if os.name == "nt" else 0,
+                    )
+                    self.children[name] = {
+                        "process": process,
+                        "active": False,
+                        "sequence": 0,
+                        "request": None,
+                        "queued": False,
+                        "exit": None,
+                        "broken": False,
+                    }
+                    self.event(
+                        "host_started",
+                        run_id=name,
+                        pid=process.pid,
+                        artifacts=entry["artifacts"],
+                    )
+                    threading.Thread(
+                        target=collect_output,
+                        args=(process, name, directory, self.inbox),
+                        daemon=True,
+                    ).start()
                 except (OSError, ValueError) as error:
                     self.failed = True
                     self.event("launch_failed", run_id=name, reason=str(error))
-            threading.Thread(target=collect_input, args=(self.source, self.inbox), daemon=True).start()
+            threading.Thread(
+                target=collect_input, args=(self.source, self.inbox), daemon=True
+            ).start()
             while any(c["exit"] is None for c in self.children.values()):
                 try:
                     if self.cancel_requested:
@@ -234,7 +316,9 @@ class Batch:
                             print("Decision refused: " + str(error), flush=True)
                             self.event("decision_refused", reason=str(error))
                     elif kind == "exit":
-                        self.children[name].update(exit=value, active=False, request=None)
+                        self.children[name].update(
+                            exit=value, active=False, request=None
+                        )
                         self.children[name]["process"].stdin.close()
                         self.failed |= value != 0
                         self.event("host_exited", run_id=name, exit_code=value)
@@ -251,10 +335,18 @@ class Batch:
                 except KeyboardInterrupt:
                     self.cancel_requested = True
                     self.drain()
-            result = {"schema_version": 1, "failed": self.failed,
-                      "exit_codes": {e["run_id"]: self.children.get(e["run_id"], {}).get("exit") for e in self.config["runs"]},
-                      "note": "Process exits are not task success or proof of tool shutdown; use the existing evaluator."}
-            (self.output / "result.json").write_text(json.dumps(result, indent=2) + "\n")
+            result = {
+                "schema_version": 1,
+                "failed": self.failed,
+                "exit_codes": {
+                    e["run_id"]: self.children.get(e["run_id"], {}).get("exit")
+                    for e in self.config["runs"]
+                },
+                "note": "Process exits are not task success or proof of tool shutdown; use the existing evaluator.",
+            }
+            (self.output / "result.json").write_text(
+                json.dumps(result, indent=2) + "\n"
+            )
             self.event("batch_exited", failed=self.failed)
         return 1 if self.failed else 0
 
@@ -266,7 +358,10 @@ if __name__ == "__main__":
     parser.add_argument("--jobs", type=int, default=2)
     args = parser.parse_args()
     config = load_batch(args.manifest, args.output, args.jobs)
-    print("Decisions: RUN_ID REQUEST_ID approve DIGEST | reject REASON | edit PATH | abort", flush=True)
+    print(
+        "Decisions: RUN_ID REQUEST_ID approve DIGEST | reject REASON | edit PATH | abort",
+        flush=True,
+    )
     batch = Batch(config, args.output.resolve())
     # Defer Ctrl+C into the coordinator, including while Popen is starting a host.
     signal.signal(signal.SIGINT, lambda *_: setattr(batch, "cancel_requested", True))

@@ -15,7 +15,7 @@ from batch_inputs import load_batch
 from run_batch import Batch
 
 
-FAKE_HOST = r'''
+FAKE_HOST = r"""
 import hashlib,json,sys,time
 from pathlib import Path
 args=sys.argv
@@ -40,7 +40,7 @@ for revision in range(1,3 if name=='amend' else 2):
     if name=='fail': sys.exit(7)
     while not (root/('finish-'+str(revision))).exists(): time.sleep(.01)
 sys.exit(0)
-'''
+"""
 
 
 class BatchTests(unittest.TestCase):
@@ -78,34 +78,55 @@ class BatchTests(unittest.TestCase):
             subprocess.run(["git", "init", "-q", str(repository)], check=True)
             prepared = runs / (name + "-prepared") / "evidence/prepared.json"
             prepared.parent.mkdir(parents=True)
-            prepared.write_text(json.dumps({"repository": str(repository), "codex_home": str(home),
-                                           "runs_directory": str(runs)}))
+            prepared.write_text(
+                json.dumps(
+                    {
+                        "repository": str(repository),
+                        "codex_home": str(home),
+                        "runs_directory": str(runs),
+                    }
+                )
+            )
             entries.append({"run_id": name, "prepared": str(prepared)})
         # Use the actual interpreter as a pinned executable; the test-only Popen
         # adapter adds fake.py. Production always executes the pinned host directly.
         self.manifest = self.root / "manifest.json"
-        self.manifest.write_text(json.dumps({"schema_version": 1, "binary": sys.executable, "runs": entries}))
+        self.manifest.write_text(
+            json.dumps({"schema_version": 1, "binary": sys.executable, "runs": entries})
+        )
         self.output = self.root / "batch"
         self.config = load_batch(self.manifest, self.output, jobs)
 
     def start(self, wait_for_reviews=True):
         read_fd, write_fd = os.pipe()
-        self.reader, self.writer = os.fdopen(read_fd), os.fdopen(write_fd, "w", buffering=1)
+        self.reader, self.writer = (
+            os.fdopen(read_fd),
+            os.fdopen(write_fd, "w", buffering=1),
+        )
         self.batch = Batch(self.config, self.output, self.reader)
         real_popen = subprocess.Popen
+
         def spawn(command, **kwargs):
             return real_popen([sys.executable, str(self.fake), *command[1:]], **kwargs)
+
         self.result = []
+
         def run():
             try:
                 with patch("run_batch.subprocess.Popen", side_effect=spawn):
                     self.result.append(self.batch.run())
             except BaseException as error:
                 self.result.append(error)
+
         self.thread = threading.Thread(target=run)
         self.thread.start()
         if wait_for_reviews:
-            self.wait(lambda: all((self.output / e["run_id"] / "review-01.json").exists() for e in self.config["runs"]))
+            self.wait(
+                lambda: all(
+                    (self.output / e["run_id"] / "review-01.json").exists()
+                    for e in self.config["runs"]
+                )
+            )
 
     def wait(self, predicate):
         deadline = time.monotonic() + 10
@@ -115,8 +136,11 @@ class BatchTests(unittest.TestCase):
                     return
             except (FileNotFoundError, json.JSONDecodeError):
                 pass
-            time.sleep(.01)
-        self.fail("condition timed out; batch result: " + repr(self.result if hasattr(self, "result") else None))
+            time.sleep(0.01)
+        self.fail(
+            "condition timed out; batch result: "
+            + repr(self.result if hasattr(self, "result") else None)
+        )
 
     def approve(self, name, revision=1):
         digest = hashlib.sha256((name + str(revision)).encode()).hexdigest()
@@ -126,7 +150,10 @@ class BatchTests(unittest.TestCase):
         (self.root / name / f"finish-{revision}").touch()
 
     def events(self):
-        return [json.loads(line) for line in (self.output / "events.jsonl").read_text().splitlines()]
+        return [
+            json.loads(line)
+            for line in (self.output / "events.jsonl").read_text().splitlines()
+        ]
 
     def done(self, code):
         self.thread.join(10)
@@ -138,7 +165,12 @@ class BatchTests(unittest.TestCase):
         self.start()
         for name in ("a", "b", "c"):
             self.approve(name)
-        self.wait(lambda: (self.root / "a/started-1").exists() and (self.root / "b/started-1").exists())
+        self.wait(
+            lambda: (
+                (self.root / "a/started-1").exists()
+                and (self.root / "b/started-1").exists()
+            )
+        )
         self.assertFalse((self.root / "c/started-1").exists())
         self.finish("a")
         self.wait(lambda: (self.root / "c/started-1").exists())
@@ -179,7 +211,10 @@ class BatchTests(unittest.TestCase):
         self.wait(lambda: (self.root / "ok/started-1").exists())
         self.finish("ok")
         self.done(1)
-        self.assertEqual(json.loads((self.output / "result.json").read_text())["exit_codes"], {"fail": 7, "ok": 0})
+        self.assertEqual(
+            json.loads((self.output / "result.json").read_text())["exit_codes"],
+            {"fail": 7, "ok": 0},
+        )
 
     def test_eof_discards_queued_authority_and_drains_running_host(self):
         self.fixture(["a", "b"], jobs=1)
@@ -201,7 +236,9 @@ class BatchTests(unittest.TestCase):
         self.done(1)
         self.assertFalse((self.root / "oversized/started-1").exists())
         self.assertTrue(any(e["type"] == "channel_failed" for e in self.events()))
-        self.assertLessEqual((self.output / "oversized/stdout.log").stat().st_size, 8 * 1024 * 1024)
+        self.assertLessEqual(
+            (self.output / "oversized/stdout.log").stat().st_size, 8 * 1024 * 1024
+        )
 
     def test_cancel_before_launch_starts_no_child_and_records_all_unstarted_ids(self):
         self.fixture(["a", "b"])
@@ -210,7 +247,10 @@ class BatchTests(unittest.TestCase):
         with patch("run_batch.subprocess.Popen") as spawn:
             self.assertEqual(self.batch.run(), 1)
             spawn.assert_not_called()
-        self.assertEqual(json.loads((self.output / "result.json").read_text())["exit_codes"], {"a": None, "b": None})
+        self.assertEqual(
+            json.loads((self.output / "result.json").read_text())["exit_codes"],
+            {"a": None, "b": None},
+        )
 
     def test_preflight_refuses_aliases_overlap_existing_outputs_and_pin_drift(self):
         self.fixture(["a", "b"])

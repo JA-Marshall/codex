@@ -56,13 +56,16 @@ fn exchange(
 ) -> Result<HumanDecision> {
     // Reuse terminal review's content/target bounds and control-character check.
     review_prompt(target, rendered)?;
-    serde_json::to_writer(&mut output, &serde_json::json!({
-        "schema_version": 1, "type": "lab_review", "request_id": request_id,
-        "target": target, "rendered": {
-            "filename": rendered.filename, "media_type": rendered.media_type,
-            "content": std::str::from_utf8(&rendered.content)?,
-        },
-    }))?;
+    serde_json::to_writer(
+        &mut output,
+        &serde_json::json!({
+            "schema_version": 1, "type": "lab_review", "request_id": request_id,
+            "target": target, "rendered": {
+                "filename": rendered.filename, "media_type": rendered.media_type,
+                "content": std::str::from_utf8(&rendered.content)?,
+            },
+        }),
+    )?;
     output.write_all(b"\n")?;
     output.flush()?;
     let mut line = String::new();
@@ -70,11 +73,16 @@ fn exchange(
     if line.is_empty() {
         return Ok(HumanDecision::Abort);
     }
-    ensure!(line.len() <= 65536 && line.ends_with('\n'), "invalid review frame length");
+    ensure!(
+        line.len() <= 65536 && line.ends_with('\n'),
+        "invalid review frame length"
+    );
     let response: Response = serde_json::from_str(&line)?;
     ensure!(response.schema_version == 1, "unsupported review protocol");
-    ensure!(response.request_id == request_id && response.target == serde_json::to_value(target)?,
-        "review response does not match current request and target");
+    ensure!(
+        response.request_id == request_id && response.target == serde_json::to_value(target)?,
+        "review response does not match current request and target"
+    );
     parse_decision(&response.command, target)
 }
 

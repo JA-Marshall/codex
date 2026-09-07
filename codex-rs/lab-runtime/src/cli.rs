@@ -9,8 +9,8 @@ use clap::Parser;
 use clap::Subcommand;
 use codex_core_api::Arg0DispatchPaths;
 use codex_lab::PlanRevision;
-use codex_lab_runtime::RunOptions;
 use codex_lab_runtime::JsonReviewer;
+use codex_lab_runtime::RunOptions;
 use codex_lab_runtime::TerminalReviewer;
 use codex_lab_runtime::compare_runs;
 use codex_lab_runtime::execute_run;
@@ -109,7 +109,11 @@ pub async fn run(arg0_paths: Arg0DispatchPaths) -> Result<()> {
         Command::Prepare(args) => {
             serde_json::to_value(prepare_run(args.into_options()?, arg0_paths).await?)?
         }
-        Command::RunPrepared { prepared, run_id, review_json } => {
+        Command::RunPrepared {
+            prepared,
+            run_id,
+            review_json,
+        } => {
             let result = if review_json {
                 run_prepared(&prepared, run_id, arg0_paths, &mut JsonReviewer::default()).await?
             } else {

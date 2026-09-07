@@ -13,9 +13,15 @@ use super::Cli;
 #[test]
 fn prepared_review_channel_is_explicit_in_cli_help() -> anyhow::Result<()> {
     let help = Cli::try_parse_from(["codex-lab", "run-prepared", "--help"])
-        .err().context("expected help")?;
+        .err()
+        .context("expected help")?;
     assert_eq!(help.kind(), ErrorKind::DisplayHelp);
-    let rendered = help.to_string().lines().map(str::trim_end).collect::<Vec<_>>().join("\n");
+    let rendered = help
+        .to_string()
+        .lines()
+        .map(str::trim_end)
+        .collect::<Vec<_>>()
+        .join("\n");
     insta::assert_snapshot!(rendered, @r###"
     Validate a saved plan and request a fresh exact human decision
 
