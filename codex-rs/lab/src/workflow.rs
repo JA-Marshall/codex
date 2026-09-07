@@ -102,7 +102,9 @@ pub(crate) enum Command {
         progress: StepProgress,
     },
     BeginVerification,
-    BeginRepair { limit: u8 },
+    BeginRepair {
+        limit: u8,
+    },
     RecordVerification {
         id: String,
         evidence: VerificationEvidence,
@@ -141,7 +143,9 @@ pub(crate) enum Change {
         progress: StepProgress,
     },
     VerificationStarted,
-    RepairStarted { attempt: u8 },
+    RepairStarted {
+        attempt: u8,
+    },
     VerificationRecorded {
         id: String,
         evidence: VerificationEvidence,
@@ -193,15 +197,22 @@ impl Workflow {
                     || self.repairs >= limit
                     || !self.snapshot.verification.values().any(|e| !e.passed)
                 {
-                    return Err(LabError::Invalid("repair requires approved failed verification and remaining budget".into()));
+                    return Err(LabError::Invalid(
+                        "repair requires approved failed verification and remaining budget".into(),
+                    ));
                 }
                 self.repairs += 1;
                 self.snapshot.verification.clear();
                 for progress in self.snapshot.progress.values_mut() {
-                    *progress = StepProgress { status: StepStatus::Pending, evidence: None };
+                    *progress = StepProgress {
+                        status: StepStatus::Pending,
+                        evidence: None,
+                    };
                 }
                 self.snapshot.state = WorkflowState::Implementing;
-                Ok(Change::RepairStarted { attempt: self.repairs })
+                Ok(Change::RepairStarted {
+                    attempt: self.repairs,
+                })
             }
             Command::BeginPlanning => {
                 self.require_state(WorkflowState::Researching)?;

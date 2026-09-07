@@ -17,7 +17,7 @@ pub fn run_spec(base: &Path) -> Result<RunSpec> {
 }
 
 pub fn run_spec_with_renderer(base: &Path, renderer: Renderer) -> Result<RunSpec> {
-    run_spec_with_repairs(base, renderer, 0)
+    run_spec_with_repairs(base, renderer, /*max_repairs*/ 0)
 }
 
 pub fn run_spec_with_repairs(base: &Path, renderer: Renderer, max_repairs: u8) -> Result<RunSpec> {
