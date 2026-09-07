@@ -7,3 +7,4 @@ providers/muse-contributor.models.json text eol=lf
 # Fixture and evaluator bytes are experimental controls across native/WSL copies.
 fixtures/** text eol=lf
 experiments/** text eol=lf
+pilot/** text eol=lf
