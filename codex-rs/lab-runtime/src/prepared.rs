@@ -140,8 +140,11 @@ pub(crate) fn load(path: &Path, run_id: String) -> Result<LoadedPrepared> {
         root == descriptor.runs_directory.join(&descriptor.source_run_id),
         "checkpoint moved from original run"
     );
-    let spec: Value =
-        serde_json::from_slice(&read_artifact(root, "config/run-spec.json", 262144)?)?;
+    let spec: Value = serde_json::from_slice(&read_artifact(
+        root,
+        "config/run-spec.json",
+        MAX_ARTIFACT_BYTES,
+    )?)?;
     let catalog = String::from_utf8(read_artifact(root, "config/workflow.source.toml", 65536)?)?;
     let workflow = spec["workflow_name"]
         .as_str()
@@ -158,7 +161,6 @@ pub(crate) fn load(path: &Path, run_id: String) -> Result<LoadedPrepared> {
     )?)?;
     validate_files(root, &descriptor, &plan, renderer)?;
     let task = spec["task"].as_str().context("missing task")?.to_owned();
-    ensure!(task.len() <= 8192, "prepared task exceeds limit");
     let settings = serde_json::from_slice(&read_artifact(
         root,
         "evidence/effective-settings.json",

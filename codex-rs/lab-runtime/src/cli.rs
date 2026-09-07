@@ -161,7 +161,8 @@ impl Arguments {
             codex_home: self.codex_home,
             runs_directory: self.runs_directory,
             run_id: self.run_id,
-            task: read_bounded(&self.task_file, 8192)?,
+            task: std::fs::read_to_string(&self.task_file)
+                .with_context(|| format!("read task {}", self.task_file.display()))?,
             workflow_catalog: read_bounded(&self.workflow_catalog, 65536)?,
             instruction_root: self.instruction_root,
             workflow: self.workflow,

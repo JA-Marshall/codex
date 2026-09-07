@@ -16,8 +16,6 @@ use codex_protocol::openai_models::ToolMode;
 use codex_protocol::protocol::MultiAgentVersion;
 use codex_protocol::protocol::SandboxPolicy;
 
-use crate::context::MAX_PHASE_FRAGMENT_BYTES;
-
 /// Filesystem authority is held outside the repository in the host process.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct RuntimePaths {
@@ -375,44 +373,5 @@ pub fn validate_model_catalog(config: &Config) -> Result<&ModelInfo> {
             && !entry.include_apps_usage_instructions,
         "catalog ambient capability instructions are unsupported"
     );
-    // Fresh threads have no historical base instructions. Match upstream's
-    // override precedence and its actual personality-template expansion.
-    let base_instructions = config
-        .base_instructions
-        .clone()
-        .unwrap_or_else(|| entry.get_model_instructions(config.personality));
-    ensure!(
-        base_instructions.len() <= MAX_PHASE_FRAGMENT_BYTES,
-        "resolved model instructions exceed the context byte limit"
-    );
-    ensure!(
-        config
-            .compact_prompt
-            .as_ref()
-            .is_none_or(|prompt| prompt.len() <= MAX_PHASE_FRAGMENT_BYTES),
-        "custom compaction prompt exceeds the context byte limit"
-    );
-    if let Some(messages) = &entry.model_messages {
-        let approval = messages
-            .approvals
-            .as_ref()
-            .and_then(|messages| messages.never.as_deref());
-        let read_only = messages
-            .permissions
-            .as_ref()
-            .and_then(|messages| messages.read_only.as_deref());
-        let workspace_write = messages
-            .permissions
-            .as_ref()
-            .and_then(|messages| messages.workspace_write.as_deref());
-        let permission_bytes = [approval, read_only, workspace_write]
-            .into_iter()
-            .flatten()
-            .fold(0_usize, |total, text| total.saturating_add(text.len()));
-        ensure!(
-            permission_bytes <= MAX_PHASE_FRAGMENT_BYTES,
-            "custom phase permission instructions exceed the context byte limit"
-        );
-    }
     Ok(entry)
 }

@@ -18,7 +18,6 @@ pub use config::ResolvedWorkflow;
 pub use config::RoleSelection;
 pub use config::WorkflowCatalog;
 pub use instructions::InstructionSnapshot;
-pub use instructions::MAX_INSTRUCTION_BYTES;
 pub use instructions::RoleInstructions;
 pub use plan::PlanCriterion;
 pub use plan::PlanRevision;

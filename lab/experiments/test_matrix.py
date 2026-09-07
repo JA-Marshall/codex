@@ -24,9 +24,6 @@ class MatrixTests(unittest.TestCase):
                 self.assertEqual(
                     sha256(root / registered["path"] / "SKILL.md"), registered["sha256"]
                 )
-                self.assertLess(
-                    (root / registered["path"] / "SKILL.md").stat().st_size, 8192
-                )
             resolved[entry["id"]] = roles
         entries = conditions()
         for left in entries:

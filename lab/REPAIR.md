@@ -19,8 +19,10 @@ amendments. A repair returns from verifying to implementing under the same exact
 approval. A material plan change still revokes authority and requests an amendment;
 repair does not approve it. Runtime failure, failed shutdown, invalid reports,
 missing command receipts and verifier-only replay are not automatic repair paths.
-Existing phase, context and sandbox limits remain. Preparation reserves room for
-repair feedback inside the existing prompt limit and refuses oversized plans.
+Existing phase budgets, sandbox authority, plan structure and artifact resource
+bounds remain. Repair prompts use the selected model's context capacity and
+upstream compaction. Preparation imposes no synthetic repair-feedback reservation
+or harness phase context byte cap.
 
 The workflow journal records failed checks before each repair and a numbered
 `repair_started` transition. Phase artifacts retain commands, results, model usage

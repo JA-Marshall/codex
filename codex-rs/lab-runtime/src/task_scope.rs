@@ -272,12 +272,7 @@ impl BoundTaskScope {
             evidence,
             write_paths,
         };
-        crate::scope_context::validate(
-            config,
-            &scoped.profile,
-            &scoped.instructions(),
-            &self.repository,
-        )?;
+        crate::scope_context::validate(&scoped.profile, &self.repository)?;
         Ok(scoped)
     }
 

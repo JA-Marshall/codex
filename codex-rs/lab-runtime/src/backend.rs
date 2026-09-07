@@ -32,7 +32,6 @@ use tokio_util::sync::CancellationToken;
 
 use crate::authority::PhaseGate;
 use crate::bootstrap::PreparedRuntime;
-use crate::context::MAX_PHASE_FRAGMENT_BYTES;
 use crate::context::validate_phase_context;
 use crate::preflight::PhaseAccess;
 use crate::preflight::validate_phase_config;
@@ -108,9 +107,6 @@ impl CodexBackend {
             instructions.push_str(&scoped.instructions());
         }
         validate_phase_context(&instructions, &request.prompt)?;
-        if let Some(schema) = &request.output_schema {
-            validate_output_schema(schema)?;
-        }
         let cancellation = request.gate.cancellation();
         ensure!(
             !cancellation.is_cancelled(),
@@ -238,14 +234,6 @@ impl CodexBackend {
         execution?;
         Ok(output)
     }
-}
-
-fn validate_output_schema(schema: &Value) -> Result<()> {
-    ensure!(
-        serde_json::to_vec(schema)?.len() <= MAX_PHASE_FRAGMENT_BYTES,
-        "output schema exceeds byte limit"
-    );
-    Ok(())
 }
 
 fn validate_phase_authority(

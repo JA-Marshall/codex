@@ -1,7 +1,6 @@
 use std::fs;
 use std::path::Path;
 
-use codex_lab::MAX_INSTRUCTION_BYTES;
 use codex_lab::WorkflowCatalog;
 use pretty_assertions::assert_eq;
 use sha2::Digest;
@@ -35,8 +34,15 @@ fn write_skill(base: &Path, bytes: &[u8]) -> std::io::Result<()> {
 #[test]
 fn freezes_exact_bytes_hash_and_selection_without_loading_ambient_skills() {
     let root = tempdir().unwrap();
-    write_skill(root.path(), SKILL).unwrap();
-    let catalog = WorkflowCatalog::parse(&source("skill", SKILL)).unwrap();
+    let skill = [
+        SKILL,
+        "Preserve the approved plan and report actual verification evidence.\r\n"
+            .repeat(256)
+            .as_bytes(),
+    ]
+    .concat();
+    write_skill(root.path(), &skill).unwrap();
+    let catalog = WorkflowCatalog::parse(&source("skill", &skill)).unwrap();
     let workflow = catalog.resolve("base").unwrap();
     let snapshots = catalog
         .resolve_instructions(root.path(), &workflow)
@@ -45,15 +51,15 @@ fn freezes_exact_bytes_hash_and_selection_without_loading_ambient_skills() {
     let expected = serde_json::json!({
         "selector": "required",
         "path": root.path().join("skill/SKILL.md").canonicalize().unwrap(),
-        "sha256": format!("{:x}", Sha256::digest(SKILL)),
-        "content": std::str::from_utf8(SKILL).unwrap(),
+        "sha256": format!("{:x}", Sha256::digest(&skill)),
+        "content": std::str::from_utf8(&skill).unwrap(),
     });
     assert_eq!(
         serde_json::to_value(&snapshots).unwrap(),
         serde_json::json!({"planner": expected, "executor": expected, "verifier": expected})
     );
     fs::write(root.path().join("skill/SKILL.md"), "changed").unwrap();
-    assert_eq!(snapshots.planner.content().as_bytes(), SKILL);
+    assert_eq!(snapshots.planner.content().as_bytes(), skill);
     assert!(
         catalog
             .resolve_instructions(root.path(), &workflow)
@@ -65,7 +71,7 @@ fn freezes_exact_bytes_hash_and_selection_without_loading_ambient_skills() {
 }
 
 #[test]
-fn rejects_missing_changed_oversized_empty_and_non_utf8_resources() {
+fn rejects_missing_changed_empty_and_non_utf8_resources() {
     let root = tempdir().unwrap();
     let catalog = WorkflowCatalog::parse(&source("skill", SKILL)).unwrap();
     let workflow = catalog.resolve("base").unwrap();
@@ -80,7 +86,7 @@ fn rejects_missing_changed_oversized_empty_and_non_utf8_resources() {
             .resolve_instructions(root.path(), &workflow)
             .is_err()
     );
-    for bytes in [vec![b'x'; MAX_INSTRUCTION_BYTES + 1], vec![], vec![0xff]] {
+    for bytes in [vec![], vec![0xff]] {
         write_skill(root.path(), &bytes).unwrap();
         let catalog = WorkflowCatalog::parse(&source("skill", &bytes)).unwrap();
         assert!(
@@ -89,10 +95,6 @@ fn rejects_missing_changed_oversized_empty_and_non_utf8_resources() {
                 .is_err()
         );
     }
-    let bytes = vec![b'x'; MAX_INSTRUCTION_BYTES];
-    write_skill(root.path(), &bytes).unwrap();
-    let catalog = WorkflowCatalog::parse(&source("skill", &bytes)).unwrap();
-    assert!(catalog.resolve_instructions(root.path(), &workflow).is_ok());
 }
 
 #[test]

@@ -176,7 +176,7 @@ impl Driver {
             .transpose()?
             .unwrap_or_default();
         let prompt = format!(
-            "Produce a concrete canonical implementation plan as JSON. Use schema_version 1, plan_id {id:?}, revision {revision}, stable step IDs, explicit affected files and verification commands in verification_strategy descriptions. Each step's depends_on, acceptance_criteria and verification arrays contain ONLY existing IDs from steps, acceptance_criteria and verification_strategy respectively, never prose or commands. Preserve retained IDs from the previous revision. Blockers are unresolved facts or missing prerequisites that prevent implementation; pending mandatory human approval is a workflow state, not a blocker. Use an empty blockers array when no such obstacle exists. Keep the plan concise enough for an 8 KiB phase prompt. No implementation is authorized.\nTask:\n{task}\nResearch:\n{research}\nHuman feedback or amendment:\n{feedback}\nPrevious canonical plan:\n{}",
+            "Produce a concrete canonical implementation plan as JSON. Use schema_version 1, plan_id {id:?}, revision {revision}, stable step IDs, explicit affected files and verification commands in verification_strategy descriptions. Each step's depends_on, acceptance_criteria and verification arrays contain ONLY existing IDs from steps, acceptance_criteria and verification_strategy respectively, never prose or commands. Preserve retained IDs from the previous revision. Blockers are unresolved facts or missing prerequisites that prevent implementation; pending mandatory human approval is a workflow state, not a blocker. Use an empty blockers array when no such obstacle exists. Keep the plan focused on the task and avoid unnecessary repetition. No implementation is authorized.\nTask:\n{task}\nResearch:\n{research}\nHuman feedback or amendment:\n{feedback}\nPrevious canonical plan:\n{}",
             String::from_utf8(prior)?
         );
         let index = self
@@ -235,12 +235,6 @@ impl Driver {
             ));
         }
         crate::validate_phase_context(self.roles.executor.content(), &implementation_prompt)?;
-        if self.max_repairs > 0 {
-            crate::validate_phase_context(
-                self.roles.executor.content(),
-                &crate::repair::prompt(&implementation_prompt, self.max_repairs, &"x".repeat(512)),
-            )?;
-        }
         crate::validate_phase_context(self.roles.verifier.content(), &verification_prompt)?;
         Ok((rendered, implementation_prompt, verification_prompt))
     }

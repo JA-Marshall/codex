@@ -83,8 +83,9 @@ def setup_suite(destination: Path, binary: Path, codex_home: Path):
             "existing_host_max_phase_seconds": 1800,
             "existing_host_max_phase_events": 10000,
             "existing_host_max_phase_event_bytes": 4194304,
-            "existing_context_fragment_bytes": 8192,
-            "existing_combined_context_bytes": 16384,
+            "existing_context_fragment_bytes": None,
+            "existing_combined_context_bytes": None,
+            "context_limit_source": "model/provider context window; no harness phase byte cap",
             "model_context_window": config.get("model_context_window"),
             "model_auto_compact_token_limit": config.get(
                 "model_auto_compact_token_limit"

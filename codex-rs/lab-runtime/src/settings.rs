@@ -14,8 +14,6 @@ use sha2::Digest;
 use sha2::Sha256;
 
 use crate::PhaseAccess;
-use crate::context::MAX_PHASE_CONTEXT_BYTES;
-use crate::context::MAX_PHASE_FRAGMENT_BYTES;
 
 pub(crate) fn effective_settings(config: &Config) -> Result<Value> {
     let toml = safe_effective_toml(
@@ -54,9 +52,10 @@ pub(crate) fn effective_settings(config: &Config) -> Result<Value> {
             "thread_lifecycle":"fresh thread per phase; upstream shutdown before phase acknowledgement",
             "role_instructions":"exact frozen RunSpec instruction bytes replace developer_instructions",
             "ambient_skills":"disabled by ProceduralInstructionsOnly and restricted configuration",
-            "context_fragment_byte_limit":MAX_PHASE_FRAGMENT_BYTES,
-            "combined_context_byte_limit":MAX_PHASE_CONTEXT_BYTES,
-            "context_truncation":"reject oversized input; no truncation"
+            "context_fragment_byte_limit":null,
+            "combined_context_byte_limit":null,
+            "context_limit_source":"selected model and upstream runtime",
+            "context_truncation":"no harness context truncation; upstream compaction applies"
         },
         "runtime_binaries":{
             "codex_self":binary_metadata(config.codex_self_exe.as_deref())?,

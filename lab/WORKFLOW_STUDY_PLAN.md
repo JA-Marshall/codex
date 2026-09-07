@@ -10,7 +10,9 @@ The subsequent [live smoke](TASK_LIBRARY_SMOKE.md) passed two corrected trials a
 dispatch and planner path instructions. Queue-aware reporting now matches the published timing fix;
 the current v2 200-trial preparation remains unstarted. A subsequent [twelve-task parallel smoke](TASK_LIBRARY_PARALLEL_SMOKE.md)
 confirmed twelve concurrent hosts; nine tasks passed and three hit the 8 KiB prompt cap before
-implementation. The launcher now defaults to twelve workers. Address that cap before the full batch.
+implementation. The launcher now defaults to twelve workers. The subsequent source change removes
+those harness context caps while preserving scope and phase budgets. Validate and freeze the
+updated binary before launching the full batch; the existing preparation remains unstarted.
 The actual inventory, interfaces, evidence limits, and artifact locations
 are recorded in [TASK_LIBRARY.md](TASK_LIBRARY.md). The earlier installed release and its focused
 checks are recorded in
@@ -73,8 +75,8 @@ candidates plus scratch; it also denies access to archived private task assets a
 audits candidate changes. The affected runtime crate passed 104 tests and four subsequent
 focused context-bound regressions; final release formatting/build remains pending.
 Separate threads and approved plan hashes alone do not establish semantic scope.
-A generated plan or handover cannot widen the contract. The remaining context-budget
-and retrieval work below is still proposed and must not be inferred from these scope changes.
+A generated plan or handover cannot widen the contract. The further handover and
+retrieval work below is still proposed and must not be inferred from these scope changes.
 
 Research/planning may inspect the repository. Implementation receives write access
 only to declared task paths plus separate build/test scratch directories; enforce
@@ -91,23 +93,23 @@ Validate allowed changes, denied out-of-scope writes, symlink/rename containment
 read-only candidate verification, and failed-recording behavior in real-sandbox
 mock tests. Keep all arms under the same scope rules.
 
-Correct the interpretation of the existing size controls before changing them:
+Keep model context controls distinct from tool-output and artifact limits:
 
 | Existing control | Meaning |
 | --- | --- |
 | Model catalog: 8,192-byte truncation budget | Budget used when presenting tool output; individual tool formatting also applies. It is not the whole model context. |
-| Phase inputs: 8 KiB each, 16 KiB combined | Separate bounds on role instructions and the initial phase prompt. Oversized inputs are rejected. Later conversation/tool context is separate. |
+| Phase inputs: no harness context byte cap | Nonempty tasks, role instructions and assembled prompts use the selected model's context capacity and upstream compaction. Base/custom instructions and output schemas have no separate harness context cap. |
 | Research prompt: at most 2,500 characters | Instruction to compress research findings, rather than a measured model capacity. |
 | Command-receipt preview: 8,192 bytes | Independent preview control. The recent fix preserves command identity when the preview is omitted. |
 | Model profile: 1,048,576 tokens | Configured total context window; this does not establish useful capacity on every task. |
 
-Make phase input and tool-output budgets separately versioned and recorded. Do
-not raise all constants together or couple them to report-schema/receipt limits.
-Retain long logs as protected artifacts with clear truncation markers and bounded
-range retrieval. Apply byte and token bounds to injected content, following the
-repository's context-size requirements. Larger evidence access never changes a
-worker's write permissions. Calibration should demonstrate that relevant failures
-beyond the initial output excerpt can still be retrieved.
+Record the selected model's context and compaction settings separately from
+versioned tool-output budgets. Plan structure, artifact resource bounds and
+receipt limits remain enforced; no harness phase context cap is added. Retain
+long logs as protected artifacts with clear truncation markers and bounded range
+retrieval. Larger evidence access never changes a worker's write permissions.
+Calibration should demonstrate that relevant failures beyond the initial output
+excerpt can still be retrieved.
 
 **2. Introduce a versioned task interface and a varied task library**
 
@@ -418,7 +420,7 @@ meant to settle before choosing variants or spending the campaign budget.
 - Workflow fields and runtime decisions: [config.rs](../codex-rs/lab/src/config.rs),
   [campaign.rs](../codex-rs/lab-runtime/src/campaign.rs),
   [driver.rs](../codex-rs/lab-runtime/src/driver.rs).
-- Current context limits: [context.rs](../codex-rs/lab-runtime/src/context.rs),
+- Context handling and model capacity: [context.rs](../codex-rs/lab-runtime/src/context.rs),
   [model profile](providers/muse-contributor.models.json). Scope enforcement starts
   at [authority.rs](../codex-rs/lab-runtime/src/authority.rs) and the runtime sandbox
   policy; new per-task write restrictions require implementation.

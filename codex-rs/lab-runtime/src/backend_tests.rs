@@ -12,7 +12,6 @@ use crate::PhaseAccess;
 use crate::RunAuthority;
 
 use super::shutdown_and_drain_events;
-use super::validate_output_schema;
 use super::validate_phase_authority;
 
 #[test]
@@ -46,16 +45,6 @@ fn phase_start_requires_its_exact_gate_and_matching_sandbox_access() -> Result<(
     let executor = executor.build();
     validate_phase_authority(&executor, &execution_gate, PhaseAccess::WorkspaceWrite)?;
     assert!(validate_phase_authority(&executor, &execution_gate, PhaseAccess::ReadOnly).is_err());
-    Ok(())
-}
-
-#[test]
-fn output_schema_budget_includes_serialization_overhead_and_escaping() -> Result<()> {
-    validate_output_schema(&serde_json::json!({"type":"object"}))?;
-    let oversized = serde_json::json!({"type":"string", "description":"x".repeat(8192)});
-    assert!(validate_output_schema(&oversized).is_err());
-    let escaped = serde_json::json!({"type":"string", "description":"\n".repeat(4096)});
-    assert!(validate_output_schema(&escaped).is_err());
     Ok(())
 }
 

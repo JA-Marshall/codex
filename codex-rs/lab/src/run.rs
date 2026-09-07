@@ -79,7 +79,9 @@ impl RunSpec {
         repository: RepositoryMetadata,
         model: Option<ModelMetadata>,
     ) -> Result<Self> {
-        bounded_text(task)?;
+        if task.trim().is_empty() {
+            return Err(LabError::Invalid("task must not be empty".into()));
+        }
         if !matches!(repository.commit.len(), 40 | 64)
             || !repository.commit.bytes().all(|b| b.is_ascii_hexdigit())
         {

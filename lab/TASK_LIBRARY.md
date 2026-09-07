@@ -171,8 +171,10 @@ All 20 references passed; all 20 starters and 40 mutants were rejected. Both cal
 record `calibrated=true` and `model_calls=0`. The selected Python harness checks passed 37 unique
 tests across scoped runs (32 main harness checks plus five helper checks). The affected runtime
 crate passed 104 tests, and the subsequent four focused context-bound regressions also passed.
-Scope/permission context bounds are enforced before a model call, with an 8,192-byte cap per
-bounded section. This limits injected authority text; it is not a model-context capacity claim.
+That initial release enforced an 8,192-byte cap per context section. The subsequent source
+change removes harness context-size caps after the parallel smoke exposed ordinary task/plan
+prompts exceeding them. Scope permissions and phase budgets remain enforced; model context
+capacity and upstream compaction now govern those inputs.
 Lint, formatting, format checking, and the final build passed. No tests were rerun after formatting.
 The current prepared campaign is `/home/james/.cache/codex-lab-campaigns/varied-library-v2-200-jobs12-20260907/campaign.json`;
 all frozen pins validate, and it contains no started trials. The [smoke receipt](task-library-smoke-2026-09-07.json)

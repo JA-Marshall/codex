@@ -302,30 +302,53 @@ async fn task_scope_does_not_expand_after_an_amended_plan() -> Result<()> {
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn task_scope_rejects_xml_expansion_before_model_requests() -> Result<()> {
+async fn task_scope_preserves_expanded_permission_paths_through_verification() -> Result<()> {
     let server = MockServer::start().await;
     let fixture = scoped_fixture(&server).await?;
-    let options = campaign::campaign_options(&fixture, "scope-xml-expansion");
+    let mut options = campaign::campaign_options(&fixture, "scope-xml-expansion");
+    options.plan = Some(serde_json::from_str(
+        &serde_json::to_string(&support::plan(1)?)?.replace("greeting.txt", "src/greeting.txt"),
+    )?);
     let outside = tempfile::tempdir()?;
     let mut read_root = outside.path().to_path_buf();
     for _ in 0..15 {
         read_root.push("'".repeat(240));
     }
     std::fs::create_dir_all(&read_root)?;
+    let reference = read_root.join("reference.txt");
+    std::fs::write(&reference, "reference")?;
     let policy_path = scoped_policy(&fixture, &options, json!(["src"]), json!([]))?;
     let mut policy: Value = serde_json::from_slice(&std::fs::read(&policy_path)?)?;
     policy["task_scope"]["read_paths"] = json!([read_root]);
     std::fs::write(&policy_path, serde_json::to_vec(&policy)?)?;
-    let error = execute_campaign_run(options, fixture.paths.clone(), &policy_path)
-        .await
-        .expect_err("XML expansion is bounded before inference");
-    assert!(error.to_string().contains("rendered context"), "{error:#}");
-    assert!(
-        server
-            .received_requests()
-            .await
-            .context("requests")?
-            .is_empty()
+    let mut sequence = implementation_and_verification("scope-long-path");
+    for event in &mut sequence {
+        *event = event.replace("greeting.txt", "src/greeting.txt");
+    }
+    sequence[2] = exec(
+        "scope-long-path-verify",
+        &format!(
+            "test \"$(cat \"{}\")\" = reference && test \"$(cat src/greeting.txt)\" = hello && test ! -e forbidden.txt",
+            reference.display()
+        ),
     );
+    let mock = responses::mount_sse_sequence(&server, sequence).await;
+    let result = execute_campaign_run(options, fixture.paths.clone(), &policy_path).await?;
+    assert_eq!(
+        (result.state, mock.requests().len()),
+        (WorkflowState::Completed, 5)
+    );
+    assert_eq!(
+        std::fs::read_to_string(fixture.repository.join("src/greeting.txt"))?,
+        "hello\n"
+    );
+    for index in 1..=2 {
+        let phase: Value = serde_json::from_slice(&std::fs::read(
+            result
+                .artifacts
+                .join(format!("evidence/phase-{index:02}.json")),
+        )?)?;
+        assert_eq!(phase["task_scope"]["audit"]["authorized"], true);
+    }
     Ok(())
 }

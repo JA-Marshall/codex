@@ -55,11 +55,14 @@ async fn prepared_generated_plan_shuts_down_then_child_requires_a_new_decision()
     })
     .collect();
     let mock = responses::mount_sse_sequence(&server, sequence).await;
-    let prepared = prepare_run(
-        fixture.options("prepared", "md", None),
-        fixture.paths.clone(),
-    )
-    .await?;
+    let mut options = fixture.options("prepared", "md", None);
+    for index in 1..=128 {
+        options.task.push_str(&format!(
+            "\nReview note {index:03}: preserve the exact greeting, its final newline and README.md; verification must cite an observed command result before reporting completion."
+        ));
+    }
+    let task = options.task.clone();
+    let prepared = prepare_run(options, fixture.paths.clone()).await?;
     assert_eq!(
         (prepared.state, prepared.phase_threads),
         (WorkflowState::AwaitingPlanApproval, 2)
@@ -90,6 +93,12 @@ async fn prepared_generated_plan_shuts_down_then_child_requires_a_new_decision()
         fixture.runs.join("child/evidence/parent-preparation.json"),
     )?)?;
     assert_eq!(parent["approval_reused"], false);
+    for run in ["prepared", "child"] {
+        let spec: Value = serde_json::from_slice(&fs::read(
+            fixture.runs.join(run).join("config/run-spec.json"),
+        )?)?;
+        assert_eq!(spec["task"], task);
+    }
     Ok(())
 }
 

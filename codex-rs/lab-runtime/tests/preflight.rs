@@ -13,11 +13,7 @@ use codex_lab_runtime::restricted_requirements;
 use codex_lab_runtime::validate_model_catalog;
 use codex_lab_runtime::validate_phase_context;
 use codex_lab_runtime::validate_runtime_config;
-use codex_protocol::config_types::Personality;
-use codex_protocol::openai_models::ApprovalMessages;
 use codex_protocol::openai_models::ConfigShellToolType;
-use codex_protocol::openai_models::ModelInstructionsVariables;
-use codex_protocol::openai_models::PermissionMessages;
 use codex_protocol::openai_models::ToolMode;
 use codex_protocol::protocol::SandboxPolicy;
 use pretty_assertions::assert_eq;
@@ -194,103 +190,6 @@ async fn pinned_catalog_rejects_prefix_fallback_and_extra_execution_modes() -> R
     Ok(())
 }
 
-#[tokio::test]
-async fn context_caps_use_selected_expanded_model_instructions_and_custom_compaction() -> Result<()>
-{
-    let root = tempfile::tempdir()?;
-    let (mut config, _) = fixture(root.path()).await?;
-    let messages = config
-        .model_catalog
-        .as_mut()
-        .context("fixture catalog")?
-        .models[0]
-        .model_messages
-        .as_mut()
-        .context("fixture model messages")?;
-    messages.instructions_template = Some("{{ personality }}{{ personality }}".to_string());
-    messages.instructions_variables = Some(ModelInstructionsVariables {
-        personality_default: Some("é".repeat(2049)),
-        personality_friendly: Some("friendly".to_string()),
-        personality_pragmatic: None,
-    });
-    config.personality = None;
-    assert!(
-        validate_model_catalog(&config)
-            .unwrap_err()
-            .to_string()
-            .contains("resolved model instructions")
-    );
-    config.personality = Some(Personality::Friendly);
-    validate_model_catalog(&config)?;
-    // The configured override wins over even an oversized selected template.
-    config.personality = None;
-    config.base_instructions = Some("x".repeat(8192));
-    validate_model_catalog(&config)?;
-    config.base_instructions = Some("x".repeat(8193));
-    assert!(
-        validate_model_catalog(&config)
-            .unwrap_err()
-            .to_string()
-            .contains("resolved model instructions")
-    );
-    config.base_instructions = Some("bounded override".to_string());
-    config.compact_prompt = Some("x".repeat(8193));
-    assert!(
-        validate_model_catalog(&config)
-            .unwrap_err()
-            .to_string()
-            .contains("custom compaction prompt")
-    );
-    config.compact_prompt = Some("x".repeat(8192));
-    validate_model_catalog(&config)?;
-    Ok(())
-}
-
-#[tokio::test]
-async fn custom_phase_permission_messages_share_a_bounded_budget() -> Result<()> {
-    let root = tempfile::tempdir()?;
-    let (mut config, _) = fixture(root.path()).await?;
-    let messages = config
-        .model_catalog
-        .as_mut()
-        .context("fixture catalog")?
-        .models[0]
-        .model_messages
-        .as_mut()
-        .context("fixture model messages")?;
-    messages.permissions = Some(PermissionMessages {
-        read_only: Some("x".repeat(4096)),
-        workspace_write: None,
-        danger_full_access: None,
-    });
-    messages.approvals = Some(ApprovalMessages {
-        never: Some("x".repeat(4097)),
-        on_request: None,
-        on_request_auto_review: None,
-        unless_trusted: None,
-    });
-    assert!(
-        validate_model_catalog(&config)
-            .unwrap_err()
-            .to_string()
-            .contains("custom phase permission instructions")
-    );
-    config
-        .model_catalog
-        .as_mut()
-        .context("fixture catalog")?
-        .models[0]
-        .model_messages
-        .as_mut()
-        .context("fixture model messages")?
-        .approvals
-        .as_mut()
-        .context("fixture approval messages")?
-        .never = Some("x".repeat(4096));
-    validate_model_catalog(&config)?;
-    Ok(())
-}
-
 #[test]
 fn canonical_paths_reject_authority_inside_repository_and_symlink_aliases() -> Result<()> {
     let root = tempfile::tempdir()?;
@@ -310,10 +209,9 @@ fn canonical_paths_reject_authority_inside_repository_and_symlink_aliases() -> R
 }
 
 #[test]
-fn context_validation_refuses_lossy_oversize_delivery() -> Result<()> {
+fn context_validation_requires_instructions_and_task() -> Result<()> {
     validate_phase_context("frozen role instructions", "task")?;
     assert!(validate_phase_context("", "task").is_err());
-    assert!(validate_phase_context("instructions", &"é".repeat(4097)).is_err());
-    assert!(validate_phase_context(&"x".repeat(8193), "task").is_err());
+    assert!(validate_phase_context("instructions", "").is_err());
     Ok(())
 }

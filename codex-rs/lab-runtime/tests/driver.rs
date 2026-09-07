@@ -12,6 +12,9 @@ mod campaign;
 #[path = "driver/task_scope.rs"]
 mod task_scope;
 
+#[path = "driver/context.rs"]
+mod context;
+
 use std::path::PathBuf;
 use std::sync::atomic::AtomicUsize;
 use std::sync::atomic::Ordering;
@@ -333,49 +336,6 @@ async fn declining_review_never_starts_a_model_or_changes_repository() -> Result
     );
     let journal = std::fs::read_to_string(fixture.runs.join("declined/events.jsonl"))?;
     assert!(journal.contains("failed"));
-    Ok(())
-}
-
-#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn oversized_plan_fails_before_human_review_or_any_model_call() -> Result<()> {
-    let server = MockServer::start().await;
-    let fixture = support::Fixture::new(&server.uri()).await?;
-    let mut canonical = support::plan(1)?;
-    canonical.goal = "x".repeat(8192);
-    canonical.validate()?;
-    let mut reviewer = Reviewer {
-        repository: fixture.repository.clone(),
-        targets: Vec::new(),
-        views: Vec::new(),
-        responses: None,
-        expected_requests_at_review: Vec::new(),
-        approve: true,
-    };
-    let error = execute_run(
-        fixture.options("oversized", "md", Some(canonical)),
-        fixture.paths.clone(),
-        &mut reviewer,
-    )
-    .await
-    .expect_err("the full plan must fit before seeking approval");
-    assert!(error.to_string().contains("byte limit"), "{error:#}");
-    assert!(reviewer.targets.is_empty());
-    assert!(
-        server
-            .received_requests()
-            .await
-            .context("mock request recording disabled")?
-            .is_empty()
-    );
-    assert!(!fixture.repository.join("greeting.txt").exists());
-    let journal = std::fs::read_to_string(fixture.runs.join("oversized/events.jsonl"))?;
-    assert!(journal.contains("failed"));
-    assert!(
-        !fixture
-            .runs
-            .join("oversized/evidence/metrics.json")
-            .exists()
-    );
     Ok(())
 }
 

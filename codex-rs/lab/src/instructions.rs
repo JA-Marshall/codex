@@ -11,8 +11,6 @@ use crate::Result;
 use crate::RoleSelection;
 use crate::digest_bytes;
 
-pub const MAX_INSTRUCTION_BYTES: usize = 12 * 1024;
-
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub(crate) struct SkillSource {
@@ -55,16 +53,15 @@ impl SkillSource {
                 "skill {selector} resolves outside the catalog base"
             )));
         }
-        let file = File::open(&path)?;
+        let mut file = File::open(&path)?;
         if !file.metadata()?.is_file() {
             return Err(LabError::Invalid(format!("skill {selector} is not a file")));
         }
         let mut bytes = Vec::new();
-        file.take((MAX_INSTRUCTION_BYTES + 1) as u64)
-            .read_to_end(&mut bytes)?;
-        if bytes.is_empty() || bytes.len() > MAX_INSTRUCTION_BYTES {
+        file.read_to_end(&mut bytes)?;
+        if bytes.is_empty() {
             return Err(LabError::Invalid(format!(
-                "skill {selector} must contain between 1 and {MAX_INSTRUCTION_BYTES} bytes"
+                "skill {selector} must not be empty"
             )));
         }
         if digest_bytes(&bytes) != self.sha256 {
@@ -129,7 +126,6 @@ impl RoleInstructions {
         ] {
             if snapshot.selector() != selector
                 || snapshot.content().is_empty()
-                || snapshot.content().len() > MAX_INSTRUCTION_BYTES
                 || digest_bytes(snapshot.content().as_bytes()) != snapshot.sha256()
             {
                 return Err(LabError::Invalid(format!(
