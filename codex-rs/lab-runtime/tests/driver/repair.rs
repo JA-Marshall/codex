@@ -3,7 +3,12 @@ use pretty_assertions::assert_eq;
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn repair_loop_rechecks_after_fix_and_stops_at_the_frozen_budget() -> Result<()> {
-    for (limit, repaired) in [(0_u8, false), (1, true), (1, false)] {
+    for (limit, repaired, padding) in [
+        (0_u8, false, 0),
+        (1, true, 0),
+        (1, false, 0),
+        (1, true, 16384),
+    ] {
         let server = MockServer::start().await;
         let mut fixture = support::Fixture::new(&server.uri()).await?;
         fixture.workflow_catalog = fixture.workflow_catalog.replace(
@@ -27,6 +32,14 @@ async fn repair_loop_rechecks_after_fix_and_stops_at_the_frozen_budget() -> Resu
             );
             sequence.extend(retry);
         }
+        if padding > 0 {
+            for event in &mut sequence {
+                *event = event.replace(
+                    "&& test ! -e forbidden.txt",
+                    &format!("&& test ! -e forbidden.txt # {}", "x".repeat(padding)),
+                );
+            }
+        }
         let expected_requests = sequence.len();
         let mock = responses::mount_sse_sequence(&server, sequence).await;
         let mut reviewer = Reviewer {
@@ -46,6 +59,21 @@ async fn repair_loop_rechecks_after_fix_and_stops_at_the_frozen_budget() -> Resu
         assert_eq!(outcome.is_ok(), repaired, "{outcome:?}");
         assert_eq!(reviewer.targets.len(), 1);
         assert_eq!(mock.requests().len(), expected_requests);
+        if padding > 0 {
+            for prefix in ["first", "repair"] {
+                let output = mock
+                    .requests()
+                    .iter()
+                    .find_map(|request| {
+                        request.function_call_output_text(&format!("{prefix}-receipt"))
+                    })
+                    .context("missing long-command receipt")?;
+                let receipt: Value = serde_json::from_str(&output)
+                    .with_context(|| format!("long-command receipt: {output}"))?;
+                assert_eq!(receipt["receipt"]["call_id"], format!("{prefix}-verify"));
+                assert_eq!(receipt["receipt"]["preview_truncated"], true);
+            }
+        }
         let root = fixture.runs.join("repair");
         let events: Vec<Value> = std::fs::read_to_string(root.join("events.jsonl"))?
             .lines()

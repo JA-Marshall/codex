@@ -222,10 +222,7 @@ async fn bounds_reject_invalid_queries_and_report_preview_truncation() -> anyhow
             .await
             .is_err()
     );
-    for (id, command) in [
-        ("valid".to_owned(), "x".repeat(8193)),
-        ("\\".repeat(512), "\0".repeat(128)),
-    ] {
+    for (id, command) in [("\\".repeat(512), "\0".repeat(128))] {
         let bounded = CommandReceipts::default();
         start(&bounded, &id, &command).await;
         assert!(
@@ -234,5 +231,40 @@ async fn bounds_reject_invalid_queries_and_report_preview_truncation() -> anyhow
                 .is_err()
         );
     }
+    Ok(())
+}
+
+#[tokio::test]
+async fn oversized_command_keeps_identity_and_does_not_poison_later_receipts() -> anyhow::Result<()>
+{
+    let receipts = CommandReceipts::default();
+    start(&receipts, "long-command", &"x".repeat(16384)).await;
+    finish(
+        &receipts,
+        "long-command",
+        ToolCallOutcome::Completed { success: false },
+    )
+    .await;
+    start(&receipts, "later-command", "true").await;
+    finish(
+        &receipts,
+        "later-command",
+        ToolCallOutcome::Completed { success: true },
+    )
+    .await;
+    assert_eq!(
+        lookup(&receipts, "thread", "turn", "{\"index\":1}", 960).await?,
+        json!({"schema_version":1,"index":1,"commands_seen":2,"receipt":{
+            "call_id":"long-command","command_preview":"[preview omitted: command arguments exceed 8192 bytes]",
+            "preview_truncated":true,"tool_outcome":{"status":"completed","success":false}
+        }})
+    );
+    assert_eq!(
+        lookup(&receipts, "thread", "turn", "{\"index\":2}", 960).await?,
+        json!({"schema_version":1,"index":2,"commands_seen":2,"receipt":{
+            "call_id":"later-command","command_preview":"true",
+            "preview_truncated":false,"tool_outcome":{"status":"completed","success":true}
+        }})
+    );
     Ok(())
 }

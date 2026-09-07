@@ -94,19 +94,29 @@ impl ToolLifecycleContributor for CommandReceipts {
                 state.faulted = true;
                 return;
             };
-            let arguments = (arguments.len() <= 8192)
-                .then(|| serde_json::from_str::<Value>(arguments).ok())
-                .flatten();
-            let Some(command) = arguments.as_ref().and_then(|v| v["cmd"].as_str()) else {
-                state.faulted = true;
-                return;
+            // Preview limits must not invalidate host identity for executable commands.
+            // Avoid parsing/copying oversized arguments; final command events still
+            // determine whether this receipt can establish verification evidence.
+            let (command_preview, preview_truncated) = if arguments.len() > 8192 {
+                (
+                    "[preview omitted: command arguments exceed 8192 bytes]".to_owned(),
+                    true,
+                )
+            } else {
+                let arguments = serde_json::from_str::<Value>(arguments).ok();
+                let Some(command) = arguments.as_ref().and_then(|v| v["cmd"].as_str()) else {
+                    state.faulted = true;
+                    return;
+                };
+                let preview: String = command.chars().take(128).collect();
+                let truncated = preview.len() < command.len();
+                (preview, truncated)
             };
-            let command_preview: String = command.chars().take(128).collect();
             state.receipts.push(Receipt {
                 thread: identity.0.to_owned(),
                 turn: identity.1.to_owned(),
                 call_id: identity.2.to_owned(),
-                preview_truncated: command_preview.len() < command.len(),
+                preview_truncated,
                 command_preview,
                 tool_outcome: Outcome::InProgress,
             });
