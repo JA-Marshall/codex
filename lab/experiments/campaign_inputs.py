@@ -65,6 +65,8 @@ def delegated_catalog(text, workflows):
 
 
 def freeze(args):
+    purpose = getattr(args, "purpose", "throughput")
+    validate_measurement(purpose, args.jobs)
     workflows, fixtures = args.workflow, args.fixture
     tasks, toolchain = selections(args, FIXTURE_NAMES)
     task_just = just_helper(args, tasks)
@@ -170,6 +172,8 @@ def freeze(args):
         **helper_metadata,
         **({"task_toolchain": str(toolchain)} if toolchain else {}),
         "jobs": args.jobs,
+        "measurement_purpose": purpose,
+        "phase_timeout_clock": "wall_clock_including_provider_queue",
         "max_amendments": args.max_amendments,
         "trials": trials,
         "automatic_retries": 0,
@@ -193,12 +197,22 @@ def validate_pins(manifest):
             raise ValueError("frozen campaign input changed: " + name)
 
 
+def validate_measurement(purpose, jobs):
+    if purpose not in ("throughput", "isolated-timing"):
+        raise ValueError("unknown measurement purpose")
+    if purpose == "isolated-timing" and jobs != 1:
+        raise ValueError("isolated-timing requires jobs=1; parallel runs measure shared throughput")
+
+
 def load_campaign(path, expected_digest=None):
     path = path.resolve(strict=True)
     fingerprint = digest(path)
     if expected_digest is not None and fingerprint != expected_digest:
         raise ValueError("campaign manifest changed after scheduling")
     manifest = read_json(path)
+    validate_measurement(manifest.get("measurement_purpose", "throughput"), manifest.get("jobs"))
+    if manifest.get("phase_timeout_clock", "wall_clock_including_provider_queue") != "wall_clock_including_provider_queue":
+        raise ValueError("unsupported phase timeout clock")
     trials = manifest.get("trials")
     if (
         manifest.get("schema_version") != 1

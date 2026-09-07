@@ -19,6 +19,7 @@ from campaign_inputs import (
     load_campaign,
     read_json,
     validate_pins,
+    validate_measurement,
     write_json,
 )
 from campaign_service import check_service
@@ -211,7 +212,9 @@ def run_trial(manifest, entry):
         host, evaluate = trial_commands(manifest, entry, metadata, directory)
         validate_pins(manifest)
         check_service(manifest)
+        record["host_started_unix_ms"] = time.time_ns() // 1000000
         record["host_exit_code"] = run_logged(host, directory / "host")
+        record["host_finished_unix_ms"] = time.time_ns() // 1000000
         if record["host_exit_code"] != 0:
             failure = Path(manifest["output"]) / "runs" / entry["run_id"] / "evidence/failure.json"
             if failure.is_file():
@@ -255,6 +258,7 @@ def worker_command(manifest, entry):
 
 
 def coordinate(manifest, cancelled=None):
+    validate_measurement(manifest.get("measurement_purpose", "throughput"), manifest["jobs"])
     cancelled = cancelled or threading.Event()
     output = Path(manifest["output"])
     validate_pins(manifest)
@@ -307,6 +311,7 @@ def coordinate(manifest, cancelled=None):
             campaign_id=manifest["campaign_id"],
             queued=len(pending),
             jobs=manifest["jobs"],
+            measurement_purpose=manifest.get("measurement_purpose", "throughput"),
             automatic_retries=0,
             resume_supported=False,
         )
@@ -369,6 +374,8 @@ def coordinate(manifest, cancelled=None):
         result = dict(
             schema_version=1,
             campaign_id=manifest["campaign_id"],
+            measurement_purpose=manifest.get("measurement_purpose", "throughput"),
+            phase_timeout_clock="wall_clock_including_provider_queue",
             cancelled=cancelled.is_set(),
             total=len(ordered),
             passed=succeeded,
@@ -429,6 +436,7 @@ def main():
     parser.add_argument("--task-just", type=Path, help="Existing just executable to freeze for Rust public test recipes")
     parser.add_argument("--repetitions", type=int, default=1)
     parser.add_argument("--jobs", type=int, default=16)
+    parser.add_argument("--purpose", choices=("throughput", "isolated-timing"), default="throughput")
     parser.add_argument("--max-amendments", type=int, default=0, choices=range(5))
     parser.add_argument("--prepare-only", action="store_true")
     parser.add_argument(

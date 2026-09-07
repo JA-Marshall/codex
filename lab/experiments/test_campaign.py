@@ -72,6 +72,21 @@ class CampaignTests(unittest.TestCase):
     def fake_command(self, manifest, entry):
         return [sys.executable, str(self.fake), manifest["output"], entry["run_id"]]
 
+    def test_isolated_timing_is_serial_and_rejects_parallel_hosts(self):
+        self.entries(2)
+        self.manifest["measurement_purpose"] = "isolated-timing"
+        with patch("run_campaign.worker_command") as command:
+            with self.assertRaisesRegex(ValueError, "requires jobs=1"):
+                coordinate(self.manifest)
+        command.assert_not_called()
+        self.assertFalse((self.output / "events.jsonl").exists())
+        self.manifest["jobs"] = 1
+        with patch("run_campaign.worker_command", self.fake_command), contextlib.redirect_stdout(io.StringIO()):
+            result = coordinate(self.manifest)
+        events = [json.loads(line) for line in (self.output / "events.jsonl").read_text().splitlines()]
+        self.assertEqual([event["active_jobs"] for event in events if event["type"] == "trial_started"], [1, 1])
+        self.assertEqual(result["measurement_purpose"], "isolated-timing")
+
     def test_hundred_subprocess_trials_are_bounded_and_failures_are_retained(self):
         self.entries(100)
         with (
@@ -166,6 +181,7 @@ class CampaignTests(unittest.TestCase):
         with (
             patch("run_campaign.setup_trial", setup),
             patch("run_campaign.trial_commands", commands),
+            patch("run_campaign.time.time_ns", side_effect=[1000000, 2000000, 3000000, 4000000]),
         ):
             record = run_trial(self.manifest, self.manifest["trials"][0])
         self.assertEqual(
@@ -175,6 +191,10 @@ class CampaignTests(unittest.TestCase):
                 record["task_success"],
             ),
             (7, 0, True),
+        )
+        self.assertEqual(
+            [record[key] for key in ("started_unix_ms", "host_started_unix_ms", "host_finished_unix_ms", "finished_unix_ms")],
+            [1, 2, 3, 4],
         )
         self.assertEqual(
             record["usage"],
