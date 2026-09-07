@@ -1,0 +1,129 @@
+[
+  {
+    "parent": "queue-r1-baa",
+    "original_plan_sha256": "4777ea722b8ba3e2ff10bb6f0f930cda4f952b31fa8109e4020a5d764103048c",
+    "editor": "assistant proposal",
+    "human_accepted": false,
+    "status": "awaiting human approval",
+    "changes": [
+      {
+        "section": "steps",
+        "id_or_index": "s2-submit-views",
+        "field": "instructions",
+        "before": "Implement submit/get/list: no input mutation, strict field whitelist/defaults, dup/unknown/self/cycle check incl. DB deps, atomic single-TX batch, idempotent same-spec no-op, exact 12-key detached sorted views.",
+        "proposed": "Implement submit/get/list: no input mutation, strict field whitelist/defaults, dup/unknown/self/cycle check incl. DB deps, atomic single-TX batch, idempotent same-spec no-op, exact ten-key detached sorted views."
+      },
+      {
+        "section": "acceptance_criteria",
+        "id_or_index": "ac-views",
+        "field": "description",
+        "before": "Views: exact 12-key detached copies, sorted unique deps, list sorted by ID, get/list validate IDs and never implicitly recover.",
+        "proposed": "Views: exact ten-key detached copies, sorted unique deps, list sorted by ID, get/list validate IDs and never implicitly recover."
+      },
+      {
+        "section": "acceptance_criteria",
+        "id_or_index": "ac-submit",
+        "field": "description",
+        "before": "Atomic submit: full pre-TX validation, dup/unknown/self/unknown-dep/cycle reject whole batch with no writes and no recovery side-effects; idempotent same normalized spec is no-op.",
+        "proposed": "Atomic submit: type checks before TX; graph/spec checks inside the write TX, dup/unknown/self/unknown-dep/cycle reject whole batch with no writes and no recovery side-effects; idempotent same normalized spec is no-op."
+      },
+      {
+        "section": "risks",
+        "id_or_index": 1,
+        "field": null,
+        "before": "Invalid batch partially mutating or triggering recovery; mitigated by full validation before TX and single-TX rollback.",
+        "proposed": "Invalid batch partially mutating or triggering recovery; mitigated by type checks before TX, graph/spec checks inside TX, and rollback."
+      },
+      {
+        "section": "verification_strategy",
+        "id_or_index": "v2",
+        "field": "description",
+        "before": "Run python3.12 -m unittest tests.test_regress -v: two processes claim same job get distinct owners; committed jobs survive close/reopen.",
+        "proposed": "Run python3.12 -m unittest tests.test_regress -v: two processes compete for one job: exactly one gets its lease, the other gets null; committed jobs survive close/reopen."
+      }
+    ],
+    "proposed_plan_sha256": "41d966bb3d0558662c963ffb3587d041b62bdedc36542790757a262bc13b37dc"
+  },
+  {
+    "parent": "queue-r3-baa",
+    "original_plan_sha256": "e7e7483a1080d7de8136080a3c3a2b5d6bb8ac68ece184e2b17d9673d4d1acb7",
+    "editor": "assistant proposal",
+    "human_accepted": false,
+    "status": "awaiting human approval",
+    "changes": [
+      {
+        "section": "steps",
+        "id_or_index": "S2",
+        "field": "instructions",
+        "before": "Implement strict validators and atomic submit plus get list: bool-is-not-int, finite JSON, allowed fields, no caller mutation, sorted-unique deps, reject dup unknown self cycle, idempotent only on exact original-spec match, detached 12-key views sorted by ID.",
+        "proposed": "Implement strict validators and atomic submit plus get list: bool-is-not-int, finite JSON, allowed fields, no caller mutation, sorted-unique deps, reject dup unknown self cycle, idempotent only on exact original-spec match, detached ten-key views sorted by ID."
+      },
+      {
+        "section": "acceptance_criteria",
+        "id_or_index": "AC1",
+        "field": "description",
+        "before": "Atomic submit with detached 12-key views sorted by ID; invalid batch leaves DB unchanged.",
+        "proposed": "Atomic submit with detached ten-key views sorted by ID; invalid batch leaves DB unchanged."
+      }
+    ],
+    "proposed_plan_sha256": "5c0857508221ba570cedb4da63dd74e3d5e322a7cded5394fec1136a9feff212"
+  },
+  {
+    "parent": "queue-r4-aaa",
+    "original_plan_sha256": "fd9e0a99696c9366f465d5f7885a11ec6e2c8ad604aa4bf6a52551d54fa19e9a",
+    "editor": "assistant proposal",
+    "human_accepted": false,
+    "status": "awaiting human approval",
+    "changes": [
+      {
+        "section": "steps",
+        "id_or_index": "s-transitions",
+        "field": "instructions",
+        "before": "Implement claim with recovery then priority-desc id-asc eligible pick and attempts increment; recover reset with ready_at rules; complete and fail with running plus owner plus attempt plus lease checks, retry_delay cap and terminal guards.",
+        "proposed": "Implement claim with recovery then priority-desc id-asc eligible pick and attempts increment; recover reset with ready_at rules; complete and fail with running plus owner plus attempt plus lease checks, nonnegative retry_delay and max_attempts cap and terminal guards."
+      },
+      {
+        "section": "verification_strategy",
+        "id_or_index": "v-cli-matrix",
+        "field": "description",
+        "before": "Run python3.12 CLI matrix via python3.12 -m durable_queue --db PATH --request FILE checking success JSON and exit-2 cases for bad JSON, UTF-8, op, fields and missing DB.",
+        "proposed": "Run python3.12 CLI matrix via python3.12 -m durable_queue --db PATH --request FILE checking success JSON and exit-2 cases for bad JSON, UTF-8, op, fields and unavailable DB."
+      }
+    ],
+    "proposed_plan_sha256": "5b43b778679e693f6c6b18be2b1c1d9a6d7a1d923b36fff775e001117876ee8b"
+  },
+  {
+    "parent": "queue-r2-baa",
+    "original_plan_sha256": "91372b675fd75645208e7b0b3ab9c6d5b7f77d50d044b2cd77ab741909b23e10",
+    "editor": "assistant proposal",
+    "human_accepted": false,
+    "status": "awaiting human approval",
+    "changes": [
+      {
+        "section": "steps",
+        "id_or_index": "S3",
+        "field": "instructions",
+        "before": "In one IMMEDIATE txn: claim recovers expiries then claims eligible job by prio DESC,id ASC; recover maps expired to pending/failed; complete/fail guard running+owner+attempt+now<lease before any write, clear lease, apply bounded retry_delay.",
+        "proposed": "In one IMMEDIATE txn: claim recovers expiries then claims eligible job by prio DESC,id ASC; recover maps expired to pending/failed; complete/fail guard running+owner+attempt+now<lease before any write, clear lease, apply nonnegative retry_delay with retries bounded by max_attempts."
+      }
+    ],
+    "proposed_plan_sha256": "2a03422cc7cf39a67ff732aac55bcdd6d159389e4c631494cbf6b2700e0274a4"
+  },
+  {
+    "parent": "queue-r4-baa",
+    "original_plan_sha256": "564c023430dd22f921a89865879a342d81dea04d66e7dc6ef961be1a5acd23a7",
+    "editor": "assistant proposal",
+    "human_accepted": false,
+    "status": "awaiting human approval",
+    "changes": [
+      {
+        "section": "acceptance_criteria",
+        "id_or_index": "A1",
+        "field": "description",
+        "before": "Submit is atomic, strictly validated, idempotent on normalized spec match, returns detached sorted views; get/list sorted, validated, no implicit recovery.",
+        "proposed": "Submit is atomic, strictly validated, idempotent on normalized spec match, returns detached views in submission order; get validates IDs, list sorts by ID, no implicit recovery."
+      }
+    ],
+    "proposed_plan_sha256": "4bbedb0c01e564ba45a4715d96292784b84639217de5fc39f0afd9757fc523ab"
+  }
+]

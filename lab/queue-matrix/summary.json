@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "root": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z",
+  "source_commit": "f0459593f8e0f864f8800dafdc4f043598021bb3",
+  "statuses": {
+    "awaiting_plan_approval": 28,
+    "blocked_by_failed_plan": 3,
+    "failed": 1
+  },
+  "preparation_tokens": {
+    "tool_calls": 163,
+    "input_tokens": 206498,
+    "output_tokens": 45479,
+    "cached_input_tokens": 121633,
+    "reasoning_output_tokens": 21854,
+    "total_tokens": 251977
+  },
+  "phase_threads": 16,
+  "inference_calls": 64,
+  "phase_concurrency": {
+    "peak": 8,
+    "eight_active_ms": 60688
+  },
+  "request_concurrency": {
+    "peak": 8,
+    "eight_active_ms": 22476
+  },
+  "requested_model": "muse-spark-1.3-contributor",
+  "provider": {
+    "provider": "muse-lab",
+    "requested_id": "muse-spark-1.3-contributor",
+    "observed_version": null,
+    "catalog_sha256": "b206e33ba7175f3608ac3f607d169e142f4123c64027138893ad29612f2e46db",
+    "effective_config_sha256": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e"
+  },
+  "baseline_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+  "controls": {
+    "schema_version": 1,
+    "task": "Complete the durable_queue Python 3.12 standard-library package and JSON CLI according to CONTRACT.md. Preserve Queue and python -m durable_queue entry points. The queue must durably submit dependency graphs, atomically claim jobs across processes, recover expired leases, reject stale completion, schedule bounded retries and roll back invalid batches. Add focused regression tests, including real separate-process durability and claim exclusivity. Research the existing repository, generate a concise concrete canonical plan and wait for explicit human approval before implementation. Verification must cover the full public contract, not just the starter tests. Run the task's relevant tests with python3.12 -m unittest discover -s tests -v. Keep implementation and tests local; no network, external packages, daemon or UI.\n",
+    "repository": {
+      "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "initial_dirty_patch_sha256": null
+    },
+    "model": {
+      "provider": "muse-lab",
+      "requested_id": "muse-spark-1.3-contributor",
+      "observed_version": null,
+      "catalog_sha256": "b206e33ba7175f3608ac3f607d169e142f4123c64027138893ad29612f2e46db",
+      "effective_config_sha256": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e"
+    },
+    "workflow": {
+      "approval": "human_required",
+      "plan": {
+        "renderer": "markdown"
+      }
+    }
+  },
+  "matrix_sha256": "71f1a2324fcb77d01e9ada18eca96a284a43c43ed03c330520a1f97a0a0444a5",
+  "batch_input_sha256": "03ca056b1bba99641b736ff6a43e79e7095642657475b56296b3236e6fc18908",
+  "all_32_checkouts_clean": true,
+  "all_16_phases_shutdown_complete": true,
+  "implementation_phases": 0,
+  "warnings": {
+    "{\"message\": \"Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /home/james/.config/codex-lab/muse-contributor/config.toml.\", \"type\": \"warning\"}": 16
+  },
+  "limits": {
+    "concurrency": 8,
+    "aggregate_token_allocation": 35000000,
+    "hard_cumulative_token_limit": null,
+    "hard_spend_limit": null,
+    "automatic_retries": 0,
+    "automatic_amendment_approvals": 0,
+    "model_context_window": 1048576,
+    "model_auto_compact_token_limit": 900000,
+    "existing_phase_seconds": 1800,
+    "existing_phase_events": 10000,
+    "existing_phase_event_bytes": 4194304,
+    "existing_phase_threads": 32,
+    "existing_fragment_bytes": 8192,
+    "existing_combined_fragment_bytes": 16384
+  }
+}
