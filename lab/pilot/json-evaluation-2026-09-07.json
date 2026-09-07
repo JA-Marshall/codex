@@ -1,0 +1,291 @@
+{
+  "schema_version": 1,
+  "fixture": "csv-summary-v1",
+  "fixture_commit": "55fb025d812a1edff454d2f5c8cd90fdedc717e9",
+  "task_sha256": "4c5f65622e3c6c053ec130ebe84cce969ab0d710bb84484822359147be2f6e2e",
+  "python": {
+    "path": "/home/james/.local/share/codex-lab-toolchain/python/cpython-3.12.14-linux-x86_64-gnu/bin/python3.12",
+    "version": "3.12.14 (main, Sep  1 2026, 14:16:52) [Clang 22.1.3 ]",
+    "sha256": "f7c6210eb40fadcd3c2889dddd24a15fc2c9f926aec5a03bf9da66e12d581526"
+  },
+  "evaluator_sha256": "a334355c80f16aef42c1040a7088e3abe4fe41cc41f142c81209cc26b9767058",
+  "sandbox_sha256": "995b7fad6135a27e7a9490b7ca4d9686d4ea69a3b7be837df709e143691fd42f",
+  "run": "/home/james/.cache/codex-lab-csv-pilot/20260907T112052Z/runs/csv-json-execution",
+  "candidate_files": {
+    "cli.py": "27f008ad6bfc747feebb0e8f55a9ef9a8216fa04ee63441b48d7a3d047b7f9a8",
+    "csv_summary.py": "e817e145420a218fb2eb15428500ef07b3f91dc906076607f559c7bcfaddfa6b",
+    "tests/test_public.py": "f6f785a14608bd833a1f5ddcbaa45415229f668cdd34ad34224b1dbebfce38d5",
+    "tests/test_regression.py": "a7cce99817db4227308d063b5a0d19d65d9e020e0f122ec9e5a0042fdd0cc7cd"
+  },
+  "public_test_success": true,
+  "hidden_test_success": false,
+  "api": {
+    "exit_code": 0,
+    "timeout": false,
+    "stdout": "[{\"value\": {}}, {\"value\": {}}, {\"value\": {\"a\": 2}}, {\"value\": {\"red,green\": 7}}, {\"value\": {\"say \\\"yes\\\"\": 1}}, {\"value\": {\"two\\r\\nlines\": 2}}, {\"value\": {\"a\": 2}}, {\"value\": {\"\": 2, \" a \": 5}}, {\"error\": \"ValueError\"}, {\"error\": \"ValueError\"}, {\"error\": \"ValueError\"}, {\"error\": \"ValueError\"}, {\"error\": \"ValueError\"}, {\"error\": \"ValueError\"}, {\"error\": \"ValueError\"}, {\"error\": \"ValueError\"}, {\"error\": \"ValueError\"}, {\"error\": \"ValueError\"}, {\"error\": \"ValueError\"}, {\"error\": \"ValueError\"}, {\"error\": \"ValueError\"}]\n",
+    "stderr": "",
+    "wall_clock_ms": 65
+  },
+  "public": {
+    "exit_code": 0,
+    "timeout": false,
+    "stdout": "",
+    "stderr": "test_cli_result (test_public.SummaryTests.test_cli_result) ... ok\ntest_quoted_comma (test_public.SummaryTests.test_quoted_comma) ... ok\ntest_repeated_categories (test_public.SummaryTests.test_repeated_categories) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 0.016s\n\nOK\n",
+    "wall_clock_ms": 115
+  },
+  "checks": [
+    {
+      "case": "empty",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "{}\n",
+        "stderr": "",
+        "wall_clock_ms": 65
+      }
+    },
+    {
+      "case": "header",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "{}\n",
+        "stderr": "",
+        "wall_clock_ms": 65
+      }
+    },
+    {
+      "case": "bom",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "{\"a\": 2}\n",
+        "stderr": "",
+        "wall_clock_ms": 65
+      }
+    },
+    {
+      "case": "quoted-comma",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "{\"red,green\": 7}\n",
+        "stderr": "",
+        "wall_clock_ms": 65
+      }
+    },
+    {
+      "case": "escaped-quote",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "{\"say \\\"yes\\\"\": 1}\n",
+        "stderr": "",
+        "wall_clock_ms": 65
+      }
+    },
+    {
+      "case": "quoted-newline",
+      "api_passed": true,
+      "cli_passed": false,
+      "cli": {
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "{\"two\\nlines\": 2}\n",
+        "stderr": "",
+        "wall_clock_ms": 65
+      }
+    },
+    {
+      "case": "blank-records",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "{\"a\": 2}\n",
+        "stderr": "",
+        "wall_clock_ms": 65
+      }
+    },
+    {
+      "case": "preserve-category",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "{\"\": 2, \" a \": 5}\n",
+        "stderr": "",
+        "wall_clock_ms": 65
+      }
+    },
+    {
+      "case": "wrong-header",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 2,
+        "timeout": false,
+        "stdout": "",
+        "stderr": "expected category,count header\n",
+        "wall_clock_ms": 65
+      }
+    },
+    {
+      "case": "extra-field",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 2,
+        "timeout": false,
+        "stdout": "",
+        "stderr": "expected 2 fields, got 3\n",
+        "wall_clock_ms": 65
+      }
+    },
+    {
+      "case": "missing-field",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 2,
+        "timeout": false,
+        "stdout": "",
+        "stderr": "expected 2 fields, got 1\n",
+        "wall_clock_ms": 65
+      }
+    },
+    {
+      "case": "negative",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 2,
+        "timeout": false,
+        "stdout": "",
+        "stderr": "invalid count: '-1'\n",
+        "wall_clock_ms": 65
+      }
+    },
+    {
+      "case": "signed",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 2,
+        "timeout": false,
+        "stdout": "",
+        "stderr": "invalid count: '+1'\n",
+        "wall_clock_ms": 65
+      }
+    },
+    {
+      "case": "whitespace-count",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 2,
+        "timeout": false,
+        "stdout": "",
+        "stderr": "invalid count: ' 1'\n",
+        "wall_clock_ms": 65
+      }
+    },
+    {
+      "case": "empty-count",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 2,
+        "timeout": false,
+        "stdout": "",
+        "stderr": "invalid count: ''\n",
+        "wall_clock_ms": 65
+      }
+    },
+    {
+      "case": "unicode-digit",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 2,
+        "timeout": false,
+        "stdout": "",
+        "stderr": "invalid count: '\u0661'\n",
+        "wall_clock_ms": 65
+      }
+    },
+    {
+      "case": "decimal",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 2,
+        "timeout": false,
+        "stdout": "",
+        "stderr": "invalid count: '1.0'\n",
+        "wall_clock_ms": 65
+      }
+    },
+    {
+      "case": "unterminated",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 2,
+        "timeout": false,
+        "stdout": "",
+        "stderr": "unclosed quote\n",
+        "wall_clock_ms": 65
+      }
+    },
+    {
+      "case": "after-quote",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 2,
+        "timeout": false,
+        "stdout": "",
+        "stderr": "unexpected chars after closing quote\n",
+        "wall_clock_ms": 65
+      }
+    },
+    {
+      "case": "bare-quote",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 2,
+        "timeout": false,
+        "stdout": "",
+        "stderr": "stray quote in unquoted field\n",
+        "wall_clock_ms": 65
+      }
+    },
+    {
+      "case": "late-error",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 2,
+        "timeout": false,
+        "stdout": "",
+        "stderr": "invalid count: '-2'\n",
+        "wall_clock_ms": 65
+      }
+    }
+  ],
+  "task_success": false
+}

@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "status": "awaiting human decisions; not approved",
+  "targets": [
+    {
+      "run_id": "csv-md-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "f5e7683f1d510e50f0ea02ffb126d77374bdef53a08a6e6595ed023fd540c529",
+      "run_spec_sha256": "8b734cddb6714fc91b6eab630de02d92c17c884877b10c590da10d3792cbe86d"
+    },
+    {
+      "run_id": "csv-json-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "f5e7683f1d510e50f0ea02ffb126d77374bdef53a08a6e6595ed023fd540c529",
+      "run_spec_sha256": "3c16a6380e3b3db9be217d9b884a3a0565272d27808fe89fe0dba76f88e5bc0c"
+    }
+  ]
+}

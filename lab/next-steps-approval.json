@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "plan_id": "lab-next-steps-v1",
+  "revision": 1,
+  "canonical_sha256": "e801c46b488a8d2c622560627be029fcf7807e9ac68bff78ff4f884cd6964daf",
+  "file_sha256": "0997338e578845027e96002a9b2e9e52efde5ca8f97df57ebed016bb493720d0",
+  "decision": "approved",
+  "user_instruction": "Ok now execute on the plan made",
+  "starting_commit": "1b83643b4c3e438b345753dc9531d50bf55c16c3",
+  "approved_steps": ["N01", "N02", "N03", "N04"],
+  "test_scope": "Focused tests only. The newer AGENTS.md rule supersedes the retained plan's historical full-suite clause.",
+  "live_task_approvals": "Each generated experimental task plan still requires a distinct explicit human decision before implementation. This development approval does not grant those decisions."
+}

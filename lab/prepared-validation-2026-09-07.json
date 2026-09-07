@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "tested_commit": "485645977772ba126838e6f41055ba41eb3403e5",
+  "runtime": {
+    "command": "just test -p codex-lab-runtime --test-threads 2 --retries 0",
+    "nextest_run_id": "cfb85df0-1926-44df-a62e-690231d8d254",
+    "passed": 83,
+    "failed": 0,
+    "timed_out": 0,
+    "skipped": 0,
+    "elapsed_seconds": 123.328
+  },
+  "fixture": {
+    "command": "CODEX_LAB_TEST_BINARY=/home/james/.cache/codex-lab-target/debug/codex-lab python3.12 -m unittest test_fixture -v",
+    "python": "3.12.14",
+    "passed": 2,
+    "elapsed_seconds": 8.062,
+    "calibration_variants": ["broken baseline fails", "no-op fails", "incomplete fix fails", "reference passes"],
+    "cases_per_variant": {"api": 21, "cli": 21, "fixed_public_tests": 3},
+    "post_format_review": "Python AST comparison confirmed that formatting changed no executable syntax. Fresh pilot fixtures use the final formatted byte hashes."
+  },
+  "final_checks": {
+    "scoped_fix": "passed; reviewed all edits",
+    "clippy": "cargo clippy -p codex-lab-runtime --all-targets -- -D warnings passed",
+    "format": "just fmt and just fmt-check passed",
+    "build": "cargo build -p codex-lab-runtime --bin codex-lab passed",
+    "lint_review": "An automatic collection-removal fix would duplicate shared JSON keys. Explicit disjoint-key iteration preserves the tested uniqueness behavior without that collection.",
+    "tests_after_fix_or_format": false
+  },
+  "scope": {
+    "full_workspace_suite_run": false,
+    "new_upstream_core_changes": false,
+    "new_dependencies": false,
+    "live_muse_task_implementation": "pending separate exact human plan approvals"
+  }
+}

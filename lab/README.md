@@ -2,7 +2,7 @@
 
 For the new restricted live host, see [RUNNING.md](RUNNING.md). The material below records the original offline foundation milestone; its statements about runtime integration and upstream edits describe that earlier scope. Current validation and remaining work are tracked in [PROGRESS.md](PROGRESS.md).
 
-The concrete proposed follow-up is [NEXT_STEPS.md](NEXT_STEPS.md): durable prepared-plan review, a realistic evaluated fixture, and one controlled Markdown/JSON pair. Its canonical plan and generated view are linked there; the proposal is not yet implemented.
+The approved follow-up in [NEXT_STEPS.md](NEXT_STEPS.md) is implemented: durable prepared-plan review, an evaluated fixture, and a Markdown/JSON pilot. The new commands and contracts are documented in [EXPERIMENTS.md](EXPERIMENTS.md). [Pilot results](pilot/RESULTS.md) record a Markdown workflow failure and a JSON candidate correctness failure; the comparison is descriptive, with no renderer winner.
 
 The foundation is implemented in [`codex-rs/lab`](../codex-rs/lab). It is an offline Rust library for experiment configuration, canonical plans, representations, human decisions and recording. It does not yet intercept live Codex tools, call Muse, or add an upstream `--workflow` flag.
 
