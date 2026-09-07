@@ -1,10 +1,10 @@
 # Instruction/workflow matrix on a durable queue task
 
-Status: concrete proposal after the user's request for more parallelism, a more
-substantial coding task, varied instruction combinations and approximately 50x
-the tokens. The ten fixed-candidate verifier trials remain sealed and unapproved;
-they are not part of this campaign. No campaign model calls are authorized by
-this document. The token interpretation is awaiting the user's answer.
+Status: user approved this proposal with Go, including approximately 35M aggregate
+reported tokens and preparation concurrency eight. Fixture/evaluator/profile
+development and research/planning are authorized. Exact generated-plan execution
+targets still require human approval. The ten fixed-candidate verifier trials
+remain sealed and unapproved; they are not part of this campaign.
 
 ## Experiment
 
@@ -93,8 +93,7 @@ This is an allocation, not an instruction to pad prompts or keep working after
 completion. It includes research, planning, execution and verification; report
 preparation costs separately and never double-count shared plans as new calls.
 
-That interpretation is not yet confirmed. Fifty times per run would be a different
-campaign. Do not infer a dollar ceiling from these token counts: cached input and
+The user confirmed the aggregate interpretation. Do not infer a dollar ceiling from these token counts: cached input and
 provider billing differ. No cumulative hard token/spend limiter exists today.
 The initial campaign can release work in reviewed blocks and account for observed
 usage, but concurrent in-flight work can exceed an approximate token envelope.
@@ -156,5 +155,6 @@ run the 17,000-test workspace suite for this campaign.
 
 One task and four planner blocks cannot establish a universal workflow winner.
 Report procedure combinations as exploratory evidence, retain all raw artifacts
-locally, and publish reproducible metadata and outcomes. No 35M-token launch,
-trial approval or implementation of this new fixture is granted by this proposal.
+locally, and publish reproducible metadata and outcomes. Implementation of the
+benchmark foundation and model planning are authorized; implementation of generated
+candidate plans still requires approval of their exact execution targets.
