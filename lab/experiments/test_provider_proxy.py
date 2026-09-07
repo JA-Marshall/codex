@@ -20,7 +20,9 @@ class Upstream(BaseHTTPRequestHandler):
     def do_POST(self):
         body = self.rfile.read(int(self.headers["Content-Length"]))
         with self.server.lock:
-            self.server.calls.append((time.monotonic(), self.path, body, self.headers["Authorization"]))
+            self.server.calls.append(
+                (time.monotonic(), self.path, body, self.headers["Authorization"])
+            )
         if body == b"cooldown":
             self.send_response(429)
             self.send_header("Retry-After", "1")
@@ -49,7 +51,13 @@ class ProxyTests(unittest.TestCase):
         self.upstream.release = threading.Event()
         self.journal = Journal(Path(self.temp.name) / "events.jsonl")
         self.limiter = SharedLimiter(5, window=0.2, startup_delay=0)
-        self.proxy = Proxy(0, f"http://127.0.0.1:{self.upstream.server_port}/v1", "test-secret", self.limiter, self.journal)
+        self.proxy = Proxy(
+            0,
+            f"http://127.0.0.1:{self.upstream.server_port}/v1",
+            "test-secret",
+            self.limiter,
+            self.journal,
+        )
         for server in (self.upstream, self.proxy):
             threading.Thread(target=server.serve_forever, daemon=True).start()
 
@@ -62,7 +70,9 @@ class ProxyTests(unittest.TestCase):
         self.journal.stream.close()
 
     def request(self, body=b"ok", path="/v1/responses", key="test-secret"):
-        client = http.client.HTTPConnection("127.0.0.1", self.proxy.server_port, timeout=4)
+        client = http.client.HTTPConnection(
+            "127.0.0.1", self.proxy.server_port, timeout=4
+        )
         client.request("POST", path, body, {"Authorization": "Bearer " + key})
         response = client.getresponse()
         value = response.status, response.read()
@@ -78,7 +88,9 @@ class ProxyTests(unittest.TestCase):
         for start in times:
             self.assertLessEqual(sum(start <= t < start + 0.195 for t in times), 5)
         self.assertTrue(all(c[3] == "Bearer test-secret" for c in self.upstream.calls))
-        self.assertNotIn("test-secret", (Path(self.temp.name) / "events.jsonl").read_text())
+        self.assertNotIn(
+            "test-secret", (Path(self.temp.name) / "events.jsonl").read_text()
+        )
 
     def test_429_is_forwarded_and_cools_down_other_clients_without_proxy_retry(self):
         self.assertEqual(self.request(b"cooldown"), (429, b'{"error":"limited"}'))
@@ -89,8 +101,12 @@ class ProxyTests(unittest.TestCase):
         self.assertEqual(self.upstream.calls[-1][1], "/v1/responses/compact")
 
     def test_sse_is_delivered_before_upstream_finishes(self):
-        client = http.client.HTTPConnection("127.0.0.1", self.proxy.server_port, timeout=1)
-        client.request("POST", "/v1/responses", b"stream", {"Authorization": "Bearer test-secret"})
+        client = http.client.HTTPConnection(
+            "127.0.0.1", self.proxy.server_port, timeout=1
+        )
+        client.request(
+            "POST", "/v1/responses", b"stream", {"Authorization": "Bearer test-secret"}
+        )
         response = client.getresponse()
         self.assertEqual(response.read1(100), b"data: first\n\n")
         self.upstream.release.set()
@@ -100,7 +116,9 @@ class ProxyTests(unittest.TestCase):
     def test_cancelled_waiter_does_not_reach_upstream(self):
         self.limiter.cooldown(0.5)
         client = socket.create_connection(("127.0.0.1", self.proxy.server_port))
-        client.sendall(b"POST /v1/responses HTTP/1.1\r\nHost: localhost\r\nAuthorization: Bearer test-secret\r\nContent-Length: 2\r\n\r\nok")
+        client.sendall(
+            b"POST /v1/responses HTTP/1.1\r\nHost: localhost\r\nAuthorization: Bearer test-secret\r\nContent-Length: 2\r\n\r\nok"
+        )
         client.close()
         deadline = time.monotonic() + 1.5
         while time.monotonic() < deadline:
