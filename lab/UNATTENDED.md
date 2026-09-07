@@ -86,6 +86,12 @@ Sandbox, tool restrictions, phase shutdown, receipts and independent grading sti
 apply. A finished workflow and a passing implementation are reported separately.
 Evaluation failures remain separate from model/workflow failures too.
 
+This release completes integration of the unattended infrastructure. Executors
+and verifiers still have workspace-wide write access. Per-task write restrictions,
+read-only candidate verification and richer handovers remain the next stage in
+[WORKFLOW_STUDY_PLAN.md](WORKFLOW_STUDY_PLAN.md). Separate phase agents and a fixed
+task digest alone do not enforce semantic scope or a plan's affected-file list.
+
 ## Results and stopping
 
 The campaign preserves its input snapshots, policy files, event log, per-trial
@@ -107,8 +113,11 @@ when comparing them with earlier human-reviewed or shared-plan results.
 
 The integrated release's validation is recorded separately in
 [unattended-integration-2026-09-07.json](unattended-integration-2026-09-07.json).
+It passed 36 selected Rust tests and 27 unique Python tests. The installed Windows
+launcher froze 200 trials with 16 worker slots and no model calls; all 71 input
+pins matched and the existing local provider service reported ready.
 
-The [validation receipt](unattended-validation-2026-09-07.json) records 32 focused
+The earlier v1 [validation receipt](unattended-validation-2026-09-07.json) records 32 focused
 Rust tests and 16 Python tests, including a real mock-provider CLI run with stdin
 closed, 100 fake subprocess trials at three concurrent workers, independent
 evaluation after a failed host, and a 200-trial offline preparation. Scoped strict

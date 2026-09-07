@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "status": "integration_complete",
+  "date": "2026-09-07",
+  "branch": "lab/workflow-study-integration",
+  "worktree": "C:/Users/james/Desktop/Code/trees/codex-lab-workflow-study",
+  "base_commit": "af8e801341b37c081d32dec090581aeaddea71c0",
+  "code_commit": "5b49e3301167ac8bf0360de474c368ba36d39842",
+  "bundle": "/home/james/.cache/codex-lab-binaries/unattended-v2-20260907",
+  "build_receipt": "/home/james/.cache/codex-lab-binaries/unattended-v2-20260907/build.json",
+  "package_check_receipt": "/home/james/.cache/codex-lab-binaries/unattended-v2-20260907/package-check.json",
+  "binary_sha256": "3f11498e1e6c00066472268f5179a58ebdde513fbea58aa4b9dbb0e74bbab66d",
+  "sandbox_resource_sha256": "0e7ab2fc4e2f142999034d624e1f6b190e251677e9d267048a95005d1243d618",
+  "provider": {
+    "home": "/home/james/.config/codex-lab/muse-contributor-unattended-v2",
+    "config_sha256": "d77213c830acf3e4b3e44672f6e6454fddd29154a7657173a5f6618348b45c1f",
+    "catalog_sha256": "292c1d0855c54ca51d73450674beab303c9de94ece432cd7c3988951603af56a",
+    "profile_change": "Only the model catalog path and its authorization instructions differ from the existing limited profile.",
+    "service_receipt": "/home/james/.cache/codex-lab-provider-proxy/v1-20260907/service.json",
+    "service_source_commit": "65ea7e6924db79b6b9495efebcbedea5d0599202",
+    "base_url": "http://127.0.0.1:8765/v1",
+    "requests_per_minute": 100,
+    "health_observed": "ready",
+    "health_checked_at": "2026-09-07T19:46:40.436316+00:00",
+    "service_restarted": false,
+    "identity_limit": "Pinned setup receipt and source files plus local readiness do not attest the code running inside the service process."
+  },
+  "validation": {
+    "rust_tests_passed": 36,
+    "rust_selections": [
+      {
+        "command": "just test -p codex-lab-runtime --test driver",
+        "passed": 13
+      },
+      {
+        "command": "just test -p codex-lab --test workflow --test config",
+        "passed": 16
+      },
+      {
+        "command": "just test -p codex-lab-runtime --bin codex-lab",
+        "passed": 3
+      },
+      {
+        "command": "just test -p codex-lab-runtime --lib -E 'test(command_receipts)'",
+        "passed": 4,
+        "filtered_out": 34
+      }
+    ],
+    "python_unique_tests_passed": 27,
+    "python_invocations": [
+      {
+        "command": "python3.12 -m unittest -v test_campaign_service test_campaign_inputs test_campaign test_terminal_run test_provider_proxy test_queue",
+        "passed": 26,
+        "binary_for_existing_fixture_checks": "/home/james/.cache/codex-lab-binaries/receipt-fix-v1-20260907/codex-lab"
+      },
+      {
+        "command": "python3.12 -m unittest -v test_campaign_service",
+        "passed": 4,
+        "note": "Rerun after adding the pre-reexec legacy-manifest guard: three previously counted tests plus one new test."
+      }
+    ],
+    "real_host_mock_case": {
+      "stdin": "closed",
+      "phases": ["research", "plan", "implement", "verify_failed", "repair", "verify_passed"],
+      "model_mock_requests": 12,
+      "phase_threads": 6,
+      "shutdown_receipts": 6,
+      "repair_attempts": 1,
+      "delegated_approvals": 1,
+      "human_approvals": 0,
+      "verification_command_padding_bytes": 16384,
+      "command_identity_retained": true,
+      "final_candidate_correct": true
+    },
+    "quality_checks_passed": [
+      "just fix -p codex-lab -p codex-lab-runtime",
+      "just fmt",
+      "just fmt-check",
+      "just clippy -p codex-lab -p codex-lab-runtime -- -D warnings",
+      "cargo build -p codex-lab-runtime --bin codex-lab",
+      "packaged binary run --help includes --campaign-policy",
+      "bash -n on the versioned launcher",
+      "package/source hashes and provider profile equivalence"
+    ],
+    "full_workspace_suite": false,
+    "tests_rerun_after_format": false
+  },
+  "offline_preparation": {
+    "launcher": "C:/Users/james/.codex-lab/queue-trials.ps1",
+    "arguments": ["-Trials", "200", "-Jobs", "16", "-PrepareOnly", "-Output", "/home/james/.cache/codex-lab-campaigns/unattended-v2-200-prepared-20260907"],
+    "manifest": "/home/james/.cache/codex-lab-campaigns/unattended-v2-200-prepared-20260907/campaign.json",
+    "manifest_sha256": "39d27491fd1a1091ff83820dcd8fec5959f5eba10c0d6fa1f2b0d2ae4b733f62",
+    "trials": 200,
+    "concurrency_limit": 16,
+    "verified_input_pins": 71,
+    "trial_hosts_started": 0,
+    "output_contains_only": ["inputs", "campaign.json"],
+    "previous_launcher_backup": "C:/Users/james/.codex-lab/run-unattended-v1-20260907.sh"
+  },
+  "live_model_calls_for_this_work": 0,
+  "preserved_legacy_binary_sha256": "de6b3c0ed3a8bb976b5fe6aa77dc0df1c39318c32892a073a5168b76d819f59b",
+  "remaining_work": [
+    "Per-task write paths, fixed scope contracts and read-only candidate verification",
+    "Separate versioned context, handover and tool-output policies with bounded retrieval",
+    "Varied Python/Rust task library and calibrated independent graders",
+    "Four separate-agent handover/repair conditions and study reporting",
+    "Live calibration, main study and reserved confirmation campaigns"
+  ]
+}

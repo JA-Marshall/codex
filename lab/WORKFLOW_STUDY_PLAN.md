@@ -1,7 +1,10 @@
 **Implementation plan: useful unattended workflow experiments**
 
-Prepared 7 September 2026. Status: proposed implementation, grounded in the current
-source. This document adds no runtime changes and launches no experiments.
+Prepared 7 September 2026. Status: the integration stage is complete; the remaining
+stages below are proposed implementation. The installed release and its focused
+checks are recorded in
+[unattended-integration-2026-09-07.json](unattended-integration-2026-09-07.json).
+No live study has started. Next implement the scope and context controls.
 
 The objective is to identify which working methods finish repository tasks
 correctly, how much additional checking and repair costs, and how reliably those
@@ -15,20 +18,23 @@ their assigned job while keeping their authority narrow and independently define
 
 **1. Integrate the working infrastructure into a new release**
 
-The source currently has two relevant lines of development:
+Integration completed in the isolated `lab/workflow-study-integration` worktree.
+The installed binary and scripts were built from `5b49e33011`:
 
-| Source | Available behavior | Integration required |
+| Source | Available behavior | Integration result |
 | --- | --- | --- |
-| Main line at `1adda1a5c0` | Bounded repair, corrected evaluator, shared provider limiter, long-command receipt fix | Use as the integration base, rechecking HEAD when implementation starts. |
-| `lab/unattended-campaign` at `f372358bfe` | Delegated plan decisions, frozen campaigns, bounded queue, independent grading of failed hosts | Port its feature commits onto the current base; its older repair corrections are already superseded. |
-| Installed unattended launcher | Queues a finite campaign with no plan prompts | It still selects the direct provider home and an older binary. Replace its default only after validating a new versioned bundle. |
+| Main line at `af8e801341` | Bounded repair, corrected evaluator, shared provider limiter, long-command receipt fix | Used as the integration base. |
+| `lab/unattended-campaign` at `0ed28fdc5a` | Delegated plan decisions, frozen campaigns, bounded queue, independent grading of failed hosts | Feature commits ported; newer receipt/repair behavior preserved. |
+| Installed unattended v2 launcher | Queues a finite campaign with no plan prompts | New versioned bundle and separate provider home validated with a 200-trial offline preparation. |
 
-Create a dedicated integration worktree and separate build mirror. The user reports
-that other work consists of running earlier tasks. Preserve their frozen binaries,
-source snapshots, provider configuration and output directories. Use the existing
-shared proxy; do not restart it or install a second limiter. All new model traffic
-must use `muse-contributor-limited`, with a local health check and recorded service
-identity. Record overlapping workload and provider waiting time where attributable.
+The integration used a dedicated worktree and separate build mirror. Earlier
+tasks retain their frozen binaries, source snapshots, provider configuration and
+output directories. The new `muse-contributor-unattended-v2` home follows the
+limited profile with a separate model catalog describing delegated authorization.
+It uses the existing shared proxy, which was not restarted. New Muse campaigns
+require the service receipt and matching provider URL, with a local health check
+before worker admission and host launch. Record overlapping workload and provider
+waiting time where attributable when live studies begin.
 
 Keep changes primarily in `codex-rs/lab`, `codex-rs/lab-runtime` and
 `lab/experiments`. Continue using upstream execution, sandbox and model interfaces.
@@ -36,11 +42,16 @@ Retain the distinction between historical human approvals and explicitly delegat
 new campaigns. The earlier experiment reset still applies: historical results are
 debugging evidence and are excluded from new comparisons.
 
-Acceptance: the integrated real host completes a mock-provider
-research/plan/implement/fail/repair/pass run with stdin closed, including a command
-longer than the old receipt preview limit. A second trial fails cleanly and the
-queue continues. Local proxy tests demonstrate a shared allowance and no direct
-provider fallback. Package a new binary and frozen scripts with source hashes.
+Validation passed: 36 selected Rust tests and 27 unique Python tests, scoped strict
+Clippy and formatting. The real mock-provider host completed
+research/plan/implement/fail/repair/pass with stdin closed and commands longer
+than 16 KiB. Queue and proxy tests covered isolated failures, bounded admission,
+shared allowance and rejection of direct Muse routing. The package records binary
+and source hashes. The Windows launcher froze 200 trials with concurrency 16;
+all 71 input pins matched and the existing service reported ready. This made no
+live model calls and started no trial hosts.
+
+**Next: scope and context controls**
 
 Implement scope boundaries before testing richer handovers. The current runtime
 uses read-only access for research/planning and workspace-wide write access for
@@ -275,7 +286,7 @@ links resolve and a reader can trace any aggregate failure back to its trial.
 
 | Stage | Work delivered | Evidence required before advancing |
 | --- | --- | --- |
-| Integration | New versioned unattended host with latest fixes and limited provider profile | Focused domain/runtime and mock-proxy tests. |
+| Integration — complete | New versioned unattended host with latest fixes and limited provider profile | 36 selected Rust tests, 27 unique Python tests and a 200-trial offline package check passed; see the integration receipt. |
 | Scope and context controls | Fixed task authority, bounded executor writes, read-only verification, separate size policies and log retrieval | Real-sandbox boundaries and long-evidence retrieval tests. |
 | Task interface | Legacy adapters plus Python/Rust repository adapters | Trusted solutions pass; deliberately wrong solutions fail; sandbox and snapshot checks pass. |
 | Conditions | Four handover/repair workflows with separate agents | Real-host mocked context, scope and repair coverage. |

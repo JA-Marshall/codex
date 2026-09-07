@@ -1,6 +1,15 @@
 # Codex workflow laboratory — progress ledger
 
-## Current state
+## Latest status — workflow study integration, 2026-09-07
+
+- Integration stage complete on `lab/workflow-study-integration` in `C:/Users/james/Desktop/Code/trees/codex-lab-workflow-study`, based on main `af8e801341`. Code release `5b49e3301167ac8bf0360de474c368ba36d39842` combines unattended campaigns with the newer receipt fix and existing shared Muse limiter.
+- The installed v2 bundle and separate `muse-contributor-unattended-v2` provider home are selected by the Windows queue launcher. New Muse campaigns pin the service receipt/source and require matching loopback routing and local readiness. Earlier frozen binaries, provider homes and outputs were preserved; the shared service was not restarted.
+- Validation: 36 selected Rust tests and 27 unique Python tests passed, followed by scoped `just fix`, `just fmt`, `just fmt-check` and strict scoped Clippy. No full workspace suite or test rerun after formatting. A real mock-provider CLI run with stdin closed completed research, planning, implementation, failing verification, repair and passing verification with commands longer than 16 KiB.
+- Installed launcher verification prepared 200 trials at concurrency 16, checked all 71 frozen input pins and observed the local service ready. No live model calls or live campaign trials were started for this work. See [unattended-integration-2026-09-07.json](unattended-integration-2026-09-07.json) for the release, hashes and validation scope.
+- Next: implement fixed per-task write authority, read-only candidate verification and separately bounded handover/context policies. These are not present in the integration release. Keep separate phase agents; scope expansion ends a trial instead of enlarging its assignment. The varied task library, four handover/repair conditions and new live study follow [WORKFLOW_STUDY_PLAN.md](WORKFLOW_STUDY_PLAN.md).
+- Authorization for opt-in finite unattended campaigns comes from the user's request to queue hundreds without per-plan prompts. Their generated-plan decisions are recorded as delegated. Historical interactive approvals and the earlier ledger entries below retain their original meaning.
+
+## Foundation snapshot (historical)
 
 - Phase: **approved milestone complete**. F01–F06 foundation and G01–G06 restricted live integration are implemented and verified with the documented upstream/environment exceptions. The three implementation checkpoints are listed in the publication follow-up below.
 - Implementation authorization: see `APPROVAL.json` for foundation and `live-integration-approval.json` for the separately approved integration scope and immutable reviewed digests.
