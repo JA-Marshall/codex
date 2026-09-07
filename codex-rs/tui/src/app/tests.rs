@@ -3095,6 +3095,7 @@ async fn remote_resume_rejects_explicit_permission_override() -> Result<()> {
             thread_id: ThreadId::new(),
             path: None,
             history_mode: None,
+            cwd: None,
         },
     )
     .await?;

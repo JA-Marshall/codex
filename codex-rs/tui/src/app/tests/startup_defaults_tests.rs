@@ -108,6 +108,7 @@ async fn cli_fork_omits_implicit_model_and_effort() -> Result<()> {
             path: None,
             thread_id: source,
             history_mode: None,
+            cwd: None,
         }),
     ));
     tokio::time::timeout(Duration::from_secs(/*secs*/ 15), async {
