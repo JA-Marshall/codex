@@ -8,6 +8,7 @@ use anyhow::bail;
 use anyhow::ensure;
 use codex_core_api::Config;
 use codex_extension_api::ExtensionRegistryBuilder;
+use codex_lab::ApprovalPolicy;
 use codex_lab::JsonRenderer;
 use codex_lab::LabRun;
 use codex_lab::MarkdownRenderer;
@@ -17,6 +18,7 @@ use codex_lab::RenderedPlan;
 use codex_lab::Renderer;
 use codex_lab::StepProgress;
 use codex_lab::StepStatus;
+use codex_lab::WorkflowCatalog;
 use codex_lab::WorkflowState;
 use serde::Serialize;
 
@@ -45,7 +47,7 @@ pub struct RunOptions {
     pub instruction_root: PathBuf,
     pub workflow: String,
     /// Reuse canonical content to isolate representation from planning. It still
-    /// requires a fresh exact-target human decision for this run.
+    /// requires a fresh exact-target host decision for this run.
     pub plan: Option<PlanRevision>,
     /// Explicit verifier-only trial input; no planner or executor phase runs.
     pub verification_input: Option<crate::VerificationInput>,
@@ -139,6 +141,12 @@ impl Driver {
             )?;
             self.amendment_feedback = Some(reason);
             self.outputs.push((phase, output));
+            if let Some(limit) = self.max_amendments {
+                ensure!(
+                    self.amendments <= usize::from(limit),
+                    "campaign amendment limit exceeded ({limit}); trial stopped without waiting for input"
+                );
+            }
             return Ok(None);
         }
         ensure!(!output.cancelled, "phase cancelled without an amendment");
@@ -235,6 +243,13 @@ impl Driver {
         options: &RunOptions,
         reviewer: &mut impl HumanReviewer,
     ) -> Result<()> {
+        let workflow =
+            WorkflowCatalog::parse(&options.workflow_catalog)?.resolve(&options.workflow)?;
+        ensure!(
+            workflow.approval != ApprovalPolicy::CampaignDelegated
+                || self.delegation_sha256.is_some(),
+            "campaign_delegated workflow requires a validated campaign policy"
+        );
         let research = self.prepare_plan(options).await?;
         'review: loop {
             let plan = self.authority.plan()?.context("canonical plan missing")?;
@@ -258,6 +273,24 @@ impl Driver {
                     self.first_approval.get_or_insert(true);
                     self.authority
                         .update(|run| run.approve(target, "local human input"))?;
+                }
+                HumanDecision::ApproveDelegated {
+                    target,
+                    policy_sha256,
+                } => {
+                    ensure!(
+                        self.delegation_sha256.as_deref() == Some(policy_sha256.as_str()),
+                        "delegated approval requires this run's validated campaign policy"
+                    );
+                    if !self.outputs.iter().any(|(phase, _)| {
+                        matches!(phase, Phase::Implementation | Phase::Verification)
+                    }) {
+                        verify_git_baseline(&options.repository, &options.repository_commit)
+                            .await?;
+                    }
+                    self.authority
+                        .update(|run| run.approve_delegated(target, &policy_sha256))?;
+                    self.delegated_approvals += 1;
                 }
                 HumanDecision::Reject(reason) => {
                     ensure!(
@@ -375,17 +408,6 @@ impl Driver {
                 let artifact = format!("evidence/phase-{:02}.json", self.phase_count);
                 let checks =
                     reports::verification_evidence(&plan, &self.outputs[index].1, &artifact)?;
-                if self.max_repairs > 0 {
-                    let checkpoint =
-                        crate::capture_git_diff(&options.repository, &options.repository_commit)
-                            .await?;
-                    self.evidence.write_bytes(
-                        &format!("verification-{:02}.diff", self.phase_count),
-                        &checkpoint.diff,
-                    )?;
-                    self.evidence.write_json(&format!("verification-{:02}.json", self.phase_count),
-                    &serde_json::json!({"repairs_used":self.repairs,"checks":checks,"phase_artifact":artifact}))?;
-                }
                 let failed = checks
                     .iter()
                     .filter(|(_, evidence)| !evidence.passed)

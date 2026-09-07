@@ -3,7 +3,7 @@ use pretty_assertions::assert_eq;
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn repair_loop_rechecks_after_fix_and_stops_at_the_frozen_budget() -> Result<()> {
-    for (limit, repaired) in [(0_u8, false), (1, true), (1, false)] {
+    for (limit, repaired) in [(0u8, false), (1, true), (1, false)] {
         let server = MockServer::start().await;
         let mut fixture = support::Fixture::new(&server.uri()).await?;
         fixture.workflow_catalog = fixture.workflow_catalog.replace(

@@ -13,6 +13,7 @@ use codex_lab_runtime::JsonReviewer;
 use codex_lab_runtime::RunOptions;
 use codex_lab_runtime::TerminalReviewer;
 use codex_lab_runtime::compare_runs;
+use codex_lab_runtime::execute_campaign_run;
 use codex_lab_runtime::execute_run;
 use codex_lab_runtime::prepare_run;
 use codex_lab_runtime::run_prepared;
@@ -38,7 +39,7 @@ enum Command {
         #[arg(long)]
         output: PathBuf,
     },
-    /// Research, plan and ask for human approval in this process.
+    /// Research, plan and execute with human review or explicit campaign delegation.
     Run(Arguments),
     /// Save an unapproved plan and exit after clean phase shutdown.
     Prepare(Arguments),
@@ -57,7 +58,7 @@ enum Command {
 #[derive(Parser)]
 #[command(
     name = "codex-lab",
-    about = "Run a restricted Codex workflow with explicit human plan approval"
+    about = "Run a restricted Codex workflow with explicit human approval or campaign delegation"
 )]
 struct Arguments {
     #[arg(long)]
@@ -87,6 +88,9 @@ struct Arguments {
     /// Verify a frozen candidate and imported report without planner/executor calls.
     #[arg(long, requires = "plan_file")]
     verification_input: Option<PathBuf>,
+    /// Delegate this exact trial using a frozen policy outside the task repository (run only).
+    #[arg(long)]
+    campaign_policy: Option<PathBuf>,
 }
 
 pub async fn run(arg0_paths: Arg0DispatchPaths) -> Result<()> {
@@ -106,10 +110,21 @@ pub async fn run(arg0_paths: Arg0DispatchPaths) -> Result<()> {
             vary,
             output,
         } => serde_json::to_value(compare_runs(&left, &right, &vary, &output)?)?,
-        Command::Run(args) => serde_json::to_value(
-            execute_run(args.into_options()?, arg0_paths, &mut TerminalReviewer).await?,
-        )?,
+        Command::Run(mut args) => {
+            let policy = args.campaign_policy.take();
+            let options = args.into_options()?;
+            let result = if let Some(policy) = policy {
+                execute_campaign_run(options, arg0_paths, &policy).await?
+            } else {
+                execute_run(options, arg0_paths, &mut TerminalReviewer).await?
+            };
+            serde_json::to_value(result)?
+        }
         Command::Prepare(args) => {
+            ensure!(
+                args.campaign_policy.is_none(),
+                "campaign policy is supported only by run"
+            );
             serde_json::to_value(prepare_run(args.into_options()?, arg0_paths).await?)?
         }
         Command::RunPrepared {
