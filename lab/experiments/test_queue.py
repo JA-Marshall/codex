@@ -97,6 +97,35 @@ class QueueEvaluationTests(unittest.TestCase):
         result = observe(self.sandbox, self.repository, scratch, "race", {"jobs": 1})
         self.assertFalse(result["value"]["unique"], result)
 
+    def test_cli_accepts_unicode_and_compact_json_but_rejects_unsorted_keys(self):
+        path = self.repository / "durable_queue/__main__.py"
+        original = path.read_text()
+        case = next(c for c in CASES if c["name"] == "durable_views")
+        for index, (options, passed) in enumerate(
+            [
+                ('sort_keys=True, ensure_ascii=False, separators=(",", ":")', True),
+                ("sort_keys=False", False),
+            ]
+        ):
+            with self.subTest(options=options):
+                path.write_text(original.replace("sort_keys=True", options))
+                scratch = self.root / f"serialization-{index}"
+                scratch.mkdir()
+                result = observe(
+                    self.sandbox,
+                    self.repository,
+                    scratch,
+                    "cli",
+                    {"steps": case["steps"]},
+                )
+                self.assertEqual(result["exit_code"], 0, result)
+                self.assertEqual(
+                    json.dumps(result["value"], sort_keys=True)
+                    == json.dumps(case["expected"], sort_keys=True),
+                    passed,
+                    result,
+                )
+
     def test_setup_keeps_private_evaluator_out_and_preserves_contract(self):
         other = setup(self.root / "other")
         self.assertEqual(self.metadata["commit"], other["commit"])

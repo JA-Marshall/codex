@@ -9,6 +9,7 @@ import sys
 from setup_fixture import git, sha256
 
 FIXTURE = Path(__file__).resolve().parents[1] / "fixtures/durable-queue-v1"
+EVALUATOR_VERSION = "durable-queue-v2"
 
 
 def evaluator_fingerprint():
@@ -17,6 +18,7 @@ def evaluator_fingerprint():
         "queue_fixture.py",
         "queue_cases.py",
         "queue_worker.py",
+        "queue_cli_format.py",
         "queue_sandbox.py",
         "evaluate_queue.py",
         "evaluate_fixture.py",
@@ -63,6 +65,7 @@ def setup(destination):
         "files": files,
         "task_sha256": sha256(FIXTURE / "task.txt"),
         "evaluator_sha256": evaluator_fingerprint(),
+        "evaluator_version": EVALUATOR_VERSION,
         "python": {
             "path": str(Path(sys.executable).resolve()),
             "version": sys.version,

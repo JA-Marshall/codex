@@ -10,7 +10,7 @@ import tempfile
 from evaluate_fixture import bounded_json, candidate_files
 from evaluate_fixture import observe as public_observe
 from queue_cases import CASES, CLI_INVALID, ERROR, job
-from queue_fixture import FIXTURE, evaluator_fingerprint
+from queue_fixture import EVALUATOR_VERSION, FIXTURE, evaluator_fingerprint
 from queue_sandbox import observe
 from setup_fixture import git, sha256
 from terminal_run import capture_diff, observe_terminal
@@ -53,6 +53,7 @@ def evaluate_locked(repository, sandbox, output, fixture_manifest, run):
         or metadata["python"]["sha256"] != sha256(Path(sys.executable).resolve())
         or metadata["task_sha256"] != sha256(FIXTURE / "task.txt")
         or metadata["evaluator_sha256"] != fingerprint
+        or metadata.get("evaluator_version") != EVALUATOR_VERSION
     ):
         raise ValueError("fixture baseline, interpreter, task or evaluator changed")
     snapshot, observation = None, None
@@ -164,6 +165,7 @@ def evaluate_locked(repository, sandbox, output, fixture_manifest, run):
         "fixture_commit": metadata["commit"],
         "task_sha256": metadata["task_sha256"],
         "evaluator_sha256": fingerprint,
+        "evaluator_version": EVALUATOR_VERSION,
         "sandbox_sha256": sha256(sandbox.resolve()),
         "python": metadata["python"],
         "run": str(run) if run else None,

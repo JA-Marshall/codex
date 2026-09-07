@@ -8,6 +8,11 @@ from pathlib import Path
 import subprocess
 import sys
 
+# The isolated interpreter omits the script directory. Only this trusted helper
+# is exposed by the sandbox; candidate imports are added later by main().
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from queue_cli_format import parse_cli_output
+
 
 def race_child(repository, database, worker, barrier, output):
     sys.path.insert(0, str(repository))
@@ -85,11 +90,9 @@ def cli(repository, scratch, request_bytes, variant=None):
     if result.returncode != 0:
         return {"error": "CLIExit", "exit_code": result.returncode}
     try:
-        value = json.loads(result.stdout)
+        value = parse_cli_output(result.stdout)
     except (ValueError, UnicodeError):
         return {"error": "CLIOutput"}
-    if result.stdout != (json.dumps(value, sort_keys=True) + "\n").encode():
-        return {"error": "CLIOutputBytes"}
     return {"ok": value}
 
 

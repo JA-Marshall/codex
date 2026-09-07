@@ -13,3 +13,4 @@ measurement/** text eol=lf
 instructions/** text eol=lf
 workflows/** text eol=lf
 queue-matrix/** text eol=lf
+queue-rerun-v2/** text eol=lf
