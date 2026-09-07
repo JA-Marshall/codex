@@ -55,7 +55,7 @@ pub(crate) fn plan_schema() -> Value {
     let strings = json!({"type":"array","items":{"type":"string"}});
     let criteria = json!({"type":"array","items":{"type":"object","additionalProperties":false,
         "required":["id","description"],"properties":{"id":{"type":"string"},"description":{"type":"string"}}}});
-    json!({"type":"object","additionalProperties":false,
+    let mut schema = json!({"type":"object","additionalProperties":false,
     "required":["schema_version","plan_id","revision","goal","assumptions","steps","risks","acceptance_criteria","verification_strategy","discoveries","blockers"],
     "properties":{
         "schema_version":{"type":"integer"},"plan_id":{"type":"string"},"revision":{"type":"integer"},
@@ -65,7 +65,29 @@ pub(crate) fn plan_schema() -> Value {
             "required":["id","title","instructions","affected_files","depends_on","acceptance_criteria","verification"],
             "properties":{"id":{"type":"string"},"title":{"type":"string"},"instructions":{"type":"string"},
                 "affected_files":strings,"depends_on":strings,"acceptance_criteria":strings,"verification":strings}}}
-    }})
+    }});
+    let properties = &mut schema["properties"];
+    properties["blockers"]["description"] = json!(
+        "Unresolved obstacles to implementation. Pending mandatory human approval is not a blocker; use [] when no obstacle exists."
+    );
+    let step = &mut properties["steps"]["items"]["properties"];
+    for (field, description) in [
+        (
+            "depends_on",
+            "Existing step IDs only; dependencies must be acyclic.",
+        ),
+        (
+            "acceptance_criteria",
+            "Existing top-level acceptance_criteria IDs only, never prose.",
+        ),
+        (
+            "verification",
+            "Existing verification_strategy IDs only; put commands in the criterion descriptions.",
+        ),
+    ] {
+        step[field]["description"] = json!(description);
+    }
+    schema
 }
 
 /// Join model-selected references with host-observed command results. A model's

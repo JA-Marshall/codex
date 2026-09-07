@@ -4,6 +4,7 @@ mod amendment_tool;
 mod authority;
 mod backend;
 mod bootstrap;
+mod command_receipts;
 mod context;
 mod driver;
 mod evidence;

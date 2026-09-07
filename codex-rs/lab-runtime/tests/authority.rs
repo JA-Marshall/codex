@@ -51,6 +51,15 @@ async fn phase_requires_the_bound_thread_and_explicit_tool_capability() -> Resul
     drop(gate.admit(input(&store, &read, "thread")).await?);
     let shell = ToolName::plain("exec_command");
     assert!(gate.admit(input(&store, &shell, "thread")).await.is_err());
+    assert!(
+        gate.admit(input(
+            &store,
+            &ToolName::plain("lab_command_receipt"),
+            "thread"
+        ))
+        .await
+        .is_err()
+    );
     let foreign = ToolName::namespaced("mcp__remote", "lab_repo_read");
     assert!(gate.admit(input(&store, &foreign, "thread")).await.is_err());
     let mut nested = input(&store, &read, "thread");
@@ -97,6 +106,15 @@ async fn amendment_revokes_immediately_and_requires_a_new_exact_approval_after_s
     let store = ExtensionData::new("thread");
     let shell = ToolName::plain("exec_command");
     let permit = gate.admit(input(&store, &shell, "thread")).await?;
+    assert!(
+        gate.admit(input(
+            &store,
+            &ToolName::plain("lab_command_receipt"),
+            "thread"
+        ))
+        .await
+        .is_err()
+    );
     gate.request_amendment("An assumption was invalid")?;
     assert!(gate.cancellation().is_cancelled());
     assert_eq!(authority.snapshot()?.state, WorkflowState::Implementing);

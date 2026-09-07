@@ -4,6 +4,8 @@
 mod support;
 
 use std::path::PathBuf;
+use std::sync::atomic::AtomicUsize;
+use std::sync::atomic::Ordering;
 
 use anyhow::Context;
 use anyhow::Result;
@@ -19,7 +21,12 @@ use core_test_support::responses::ResponseMock;
 use pretty_assertions::assert_eq;
 use serde_json::Value;
 use serde_json::json;
+use wiremock::Mock;
 use wiremock::MockServer;
+use wiremock::Request;
+use wiremock::ResponseTemplate;
+use wiremock::matchers::method;
+use wiremock::matchers::path;
 
 const PATCH: &str = "*** Begin Patch\n*** Add File: greeting.txt\n+hello\n*** End Patch";
 const FORBIDDEN_PATCH: &str =
@@ -85,6 +92,7 @@ fn implementation_and_verification(prefix: &str) -> Vec<String> {
             "cmd":"test \"$(cat greeting.txt)\" = hello && test ! -e forbidden.txt",
             "max_output_tokens":1024, "timeout_ms":5000
         }).to_string())),
+        response(&format!("{prefix}-receipt"), responses::ev_function_call(&format!("{prefix}-receipt"), "lab_command_receipt", "{\"index\":1}")),
         response(&format!("{prefix}-verification-done"), responses::ev_assistant_message("verification", &json!({
             "checks":[{"verification_id":"V01","call_id":call,"acceptance_criteria":["AC01"]}]
         }).to_string())),
@@ -175,7 +183,20 @@ async fn generated_workflow_enforces_review_before_real_patch_and_verification()
         String::from_utf8(std::fs::read(result.artifacts.join("evidence/final.diff"))?)?
             .contains("+hello")
     );
-    assert_eq!(mock.requests().len(), 8);
+    let receipt = mock
+        .requests()
+        .last()
+        .context("verification request")?
+        .function_call_output_text("generated-receipt")
+        .context("missing command receipt")?;
+    let receipt: Value = serde_json::from_str(&receipt)
+        .with_context(|| format!("actual receipt output: {receipt}"))?;
+    assert_eq!(receipt["receipt"]["call_id"], "generated-verify");
+    assert_eq!(
+        receipt["receipt"]["tool_outcome"],
+        json!({"status":"completed","success":true})
+    );
+    assert_eq!(mock.requests().len(), 9);
     Ok(())
 }
 
@@ -192,7 +213,7 @@ async fn reused_canonical_plan_is_identical_across_markdown_and_json_runs() -> R
         targets: Vec::new(),
         views: Vec::new(),
         responses: Some(mock.clone()),
-        expected_requests_at_review: vec![0, 4],
+        expected_requests_at_review: vec![0, 5],
         approve: true,
     };
     let md = execute_run(
@@ -263,7 +284,7 @@ async fn reused_canonical_plan_is_identical_across_markdown_and_json_runs() -> R
         (&json_input["instructions"], &json_input["output_schema"])
     );
     assert_ne!(md_input["prompt"], json_input["prompt"]);
-    assert_eq!(mock.requests().len(), 8);
+    assert_eq!(mock.requests().len(), 10);
     Ok(())
 }
 
@@ -434,6 +455,103 @@ async fn amendment_stops_the_old_thread_and_requires_a_new_exact_approval() -> R
         result.artifacts.join("evidence/metrics.json"),
     )?)?;
     assert_eq!(metrics["plan_amendments"], 1);
-    assert_eq!(mock.requests().len(), 6);
+    assert_eq!(mock.requests().len(), 7);
+    Ok(())
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn displayed_chunk_id_still_fails_after_a_passing_command_and_valid_receipt() -> Result<()> {
+    let server = MockServer::start().await;
+    let fixture = support::Fixture::new(&server.uri()).await?;
+    let sequence = implementation_and_verification("chunk");
+    let position = AtomicUsize::new(0);
+    Mock::given(method("POST")).and(path("/v1/responses")).respond_with(move |request: &Request| {
+        let index = position.fetch_add(1, Ordering::SeqCst);
+        let body = if index < 4 { sequence[index].clone() } else {
+            let request: Value = serde_json::from_slice(&request.body).expect("valid request JSON");
+            let inputs = request["input"].as_array().expect("request inputs");
+            let output = inputs.iter().find(|item| item["type"] == "function_call_output" && item["call_id"] == "chunk-verify")
+                .expect("actual command result")["output"].as_str().expect("command output");
+            let chunk_id = output.lines().find_map(|line| line.strip_prefix("Chunk ID: ")).expect("displayed chunk ID");
+            let receipt = inputs.iter().find(|item| item["type"] == "function_call_output" && item["call_id"] == "chunk-receipt").expect("receipt output");
+            let receipt: Value = serde_json::from_str(receipt["output"].as_str().expect("receipt JSON text")).expect("receipt JSON");
+            assert_eq!(receipt["receipt"]["call_id"], "chunk-verify");
+            assert_ne!(chunk_id, "chunk-verify");
+            response("wrong-reference", responses::ev_assistant_message("verification", &json!({
+                "checks":[{"verification_id":"V01","call_id":chunk_id,"acceptance_criteria":["AC01"]}]
+            }).to_string()))
+        };
+        ResponseTemplate::new(200).insert_header("content-type", "text/event-stream").set_body_string(body)
+    }).mount(&server).await;
+    let mut reviewer = Reviewer {
+        repository: fixture.repository.clone(),
+        targets: vec![],
+        views: vec![],
+        responses: None,
+        expected_requests_at_review: vec![0],
+        approve: true,
+    };
+    let error = execute_run(
+        fixture.options("chunk", "md", Some(support::plan(1)?)),
+        fixture.paths.clone(),
+        &mut reviewer,
+    )
+    .await
+    .expect_err("displayed chunk cannot replace the host call ID");
+    assert!(
+        error
+            .to_string()
+            .contains("verification did not reference a completed host command")
+    );
+    assert_eq!(
+        std::fs::read(fixture.repository.join("greeting.txt"))?,
+        b"hello\n"
+    );
+    let journal = std::fs::read_to_string(fixture.runs.join("chunk/events.jsonl"))?;
+    let last: Value = serde_json::from_str(journal.lines().last().context("last workflow event")?)?;
+    assert_eq!(last["state"], "failed");
+    assert!(!fixture.runs.join("chunk/evidence/metrics.json").exists());
+    Ok(())
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn planner_prose_reference_fails_domain_validation_before_review() -> Result<()> {
+    let server = MockServer::start().await;
+    let fixture = support::Fixture::new(&server.uri()).await?;
+    let mut canonical = support::plan(1)?;
+    canonical.steps[0].verification = vec!["Run V01 Python byte check read-only.".into()];
+    let mock = responses::mount_sse_sequence(
+        &server,
+        vec![
+            response(
+                "research",
+                responses::ev_assistant_message("research", "Create greeting.txt and run Python."),
+            ),
+            response(
+                "plan",
+                responses::ev_assistant_message("plan", &serde_json::to_string(&canonical)?),
+            ),
+        ],
+    )
+    .await;
+    let mut reviewer = Reviewer {
+        repository: fixture.repository.clone(),
+        targets: vec![],
+        views: vec![],
+        responses: Some(mock.clone()),
+        expected_requests_at_review: vec![],
+        approve: true,
+    };
+    let error = execute_run(
+        fixture.options("invalid-reference", "md", None),
+        fixture.paths.clone(),
+        &mut reviewer,
+    )
+    .await
+    .expect_err("prose is not a verification ID");
+    assert!(error.to_string().contains("plan IDs require"), "{error:#}");
+    assert!(reviewer.targets.is_empty());
+    assert!(!fixture.repository.join("greeting.txt").exists());
+    assert_eq!(mock.requests().len(), 2);
     Ok(())
 }

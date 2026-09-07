@@ -64,6 +64,7 @@ impl Phase {
                 matches!(self, Self::Implementation | Self::Verification)
             }
             "apply_patch" => self == Self::Implementation,
+            "lab_command_receipt" => self == Self::Verification,
             _ => false,
         }
     }

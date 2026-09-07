@@ -38,6 +38,8 @@ The provider reports no immutable serving revision. Maximum output behavior, con
 
 ## Bounded follow-up proposal — not implemented
 
+Historical proposal below: the user subsequently approved this follow-up with “Go”. The correction and its current validation status are tracked in [MUSE_INTERFACE_FIX_PLAN.md](../MUSE_INTERFACE_FIX_PLAN.md) and the progress ledger. This report continues to describe the original failed baseline.
+
 1. Clarify canonical-domain constraints in the planner interface: step reference arrays contain IDs, verification commands belong in criterion descriptions, and awaiting the mandatory human gate is not a blocker. The relevant seams are `lab-runtime/src/driver.rs` plan prompt and `reports.rs::plan_schema`. Keep renderer-specific wording out of this contract. If procedural skills change, add a versioned module and explicitly selected configuration; retain the tested v1 hashes.
 2. Make command references reliably available to the verifier. Inspect the existing tool-result/extension context surfaces before choosing a bounded host-issued receipt containing command call ID, status and criterion mapping. Keep the authoritative `ExecCommandEnd` join in `reports.rs`; do not accept chunk IDs, arbitrary model claims or the last successful command as replacements. Provider-assigned IDs may not be visible in generated model text, so prompt wording alone is not yet established as a sufficient fix.
 3. Add focused integration coverage with different chunk/call IDs and the actual domain-reference failure. Replay the synthetic task under explicitly recorded changed instructions/context, then require fresh human approval for its new exact run target. Retain this failed baseline for comparison.

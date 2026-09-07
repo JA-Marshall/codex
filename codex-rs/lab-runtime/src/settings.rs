@@ -39,6 +39,7 @@ pub(crate) fn effective_settings(config: &Config) -> Result<Value> {
     redact(&mut selected_provider);
     Ok(json!({
         "schema_version":1,"effective_toml":toml,"selected_provider":selected_provider,
+        "lab_report_contracts":{"planner":"canonical-id-references-v2","verification":"indexed-command-receipt-v1"},
         "model":config.model,"model_catalog":config.model_catalog,"service_tier":config.service_tier,
         "context_window":config.model_context_window,
         "auto_compact_token_limit":config.model_auto_compact_token_limit,
