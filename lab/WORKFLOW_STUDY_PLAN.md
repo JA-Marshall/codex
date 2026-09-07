@@ -7,6 +7,12 @@ The objective is to identify which working methods finish repository tasks
 correctly, how much additional checking and repair costs, and how reliably those
 methods work without human intervention. A plan is one input to that process.
 
+Revised after the user's scope-creep clarification: keep separate, bounded agents
+as a design requirement. The first study now compares handover information and
+repair, replacing the earlier tests-first/implementation-first matrix. A single
+continuous agent is outside this study. Give workers enough information to do
+their assigned job while keeping their authority narrow and independently defined.
+
 **1. Integrate the working infrastructure into a new release**
 
 The source currently has two relevant lines of development:
@@ -36,6 +42,47 @@ longer than the old receipt preview limit. A second trial fails cleanly and the
 queue continues. Local proxy tests demonstrate a shared allowance and no direct
 provider fallback. Package a new binary and frozen scripts with source hashes.
 
+Implement scope boundaries before testing richer handovers. The current runtime
+uses read-only access for research/planning and workspace-wide write access for
+both implementation and verification. Separate threads and approved plan hashes
+do not enforce the plan's individual affected-file list or its semantic scope.
+Add a trusted task contract containing the fixed goal, acceptance criteria,
+permitted write paths and explicit exclusions. Bind its digest into the campaign
+policy and every phase's evidence. A generated plan or handover cannot widen it.
+
+Research/planning may inspect the repository. Implementation receives write access
+only to declared task paths plus separate build/test scratch directories; enforce
+that through the sandbox rather than shell-command guessing. Verification reads
+the candidate implementation and writes exploratory tests/artifacts in scratch.
+Repairs return to an executor under the same task contract. Before recording a
+candidate, audit changed paths and independently check stated behavioral exclusions.
+Filesystem checks cannot prove semantic scope, so report that distinction.
+
+When a worker needs work outside the contract, record `scope_blocked` and end that
+trial, then admit the next queued trial. Do not expand scope, rewrite the goal or
+open a per-trial permission prompt. Count such outcomes when assessing usefulness.
+Validate allowed changes, denied out-of-scope writes, symlink/rename containment,
+read-only candidate verification, and failed-recording behavior in real-sandbox
+mock tests. Keep all arms under the same scope rules.
+
+Correct the interpretation of the existing size controls before changing them:
+
+| Existing control | Meaning |
+| --- | --- |
+| Model catalog: 8,192-byte truncation budget | Budget used when presenting tool output; individual tool formatting also applies. It is not the whole model context. |
+| Phase inputs: 8 KiB each, 16 KiB combined | Separate bounds on role instructions and the initial phase prompt. Oversized inputs are rejected. Later conversation/tool context is separate. |
+| Research prompt: at most 2,500 characters | Instruction to compress research findings, rather than a measured model capacity. |
+| Command-receipt preview: 8,192 bytes | Independent preview control. The recent fix preserves command identity when the preview is omitted. |
+| Model profile: 1,048,576 tokens | Configured total context window; this does not establish useful capacity on every task. |
+
+Make phase input and tool-output budgets separately versioned and recorded. Do
+not raise all constants together or couple them to report-schema/receipt limits.
+Retain long logs as protected artifacts with clear truncation markers and bounded
+range retrieval. Apply byte and token bounds to injected content, following the
+repository's context-size requirements. Larger evidence access never changes a
+worker's write permissions. Calibration should demonstrate that relevant failures
+beyond the initial output excerpt can still be retrieved.
+
 **2. Introduce a versioned task interface and a varied task library**
 
 Replace the hard-coded choice between three function fixtures and the queue
@@ -44,9 +91,9 @@ fixtures as calibration coverage. Add repository-test adapters for Python and
 Rust so the main study includes different languages and changes to existing code.
 
 Each task manifest records a task/version ID, task family, language, repository
-snapshot and baseline commit, instruction text, dependency/toolchain pins, public
-checks, private evaluator identity, resource limits and development/study/
-confirmation membership. Public task files and private grader assets have separate
+snapshot and baseline commit, instruction text, fixed scope contract, dependency/
+toolchain pins, public checks, private evaluator identity, resource limits and
+development/study/confirmation membership. Public task files and private grader assets have separate
 inventories. Candidate code never receives reference patches or private tests.
 
 The task interface has three responsibilities: create a clean checkout, describe
@@ -92,44 +139,45 @@ regressions, protect private grading material and leave candidate snapshots inta
 
 **3. Define understandable workflow conditions and measure their execution**
 
-Add generic, versioned executor instructions and a fixed generic planner/verifier.
-Remove queue-specific assumptions from these new modules. The planner must permit
-either implementation order: it should specify behavior and dependencies without
-forcing all tests to the last step. Pin the same planner, verifier, renderer,
-provider, model settings and available tools in all four initial conditions.
+Add generic, versioned research/planner/executor/verifier instructions, removing
+queue-specific assumptions. Keep the same separate phase threads, role instructions,
+scope contract, tools, renderer and model settings in all four initial conditions.
+Every executor gets a bounded assignment. Both handover formats include the full
+task contract and acceptance criteria; the compact arm must not omit authority.
 
-| Condition ID | Implementation method | Maximum repair rounds |
+| Condition ID | Information passed between phases | Maximum repair rounds |
 | --- | --- | ---: |
-| `implementation-first` | Implement the behavior, then test it | 0 |
-| `tests-first` | Demonstrate a relevant failing test, implement, then pass it | 0 |
-| `implementation-first-repair` | Implement the behavior, then test it | 1 |
-| `tests-first-repair` | Demonstrate a relevant failing test, implement, then pass it | 1 |
+| `compact-handover` | Task contract, plan and concise phase findings | 0 |
+| `evidence-handover` | The same contract/plan plus a bounded file map, decisions, check evidence and unresolved issues | 0 |
+| `compact-handover-repair` | Task contract, plan and concise phase findings | 1 |
+| `evidence-handover-repair` | The same contract/plan plus a bounded file map, decisions, check evidence and unresolved issues | 1 |
 
-Use the existing role selectors and `max_repairs` setting. A repair begins only
+Add a versioned handover policy alongside the existing role selectors and
+`max_repairs` setting. Construct both views from the same categories of recorded
+phase artifacts, preserve uncertainty and provenance, and record actual content
+and size. Additional context is evidence, not new instructions or authority.
+Keep the tool-output policy fixed across this first matrix so it is not confounded
+with handover changes. Set explicit handover bounds during calibration and freeze
+them before study tasks run. Larger caps alone do not demonstrate richer content.
+
+A repair begins only
 after a valid failed verification. Malformed reports, missing receipts, provider
 errors and exhausted limits remain separately classified failures. All arms use
 delegated plan decisions, zero automatic amendments and zero replacement trials.
 Each trial generates a fresh plan under the same planner instructions. This is an
 end-to-end workflow comparison, not a shared-plan experiment.
 
-Add bounded procedural evidence alongside outcome grading. Reuse command receipts
-and candidate checkpoints. Give every arm the same lab-level public-test helper,
-which records the command, result, sequence and code/test hashes. Preserve relevant
-pre-change snapshots when a test-first cycle is attempted. The independent audit
-checks that the same test fails for the intended behavior before implementation and
-passes afterward without weakening it. Syntax/import failures alone are not a
-successful test-first demonstration. Only supported, observed test invocations
-receive that classification; ambiguous traces remain unknown.
+Reuse command receipts and candidate checkpoints for both outcome and scope
+auditing. Give every arm the same lab-level public-test helper, recording command,
+result, sequence and code/test hashes. Record handover omissions, truncation,
+retrievals and rejected scope changes. Evidence that an agent followed a procedure
+is separate from its assigned condition; ambiguous observations remain unknown.
+Keep every started trial in its original condition for the main comparison.
 
-Procedure classifications are `observed`, `not_observed` or `unknown`, with evidence
-links. Do not manufacture compliance from the selected skill name or the model's
-summary. Keep trials that did not follow their assigned instructions in their
-original condition for the main comparison; report compliance separately.
-
-Acceptance: mock traces distinguish a real failing-test/passing-test cycle from
-tests added after implementation, a weakened assertion and missing evidence. Both
-executor instructions are compatible with the fixed planner. Repair-disabled and
-repair-enabled runs respect their frozen limits.
+Acceptance: real-host mock tests show distinct recorded handover contents, intact
+task authority in both arms, recovery of longer test output, denied scope expansion,
+read-only verification, and repair under the unchanged contract. Both repair limits
+and the queue's no-prompt behavior must hold with stdin closed.
 
 **4. Extend the queue into a study runner**
 
@@ -191,20 +239,21 @@ report and a local HTML view with condition/task filters and evidence links.
 | Repair benefit | Independent correctness before the repair versus after it, including regressions introduced by repair. |
 | Usage per correct result | Usage for all started trials divided by correct results; unavailable if required usage is missing. |
 | Reliability | Model/task, workflow/protocol, provider, timeout and evaluator failures shown separately. |
-| Procedure | Evidence-backed adherence to the assigned implementation method. |
+| Scope | Attempts to exceed allowed writes, scope-blocked outcomes and independently detected violations of stated exclusions. |
+| Context delivery | Exact handover sizes/content, truncation and retrieval observations; distinguish available evidence from claims that the model used it. |
 
 Grade immutable checkpoints from before any repair and after the final phase,
 only after the host stops. These checkpoint grades never feed back into the
-model. In-workflow repair receives public tests and verifier findings only. Record
-edits made during verification separately so they cannot masquerade as executor
-improvements or a nominally absent repair round.
+model. In-workflow repair receives public tests and verifier findings only. Candidate
+implementation is read-only during verification; scratch tests are separately
+recorded and cannot masquerade as changes to the delivered implementation.
 
 Count planned, admitted, graded and correct trials explicitly. Unknown grading
 does not become a task failure or a pass; incomplete campaigns are visibly
 incomplete. Report an all-started autonomous-success rate, a graded-only task pass
 rate with its denominator, and missing outcomes alongside both.
 
-Show per-task and per-family results, the effect of tests-first, the effect of
+Show per-task and per-family results, the effect of evidence-rich handovers, the effect of
 repair, and whether their combination behaves differently. Compare matched tasks
 and resample complete task groups for exploratory uncertainty intervals, preserving
 their conditions and repetitions; account for shared repositories where feasible.
@@ -227,8 +276,9 @@ links resolve and a reader can trace any aggregate failure back to its trial.
 | Stage | Work delivered | Evidence required before advancing |
 | --- | --- | --- |
 | Integration | New versioned unattended host with latest fixes and limited provider profile | Focused domain/runtime and mock-proxy tests. |
+| Scope and context controls | Fixed task authority, bounded executor writes, read-only verification, separate size policies and log retrieval | Real-sandbox boundaries and long-evidence retrieval tests. |
 | Task interface | Legacy adapters plus Python/Rust repository adapters | Trusted solutions pass; deliberately wrong solutions fail; sandbox and snapshot checks pass. |
-| Conditions | Four generic workflows and procedural observations | Real-host mocked procedure and repair coverage. |
+| Conditions | Four handover/repair workflows with separate agents | Real-host mocked context, scope and repair coverage. |
 | Study runner | Frozen 240-trial expansion, bounded scheduling and progress | Offline queue, cancellation, deadline and duplicate-admission coverage. |
 | Report | Correctness, reliability, usage and paired comparisons | Synthetic-result tests and verified local evidence links. |
 | Calibration | Four development tasks across four conditions, one attempt each: 16 live trials | End-to-end evidence is sound; grader/protocol defects are resolved in a newly versioned release if found. |
@@ -255,13 +305,14 @@ enter the main-study ranking.
 | Extension | Concrete implementation | Controlled study |
 | --- | --- | --- |
 | Verifier quality | Add a verifier-only campaign mode around `VerificationInput`, with fresh delegated authority and explicit provenance for curated inputs. Mount candidate implementation read-only; allow new tests only in scratch space. | Give every verifier the exact same new clean and deliberately faulty candidates, plans and implementation evidence. Measure defect detection, false alarms, report validity and usage. |
-| Context handovers | Add versioned handover policies to the workflow settings; construct and record bounded context in the lab runtime using existing interfaces. | Compare a short factual handover with fuller evidence while keeping candidate and available tools fixed. Measure final task outcomes and actual context usage. |
+| Tool-output policies | Extend the initial separate size controls with versioned excerpt/retrieval policies. Preserve full artifacts and record actual tool limits. | Compare the current 8 KiB budget with larger budgets or more selective output, holding phase handovers and scope fixed. Measure missed evidence, successful retrieval, correctness and usage. |
 | Automatic test feedback | Add a policy for the trusted public-test helper after defined change checkpoints. Record host checks separately from agent-requested checks. | Compare agent-selected testing with enforced public feedback under the same workflow. Private grading remains out of the loop. |
 | Model allocation | Freeze a validated model/provider profile per phase and record actual selections and usage. | Compare a single model with a different reviewer or a different allocation of computation, using the same task suite. |
+| Coding procedures | Add tests-first and implementation-first role variants once context and scope controls are established. Observe failing-test/passing-test evidence rather than relying on instruction labels. | Compare coding methods under the selected separate-agent architecture and fixed recovery policy. |
 
 These settings belong in versioned lab configuration and effective-setting
 evidence. Unselected settings preserve current behavior. Add them one at a time;
-the initial 240-trial experiment does not depend on implementing all four.
+the initial 240-trial experiment does not depend on implementing every extension.
 Verifier-only trials need an explicit extension of campaign dispatch: the current
 unattended worker always runs the complete workflow. Curated implementation
 evidence must not be presented as a historical model run that never happened.
@@ -277,6 +328,10 @@ meant to settle before choosing variants or spending the campaign budget.
 - Workflow fields and runtime decisions: [config.rs](../codex-rs/lab/src/config.rs),
   [campaign.rs](../codex-rs/lab-runtime/src/campaign.rs),
   [driver.rs](../codex-rs/lab-runtime/src/driver.rs).
+- Current context limits: [context.rs](../codex-rs/lab-runtime/src/context.rs),
+  [model profile](providers/muse-contributor.models.json). Scope enforcement starts
+  at [authority.rs](../codex-rs/lab-runtime/src/authority.rs) and the runtime sandbox
+  policy; new per-task write restrictions require implementation.
 - Task/evaluator adapters: [fixture_registry.py](experiments/fixture_registry.py),
   [evaluate_fixture.py](experiments/evaluate_fixture.py),
   [evaluate_queue.py](experiments/evaluate_queue.py).
