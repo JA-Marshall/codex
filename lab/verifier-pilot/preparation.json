@@ -1,0 +1,224 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-09-07T15:32:40.800418+00:00",
+  "status": "prepared; human execution approval pending",
+  "experiment": {
+    "schema_version": 1,
+    "root": "/home/james/.cache/codex-lab-verifier-pilot/20260907T153300Z",
+    "source_commit": "c624245c6486151fbc2a08401a266a3c8c762e24",
+    "created_at": "2026-09-07T15:30:47.763746+00:00",
+    "binary": "/home/james/.cache/codex-lab-binaries/parallel-v1-20260907/codex-lab",
+    "binary_sha256": "9a75fbe6671079eb1eac3436934a5a4a847e24f331cb02b490015b5ef27e7529",
+    "binary_source_commit": "1f64ad13b7b513c97a73c21288f0f2dbcefc3591",
+    "bwrap_sha256": "0e7ab2fc4e2f142999034d624e1f6b190e251677e9d267048a95005d1243d618",
+    "model_home": "/home/james/.config/codex-lab/muse-contributor",
+    "python": {
+      "path": "/home/james/.local/share/codex-lab-toolchain/python/cpython-3.12.14-linux-x86_64-gnu/bin/python3.12",
+      "version": "3.12.14 (main, Sep  1 2026, 14:16:52) [Clang 22.1.3 ]",
+      "sha256": "f7c6210eb40fadcd3c2889dddd24a15fc2c9f926aec5a03bf9da66e12d581526"
+    },
+    "inputs": {
+      "inputs/config.toml": "a91b3e217c0e5b60ea72b462cb6e93ba3eb38955e69481605c9ce8ff15a91ef2",
+      "inputs/lab/experiments/batch_inputs.py": "eb8f129b1938ff1db0171f9f11be2568daac1f63dbbd2944bd188e4c9cd7ce24",
+      "inputs/lab/experiments/evaluate_fixture.py": "ff193cb70d50ca02dc95f1d2cdf475af1fa66c29c4a9128f15a978612f89b829",
+      "inputs/lab/experiments/evaluation_worker.py": "51949e82d3942af4b109551fbe0ef7e19645cf911469cc2635d3aa8e1f5b69fe",
+      "inputs/lab/experiments/fixture_cases.py": "a6743c4ca545e1be96ef540f4e54ecfd5fd39e4d7b5ae311afea4c769d7eb975",
+      "inputs/lab/experiments/fixture_registry.py": "8c63f3d20932c44fd460d6d71d1fafe4b0d98cea9eca4d818cc6964aa125f0e2",
+      "inputs/lab/experiments/reference_csv_summary.py": "34838c7be445acd2b73af2f6aedc5658d59d2ff2251417f6b88701767bbbacdd",
+      "inputs/lab/experiments/reference_structured.py": "a944420895883cdb03536a67983cac11806860765580607dea4f586d6eef3cd2",
+      "inputs/lab/experiments/run_batch.py": "8aa5ea98beca1a32efd28e60abaf8ad3b819f2f0837d6b98ed26568061fd3c3c",
+      "inputs/lab/experiments/setup_fixture.py": "9e8af371d5847da7c9ee7dd854f307cbf8eea451d180e26eb83377e458ccce32",
+      "inputs/lab/experiments/setup_suite.py": "53ad35ce66b53bb77ab37596c378ddcdd8b2f029729372f5a91887687d5ee31b",
+      "inputs/lab/experiments/structured_cases.py": "1311d7ebcd1141591122d1807176291440fafd1943e49b04b5fd06d2ba2a65c0",
+      "inputs/lab/experiments/terminal_run.py": "fd262587ad4930d01d6e777b8334741f72236f0d8c20633093a78686c48927fb",
+      "inputs/lab/experiments/test_batch.py": "0db7d45c55101240b437a66ecdda037719ef3792511fa36c1feb49f5a0592ac0",
+      "inputs/lab/experiments/test_fixture.py": "3a01495116d63d8dec7907d45dd388c62477bc02e8a7e2825b8717e9b411e378",
+      "inputs/lab/experiments/test_suite.py": "e4ee9e6394536d70338e3f3e0e0ab20cf6024cd1da1d28fc4a23c30e4a131c1c",
+      "inputs/lab/experiments/test_terminal_run.py": "287c6d708fee822f8cd86c5be89804013139b465badfd2fc79b20118f1fc910a",
+      "inputs/lab/fixtures/config-merge-v1/project/cli.py": "3c1c111d5869bfdfd82800139f13b01cfbc74ea29c424c922ff23067c05d67ba",
+      "inputs/lab/fixtures/config-merge-v1/project/config_merge.py": "714052e295f579d28eca489e5a7b4db5eedf810c5dcd4c836cb0b053f486222d",
+      "inputs/lab/fixtures/config-merge-v1/project/tests/test_public.py": "7d46416ec9a6b9cc4488dcc17ce8890c14d7ad684e9bd03e76cc5d15f5ce2e6e",
+      "inputs/lab/fixtures/config-merge-v1/task.txt": "25654e574ef2f64553a8f7cefb54a79376b04518ea4c3039fbc7572f39cda9d4",
+      "inputs/lab/fixtures/csv-summary-v1/project/cli.py": "550fbb29e245604aaf3d5bbbc73d334075cab175fc7f645ca1956607c2b3d663",
+      "inputs/lab/fixtures/csv-summary-v1/project/csv_summary.py": "9ff2c136604dcc46b9ac0c4cd871fa924479347ef60990eafaf50f7ef134c000",
+      "inputs/lab/fixtures/csv-summary-v1/project/tests/test_public.py": "f6f785a14608bd833a1f5ddcbaa45415229f668cdd34ad34224b1dbebfce38d5",
+      "inputs/lab/fixtures/csv-summary-v1/task.txt": "4c5f65622e3c6c053ec130ebe84cce969ab0d710bb84484822359147be2f6e2e",
+      "inputs/lab/fixtures/dependency-order-v1/project/cli.py": "c8d9d6d98e205ce8ad6e4e98683e180c315872d5e80052de2376cad75c7bef61",
+      "inputs/lab/fixtures/dependency-order-v1/project/dependency_order.py": "845ac6e3bd7d2dcb0ca6adc715c1817cdfe3a32e28bd0527f3387922213a3a36",
+      "inputs/lab/fixtures/dependency-order-v1/project/tests/test_public.py": "1b343155d270f06156df5077260eaa2f9ad7e971151e257d9d7756ac57df2d42",
+      "inputs/lab/fixtures/dependency-order-v1/task.txt": "2337915f18fd3b28dd7b23e53a37a672a899bfd62d8f259153c6c7ff7fce8aa1",
+      "inputs/lab/instructions/.gitattributes": "a0f1dcb042547b6545879b7e3005725652ce91465f63f586a0484df77a87671f",
+      "inputs/lab/instructions/executor/default-v1/SKILL.md": "af8e2201e88556a27b91fba8472ace0db4faf9602ba4e6cb18d847c40e39f91a",
+      "inputs/lab/instructions/planner/minimal-v1/SKILL.md": "332e74c240dc794a496bbc2c9e10de0ccc394ee8826f90111b94285cda2472c4",
+      "inputs/lab/instructions/verifier/tests-only-single-observation-v2/SKILL.md": "3a10deca2adacfd18a855bfabb0c2c0fe86f5c02828cbc4d823c1966732e242b",
+      "inputs/lab/instructions/verifier/tests-only-v1/SKILL.md": "46ea6eca22efb6107ca4d255226592f63a1113be642265567bceedfcd556769d",
+      "inputs/lab/workflows/foundation.toml": "20e3c21b7061137378f1344f6c576896d1c6d7c747a8d72706cd02b895f43499",
+      "inputs/models.json": "2453f904dc5b08c8d9180d36f665ae105140e9b2ae4a5962d244d4253c2ca4ef",
+      "inputs/plan.json": "0eadb6d14529a2989108b40ffbbb8e44bbca0b0be88e776b8424730c74449a53",
+      "inputs/prepare-verifier-pair.py": "baf796a1de304eb38e827a05eea53c73779bb1bf7068ce9499f4021d3367fd34"
+    },
+    "conditions": {
+      "verifier-v1": "plan-md-v1",
+      "verifier-single-v2": "plan-md-single-observation-v2"
+    },
+    "jobs": 2,
+    "attempts_per_condition": 1,
+    "vary": "workflow.roles.verifier",
+    "approval": "pending"
+  },
+  "conditions": [
+    {
+      "condition": "verifier-v1",
+      "workflow": "plan-md-v1",
+      "target": {
+        "run_id": "verifier-v1-execution",
+        "plan_id": "task-plan",
+        "revision": 1,
+        "content_sha256": "0eadb6d14529a2989108b40ffbbb8e44bbca0b0be88e776b8424730c74449a53",
+        "run_spec_sha256": "14ba875e066ffdce03df13d494c7a83bbf4cd3006a500ed0e2765e4c6627b3e5"
+      },
+      "prepared": "/home/james/.cache/codex-lab-verifier-pilot/20260907T153300Z/runs/verifier-v1-prepared/evidence/prepared.json",
+      "prepared_sha256": "8683478d5e11c41a7afec4f23fa02b6c19966adac7b7359bc0a6a4d520386190",
+      "repository": "/home/james/.cache/codex-lab-verifier-pilot/20260907T153300Z/tasks/verifier-v1/repository",
+      "baseline": "8e166376f2a0a057c828d33d7fee32170ab136b4",
+      "preparation_metrics": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "phase_threads": 0,
+        "schema_version": 1,
+        "scope": "preparation only",
+        "task_success": null,
+        "wall_clock_ms": 12987
+      },
+      "prepared_files": {
+        "config/run-spec.json": "c994453494b9326953708dde3c66836bea497bcdd5e8a28a3ff736ff4040807f",
+        "config/workflow.effective.json": "f19f72162369d4d0e6c3b8d83b97caefd97701f46986968c4e1e931890487b1f",
+        "config/workflow.source.toml": "20e3c21b7061137378f1344f6c576896d1c6d7c747a8d72706cd02b895f43499",
+        "events.jsonl": "9ae882470795352c60c0286b37921ccc7e0ca5b6fc3022db7da87935a52810c0",
+        "evidence/effective-settings.json": "6d6f06f6099c9a16ce8ecf06d18c24371d8f37dbbe7d8a242bef92356ad5d0c8",
+        "evidence/environment.json": "5edfee94933335dc8d13f41c6b3df2d894660b30689b5f3835e0e943e32ec2bb",
+        "evidence/runtime-manifest.json": "d95765a1106ba4041344a43e99d56c8fd303ac39eac869dbcf1e1a88d168a43f",
+        "instructions/executor.SKILL.md": "af8e2201e88556a27b91fba8472ace0db4faf9602ba4e6cb18d847c40e39f91a",
+        "instructions/planner.SKILL.md": "332e74c240dc794a496bbc2c9e10de0ccc394ee8826f90111b94285cda2472c4",
+        "instructions/verifier.SKILL.md": "46ea6eca22efb6107ca4d255226592f63a1113be642265567bceedfcd556769d",
+        "manifest.json": "22d7bdedcb66bcd80b92a3f8f807df7a2d650ef24d7dc1ade12994d2dc24ff8e",
+        "plans/1/PLAN.md": "9afc487525c0e60f0775307703f8b0d0939adb1d5fcc689b563ef2666707a58a",
+        "plans/1/plan.json": "0eadb6d14529a2989108b40ffbbb8e44bbca0b0be88e776b8424730c74449a53",
+        "runtime-events.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "verifier_sha256": "46ea6eca22efb6107ca4d255226592f63a1113be642265567bceedfcd556769d"
+    },
+    {
+      "condition": "verifier-single-v2",
+      "workflow": "plan-md-single-observation-v2",
+      "target": {
+        "run_id": "verifier-single-v2-execution",
+        "plan_id": "task-plan",
+        "revision": 1,
+        "content_sha256": "0eadb6d14529a2989108b40ffbbb8e44bbca0b0be88e776b8424730c74449a53",
+        "run_spec_sha256": "d13619e47c519b9a3ee16ba52fc070eab395b4d9ad7da23e44f3fb5c988b1483"
+      },
+      "prepared": "/home/james/.cache/codex-lab-verifier-pilot/20260907T153300Z/runs/verifier-single-v2-prepared/evidence/prepared.json",
+      "prepared_sha256": "382ec0f18019fa2490669b6c0e7c24b90a970bc38d5fcbec06f30d170d4888d4",
+      "repository": "/home/james/.cache/codex-lab-verifier-pilot/20260907T153300Z/tasks/verifier-single-v2/repository",
+      "baseline": "8e166376f2a0a057c828d33d7fee32170ab136b4",
+      "preparation_metrics": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "phase_threads": 0,
+        "schema_version": 1,
+        "scope": "preparation only",
+        "task_success": null,
+        "wall_clock_ms": 12927
+      },
+      "prepared_files": {
+        "config/run-spec.json": "3554fb6b10785d6fa7b7f9afe8ed2d4a1a80f2137acbeb46951d93ad1ef5e1ea",
+        "config/workflow.effective.json": "bc6287cee200c030cec06b7f852a7fbfcdc803c0a24501edff5234054762f209",
+        "config/workflow.source.toml": "20e3c21b7061137378f1344f6c576896d1c6d7c747a8d72706cd02b895f43499",
+        "events.jsonl": "c2203488d7257b5b158520b43f3960a0fd215fdfa55285430fda47bc13830c4f",
+        "evidence/effective-settings.json": "6d6f06f6099c9a16ce8ecf06d18c24371d8f37dbbe7d8a242bef92356ad5d0c8",
+        "evidence/environment.json": "5edfee94933335dc8d13f41c6b3df2d894660b30689b5f3835e0e943e32ec2bb",
+        "evidence/runtime-manifest.json": "d95765a1106ba4041344a43e99d56c8fd303ac39eac869dbcf1e1a88d168a43f",
+        "instructions/executor.SKILL.md": "af8e2201e88556a27b91fba8472ace0db4faf9602ba4e6cb18d847c40e39f91a",
+        "instructions/planner.SKILL.md": "332e74c240dc794a496bbc2c9e10de0ccc394ee8826f90111b94285cda2472c4",
+        "instructions/verifier.SKILL.md": "3a10deca2adacfd18a855bfabb0c2c0fe86f5c02828cbc4d823c1966732e242b",
+        "manifest.json": "cbd2d3835d160763a15963b65c0cdf5528cb77fa13c87df72c12771f71460896",
+        "plans/1/PLAN.md": "9afc487525c0e60f0775307703f8b0d0939adb1d5fcc689b563ef2666707a58a",
+        "plans/1/plan.json": "0eadb6d14529a2989108b40ffbbb8e44bbca0b0be88e776b8424730c74449a53",
+        "runtime-events.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "verifier_sha256": "3a10deca2adacfd18a855bfabb0c2c0fe86f5c02828cbc4d823c1966732e242b"
+    }
+  ],
+  "run_spec_differing_paths": [
+    "inheritance_chain",
+    "instructions.verifier.content",
+    "instructions.verifier.path",
+    "instructions.verifier.selector",
+    "instructions.verifier.sha256",
+    "workflow.roles.verifier",
+    "workflow_name"
+  ],
+  "identical": [
+    "canonical plan bytes",
+    "rendered Markdown bytes",
+    "effective model/harness settings",
+    "environment metadata",
+    "task",
+    "clean repository baseline",
+    "planner instructions",
+    "executor instructions"
+  ],
+  "batch_preflight": {
+    "schema_version": 1,
+    "manifest_sha256": "d2a06e4c9cb6b419ae0c52221a5dfdb862dc897c29fe191c268d0842feb87ae9",
+    "binary": "/home/james/.cache/codex-lab-binaries/parallel-v1-20260907/codex-lab",
+    "binary_sha256": "9a75fbe6671079eb1eac3436934a5a4a847e24f331cb02b490015b5ef27e7529",
+    "jobs": 2,
+    "max_hosts": 32,
+    "runs": [
+      {
+        "run_id": "verifier-v1-execution",
+        "prepared": "/home/james/.cache/codex-lab-verifier-pilot/20260907T153300Z/runs/verifier-v1-prepared/evidence/prepared.json",
+        "prepared_sha256": "8683478d5e11c41a7afec4f23fa02b6c19966adac7b7359bc0a6a4d520386190",
+        "repository": "/home/james/.cache/codex-lab-verifier-pilot/20260907T153300Z/tasks/verifier-v1/repository",
+        "artifacts": "/home/james/.cache/codex-lab-verifier-pilot/20260907T153300Z/runs/verifier-v1-execution"
+      },
+      {
+        "run_id": "verifier-single-v2-execution",
+        "prepared": "/home/james/.cache/codex-lab-verifier-pilot/20260907T153300Z/runs/verifier-single-v2-prepared/evidence/prepared.json",
+        "prepared_sha256": "382ec0f18019fa2490669b6c0e7c24b90a970bc38d5fcbec06f30d170d4888d4",
+        "repository": "/home/james/.cache/codex-lab-verifier-pilot/20260907T153300Z/tasks/verifier-single-v2/repository",
+        "artifacts": "/home/james/.cache/codex-lab-verifier-pilot/20260907T153300Z/runs/verifier-single-v2-execution"
+      }
+    ],
+    "scheduler_sha256": {
+      "run_batch.py": "8aa5ea98beca1a32efd28e60abaf8ad3b819f2f0837d6b98ed26568061fd3c3c",
+      "batch_inputs.py": "eb8f129b1938ff1db0171f9f11be2568daac1f63dbbd2944bd188e4c9cd7ce24"
+    },
+    "python": {
+      "path": "/home/james/.local/bin/python3.12",
+      "version": "3.12.14 (main, Sep  1 2026, 14:16:52) [Clang 22.1.3 ]",
+      "sha256": "f7c6210eb40fadcd3c2889dddd24a15fc2c9f926aec5a03bf9da66e12d581526"
+    }
+  },
+  "preparation_model_calls": 0,
+  "validation": [
+    "both real imported-plan prepare commands exited 0",
+    "zero phase threads and empty runtime traces",
+    "both terminal preparation events awaiting_plan_approval with no approval",
+    "all sealed preparation inventory hashes match",
+    "all frozen source/config/catalog/binary/bwrap/interpreter hashes match",
+    "only expected verifier-related run-spec paths differ",
+    "batch preflight accepts two isolated repositories and new execution destinations",
+    "just fmt and just fmt-check passed with clean source"
+  ],
+  "setup_note": "Initial local staging at 20260907T153200Z lacked the required runs parent; both commands failed before preparation/model work. Logs retained. Fresh staging supplies the parent. No execution or approval was retried.",
+  "limits": [
+    "one attempt per condition; descriptive only",
+    "remote immutable model revision unavailable",
+    "no cumulative token/spend cap",
+    "no execution, automatic retry or amendment approval granted",
+    "actual parallel overlap must be established from execution evidence after approval"
+  ]
+}
