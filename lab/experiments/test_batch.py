@@ -252,6 +252,40 @@ class BatchTests(unittest.TestCase):
             {"a": None, "b": None},
         )
 
+    def test_isolated_timing_refuses_parallelism_before_launch(self):
+        with self.assertRaisesRegex(ValueError, "requires jobs=1"):
+            load_batch(
+                self.root / "nonexistent", self.root / "output", 16, "isolated-timing"
+            )
+        with self.assertRaisesRegex(ValueError, "unknown measurement purpose"):
+            load_batch(self.root / "nonexistent", self.root / "output", 1, "speed")
+
+    def test_isolated_timing_runs_one_approved_condition_at_a_time(self):
+        self.fixture(["a", "b"], jobs=1)
+        self.config = load_batch(self.manifest, self.output, 1, "isolated-timing")
+        self.start()
+        self.approve("a")
+        self.wait(lambda: (self.root / "a/started-1").exists())
+        self.approve("b")
+        self.wait(
+            lambda: (
+                sum(e["type"] == "human_decision_queued" for e in self.events()) == 2
+            )
+        )
+        self.assertFalse((self.root / "b/started-1").exists())
+        self.finish("a")
+        self.wait(lambda: (self.root / "b/started-1").exists())
+        self.finish("b")
+        self.done(0)
+        self.assertEqual(self.events()[0]["measurement_purpose"], "isolated-timing")
+        self.assertTrue(
+            all(
+                e["active_jobs"] == 1
+                for e in self.events()
+                if e["type"] == "decision_sent"
+            )
+        )
+
     def test_preflight_refuses_aliases_overlap_existing_outputs_and_pin_drift(self):
         self.fixture(["a", "b"])
         original = json.loads(self.manifest.read_text())
