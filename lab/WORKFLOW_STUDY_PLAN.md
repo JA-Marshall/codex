@@ -8,7 +8,9 @@ Final lint/format/build checks passed. The separate release and 200-trial offlin
 their initial identities are recorded in [the release receipt](task-library-release-2026-09-07.json).
 The subsequent [live smoke](TASK_LIBRARY_SMOKE.md) passed two corrected trials after fixing sandbox
 dispatch and planner path instructions. Queue-aware reporting now matches the published timing fix;
-the current v2 200-trial preparation remains unstarted.
+the current v2 200-trial preparation remains unstarted. A subsequent [twelve-task parallel smoke](TASK_LIBRARY_PARALLEL_SMOKE.md)
+confirmed twelve concurrent hosts; nine tasks passed and three hit the 8 KiB prompt cap before
+implementation. The launcher now defaults to twelve workers. Address that cap before the full batch.
 The actual inventory, interfaces, evidence limits, and artifact locations
 are recorded in [TASK_LIBRARY.md](TASK_LIBRARY.md). The earlier installed release and its focused
 checks are recorded in
@@ -257,7 +259,7 @@ Current increment extends the existing freezer with task-library/split, pinned
 toolchain, and `--task-just` selection. The just executable is frozen in the archive's
 `task-tools/` directory; only that helper directory becomes readable to workers.
 The Windows launcher `C:/Users/james/.codex-lab/queue-varied-tasks.ps1` defaults to
-20 tasks × two generic workflows × five repetitions = 200 trials, `jobs=8`, `max_amendments=0`, and uses
+20 tasks × two generic workflows × five repetitions = 200 trials, `jobs=12`, `max_amendments=0`, and uses
 `-PrepareOnly` for offline freezing or `-Execute <Linuxcampaign.json>` for an existing
 freeze. Final task calibration passed; its evidence paths and the still-pending bundle/preparation are recorded
 in [TASK_LIBRARY.md](TASK_LIBRARY.md). No live launch is included. The following randomized 240-trial

@@ -13,6 +13,8 @@ Both candidates passed public and private checks, stayed within scope, and stopp
 
 The first two attempts exposed a sandbox-dispatch alias bug in the freezer and an underspecified planner path rule. Python stopped at plan validation; Rust completed but the grader invocation failed. Separate posthoc grading confirmed the original Rust candidate passed and the unfinished Python candidate failed. Those original attempts and result files remain intact; the corrected run uses fresh candidates and the versioned v2 planner.
 
-The current launcher uses the corrected timing-v2 bundle and repository-v2 workflows. The fresh 200-trial preparation is `/home/james/.cache/codex-lab-campaigns/varied-library-v2-200-20260907/campaign.json`. It contains 20 tasks × two workflows × five repetitions at eight jobs, and remains unstarted. The earlier v1 200-trial preparation is historical and should not be launched.
+This serial smoke used the corrected timing-v2 bundle and repository-v2 workflows. Its accompanying 200-trial preparation is `/home/james/.cache/codex-lab-campaigns/varied-library-v2-200-20260907/campaign.json`, with eight jobs, and remains unstarted. The user subsequently selected twelve parallel tasks; the current launcher and fresh preparation are recorded in [TASK_LIBRARY.md](TASK_LIBRARY.md). Earlier frozen manifests remain unchanged. The earlier v1 200-trial preparation is historical and should not be launched.
 
 See [the machine-readable receipt](task-library-smoke-2026-09-07.json) for exact versions, hashes, original failures and timing evidence, and [TIMING.md](TIMING.md) for measurement semantics.
+
+The subsequent [twelve-task parallel smoke](TASK_LIBRARY_PARALLEL_SMOKE.md) measured real queue contention: nine tasks passed and three stopped at the prompt-size limit. The new twelve-worker 200-trial preparation remains unstarted.

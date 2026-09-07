@@ -68,3 +68,9 @@ The earlier 200-trial task-library preparation remains frozen with its original 
 be replaced by a new preparation to use this timing adapter. The [corrected two-trial live smoke](TASK_LIBRARY_SMOKE.md)
 passed, and a new v2 200-trial preparation is ready but unstarted. Neither the limiter policy nor
 the phase timeout was changed.
+
+The subsequent [twelve-task parallel smoke](TASK_LIBRARY_PARALLEL_SMOKE.md) observed twelve overlapping
+hosts, 328 successful provider responses, a peak of 89 dispatches per rolling minute, and a maximum
+individual queue wait of 5.767 seconds. Nine tasks passed; three failed the prompt-size check before
+implementation. This is throughput evidence with shared contention, not an isolated-speed estimate
+or a test of prolonged timeout behavior. The twelve-worker 200-trial preparation remains unstarted.

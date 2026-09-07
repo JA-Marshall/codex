@@ -9,9 +9,11 @@ This implementation increment adds a varied task interface to the existing unatt
 two generic workflows differing only in their maximum repair rounds. Final shared Linux/WSL
 sandbox calibration passed: all 80 variants matched their expected outcomes with zero model calls.
 The frozen offline preparation contains **200 trials = 20 tasks ×
-2 workflows × 5 repetitions**, with eight active hosts by default if subsequently executed. Preparation
-does not launch model hosts. Two corrected live smoke trials have passed; the 200-trial batch
-remains stopped. See [the smoke results](TASK_LIBRARY_SMOKE.md) for the bugs found and corrected.
+2 workflows × 5 repetitions**, with twelve active workers by default if subsequently executed. Preparation
+does not launch model hosts. The subsequent [twelve-task parallel smoke](TASK_LIBRARY_PARALLEL_SMOKE.md)
+confirmed twelve overlapping hosts: nine tasks passed and three stopped at the 8 KiB prompt limit.
+Address that limit before launching the 200-trial batch, which remains stopped. The earlier
+[serial smoke](TASK_LIBRARY_SMOKE.md) records the initial bugs found and corrected.
 
 ## Inventory
 
@@ -134,7 +136,7 @@ home/service receipt, catalog, instruction root, sandbox, and fresh output argum
 --workflow repository-v2
 --workflow repository-repair-v2
 --repetitions 5
---jobs 8
+--jobs 12
 --max-amendments 0
 --prepare-only
 ```
@@ -146,7 +148,7 @@ it does not start trial hosts, generate model plans, or execute candidates. Each
 later receives its own checkout and policy. Existing legacy fixture selection remains available.
 
 The local Windows launcher is `C:/Users/james/.codex-lab/queue-varied-tasks.ps1`. Its defaults select
-all 20 study tasks, both workflows, five repetitions, and eight jobs. Freeze without launching:
+all 20 study tasks, both workflows, five repetitions, and twelve jobs. Freeze without launching:
 
 ```powershell
 & 'C:/Users/james/.codex-lab/queue-varied-tasks.ps1' -PrepareOnly
@@ -172,9 +174,11 @@ crate passed 104 tests, and the subsequent four focused context-bound regression
 Scope/permission context bounds are enforced before a model call, with an 8,192-byte cap per
 bounded section. This limits injected authority text; it is not a model-context capacity claim.
 Lint, formatting, format checking, and the final build passed. No tests were rerun after formatting.
-The current prepared campaign is `/home/james/.cache/codex-lab-campaigns/varied-library-v2-200-20260907/campaign.json`;
+The current prepared campaign is `/home/james/.cache/codex-lab-campaigns/varied-library-v2-200-jobs12-20260907/campaign.json`;
 all frozen pins validate, and it contains no started trials. The [smoke receipt](task-library-smoke-2026-09-07.json)
-records the current version and preparation. [Initial offline validation](TASK_LIBRARY_VALIDATION.json)
+records the preceding serial smoke and eight-worker preparation. The [parallel smoke receipt](task-library-parallel-smoke-12-2026-09-07.json)
+records the current twelve-worker preparation and the prompt-limit blocker. Earlier frozen manifests
+are preserved. [Initial offline validation](TASK_LIBRARY_VALIDATION.json)
 and the [initial release receipt](task-library-release-2026-09-07.json) remain historical evidence.
 The same queue-aware timing calculation is now available through [campaign timing reports](TIMING.md).
 
