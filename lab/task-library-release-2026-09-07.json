@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "status": "prepared_not_launched",
+  "source_commit": "03703122bc6e880d85d86aaef62ed5a93fd6b86f",
+  "bundle": "/home/james/.cache/codex-lab-binaries/task-library-v1-20260907",
+  "binary_sha256": "b51aaa41d8862a531cfd00020a584a8a667a5d513dc2860634db579f61596ce5",
+  "campaign": "/home/james/.cache/codex-lab-campaigns/varied-library-v1-200-20260907/campaign.json",
+  "campaign_sha256": "21e4d947c453ca1e968b41991bcbf127957a77853750ae83f63e252d4883eab4",
+  "trials": 200,
+  "tasks": 20,
+  "workflows": [
+    "repository-v1",
+    "repository-repair-v1"
+  ],
+  "repetitions": 5,
+  "jobs": 8,
+  "max_amendments": 0,
+  "all_frozen_pins_valid": true,
+  "model_calls": 0,
+  "provider_home_unchanged": true,
+  "old_campaigns_modified": false,
+  "launchers": {
+    "queue-varied-tasks.ps1": "7a15a7c86dd9c7b343e7a3675d9912dad08a1e44b2c047390e04e9f935324483",
+    "run-varied-tasks.sh": "15636f38ccdd68d231351213714d627c4e5d6b368fee252f2c70d0f52d68f6c7"
+  },
+  "validation_receipt": "TASK_LIBRARY_VALIDATION.json"
+}

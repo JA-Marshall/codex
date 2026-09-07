@@ -8,7 +8,7 @@ tasks in each of four families. Every family has two small, two medium, and one 
 This implementation increment adds a varied task interface to the existing unattended runner and
 two generic workflows differing only in their maximum repair rounds. Final shared Linux/WSL
 sandbox calibration passed: all 80 variants matched their expected outcomes with zero model calls.
-The intended offline preparation is **200 trials = 20 tasks ×
+The frozen offline preparation contains **200 trials = 20 tasks ×
 2 workflows × 5 repetitions**, with eight active hosts by default if subsequently executed. Preparation
 does not launch model hosts. No live campaign has been launched for this library.
 
@@ -154,7 +154,7 @@ all 20 study tasks, both workflows, five repetitions, and eight jobs. Freeze wit
 `-PrepareOnly` or `-Execute` prepares and starts a new campaign. The launcher has not been used to
 launch live trials for this library.
 
-The planned bundle is `/home/james/.cache/codex-lab-binaries/task-library-v1-20260907`. It reuses
+The installed bundle is `/home/james/.cache/codex-lab-binaries/task-library-v1-20260907`. It reuses
 `/home/james/.config/codex-lab/muse-contributor-unattended-v2` unchanged and the existing shared
 provider service. Final shared calibration completed successfully:
 
@@ -169,7 +169,11 @@ tests across scoped runs (32 main harness checks plus five helper checks). The a
 crate passed 104 tests, and the subsequent four focused context-bound regressions also passed.
 Scope/permission context bounds are enforced before a model call, with an 8,192-byte cap per
 bounded section. This limits injected authority text; it is not a model-context capacity claim.
-Final binary identity and the 200-trial preparation receipt remain **pending**.
+Lint, formatting, format checking, and the final build passed. No tests were rerun after formatting.
+The prepared campaign is `/home/james/.cache/codex-lab-campaigns/varied-library-v1-200-20260907/campaign.json`;
+all frozen pins validate, and it contains no started trials. Binary identity and preparation hashes
+are in [the release receipt](task-library-release-2026-09-07.json); detailed validation is in
+[TASK_LIBRARY_VALIDATION.json](TASK_LIBRARY_VALIDATION.json).
 
 ## Remaining study work
 

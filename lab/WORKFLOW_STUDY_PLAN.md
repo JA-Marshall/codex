@@ -4,8 +4,9 @@ Prepared 7 September 2026. Updated implementation status: integration is complet
 the current increment adds a 20-task Python/Rust library, repository-task adapters,
 scope controls, and two generic workflows with zero or one repair. Final shared
 WSL sandbox calibration passed all 80 expected variant outcomes with zero model calls.
-Final release formatting/build, bundle identity, and the 200-trial offline preparation remain pending.
-The actual inventory, interfaces, evidence limits, and pending artifact locations
+Final lint/format/build checks passed. The separate release and 200-trial offline preparation are complete;
+their identities are recorded in [the release receipt](task-library-release-2026-09-07.json).
+The actual inventory, interfaces, evidence limits, and artifact locations
 are recorded in [TASK_LIBRARY.md](TASK_LIBRARY.md). The earlier installed release and its focused
 checks are recorded in
 [unattended-integration-2026-09-07.json](unattended-integration-2026-09-07.json).

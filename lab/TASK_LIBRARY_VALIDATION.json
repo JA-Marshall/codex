@@ -1,11 +1,19 @@
 {
   "schema_version": 1,
   "date": "2026-09-07",
-  "status": "validated_pending_release_build",
+  "status": "validated_and_packaged",
   "task_library": {
     "tasks": 20,
-    "languages": {"python": 12, "rust": 8},
-    "families": {"greenfield": 5, "extension": 5, "bug_fix": 5, "maintenance": 5},
+    "languages": {
+      "python": 12,
+      "rust": 8
+    },
+    "families": {
+      "greenfield": 5,
+      "extension": 5,
+      "bug_fix": 5,
+      "maintenance": 5
+    },
     "private_cases": 149,
     "calibration_variants": 80,
     "reference_solutions_passed": 20,
@@ -55,7 +63,12 @@
     "exact_provider_token_count_measured": false,
     "upstream_formatter_changes_require_bound_review": true
   },
-  "formatting": {"fix": "passed", "fmt": "passed", "fmt_check": "passed", "tests_rerun_after_format": false},
+  "formatting": {
+    "fix": "passed",
+    "fmt": "passed",
+    "fmt_check": "passed",
+    "tests_rerun_after_format": false
+  },
   "live_model_calls": 0,
   "old_campaigns_modified": false,
   "limitations": [
@@ -64,5 +77,18 @@
     "All current tasks are study tasks; development and confirmation packs remain future work",
     "Generic zero/one repair comparison only; richer handover matrix remains future work",
     "No live Muse smoke run or comparative result is claimed"
-  ]
+  ],
+  "build": {
+    "source_commit": "03703122bc6e880d85d86aaef62ed5a93fd6b86f",
+    "binary_sha256": "b51aaa41d8862a531cfd00020a584a8a667a5d513dc2860634db579f61596ce5",
+    "bundle": "/home/james/.cache/codex-lab-binaries/task-library-v1-20260907",
+    "succeeded": true
+  },
+  "preparation": {
+    "campaign": "/home/james/.cache/codex-lab-campaigns/varied-library-v1-200-20260907/campaign.json",
+    "sha256": "21e4d947c453ca1e968b41991bcbf127957a77853750ae83f63e252d4883eab4",
+    "trials": 200,
+    "jobs": 8,
+    "model_calls": 0
+  }
 }
