@@ -112,7 +112,11 @@ class QueueEvaluationTests(unittest.TestCase):
                 scratch = self.root / f"serialization-{index}"
                 scratch.mkdir()
                 result = observe(
-                    self.sandbox, self.repository, scratch, "cli", {"steps": case["steps"]}
+                    self.sandbox,
+                    self.repository,
+                    scratch,
+                    "cli",
+                    {"steps": case["steps"]},
                 )
                 self.assertEqual(result["exit_code"], 0, result)
                 self.assertEqual(
