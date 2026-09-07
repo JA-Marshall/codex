@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "run": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r3-baa-execution",
+  "workflow_state": "completed",
+  "terminal_change": {
+    "type": "completed"
+  },
+  "all_started_phases_shutdown": true,
+  "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r3-baa/repository",
+  "first_plan_human_approval": true,
+  "phase_turns": 2,
+  "planner_phases": 0,
+  "tool_admissions": 84,
+  "usage": {
+    "input_tokens": 1985536,
+    "output_tokens": 58728,
+    "cached_input_tokens": 1858895
+  },
+  "workflow_terminal_elapsed_ms": 1122904,
+  "human_plan_edits": 0,
+  "plan_amendments": 0,
+  "plan_deviations": null,
+  "source_artifact_sha256": {
+    "events.jsonl": "130717276770ae032c0516dad10cc43dd5580d2085634b21edc28e4e71a20e80",
+    "runtime-events.jsonl": "47672070714e8323e901680d5c6c3f63e9ebb5d6ba980dfab1c24cfd2dd69d75",
+    "evidence/input-01.json": "7ca9120baeabce672347519a68964d29e7284f6a29af1d0bdd1ef8b4e6c0ae15",
+    "evidence/phase-01.json": "31bfc01279f571fc68534fffc5a1883ebcf50226dd95e6551354c38e16405706",
+    "evidence/input-02.json": "046fd8831c79f51031fd55cd79e7e132e7033975dac6d9b1404ecbd7efce7428",
+    "evidence/phase-02.json": "d0dc7389e0b1055b3e062ecb95b3e251966a49ca7fd4e72b14aef2c6ed56e730",
+    "config/run-spec.json": "83fcda7267905483e4676c5ee19bba952d8ff2f119da8e6637e9c58a90dcf2ee"
+  },
+  "authority_restored": false,
+  "git": {
+    "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "files_changed": 10,
+    "changed_files": [
+      "durable_queue/__main__.py",
+      "durable_queue/queue.py",
+      "durable_queue/storage.py",
+      "tests/test_regression.py",
+      "tmp.kXnJ3D75cE/err.txt",
+      "tmp.kXnJ3D75cE/out.txt",
+      "tmp.kXnJ3D75cE/q.db",
+      "tmp.kXnJ3D75cE/req.json",
+      "tmp6g5uuzdf/race.db",
+      "tmpwo68jgzc/q.db"
+    ],
+    "diff_bytes": 48466,
+    "diff_sha256": "35fc79d68bdedc4ff5faac6fa6b5b6fa60b7fed082382c55d8ebdd93ad7163e6"
+  }
+}

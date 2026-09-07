@@ -1,0 +1,22 @@
+{
+  "executor": {
+    "pairs": 16,
+    "plan_blocks": 8,
+    "outcomes": {
+      "tie": 9,
+      "a_only_passed": 4,
+      "b_only_passed": 3
+    },
+    "interpretation": "Full pipeline comparison sharing a plan; execution samples differ. Not a fixed-candidate verifier comparison."
+  },
+  "verifier": {
+    "pairs": 16,
+    "plan_blocks": 8,
+    "outcomes": {
+      "b_only_passed": 3,
+      "tie": 9,
+      "a_only_passed": 4
+    },
+    "interpretation": "Full pipeline comparison sharing a plan; execution samples differ. Not a fixed-candidate verifier comparison."
+  }
+}

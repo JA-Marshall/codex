@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "run": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r2-abb-execution",
+  "workflow_state": "completed",
+  "terminal_change": {
+    "type": "completed"
+  },
+  "all_started_phases_shutdown": true,
+  "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r2-abb/repository",
+  "first_plan_human_approval": true,
+  "phase_turns": 2,
+  "planner_phases": 0,
+  "tool_admissions": 66,
+  "usage": {
+    "input_tokens": 1654284,
+    "output_tokens": 50482,
+    "cached_input_tokens": 1557959
+  },
+  "workflow_terminal_elapsed_ms": 640443,
+  "human_plan_edits": 0,
+  "plan_amendments": 0,
+  "plan_deviations": null,
+  "source_artifact_sha256": {
+    "events.jsonl": "ced92d9f76d2ca67bdc3715948ad3b0f1481986c9b7f7984b7b5f1fb537fc4a5",
+    "runtime-events.jsonl": "8203f3e7b600a4427b6235daa98187e4bdaecc81db81b4c15c991a5623608d7b",
+    "evidence/input-01.json": "ac57860d0c140738f51bc6a19273927460ad6942aad35f5c5af0a61e165f049d",
+    "evidence/phase-01.json": "f7640bf77f975921afade3812b1d043fa9cb901be0d2c6d80763da8fad133795",
+    "evidence/input-02.json": "aa66dbe958e14bd2e82e4af676f51c6cbcf904b037198b8ffccc78905313c34d",
+    "evidence/phase-02.json": "bd6c3da3007b3b02c796814ddf6fbfc0035f56ff510ce293c9b3f719e69044b0",
+    "config/run-spec.json": "f705bc4c6258627312c6dbaba99449ed9189ad4dde947a92868c650de21fb779"
+  },
+  "authority_restored": false,
+  "git": {
+    "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "files_changed": 4,
+    "changed_files": [
+      "durable_queue/__main__.py",
+      "durable_queue/queue.py",
+      "durable_queue/storage.py",
+      "tests/test_regression.py"
+    ],
+    "diff_bytes": 49148,
+    "diff_sha256": "9ac402032285c9ceeccc1011c18aafc34b4bf5830b4146f231e33c104f460f26"
+  }
+}

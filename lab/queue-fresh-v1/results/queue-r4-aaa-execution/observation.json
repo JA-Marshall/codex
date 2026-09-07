@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "run": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r4-aaa-execution",
+  "workflow_state": "completed",
+  "terminal_change": {
+    "type": "completed"
+  },
+  "all_started_phases_shutdown": true,
+  "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r4-aaa/repository",
+  "first_plan_human_approval": true,
+  "phase_turns": 2,
+  "planner_phases": 0,
+  "tool_admissions": 44,
+  "usage": {
+    "input_tokens": 666573,
+    "output_tokens": 45504,
+    "cached_input_tokens": 594351
+  },
+  "workflow_terminal_elapsed_ms": 1159622,
+  "human_plan_edits": 0,
+  "plan_amendments": 0,
+  "plan_deviations": null,
+  "source_artifact_sha256": {
+    "events.jsonl": "8c78df3645b4cf1069cf7629d3171752d480a39809de27b3741bbb97e6a1f1fe",
+    "runtime-events.jsonl": "8b59a72d8248c79b475a04a8ae8964901c108e59da3e508b6a7d47b79a18e5e5",
+    "evidence/input-01.json": "f1b975125aa5e2a6fc454ee9e2e45a7d21c1465ca87efab20a54d1e659d16e8c",
+    "evidence/phase-01.json": "0f724bc4aea0ddbdbf201cbc3f748e82c65ed55718caf606256fbd12f826ecc4",
+    "evidence/input-02.json": "11cb371ceb63358864412cda4f1c4211b61188fad76690ca60cdace9920dc03d",
+    "evidence/phase-02.json": "a3a866cd06602b5385ea81e3e2c24f8caaac43a9875ab1a1418abcf24dbd35fe",
+    "config/run-spec.json": "1c4a9d9dd87fc34751fb263af4307dcb422a9a9b0cb2aa4646150a0d57aa7153"
+  },
+  "authority_restored": false,
+  "git": {
+    "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "files_changed": 16,
+    "changed_files": [
+      ".v2_check.py",
+      "durable_queue/__main__.py",
+      "durable_queue/queue.py",
+      "durable_queue/storage.py",
+      "tests/test_regression.py",
+      "tmp2kg0x0l6.json",
+      "tmp4c3kq7x1.json",
+      "tmp6fpjioxf.json",
+      "tmp6t16jscy/q.db",
+      "tmp97r685pp.json",
+      "tmpas777lu6.json",
+      "tmpc1fzhhk0.json",
+      "tmpcttcum4n.json",
+      "tmpigiveu5i.json",
+      "tmpx99dp95x.json",
+      "tmpzblunu_b.json"
+    ],
+    "diff_bytes": 72666,
+    "diff_sha256": "19646d946eb91183dd48d8ca19e7aa27c15c8a55b0b5a3b4f81b861b06dee027"
+  }
+}

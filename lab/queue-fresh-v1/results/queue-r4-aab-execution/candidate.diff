@@ -1,0 +1,1941 @@
+diff --git a/durable_queue/__main__.py b/durable_queue/__main__.py
+index 65c8720..6ca51cd 100644
+--- a/durable_queue/__main__.py
++++ b/durable_queue/__main__.py
+@@ -1,19 +1,123 @@
+ import argparse
+ import json
++import sys
+ 
+ from .queue import Queue
+ 
++_FIELDS = {
++    "submit": {"jobs"},
++    "get": {"id"},
++    "list": set(),
++    "claim": {"worker", "now", "lease_seconds"},
++    "recover": {"now"},
++    "complete": {"id", "worker", "attempt", "now"},
++    "fail": {"id", "worker", "attempt", "now", "retry_delay"},
++}
+ 
+-def main():
++_REQUIRED = {
++    "submit": {"jobs"},
++    "get": {"id"},
++    "list": set(),
++    "claim": {"worker", "now", "lease_seconds"},
++    "recover": {"now"},
++    "complete": {"id", "worker", "attempt", "now"},
++    "fail": {"id", "worker", "attempt", "now"},
++}
++
++
++def main(argv=None):
+     parser = argparse.ArgumentParser()
+     parser.add_argument("--db", required=True)
+     parser.add_argument("--request", required=True)
+-    args = parser.parse_args()
+-    with open(args.request, encoding="utf-8") as stream:
+-        request = json.load(stream)
+-    operation = request.pop("op")
+-    value = getattr(Queue(args.db), operation)(**request)
+-    print(json.dumps(value, sort_keys=True))
++    args = parser.parse_args(argv)
++    try:
++        with open(args.request, encoding="utf-8") as stream:
++            request = json.load(stream)
++    except Exception as exc:
++        try:
++            sys.stderr.write(f"request error: {exc}\n")
++        except Exception:
++            pass
++        return 2
++    if not isinstance(request, dict):
++        try:
++            sys.stderr.write("invalid request\n")
++        except Exception:
++            pass
++        return 2
++    if "op" not in request:
++        try:
++            sys.stderr.write("missing op\n")
++        except Exception:
++            pass
++        return 2
++    op = request.pop("op")
++    if op not in _FIELDS:
++        try:
++            sys.stderr.write("unknown op\n")
++        except Exception:
++            pass
++        return 2
++    allowed = _FIELDS[op]
++    for key in request:
++        if key not in allowed:
++            try:
++                sys.stderr.write("unknown field\n")
++            except Exception:
++                pass
++            return 2
++    required = _REQUIRED[op]
++    for key in required:
++        if key not in request:
++            try:
++                sys.stderr.write("missing field\n")
++            except Exception:
++                pass
++            return 2
++    try:
++        queue = Queue(args.db)
++    except Exception as exc:
++        try:
++            sys.stderr.write(f"db error: {exc}\n")
++        except Exception:
++            pass
++        return 2
++    try:
++        method = getattr(queue, op)
++    except Exception as exc:
++        try:
++            sys.stderr.write(f"unknown op: {exc}\n")
++        except Exception:
++            pass
++        return 2
++    try:
++        value = method(**request)
++    except ValueError as exc:
++        try:
++            sys.stderr.write(f"invalid: {exc}\n")
++        except Exception:
++            pass
++        return 2
++    except TypeError as exc:
++        try:
++            sys.stderr.write(f"invalid args: {exc}\n")
++        except Exception:
++            pass
++        return 2
++    except Exception as exc:
++        try:
++            sys.stderr.write(f"error: {exc}\n")
++        except Exception:
++            pass
++        return 2
++    try:
++        sys.stdout.write(json.dumps(value, sort_keys=True) + "\n")
++    except Exception as exc:
++        try:
++            sys.stderr.write(f"encode error: {exc}\n")
++        except Exception:
++            pass
++        return 2
+     return 0
+ 
+ 
+diff --git a/durable_queue/queue.py b/durable_queue/queue.py
+index 048c736..51c938b 100644
+--- a/durable_queue/queue.py
++++ b/durable_queue/queue.py
+@@ -1,61 +1,545 @@
+-"""Initial durable storage; scheduling and lease behavior are unfinished."""
++"""Durable queue with atomic submit; claim/recovery/finish pending."""
+ 
++import copy
+ import json
++import math
+ 
+ from .storage import connect
+ 
++_ALLOWED_JOB_FIELDS = {"id", "payload", "priority", "dependencies", "max_attempts", "ready_at"}
++_VIEW_KEYS = ("id", "payload", "priority", "dependencies", "max_attempts", "ready_at", "state", "attempts", "worker", "lease_until")
++
++_SELECT_COLS = "id, payload, priority, dependencies, max_attempts, ready_at, state, attempts, worker, lease_until, spec_payload, spec_priority, spec_dependencies, spec_max_attempts, spec_ready_at"
++
++
++def _is_strict_int(v):
++    return type(v) is int
++
++
++def _validate_id(value):
++    if not isinstance(value, str) or value == "":
++        raise ValueError("invalid id")
++
++
++def _validate_worker(value):
++    if not isinstance(value, str) or value == "":
++        raise ValueError("invalid worker")
++
++
++def _validate_now(now):
++    if type(now) is not int or now < 0:
++        raise ValueError("invalid now")
++
++
++def _check_finite_json(value):
++    if value is None:
++        return
++    t = type(value)
++    if t is bool:
++        return
++    if t is int:
++        return
++    if t is float:
++        if not math.isfinite(value):
++            raise ValueError("non-finite JSON value")
++        return
++    if t is str:
++        return
++    if t is list:
++        for item in value:
++            _check_finite_json(item)
++        return
++    if t is dict:
++        for k, v in value.items():
++            if type(k) is not str:
++                raise ValueError("invalid JSON object key")
++            _check_finite_json(v)
++        return
++    raise ValueError("invalid JSON value")
++
++
++def _payload_canonical(payload):
++    return json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
++
++
++def _validate_job_spec(job):
++    if not isinstance(job, dict):
++        raise ValueError("invalid job")
++    for k in job:
++        if k not in _ALLOWED_JOB_FIELDS:
++            raise ValueError("unknown job field")
++    if "id" not in job:
++        raise ValueError("missing id")
++    jid = job["id"]
++    _validate_id(jid)
++    if "payload" in job:
++        payload = job["payload"]
++        if not isinstance(payload, dict):
++            raise ValueError("invalid payload")
++        _check_finite_json(payload)
++        payload_norm = copy.deepcopy(payload)
++    else:
++        payload_norm = {}
++    if "priority" in job:
++        priority = job["priority"]
++        if type(priority) is not int:
++            raise ValueError("invalid priority")
++    else:
++        priority = 0
++    if "dependencies" in job:
++        raw_deps = job["dependencies"]
++        if not isinstance(raw_deps, list):
++            raise ValueError("invalid dependencies")
++        for d in raw_deps:
++            if not isinstance(d, str) or d == "":
++                raise ValueError("invalid dependency")
++        deps_norm = sorted(set(raw_deps))
++    else:
++        deps_norm = []
++    if "max_attempts" in job:
++        max_attempts = job["max_attempts"]
++        if type(max_attempts) is not int or not (1 <= max_attempts <= 100):
++            raise ValueError("invalid max_attempts")
++    else:
++        max_attempts = 3
++    if "ready_at" in job:
++        ready_at = job["ready_at"]
++        if type(ready_at) is not int or ready_at < 0:
++            raise ValueError("invalid ready_at")
++    else:
++        ready_at = 0
++    return {
++        "id": jid,
++        "payload": payload_norm,
++        "priority": priority,
++        "dependencies": deps_norm,
++        "max_attempts": max_attempts,
++        "ready_at": ready_at,
++    }
++
++
++def _row_to_view(row):
++    jid, payload_s, priority, deps_s, max_attempts, ready_at, state, attempts, worker, lease_until = row[:10]
++    try:
++        payload = json.loads(payload_s)
++    except Exception:
++        raise ValueError("corrupt payload")
++    try:
++        deps = json.loads(deps_s)
++    except Exception:
++        raise ValueError("corrupt dependencies")
++    return {
++        "id": jid,
++        "payload": payload,
++        "priority": priority,
++        "dependencies": deps,
++        "max_attempts": max_attempts,
++        "ready_at": ready_at,
++        "state": state,
++        "attempts": attempts,
++        "worker": worker,
++        "lease_until": lease_until,
++    }
++
++
++def _has_cycle(nodes, edges):
++    # nodes: set of ids, edges: dict id -> list of deps (within nodes)
++    WHITE, GRAY, BLACK = 0, 1, 2
++    color = {n: WHITE for n in nodes}
++
++    def visit(start):
++        stack = [(start, 0)]
++        while stack:
++            node, idx = stack[-1]
++            if color[node] == WHITE:
++                color[node] = GRAY
++            deps = edges.get(node, [])
++            if idx < len(deps):
++                nxt = deps[idx]
++                stack[-1] = (node, idx + 1)
++                if nxt not in color:
++                    continue
++                if color[nxt] == GRAY:
++                    return True
++                if color[nxt] == WHITE:
++                    stack.append((nxt, 0))
++            else:
++                color[node] = BLACK
++                stack.pop()
++        return False
++
++    for n in nodes:
++        if color[n] == WHITE:
++            if visit(n):
++                return True
++    return False
++
++
++def _recover_expired(conn, now):
++    rows = conn.execute(
++        "SELECT id, attempts, max_attempts, lease_until FROM jobs WHERE state='running' AND lease_until IS NOT NULL AND lease_until <= ?",
++        (now,),
++    ).fetchall()
++    ids = []
++    for jid, attempts, max_a, lease in rows:
++        ids.append(jid)
++        if attempts < max_a:
++            conn.execute(
++                "UPDATE jobs SET state='pending', worker=NULL, lease_until=NULL, ready_at=? WHERE id=?",
++                (lease, jid),
++            )
++        else:
++            conn.execute(
++                "UPDATE jobs SET state='failed', worker=NULL, lease_until=NULL WHERE id=?",
++                (jid,),
++            )
++    return sorted(ids)
++
+ 
+ class Queue:
+     def __init__(self, db_path):
+         self.db_path = db_path
+-        with connect(db_path):
++        conn = connect(db_path)
++        try:
+             pass
++        finally:
++            try:
++                conn.close()
++            except Exception:
++                pass
+ 
+     def submit(self, jobs):
+-        views = []
+-        with connect(self.db_path) as connection:
+-            for job in jobs:
+-                view = dict(
+-                    id=job["id"],
+-                    payload=job.get("payload", {}),
+-                    priority=job.get("priority", 0),
+-                    dependencies=job.get("dependencies", []),
+-                    max_attempts=job.get("max_attempts", 3),
+-                    ready_at=job.get("ready_at", 0),
+-                    state="pending",
+-                    attempts=0,
+-                    worker=None,
+-                    lease_until=None,
+-                )
+-                connection.execute(
+-                    "INSERT OR REPLACE INTO jobs VALUES (?, ?)",
+-                    (view["id"], json.dumps(view)),
+-                )
+-                views.append(view)
+-        return views
++        if not isinstance(jobs, list):
++            raise ValueError("invalid jobs")
++        if len(jobs) == 0:
++            return []
++        specs = []
++        for job in jobs:
++            specs.append(_validate_job_spec(job))
++        ids = [s["id"] for s in specs]
++        if len(set(ids)) != len(ids):
++            raise ValueError("duplicate id in batch")
++        conn = connect(self.db_path)
++        try:
++            conn.execute("BEGIN IMMEDIATE")
++            try:
++                # Load existing jobs.
++                existing = {}
++                # spec map: id -> (spec_payload_canonical, spec_priority, spec_deps, spec_max, spec_ready)
++                for r in conn.execute(
++                    "SELECT " + _SELECT_COLS + " FROM jobs"
++                ).fetchall():
++                    jid = r[0]
++                    existing[jid] = r
++                batch_ids = set(ids)
++                existing_ids = set(existing.keys())
++                # Idempotency / conflict check.
++                new_specs = []
++                for s in specs:
++                    jid = s["id"]
++                    if jid in existing:
++                        er = existing[jid]
++                        espec_payload_s = er[10]
++                        espec_priority = er[11]
++                        espec_deps_s = er[12]
++                        espec_max = er[13]
++                        espec_ready = er[14]
++                        try:
++                            espec_deps = json.loads(espec_deps_s)
++                        except Exception:
++                            raise ValueError("corrupt spec")
++                        incoming_payload_c = _payload_canonical(s["payload"])
++                        # Normalize stored spec payload canonical for comparison
++                        # espec_payload_s already canonical dumps; incoming canonical compare
++                        if (
++                            espec_payload_s != incoming_payload_c
++                            or espec_priority != s["priority"]
++                            or espec_deps != s["dependencies"]
++                            or espec_max != s["max_attempts"]
++                            or espec_ready != s["ready_at"]
++                        ):
++                            raise ValueError("conflicting resubmit")
++                        # idempotent: no write
++                    else:
++                        new_specs.append(s)
++                # Dependency checks for new jobs.
++                allowed = existing_ids | batch_ids
++                for s in new_specs:
++                    for d in s["dependencies"]:
++                        if d not in allowed:
++                            raise ValueError("unknown dependency")
++                        if d == s["id"]:
++                            raise ValueError("self dependency")
++                # Cycle check over full graph.
++                if new_specs:
++                    nodes = set(existing_ids) | batch_ids
++                    edges = {}
++                    for jid, er in existing.items():
++                        try:
++                            edeps = json.loads(er[3])
++                        except Exception:
++                            edeps = []
++                        edges[jid] = [d for d in edeps if d in nodes]
++                    # batch jobs (both new and idempotent-existing): use spec deps
++                    # For idempotent existing, edges already from current deps (== spec deps)
++                    for s in specs:
++                        if s["id"] not in existing:
++                            edges[s["id"]] = list(s["dependencies"])
++                    if _has_cycle(nodes, edges):
++                        raise ValueError("dependency cycle")
++                    # Insert new jobs.
++                    for s in new_specs:
++                        payload_s = _payload_canonical(s["payload"])
++                        # Store payload preserving types: use json dumps without canonical? canonical is fine (sorted keys)
++                        # Use canonical for storage; loads will restore types.
++                        deps_s = json.dumps(s["dependencies"], sort_keys=True, separators=(",", ":"), ensure_ascii=False)
++                        spec_payload_s = payload_s
++                        conn.execute(
++                            "INSERT INTO jobs (id, payload, priority, dependencies, max_attempts, ready_at, state, attempts, worker, lease_until, spec_payload, spec_priority, spec_dependencies, spec_max_attempts, spec_ready_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
++                            (
++                                s["id"], payload_s, s["priority"], deps_s, s["max_attempts"], s["ready_at"],
++                                "pending", 0, None, None,
++                                spec_payload_s, s["priority"], deps_s, s["max_attempts"], s["ready_at"],
++                            ),
++                        )
++                # Build return views in input order (current views).
++                views = []
++                for s in specs:
++                    jid = s["id"]
++                    if jid in existing and s["id"] not in [n["id"] for n in new_specs]:
++                        # idempotent existing: current view from DB (pre-insert state)
++                        er = existing[jid]
++                        views.append(_row_to_view(er))
++                    elif jid in existing:
++                        # shouldn't happen: existing handled above; but for safety fetch
++                        r = conn.execute("SELECT " + _SELECT_COLS + " FROM jobs WHERE id=?", (jid,)).fetchone()
++                        views.append(_row_to_view(r))
++                    else:
++                        r = conn.execute("SELECT " + _SELECT_COLS + " FROM jobs WHERE id=?", (jid,)).fetchone()
++                        if r is None:
++                            raise ValueError("insert failed")
++                        views.append(_row_to_view(r))
++                conn.execute("COMMIT")
++                return views
++            except Exception:
++                try:
++                    conn.execute("ROLLBACK")
++                except Exception:
++                    pass
++                raise
++        finally:
++            try:
++                conn.close()
++            except Exception:
++                pass
+ 
+     def get(self, id):
+-        with connect(self.db_path) as connection:
+-            row = connection.execute(
+-                "SELECT data FROM jobs WHERE id=?", (id,)
++        _validate_id(id)
++        conn = connect(self.db_path)
++        try:
++            row = conn.execute(
++                "SELECT " + _SELECT_COLS + " FROM jobs WHERE id=?", (id,)
+             ).fetchone()
+-        return json.loads(row[0]) if row else None
++            if row is None:
++                return None
++            return _row_to_view(row)
++        finally:
++            try:
++                conn.close()
++            except Exception:
++                pass
+ 
+     def list(self):
+-        with connect(self.db_path) as connection:
+-            return [
+-                json.loads(row[0])
+-                for row in connection.execute("SELECT data FROM jobs ORDER BY id")
+-            ]
+-
+-    def claim(self, worker, now, lease_seconds):
+-        raise NotImplementedError("claim scheduling and atomic ownership")
++        conn = connect(self.db_path)
++        try:
++            rows = conn.execute("SELECT " + _SELECT_COLS + " FROM jobs ORDER BY id").fetchall()
++            return [_row_to_view(r) for r in rows]
++        finally:
++            try:
++                conn.close()
++            except Exception:
++                pass
+ 
+     def recover(self, now):
+-        raise NotImplementedError("expired lease recovery")
++        _validate_now(now)
++        conn = connect(self.db_path)
++        try:
++            conn.execute("BEGIN IMMEDIATE")
++            try:
++                ids = _recover_expired(conn, now)
++                conn.execute("COMMIT")
++                return ids
++            except Exception:
++                try:
++                    conn.execute("ROLLBACK")
++                except Exception:
++                    pass
++                raise
++        finally:
++            try:
++                conn.close()
++            except Exception:
++                pass
++
++    def claim(self, worker, now, lease_seconds):
++        _validate_worker(worker)
++        _validate_now(now)
++        if type(lease_seconds) is not int or lease_seconds <= 0:
++            raise ValueError("invalid lease_seconds")
++        conn = connect(self.db_path)
++        try:
++            conn.execute("BEGIN IMMEDIATE")
++            try:
++                _recover_expired(conn, now)
++                state_rows = conn.execute("SELECT id, state FROM jobs").fetchall()
++                states = {r[0]: r[1] for r in state_rows}
++                candidates = conn.execute(
++                    "SELECT " + _SELECT_COLS + " FROM jobs WHERE state='pending' AND ready_at <= ? AND attempts < max_attempts ORDER BY priority DESC, id ASC",
++                    (now,),
++                ).fetchall()
++                chosen = None
++                for r in candidates:
++                    try:
++                        deps = json.loads(r[3])
++                    except Exception:
++                        continue
++                    ok = True
++                    for d in deps:
++                        if states.get(d) != "succeeded":
++                            ok = False
++                            break
++                    if not ok:
++                        continue
++                    jid = r[0]
++                    lease_until = now + lease_seconds
++                    cur = conn.execute(
++                        "UPDATE jobs SET state='running', attempts=attempts+1, worker=?, lease_until=? WHERE id=? AND state='pending' AND attempts < max_attempts",
++                        (worker, lease_until, jid),
++                    )
++                    if cur.rowcount == 1:
++                        chosen = jid
++                    else:
++                        continue
++                    break
++                if chosen is None:
++                    conn.execute("COMMIT")
++                    return None
++                row = conn.execute("SELECT " + _SELECT_COLS + " FROM jobs WHERE id=?", (chosen,)).fetchone()
++                view = _row_to_view(row)
++                conn.execute("COMMIT")
++                return view
++            except Exception:
++                try:
++                    conn.execute("ROLLBACK")
++                except Exception:
++                    pass
++                raise
++        finally:
++            try:
++                conn.close()
++            except Exception:
++                pass
+ 
+     def complete(self, id, worker, attempt, now):
+-        raise NotImplementedError("completion validation")
++        _validate_id(id)
++        _validate_worker(worker)
++        if type(attempt) is not int or attempt <= 0:
++            raise ValueError("invalid attempt")
++        _validate_now(now)
++        conn = connect(self.db_path)
++        try:
++            conn.execute("BEGIN IMMEDIATE")
++            try:
++                row = conn.execute("SELECT " + _SELECT_COLS + " FROM jobs WHERE id=?", (id,)).fetchone()
++                if row is None:
++                    raise ValueError("unknown job")
++                state = row[6]
++                attempts = row[7]
++                owner = row[8]
++                lease_until = row[9]
++                if state != "running":
++                    raise ValueError("not running")
++                if owner != worker:
++                    raise ValueError("wrong owner")
++                if attempt != attempts:
++                    raise ValueError("stale attempt")
++                if lease_until is None or not (type(lease_until) is int):
++                    raise ValueError("invalid lease")
++                if not (now < lease_until):
++                    raise ValueError("lease expired")
++                conn.execute(
++                    "UPDATE jobs SET state='succeeded', worker=NULL, lease_until=NULL WHERE id=?",
++                    (id,),
++                )
++                nrow = conn.execute("SELECT " + _SELECT_COLS + " FROM jobs WHERE id=?", (id,)).fetchone()
++                view = _row_to_view(nrow)
++                conn.execute("COMMIT")
++                return view
++            except Exception:
++                try:
++                    conn.execute("ROLLBACK")
++                except Exception:
++                    pass
++                raise
++        finally:
++            try:
++                conn.close()
++            except Exception:
++                pass
+ 
+     def fail(self, id, worker, attempt, now, retry_delay=0):
+-        raise NotImplementedError("retry state transition")
++        _validate_id(id)
++        _validate_worker(worker)
++        if type(attempt) is not int or attempt <= 0:
++            raise ValueError("invalid attempt")
++        _validate_now(now)
++        if type(retry_delay) is not int or retry_delay < 0:
++            raise ValueError("invalid retry_delay")
++        conn = connect(self.db_path)
++        try:
++            conn.execute("BEGIN IMMEDIATE")
++            try:
++                row = conn.execute("SELECT " + _SELECT_COLS + " FROM jobs WHERE id=?", (id,)).fetchone()
++                if row is None:
++                    raise ValueError("unknown job")
++                state = row[6]
++                attempts = row[7]
++                owner = row[8]
++                lease_until = row[9]
++                max_attempts = row[4]
++                if state != "running":
++                    raise ValueError("not running")
++                if owner != worker:
++                    raise ValueError("wrong owner")
++                if attempt != attempts:
++                    raise ValueError("stale attempt")
++                if lease_until is None or not (type(lease_until) is int):
++                    raise ValueError("invalid lease")
++                if not (now < lease_until):
++                    raise ValueError("lease expired")
++                if attempts < max_attempts:
++                    new_ready = now + retry_delay
++                    conn.execute(
++                        "UPDATE jobs SET state='pending', worker=NULL, lease_until=NULL, ready_at=? WHERE id=?",
++                        (new_ready, id),
++                    )
++                else:
++                    conn.execute(
++                        "UPDATE jobs SET state='failed', worker=NULL, lease_until=NULL WHERE id=?",
++                        (id,),
++                    )
++                nrow = conn.execute("SELECT " + _SELECT_COLS + " FROM jobs WHERE id=?", (id,)).fetchone()
++                view = _row_to_view(nrow)
++                conn.execute("COMMIT")
++                return view
++            except Exception:
++                try:
++                    conn.execute("ROLLBACK")
++                except Exception:
++                    pass
++                raise
++        finally:
++            try:
++                conn.close()
++            except Exception:
++                pass
+diff --git a/durable_queue/storage.py b/durable_queue/storage.py
+index 0eb7fa5..ca01a61 100644
+--- a/durable_queue/storage.py
++++ b/durable_queue/storage.py
+@@ -1,9 +1,104 @@
+ import sqlite3
+ 
++_SCHEMA_NEW = """
++CREATE TABLE IF NOT EXISTS jobs (
++    id TEXT PRIMARY KEY,
++    payload TEXT NOT NULL,
++    priority INTEGER NOT NULL,
++    dependencies TEXT NOT NULL,
++    max_attempts INTEGER NOT NULL,
++    ready_at INTEGER NOT NULL,
++    state TEXT NOT NULL,
++    attempts INTEGER NOT NULL,
++    worker TEXT,
++    lease_until INTEGER,
++    spec_payload TEXT NOT NULL,
++    spec_priority INTEGER NOT NULL,
++    spec_dependencies TEXT NOT NULL,
++    spec_max_attempts INTEGER NOT NULL,
++    spec_ready_at INTEGER NOT NULL
++)
++"""
++
++def _ensure_schema(conn):
++    row = conn.execute(
++        "SELECT name FROM sqlite_master WHERE type='table' AND name='jobs'"
++    ).fetchone()
++    if row is None:
++        conn.execute(_SCHEMA_NEW)
++        return
++    cols = [r[1] for r in conn.execute("PRAGMA table_info(jobs)").fetchall()]
++    if "state" in cols and "spec_payload" in cols:
++        return
++    if "data" in cols and "state" not in cols:
++        # Migrate legacy single-blob table.
++        import json as _json
++        old_rows = list(conn.execute("SELECT id, data FROM jobs").fetchall())
++        conn.execute("DROP TABLE jobs")
++        conn.execute(_SCHEMA_NEW)
++        for oid, data in old_rows:
++            try:
++                v = _json.loads(data)
++            except Exception:
++                continue
++            import json as _j2
++            payload = v.get("payload", {})
++            priority = v.get("priority", 0)
++            deps = v.get("dependencies", [])
++            try:
++                deps_norm = sorted(set(deps)) if isinstance(deps, list) else []
++            except Exception:
++                deps_norm = []
++            max_a = v.get("max_attempts", 3)
++            ready = v.get("ready_at", 0)
++            state = v.get("state", "pending")
++            attempts = v.get("attempts", 0)
++            worker = v.get("worker", None)
++            lease = v.get("lease_until", None)
++            try:
++                payload_s = _j2.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
++                deps_s = _j2.dumps(deps_norm, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
++                spec_payload_s = payload_s
++            except Exception:
++                payload_s = "{}"
++                deps_s = "[]"
++                spec_payload_s = "{}"
++            try:
++                priority_i = int(priority)
++            except Exception:
++                priority_i = 0
++            try:
++                max_i = int(max_a)
++            except Exception:
++                max_i = 3
++            try:
++                ready_i = int(ready)
++            except Exception:
++                ready_i = 0
++            try:
++                att_i = int(attempts)
++            except Exception:
++                att_i = 0
++            conn.execute(
++                "INSERT OR REPLACE INTO jobs (id, payload, priority, dependencies, max_attempts, ready_at, state, attempts, worker, lease_until, spec_payload, spec_priority, spec_dependencies, spec_max_attempts, spec_ready_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
++                (oid, payload_s, priority_i, deps_s, max_i, ready_i, state, att_i, worker, lease, spec_payload_s, priority_i, deps_s, max_i, ready_i),
++            )
++        return
++    # Unknown schema shape: ensure new table exists.
++    conn.execute(_SCHEMA_NEW)
++
+ 
+ def connect(path):
+-    connection = sqlite3.connect(path, timeout=5)
+-    connection.execute(
+-        "CREATE TABLE IF NOT EXISTS jobs (id TEXT PRIMARY KEY, data TEXT NOT NULL)"
+-    )
++    connection = sqlite3.connect(str(path), timeout=5.0, isolation_level=None, check_same_thread=True)
++    try:
++        connection.execute("PRAGMA journal_mode=WAL;")
++        connection.execute("PRAGMA busy_timeout=5000;")
++        connection.execute("PRAGMA synchronous=NORMAL;")
++        _ensure_schema(connection)
++    except Exception:
++        try:
++            connection.close()
++        except Exception:
++            pass
++        raise
+     return connection
+diff --git a/tests/test_regression.py b/tests/test_regression.py
+new file mode 100644
+index 0000000..76e6548
+--- /dev/null
++++ b/tests/test_regression.py
+@@ -0,0 +1,511 @@
++import copy
++import json
++import subprocess
++import sys
++import tempfile
++import unittest
++from pathlib import Path
++
++from durable_queue import Queue
++
++
++def _db(tmp):
++    return str(Path(tmp) / "queue.db")
++
++
++def _cli(db_path, request_obj=None, raw_bytes=None, request_file=None):
++    # Helper to run CLI with given request; returns CompletedProcess.
++    if request_file is None:
++        with tempfile.NamedTemporaryFile(mode="wb", suffix=".json", delete=False) as f:
++            if raw_bytes is not None:
++                f.write(raw_bytes)
++            else:
++                f.write(json.dumps(request_obj).encode("utf-8"))
++            req = f.name
++    else:
++        req = request_file
++    proc = subprocess.run(
++        [sys.executable, "-m", "durable_queue", "--db", db_path, "--request", req],
++        capture_output=True,
++    )
++    return proc
++
++
++class SubmitValidationTests(unittest.TestCase):
++    def test_strict_types_and_unknown(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            bad = [
++                [{"id": "", }],
++                [{"id": 123}],
++                [{"payload": {}}],  # missing id
++                [{"id": "a", "unknown": 1}],
++                [{"id": "a", "payload": []}],
++                [{"id": "a", "payload": {"v": float("nan")}}],
++                [{"id": "a", "payload": {"v": float("inf")}}],
++                [{"id": "a", "priority": True}],
++                [{"id": "a", "priority": 1.0}],
++                [{"id": "a", "dependencies": "x"}],
++                [{"id": "a", "dependencies": [""]}],
++                [{"id": "a", "dependencies": [123]}],
++                [{"id": "a", "max_attempts": 0}],
++                [{"id": "a", "max_attempts": 101}],
++                [{"id": "a", "max_attempts": True}],
++                [{"id": "a", "ready_at": -1}],
++                [{"id": "a", "ready_at": True}],
++                [{"id": "a", "ready_at": 1.5}],
++                ["notadict"],
++                [{"id": "a", "payload": {1: "x"}}],
++                [{"id": "a", "payload": {"x": (1, 2)}}],
++            ]
++            for jobs in bad:
++                with self.subTest(jobs=repr(jobs)[:80]):
++                    with self.assertRaises(ValueError):
++                        q.submit(jobs)
++            self.assertEqual(q.list(), [])
++
++    def test_no_mutation_and_normalize(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "a"}, {"id": "b"}])
++            orig = {"id": "m", "payload": {"a": [1, 2]}, "dependencies": ["b", "a", "b"], "priority": 2}
++            snap = copy.deepcopy(orig)
++            views = q.submit([orig])
++            self.assertEqual(orig, snap)
++            self.assertEqual(views[0]["dependencies"], ["a", "b"])
++            # stored view sorted unique
++            self.assertEqual(q.get("m")["dependencies"], ["a", "b"])
++
++    def test_duplicate_unknown_self_cycle(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "x"}, {"id": "x"}])
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "a", "dependencies": ["missing"]}])
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "s", "dependencies": ["s"]}])
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "p", "dependencies": ["qq"]}, {"id": "qq", "dependencies": ["p"]}])
++            # 3-cycle
++            with self.assertRaises(ValueError):
++                q.submit([
++                    {"id": "a1", "dependencies": ["b1"]},
++                    {"id": "b1", "dependencies": ["c1"]},
++                    {"id": "c1", "dependencies": ["a1"]},
++                ])
++            self.assertEqual(q.list(), [])
++            # cycle with existing
++            q.submit([{"id": "e1"}])
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "e2", "dependencies": ["e1", "e3"]}, {"id": "e3", "dependencies": ["e2"]}])
++            self.assertEqual(sorted(v["id"] for v in q.list()), ["e1"])
++
++    def test_idempotent_and_conflict(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "a", "payload": {"x": 1}, "priority": 5, "ready_at": 0}])
++            c = q.claim("w", 0, 10)
++            self.assertEqual(c["id"], "a")
++            # resubmit same original spec after state change is no-op
++            views = q.submit([{"id": "a", "payload": {"x": 1}, "priority": 5, "ready_at": 0}])
++            self.assertEqual(views[0]["state"], "running")
++            self.assertEqual(views[0]["attempts"], 1)
++            # conflicting spec rejects whole batch and leaves DB unchanged
++            before = q.list()
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "a", "payload": {"x": 2}}, {"id": "new"}])
++            self.assertEqual(q.list(), before)
++            self.assertIsNone(q.get("new"))
++            # bool vs int payload distinction
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "a", "payload": {"x": 1}, "priority": True}])
++
++    def test_batch_rollback_atomic(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "keep"}])
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "good"}, {"id": "bad", "dependencies": ["nope"]}])
++            ids = sorted(v["id"] for v in q.list())
++            self.assertEqual(ids, ["keep"])
++
++    def test_invalid_submit_no_recovery(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "r", "max_attempts": 3}])
++            c = q.claim("w", 0, 10)
++            self.assertEqual(c["id"], "r")
++            # expired at 10, but invalid submit must not recover
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "bad", "dependencies": ["missing"]}])
++            cur = q.get("r")
++            self.assertEqual(cur["state"], "running")
++            self.assertIsNotNone(cur["lease_until"])
++            self.assertEqual(q.recover(10), ["r"])
++
++    def test_views_exact_keys_detached(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "v", "payload": {"k": [1, {"n": None}]}}])
++            v = q.get("v")
++            self.assertEqual(
++                sorted(v.keys()),
++                sorted(["id", "payload", "priority", "dependencies", "max_attempts", "ready_at", "state", "attempts", "worker", "lease_until"]),
++            )
++            v["payload"]["k"].append(999)
++            v["dependencies"].append("zzz")
++            v2 = q.get("v")
++            self.assertEqual(v2["payload"], {"k": [1, {"n": None}]})
++            self.assertEqual(v2["dependencies"], [])
++            # list sorted by id
++            q.submit([{"id": "a"}, {"id": "z"}])
++            self.assertEqual([x["id"] for x in q.list()], ["a", "v", "z"])
++            with self.assertRaises(ValueError):
++                q.get("")
++            with self.assertRaises(ValueError):
++                q.get(123)
++            with self.assertRaises(ValueError):
++                q.get(None)
++
++
++class ClaimRecoverTests(unittest.TestCase):
++    def test_claim_ordering_and_eligibility(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([
++                {"id": "low", "priority": 1, "ready_at": 0},
++                {"id": "high", "priority": 10, "ready_at": 0},
++                {"id": "tie-a", "priority": 10, "ready_at": 0},
++                {"id": "future", "priority": 100, "ready_at": 50},
++                {"id": "limited", "priority": 100, "max_attempts": 1, "ready_at": 0},
++            ])
++            # limited: claim once then fail to failed, never exceed
++            cl = q.claim("w", 0, 10)
++            # highest priority among eligible: future not eligible (ready_at), limited priority 100 eligible
++            self.assertEqual(cl["id"], "limited")
++            q.fail("limited", "w", cl["attempts"], 1)
++            self.assertEqual(q.get("limited")["state"], "failed")
++            # next: high vs tie-a same priority 10, lexicographically smallest
++            c2 = q.claim("w", 0, 10)
++            self.assertEqual(c2["id"], "high")
++            q.complete("high", "w", c2["attempts"], 1)
++            c3 = q.claim("w", 0, 10)
++            self.assertEqual(c3["id"], "tie-a")
++            q.complete("tie-a", "w", c3["attempts"], 1)
++            c4 = q.claim("w", 0, 10)
++            self.assertEqual(c4["id"], "low")
++            q.complete("low", "w", c4["attempts"], 1)
++            self.assertIsNone(q.claim("w", 0, 10))
++            # future becomes eligible at 50
++            self.assertIsNone(q.claim("w", 49, 10))
++            self.assertEqual(q.claim("w", 50, 10)["id"], "future")
++
++    def test_failed_dependency_ineligible(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "parent", "max_attempts": 1}, {"id": "child", "dependencies": ["parent"]}])
++            c = q.claim("w", 0, 10)
++            self.assertEqual(c["id"], "parent")
++            q.fail("parent", "w", c["attempts"], 1)
++            self.assertEqual(q.get("parent")["state"], "failed")
++            self.assertIsNone(q.claim("w", 1, 10))
++            self.assertEqual(q.get("child")["state"], "pending")
++
++    def test_recover_semantics(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "a", "max_attempts": 2}, {"id": "b", "max_attempts": 1}])
++            ca = q.claim("w", 0, 10)
++            self.assertEqual(ca["id"], "a")
++            # need to complete a? Actually claim b next: a running, so next claim gets b
++            cb = q.claim("w", 0, 10)
++            self.assertEqual(cb["id"], "b")
++            # not expired yet
++            self.assertEqual(q.recover(5), [])
++            # expire both at 10
++            ids = q.recover(10)
++            self.assertEqual(ids, ["a", "b"])
++            self.assertEqual(q.get("a")["state"], "pending")
++            self.assertEqual(q.get("a")["ready_at"], 10)
++            self.assertIsNone(q.get("a")["worker"])
++            self.assertIsNone(q.get("a")["lease_until"])
++            self.assertEqual(q.get("b")["state"], "failed")
++            # repeated no-op
++            self.assertEqual(q.recover(10), [])
++            self.assertEqual(q.recover(99), [])
++
++    def test_claim_does_recovery(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "x"}])
++            c1 = q.claim("w", 0, 10)
++            # expired, next claim should recover and reclaim same job with incremented attempt
++            c2 = q.claim("w2", 10, 5)
++            self.assertEqual(c2["id"], "x")
++            self.assertEqual(c2["worker"], "w2")
++            self.assertEqual(c2["attempts"], 2)
++            self.assertEqual(c2["lease_until"], 15)
++            self.assertEqual(c2["ready_at"], 10)
++
++    def test_claim_invalid_no_recovery(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "x"}])
++            q.claim("w", 0, 10)
++            with self.assertRaises(ValueError):
++                q.claim("", 10, 10)
++            with self.assertRaises(ValueError):
++                q.claim("w", True, 10)
++            with self.assertRaises(ValueError):
++                q.claim("w", 10, 0)
++            with self.assertRaises(ValueError):
++                q.claim("w", 10, True)
++            # still running, not recovered
++            self.assertEqual(q.get("x")["state"], "running")
++            with self.assertRaises(ValueError):
++                q.recover(True)
++            self.assertEqual(q.get("x")["state"], "running")
++
++    def test_attempts_never_exceed(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "x", "max_attempts": 2}])
++            c1 = q.claim("w", 0, 10)
++            self.assertEqual(c1["attempts"], 1)
++            q.recover(10)
++            c2 = q.claim("w", 10, 10)
++            self.assertEqual(c2["attempts"], 2)
++            q.recover(20)
++            self.assertEqual(q.get("x")["state"], "failed")
++            self.assertEqual(q.get("x")["attempts"], 2)
++            self.assertIsNone(q.claim("w", 20, 10))
++
++
++class FinishTests(unittest.TestCase):
++    def test_complete_fail_rules(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "a"}])
++            c = q.claim("w", 0, 10)
++            v = q.complete("a", "w", c["attempts"], 5)
++            self.assertEqual(v["state"], "succeeded")
++            self.assertIsNone(v["worker"])
++            self.assertIsNone(v["lease_until"])
++            self.assertEqual(v["ready_at"], 0)
++            with self.assertRaises(ValueError):
++                q.complete("a", "w", c["attempts"], 6)
++            with self.assertRaises(ValueError):
++                q.fail("a", "w", c["attempts"], 6)
++
++    def test_fail_retry_and_terminal(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "r", "max_attempts": 2}])
++            c1 = q.claim("w", 0, 10)
++            v = q.fail("r", "w", c1["attempts"], 5, retry_delay=7)
++            self.assertEqual(v["state"], "pending")
++            self.assertEqual(v["ready_at"], 12)
++            self.assertIsNone(v["worker"])
++            # not eligible before ready
++            self.assertIsNone(q.claim("w", 11, 10))
++            c2 = q.claim("w", 12, 10)
++            self.assertEqual(c2["attempts"], 2)
++            v2 = q.fail("r", "w", c2["attempts"], 13)
++            self.assertEqual(v2["state"], "failed")
++            self.assertEqual(v2["ready_at"], 12)
++            self.assertIsNone(q.claim("w", 13, 10))
++
++    def test_stale_wrong_expired_unknown(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "s"}])
++            c = q.claim("w1", 0, 10)
++            with self.assertRaises(ValueError):
++                q.complete("s", "w2", c["attempts"], 1)
++            with self.assertRaises(ValueError):
++                q.complete("s", "w1", 999, 1)
++            with self.assertRaises(ValueError):
++                q.complete("s", "w1", c["attempts"], 10)
++            with self.assertRaises(ValueError):
++                q.complete("missing", "w1", 1, 1)
++            with self.assertRaises(ValueError):
++                q.fail("s", "w1", c["attempts"], 1, retry_delay=-1)
++            with self.assertRaises(ValueError):
++                q.fail("s", "w1", c["attempts"], 1, retry_delay=True)
++            with self.assertRaises(ValueError):
++                q.complete("s", "w1", True, 1)
++            # still running
++            self.assertEqual(q.get("s")["state"], "running")
++            # reclaim after expiry, old attempt rejected even same worker
++            q.recover(10)
++            c2 = q.claim("w1", 10, 10)
++            self.assertEqual(c2["attempts"], 2)
++            with self.assertRaises(ValueError):
++                q.complete("s", "w1", c["attempts"], 11)
++            # invalid complete must not recover/write: expired job stays running
++            with tempfile.TemporaryDirectory() as tmp2:
++                q2 = Queue(Path(tmp2) / "q.db")
++                q2.submit([{"id": "e"}])
++                ce = q2.claim("w", 0, 10)
++                with self.assertRaises(ValueError):
++                    q2.complete("e", "wrong", ce["attempts"], 10)
++                cur = q2.get("e")
++                self.assertEqual(cur["state"], "running")
++                self.assertEqual(cur["worker"], "w")
++
++
++class SubprocessTests(unittest.TestCase):
++    def test_reopen_durability_subprocess(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            db = str(Path(tmp) / "q.db")
++            code_submit = (
++                "from durable_queue import Queue; "
++                f"Queue({db!r}).submit([{ {'id': 'persist', 'payload': {'n': 42}} }])"
++            )
++            # use CLI for submit to exercise separate process
++            req_path = str(Path(tmp) / "req.json")
++            with open(req_path, "w", encoding="utf-8") as f:
++                json.dump({"op": "submit", "jobs": [{"id": "persist", "payload": {"n": 42}}]}, f)
++            p1 = subprocess.run([sys.executable, "-m", "durable_queue", "--db", db, "--request", req_path], capture_output=True, text=True)
++            self.assertEqual(p1.returncode, 0, p1.stderr)
++            # reopen in fresh process via API
++            code = f"from durable_queue import Queue; import json; print(json.dumps(Queue({db!r}).get('persist'), sort_keys=True))"
++            p2 = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True)
++            self.assertEqual(p2.returncode, 0, p2.stderr)
++            val = json.loads(p2.stdout)
++            self.assertEqual(val["payload"], {"n": 42})
++
++    def test_claim_exclusivity_subprocesses(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            db = str(Path(tmp) / "q.db")
++            q = Queue(db)
++            q.submit([{"id": "only"}])
++            # launch N parallel claimants as separate processes
++            procs = []
++            helper = (
++                "import sys, json; "
++                "from durable_queue import Queue; "
++                f"q=Queue({db!r}); "
++                "v=q.claim(sys.argv[1], 0, 30); "
++                "print(json.dumps(v, sort_keys=True))"
++            )
++            n = 8
++            for i in range(n):
++                procs.append(subprocess.Popen([sys.executable, "-c", helper, f"worker-{i}"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True))
++            results = []
++            for pr in procs:
++                out, err = pr.communicate(timeout=20)
++                self.assertEqual(pr.returncode, 0, err)
++                results.append(json.loads(out.strip()))
++            claimed = [r for r in results if r is not None]
++            self.assertEqual(len(claimed), 1, results)
++            self.assertEqual(claimed[0]["id"], "only")
++            # distinct workers never share active lease: second round all None
++            procs2 = []
++            for i in range(4):
++                procs2.append(subprocess.Popen([sys.executable, "-c", helper, f"w2-{i}"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True))
++            results2 = []
++            for pr in procs2:
++                out, err = pr.communicate(timeout=20)
++                self.assertEqual(pr.returncode, 0, err)
++                results2.append(json.loads(out.strip()))
++            self.assertTrue(all(r is None for r in results2), results2)
++
++
++class CliTests(unittest.TestCase):
++    def test_cli_success_sorted_keys(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            db = str(Path(tmp) / "q.db")
++            req = str(Path(tmp) / "r.json")
++            with open(req, "w", encoding="utf-8") as f:
++                json.dump({"op": "submit", "jobs": [{"id": "a", "payload": {"z": 1, "a": 2}}]}, f)
++            p = subprocess.run([sys.executable, "-m", "durable_queue", "--db", db, "--request", req], capture_output=True, text=True)
++            self.assertEqual(p.returncode, 0, p.stderr)
++            self.assertTrue(p.stdout.endswith("\n"))
++            self.assertEqual(p.stdout.count("\n"), 1)
++            val = json.loads(p.stdout)
++            self.assertEqual(val[0]["id"], "a")
++            # sorted keys check: raw stdout should have keys in order
++            raw = p.stdout.strip()
++            # for list result, check inner object keys sorted by ensuring dumps sorted equals raw for that structure
++            self.assertEqual(json.dumps(val, sort_keys=True), raw)
++            # list via CLI persists
++            with open(req, "w", encoding="utf-8") as f:
++                json.dump({"op": "list"}, f)
++            p2 = subprocess.run([sys.executable, "-m", "durable_queue", "--db", db, "--request", req], capture_output=True, text=True)
++            self.assertEqual(p2.returncode, 0)
++            self.assertEqual(len(json.loads(p2.stdout)), 1)
++
++    def test_cli_failures_exit2_empty_stdout(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            db = str(Path(tmp) / "q.db")
++            # need valid db first
++            Queue(db).submit([{"id": "a"}])
++            cases = []
++            # malformed JSON
++            cases.append(("malformed", b"{not json"))
++            # non-object
++            cases.append(("nonobject", json.dumps([1, 2]).encode()))
++            # unknown op
++            cases.append(("unknownop", json.dumps({"op": "nope"}).encode()))
++            # unknown field
++            cases.append(("unknownfield", json.dumps({"op": "list", "extra": 1}).encode()))
++            # missing field
++            cases.append(("missingfield", json.dumps({"op": "get"}).encode()))
++            # api ValueError (unknown dep)
++            cases.append(("apierror", json.dumps({"op": "submit", "jobs": [{"id": "x", "dependencies": ["missing"]}]}).encode()))
++            # bad UTF-8
++            cases.append(("badutf8", b"\xff\xfe"))
++            for name, raw in cases:
++                with self.subTest(name=name):
++                    req = str(Path(tmp) / f"{name}.json")
++                    with open(req, "wb") as f:
++                        f.write(raw)
++                    p = subprocess.run([sys.executable, "-m", "durable_queue", "--db", db, "--request", req], capture_output=True)
++                    self.assertEqual(p.returncode, 2, name)
++                    self.assertEqual(p.stdout, b"", name)
++            # missing file
++            p = subprocess.run([sys.executable, "-m", "durable_queue", "--db", db, "--request", str(Path(tmp) / "does-not-exist.json")], capture_output=True)
++            self.assertEqual(p.returncode, 2)
++            self.assertEqual(p.stdout, b"")
++            # db error (directory as db)
++            req = str(Path(tmp) / "ok.json")
++            with open(req, "w", encoding="utf-8") as f:
++                json.dump({"op": "list"}, f)
++            p = subprocess.run([sys.executable, "-m", "durable_queue", "--db", tmp, "--request", req], capture_output=True)
++            # sqlite connecting to directory fails -> exit 2 empty stdout
++            self.assertEqual(p.returncode, 2)
++            self.assertEqual(p.stdout, b"")
++
++    def test_cli_persistence_across_restarts(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            db = str(Path(tmp) / "q.db")
++            def run(req_obj):
++                req = str(Path(tmp) / "tmp_req.json")
++                with open(req, "w", encoding="utf-8") as f:
++                    json.dump(req_obj, f)
++                p = subprocess.run([sys.executable, "-m", "durable_queue", "--db", db, "--request", req], capture_output=True, text=True)
++                return p
++            p = run({"op": "submit", "jobs": [{"id": "a"}, {"id": "b", "dependencies": ["a"]}]})
++            self.assertEqual(p.returncode, 0, p.stderr)
++            p = run({"op": "claim", "worker": "w", "now": 0, "lease_seconds": 10})
++            self.assertEqual(p.returncode, 0)
++            claimed = json.loads(p.stdout)
++            self.assertEqual(claimed["id"], "a")
++            p = run({"op": "complete", "id": "a", "worker": "w", "attempt": claimed["attempts"], "now": 1})
++            self.assertEqual(p.returncode, 0)
++            p = run({"op": "claim", "worker": "w", "now": 1, "lease_seconds": 10})
++            self.assertEqual(json.loads(p.stdout)["id"], "b")
++            # failed request must not lose committed work
++            p = run({"op": "submit", "jobs": [{"id": "bad", "dependencies": ["missing"]}]})
++            self.assertEqual(p.returncode, 2)
++            self.assertEqual(p.stdout, "")
++            p = run({"op": "list"})
++            self.assertEqual(p.returncode, 0)
++            ids = sorted(v["id"] for v in json.loads(p.stdout))
++            self.assertEqual(ids, ["a", "b"])
++
++
++if __name__ == "__main__":
++    unittest.main()
+diff --git a/tmp02c7dvdo/q.db b/tmp02c7dvdo/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..abd0659ebd190689a55a4e232979dd8262ee330a
+GIT binary patch
+literal 12288
+zcmeI$u};E390u@fA&MlVI1mPxi;J2V6XWP2n#K?Twbn#pOmooFR7+diBSMUmgHPZ?
+zIXSZUASNze4;UB#9W~!SJ$lD?J?IaX>)C0|6P#X$afb=ILyAP#$sVPI5M8#6Y~#{o
+zCp#X<b2^?^I@x-CD;S?dFAPXwV7$+}067F8009U<00Izz00bZa0SNp`;JK?UmP;k=
+zr7l>@=eJ=iNt=FPnHAflc4fb2()1m=o~N=rm)hoqO;4<9y<#=#k=fi-LB#rg$VO@7
+z*rtv1T5S}?UKo3#Ppb{vJTxsj8M{2<fy;xo$CKgWlX-{r93}+sL?W58M9i7nmy@Q%
+ziC}W;s=oK+(sP!52;(~*s|$yB;&Ya8ryB^*AAi&^NFv^LW)KYX*$!&XJPbAI2O?_T
+zRF?e4n!ZrpEosD)^1bBVmwS7Mbw#MgPWpp8+v#h%ug|6bsDf;o@j>K)f&c^{009U<
+z00Izz00bZa0SG|g4+^YmMPoU)tmRhZR$q14<J09;CVejB1vjdnm-nR^Uql`#2tWV=
+a5P$##AOHafKmY;|fB*#kpFlQaEU|B=WVa6h
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmp1n1_l1c_/q.db b/tmp1n1_l1c_/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..abd0659ebd190689a55a4e232979dd8262ee330a
+GIT binary patch
+literal 12288
+zcmeI$u};E390u@fA&MlVI1mPxi;J2V6XWP2n#K?Twbn#pOmooFR7+diBSMUmgHPZ?
+zIXSZUASNze4;UB#9W~!SJ$lD?J?IaX>)C0|6P#X$afb=ILyAP#$sVPI5M8#6Y~#{o
+zCp#X<b2^?^I@x-CD;S?dFAPXwV7$+}067F8009U<00Izz00bZa0SNp`;JK?UmP;k=
+zr7l>@=eJ=iNt=FPnHAflc4fb2()1m=o~N=rm)hoqO;4<9y<#=#k=fi-LB#rg$VO@7
+z*rtv1T5S}?UKo3#Ppb{vJTxsj8M{2<fy;xo$CKgWlX-{r93}+sL?W58M9i7nmy@Q%
+ziC}W;s=oK+(sP!52;(~*s|$yB;&Ya8ryB^*AAi&^NFv^LW)KYX*$!&XJPbAI2O?_T
+zRF?e4n!ZrpEosD)^1bBVmwS7Mbw#MgPWpp8+v#h%ug|6bsDf;o@j>K)f&c^{009U<
+z00Izz00bZa0SG|g4+^YmMPoU)tmRhZR$q14<J09;CVejB1vjdnm-nR^Uql`#2tWV=
+a5P$##AOHafKmY;|fB*#kpFlQaEU|B=WVa6h
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmp2lw55gjq/q.db b/tmp2lw55gjq/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..73ecfeef27fc4e37522d4a61979105a406567286
+GIT binary patch
+literal 12288
+zcmeI$!D<sh7zgm#NzvUv*yIpG=w&QI6+{rhix*>AN->R^u3(X{OtVv+y4hWKC$vF4
+zdGHB*fIf~VkHvTBSv+=TwxQ&ZMxo&4KQPJ6ely=>ew)k8-s`?pf*oeXge&%#Gzq2T
+z8DoSHs%uTxd2w`OZQjw}roXCC^6>kQhX04q#u;gx`9D`pKpX-PfB*y_009U<00Izz
+z00jO?;Oo@6-D$U-Z@Y>gB;qJLC{3kX!=M)iEbKk+2h2QS_v%a+8M82W8?sl!o!#DW
+zpS=k7AJ{<7XGz8{ql1?r8@%cFFGGdQ3aMsnXAlP4!H_M6W08wA7U@`uvP!-fpYW52
+zD<vkmDwm`v1dnHW(2{VexIVht-@TZ6McU)6_$UfHvD!%@cqyW3s$?=>stT037)RF-
+zRPpN_?3h&;cF<pl*l|l)>i0M4t<KZ7L!_2JDL*CpY#;Hd%4|O}FFbl=KFzt_HUFrF
+zuGBwu{9pd5>7zgZ0uX=z1Rwwb2tWV=5P$##AaHX6n@+Raa$BCe?)i>w<h&56`uyeH
+zsF<dyOy3{ZP3H-1c3SQo$6eRwb=w$!kV&jV8`X@BQO#Vm=m`tY?#>tJdS;$p>1u&P
+zE)!u=j7D|6CF-9O|J?t5bGt((2tWV=5P$##AOHafKmY;|fB*#kmw;F6IQH^@dbO@s
+HT?bqMRSVcc
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmp574j8ubb/q.db b/tmp574j8ubb/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..16e5f61d32d5b6e02142dbdacccfbc35d08340c4
+GIT binary patch
+literal 12288
+zcmeI#!Aiq000!W+ib|num$7SZDu^H+y*MSvu$x*dxKqj22-R+_ZHC*~gHPZ?dGfed
+z@o186haI-+b^L*(P5(4)zV?#)J1>@kKBf7POL|J`#J0&frGyY$)h$&Q#Zo8Ri;g<#
+zepRu_@#mLY`ysYFBkrvBU3CL;2tWV=5P$##AOHafKmY;|_?N)@*xGG28rDZg@_r(o
+z(|)0=ed)7Sz-Z9A@EFxs=z&93i6a`Y$AI4Y?M}<@(QDQ_GC{_tNy_JG_a>m-2hW>F
+zd7S34oYHnTU{}ni%W)(!F^a@!5R0Omd^sQTNyw!X!%P+{rpN`4rfSfNxR6|JUCnzh
+zPhBzXTbjR!+}v2MBoVw2;dmtDWbvpnC^9h!*ASHXdIvM63d0QggNPZolEpdPw|AOn
+z4U5D|ep0+9YHuI%u}n=r)E_)N(XHOs@996v)lFSDC=h@E1Rwwb2tWV=5P$##AOHaf
+lY^s2x7l!@+rhZ<m3jz>;00bZa0SG_<0uX=z1R!7pegVEqt4sg@
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmp6jrqdl0v/q.db b/tmp6jrqdl0v/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..f58ea4a17de7575a4d3bd453683c82c3c23c9e0e
+GIT binary patch
+literal 12288
+zcmeI#u}Z^090u^aRJ0A0=ujM7ZV*%uK^$GI5=3mP#t4c?IPEFXG^v*>Z4oC2pTLK5
+zaxC~Hf{T}HJ9MbkQThJl+FZW7Yx7H%J3gv}O0erhHn?INWR_SK*<y?kV(FICZCF&F
+zObt8wJL^v>i>$r87M%}b6?>%EbKWLRKn?*2KmY;|fB*y_009U<00O@fcxus^`BI5K
+zR~5gE#BFk!X3g61+_LX7zr0;>S$2gj+e}wjXTE#tvqNvMTK3M^zI(Q6f+p`q2_K}j
+z1E1ASDwRPb!$gLv%l2x%yX$&vG_H%Li0dN03Psvqd^B(HPQaBCjiyS+EFlH2clDq#
+zajLl9x|;tzy7Yu)+ljmr(oF2%NhEkGf>x};X!uk8AZ?1P;2VN|{=I`4GYP{C`hkcU
+zH<ra-S+b_*H%pX+TE3IsM|y7`@RmwUKgb?<u%3Np`}%zLMiq6V&O6Zu3IY&-00bZa
+z0SG_<0uX=z1Rwx`KPRwAXPvqH9L+Bj9BNMF!{hlyPPXDWjBnbu>Dl_esPjqmfr0=8
+cAOHafKmY;|fB*y_009U<;Qt9s<(z{20!$IN-2eap
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmp8l9m3opp/q.db b/tmp8l9m3opp/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..dcfbe8c2b8307056b319f40353156b6dd7e49cc2
+GIT binary patch
+literal 12288
+zcmeI#u};E390u^aLKH|yaUcvXH<+l2F)@xVqG=2fP_ZTwW10g_Q!OpFM}Qb72cN))
+za&jc`NlaY49xyNfI%>XudeG~4chFzE-1%AAm4e*_VVg^~OLD|8$Ub9)5JR<uYLlYs
+zBsuA*@3_CH46^<DmNh?#ksXrk(0pGs0XYO9009U<00Izz00bZa0SNp`;JHhe3;8^K
+zsYu@N#9h#c;$|GytfFl(yLeExSbT+TWSA<q#cb=+W~a4MrC6)8W2?TUgAN~f0UxK;
+z6Pr~p%H?qsx<Tm50V`E)>&U9H>9{32!fy$`>56Ey_;lXpeTPda+8r6qSRxd>HBf_Q
+z#F6A`>#G0v^wJBK?FHez2=&C#op^#r!s+_b^(H?x3Zjl^I&%m{`FsaGW)X%S^aBw+
+zZYE1+bKO`f?BywOm3%*X@YLSk;awT%z7s!iXD9xQ_w}jxjmoM<%@3ju6a*ju0SG_<
+z0uX=z1Rwwb2tWV=e@<YH=FFAU3Qeu1O{!1C<I~l3BJBFU>)-Y=x|dP+Ma?gw4ip3+
+c009U<00Izz00bZa0SG_<0{>4SnK0Ah8+!4#!vFvP
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmp9izmqqup/q.db b/tmp9izmqqup/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..5d0ea232292b384e1d534c068266e3b03c169bfe
+GIT binary patch
+literal 12288
+zcmeI$F;Buk7zW_Gf(j(0IuHk!3yYc<mAL65n#K?T6>Fj~ra9m=)k3j7BE&d3_zV0|
+zPLBK)6Bq9aBr*UxYThp#^!i>8`oQvWdQx<yVAp=o;F4{Td14r3moY+!p+-!NVNrDu
+zA5PS(o=+=-tiQgc%@1OvdnDa6-=|%G90Cx400bZa0SG_<0uX=z1b!v(+@^DjnGAg?
+zNnZ8DtzQlGF!n1}-nN*X-z!>7pJ6L0rpm1|+d8+|aivhoS1#D0b+Hx&E#CEfK1j<)
+zHY=YMi-Ra|{lJx7Rw&!nfmLCnab2`Tvo4x7SA_k|NAm{nI9y86XvuKQ7J=aPu39uE
+z4kcHuYxKECx1O@?gCE?9AiA)BC!XM;aN14jdc(Ks2VqOpoCyT|e6mBdW*SDc=m#Rv
+zy0I*&)n#LLaVJBGtK>W3y{CG6hqt94%^m%PJ30NV`}&0bMWxlCsx3!nt~F2)fB*y_
+z009U<00Izz00bZafxjTIxk2a6CAvWAQj!pTkl>HmPIf!@G;?_sOX+`P+~&>qQ|h*;
+j`AO6R1px>^00Izz00bZa0SG_<0uX?}{}YJE%q0H;!)>{g
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmp_y1_om29/q.db b/tmp_y1_om29/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..41ee37daf334aa89e1e341eaa5e68e3e8202d3a1
+GIT binary patch
+literal 12288
+zcmeI%Jxjwt90u^aYtdRLX@??i2ZApkf;hTZC5YHotq~NFa5YzmrcF(**dR_0egZ#~
+zlVb<Jh~VNSX@?GNbyS`|xi**Qa!G#aa`f!9>MF@we$W<*Z<8WnjO=nw2w}QqbQ=}b
+zJK0f3f5-h<#mMICTfz7wtS}&jf$=`;1mqBa00bZa0SG_<0uX=z1R(G$f#)8bUo4mD
+zOHGNUCvW{`7&o@xFe{eHt;$~2<na-{mgl-$hg;@_#ZMZCwMyfXADNdMNzfIM=Zj%l
+zKel-NyjmSbf$ImZiuhsOG7roKACDc`l^sWRZd@6rlaJ?Z(YJ+CvfWkTged|koJbFv
+z5Qj?WrE7BE<5SO=_Q4PCWRRSgK8YtqDD7THx!&kfX%KehjXi}R&8IsgV`gC_gMJ{A
+zjGM@kUteW&i#ugXTrJ-Z?>)V?w?$9+N#BlNxV;sB#_RfA{EI5+MvV`mHxvXQ009U<
+z00Izz00bZa0SG_<0)I?kg%+1-(J19glrHIi>f@bU^!Rjj&GIebdeUKOM?V)ezKGsX
+f5P$##AOHafKmY;|fB*y_009X6KY?t<Sctv>5CXRE
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpaazzq1dv/q.db b/tmpaazzq1dv/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..73ecfeef27fc4e37522d4a61979105a406567286
+GIT binary patch
+literal 12288
+zcmeI$!D<sh7zgm#NzvUv*yIpG=w&QI6+{rhix*>AN->R^u3(X{OtVv+y4hWKC$vF4
+zdGHB*fIf~VkHvTBSv+=TwxQ&ZMxo&4KQPJ6ely=>ew)k8-s`?pf*oeXge&%#Gzq2T
+z8DoSHs%uTxd2w`OZQjw}roXCC^6>kQhX04q#u;gx`9D`pKpX-PfB*y_009U<00Izz
+z00jO?;Oo@6-D$U-Z@Y>gB;qJLC{3kX!=M)iEbKk+2h2QS_v%a+8M82W8?sl!o!#DW
+zpS=k7AJ{<7XGz8{ql1?r8@%cFFGGdQ3aMsnXAlP4!H_M6W08wA7U@`uvP!-fpYW52
+zD<vkmDwm`v1dnHW(2{VexIVht-@TZ6McU)6_$UfHvD!%@cqyW3s$?=>stT037)RF-
+zRPpN_?3h&;cF<pl*l|l)>i0M4t<KZ7L!_2JDL*CpY#;Hd%4|O}FFbl=KFzt_HUFrF
+zuGBwu{9pd5>7zgZ0uX=z1Rwwb2tWV=5P$##AaHX6n@+Raa$BCe?)i>w<h&56`uyeH
+zsF<dyOy3{ZP3H-1c3SQo$6eRwb=w$!kV&jV8`X@BQO#Vm=m`tY?#>tJdS;$p>1u&P
+zE)!u=j7D|6CF-9O|J?t5bGt((2tWV=5P$##AOHafKmY;|fB*#kmw;F6IQH^@dbO@s
+HT?bqMRSVcc
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpax3hdfyk/q.db b/tmpax3hdfyk/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..d060f875228084b4a145fa5e1a164491389f8096
+GIT binary patch
+literal 12288
+zcmeI$u};E390u^aLKKLkFc1cpOEggvV`3a#MAH}|pkhrV#xw_<rdlYrM}!zB2cN))
+za&lzwMNC}0D=;tsI%>XudeG~4y|%xy9A~E`R|<CR2Q4ny4#^P1AbX4vLJZYns*Q`P
+zo%pz;zIA_I8D#7AEp2`hBRwGLf%!h~1mqBa00bZa0SG_<0uX=z1R(G$f#)t=%;$3S
+zr7U^f6Ssan)Xg}kS_Ru;c45C{F@1!sr<f|Y$!zPwW+&BRxlpaKBdfL<1s&e^d_GDm
+z$2O~+mrA23aQ(oQeO9d4)}d8plW|jYM7t^44OfK2$tUv`?>Ssb(dx)>$`pa%&Au8m
+zB@QK5OV{YWC#Rk>?SmiOi6A<0_#~d-p>Vow>3ZW!4TG>F8qN%YVLsa-8Z!?g8uSB^
+zXxvnm)W({zkl)Qw;wt%Gc<-sTy~DfGkNS>&;m)@H)a&|${zau#qvi)u8wvstfB*y_
+z009U<00Izz00bZafj=j(x<WH%Hj$-tIZ24#Nz@;oF0W!s`hOX>eG_$3>ba=-Mbw6Z
+e00bZa0SG_<0uX=z1Rwwb2teTf3B+S&vi=P({I@y)
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpfcunh874/q.db b/tmpfcunh874/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..00d08f462db214c080c7571d1542d8c39f38f104
+GIT binary patch
+literal 12288
+zcmeI#u};E390u@fAqpg<I1u9G#YIhwiE(rhO=F0FT5BRPra9=5R13xSh!ErC;1l>z
+zPL7PehKY-JEes5Rj+*bEUVF!PJ?O72cX3|z1gGsF>@Y$1NP*}&IiQpfqRW<&ZBm--
+zq$dM;RpUjalbzSMyzxo&{D|a7#`~fhkV60h5P$##AOHafKmY;|fWWT=p8MKzsaVur
+zYJxR=ej79+)$}9FEZZiv%ZF8ys!!-<j>_^}YMWO!J+mscvelp`W@9@JdTi(iY@F6l
+zZCbyqR>x831)(Q~v{JXtW7DG3vCDhB>+){P<59BsblzbDhY7(uJrT`VBIL{+%1JZg
+zNHDo|jeqy_(hHV-2*Nua#y2KU;&T>pr{5KxKl!R8h<d!`%ppkf`3~`%MHum<ABe>B
+zX0qhAHuR;^eo-TylpjR*zTDe8tS^Fi?5G#+?5eZc*Jso}DleO6d=Pn{AOHafKmY;|
+zfB*y_009U<00I#Bg97VXVNEL-E18vSW;IJl+-W^NUEj2s=W|!}a`L$}<BP}x1px>^
+b00Izz00bZa0SG_<0uX?}{}V{3jBM*0412cH
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpfg5zu7iq/q.db b/tmpfg5zu7iq/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..912f8e8a27bd34aa4b411a44d0a7f93f9397bf8f
+GIT binary patch
+literal 12288
+zcmeI$L2DC16bJB`NwvERVcJ6|(t`sEDu^H+y%=RF#WZSM!6LFux>Fgu*^Rps+E9A(
+z;3x32^fP$!*o$975WF}un}9i_(TfN9KQfz{eQ#f~zs+Ux@<mS@B@WAKB#n4LHV9+n
+zkr0FsW=G48c~Co9n=kCUTdxX6?tT8!=06B)Uy$|%|GMe|<RJh72tWV=5P$##AOHaf
+zK;W+gK2GTRR;NQh?HM`D)%$W-yTP6e;%*X)r2DuR3wK7`j)V=Ji6nlVi06adz3yON
+zJdOA7`ovgH^HR>T{bz~jzv}g7sY;iXHdC?NPvV_;AQsb^8ml5x#er6J(|j>Mk|(J&
+zMvca%UecmcGMn0>CF$BoyLI*7d$IM3w#Q|4q$+=5b0@iywMr+2(fRzNnnXQT2k9jQ
+zP5yERU$Y9s7yW^VuUpCz-MPiCZawT!qOJT%{UNt|`&3R$>DQ@y;OTvLbo=_i{i51-
+zFn-?R=lq*nBOm|)2tWV=5P$##AOHafKmY;|_%{MK=?32nHfgXOa_T4Y^z6-BR!xdR
+z7w?Xv)3Y1161p7{@>@yd{&TT4zWzG%eZt^cQxpb6cm7c7TxD)%Uy;2f#=jH((;g5I
+ifB*y_009U<00Izz00bZa0SNp*0#{m`4%u3Zhw>LVBFNDI
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpgiq7i3ia/q.db b/tmpgiq7i3ia/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..e1b0b1c307d5732be7e247a5a6807910b51bd996
+GIT binary patch
+literal 12288
+zcmeI$u}Z^090u@9TC^5IbSNEMjw~vOAmXBnRicQoYK)+Wgwvc7O_Q2jw52#X_yoR-
+zui)g^R}oyiq;}{~tDDI8C)eikT`tKlU9N`*mM=KHjN%3pbcsw7RV8bb5<*nj3bOS}
+zkvqkHM}BAhQKgcF=T}XCC#u#ZT33G?bpmn-KmY;|fB*y_009U<00I#BmB3@Fj8`ia
+z<!M*2^MGGR=SkMo4cn|aCUt7-mPxZCbhb=o`5tx5V~6hB+q*UUgzlIp^Lfx@?I2=b
+zX?@S3^&`vrief*CebJ`db;sN?Z8{ixyvak4hZjCidXo?44c2m*5WLY8$&e{x&b+o9
+zG$c+0lS|k9z6YlsG3|X6-|#p;vG*haX9;)HQ20UrQoSH)@(cGHf?oc;Lq28{Mn32V
+zBKf$XEakZwb*#EtQHU?)Tgh!8*Y++;MU?m5?1j6F*=M${FJ-?dO*Tb;A#y`O00Izz
+z00bZa0SG_<0uX=z1R(Io1U8jPeYrHHl&0k}KHs_P7&pes>Ee9H2#u964T6WWhtsn{
+u_AiVdUJXgh^0^fKgUAg90SG_<0uX=z1Rwwb2tWV=5P-n{6DSt+iMvllzQUIP
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpi51x3xyr/q.db b/tmpi51x3xyr/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..5d0ea232292b384e1d534c068266e3b03c169bfe
+GIT binary patch
+literal 12288
+zcmeI$F;Buk7zW_Gf(j(0IuHk!3yYc<mAL65n#K?T6>Fj~ra9m=)k3j7BE&d3_zV0|
+zPLBK)6Bq9aBr*UxYThp#^!i>8`oQvWdQx<yVAp=o;F4{Td14r3moY+!p+-!NVNrDu
+zA5PS(o=+=-tiQgc%@1OvdnDa6-=|%G90Cx400bZa0SG_<0uX=z1b!v(+@^DjnGAg?
+zNnZ8DtzQlGF!n1}-nN*X-z!>7pJ6L0rpm1|+d8+|aivhoS1#D0b+Hx&E#CEfK1j<)
+zHY=YMi-Ra|{lJx7Rw&!nfmLCnab2`Tvo4x7SA_k|NAm{nI9y86XvuKQ7J=aPu39uE
+z4kcHuYxKECx1O@?gCE?9AiA)BC!XM;aN14jdc(Ks2VqOpoCyT|e6mBdW*SDc=m#Rv
+zy0I*&)n#LLaVJBGtK>W3y{CG6hqt94%^m%PJ30NV`}&0bMWxlCsx3!nt~F2)fB*y_
+z009U<00Izz00bZafxjTIxk2a6CAvWAQj!pTkl>HmPIf!@G;?_sOX+`P+~&>qQ|h*;
+j`AO6R1px>^00Izz00bZa0SG_<0uX?}{}YJE%q0H;!)>{g
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpicsucxhn/q.db b/tmpicsucxhn/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..e1b0b1c307d5732be7e247a5a6807910b51bd996
+GIT binary patch
+literal 12288
+zcmeI$u}Z^090u@9TC^5IbSNEMjw~vOAmXBnRicQoYK)+Wgwvc7O_Q2jw52#X_yoR-
+zui)g^R}oyiq;}{~tDDI8C)eikT`tKlU9N`*mM=KHjN%3pbcsw7RV8bb5<*nj3bOS}
+zkvqkHM}BAhQKgcF=T}XCC#u#ZT33G?bpmn-KmY;|fB*y_009U<00I#BmB3@Fj8`ia
+z<!M*2^MGGR=SkMo4cn|aCUt7-mPxZCbhb=o`5tx5V~6hB+q*UUgzlIp^Lfx@?I2=b
+zX?@S3^&`vrief*CebJ`db;sN?Z8{ixyvak4hZjCidXo?44c2m*5WLY8$&e{x&b+o9
+zG$c+0lS|k9z6YlsG3|X6-|#p;vG*haX9;)HQ20UrQoSH)@(cGHf?oc;Lq28{Mn32V
+zBKf$XEakZwb*#EtQHU?)Tgh!8*Y++;MU?m5?1j6F*=M${FJ-?dO*Tb;A#y`O00Izz
+z00bZa0SG_<0uX=z1R(Io1U8jPeYrHHl&0k}KHs_P7&pes>Ee9H2#u964T6WWhtsn{
+u_AiVdUJXgh^0^fKgUAg90SG_<0uX=z1Rwwb2tWV=5P-n{6DSt+iMvllzQUIP
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmplen8hr0f/q.db b/tmplen8hr0f/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..97677b9ce25a7146da77e19c7293cf0252db7b00
+GIT binary patch
+literal 12288
+zcmeI#u};E390u^aLKI0zVIT}Hx1otKQAZciG=>PMSQCjc%>k#WmbSJ>fEXtSpTLK5
+za^zJ^T)eh0FaSDgzJGeqyYG6?U%TAJdCiuB-FiWfOSVVyMAOItV}uY*wUlbpqUt0)
+z?WpglzpON}{q~;IKZ%wbliXPUSatz&2tWV=5P$##AOHafKmY;|_?5s*pRSgQMfzHo
+zyzPj4uN_8BJ8Bvg(_m)hux7Amgl%M*D!a=}<H}@b&1${UY_SugwG{_GA2}YMq>WRP
+zH7;wlNfg*#V9OD!HcaE#XtLS3D}3R0h1;=3m@Gb<_xRA_Qi`50!#PU?f_F!1(wsPy
+zTy0(B|2@0(l4S>8@F0Tt!sJdI!9!v7U1>YhpGtzz7aeN>L6R?ai03TBh$sC(B%U{y
+zCA(SHR!aLtN^B)R3?Ch}x3_p-dU4;19=Np=eMbBGO!P+ORHOQsr~?H72tWV=5P$##
+zAOHafKmY;|fWY4pDAT-N$P_4Drv)0FWQI@A*Egwb(05(iz0(G}dNQEyi|SuQ9ViGu
+d00Izz00bZa0SG_<0uX=z1pc2uI;F1-zX6SnxEufg
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpn81fmghg/q.db b/tmpn81fmghg/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..45c7c0c1eb95f338699f188615f4b33480534adf
+GIT binary patch
+literal 12288
+zcmeI#u}Z^090u@9TC^>M)S-0r20;Z8#L>knL5gkF8o?qGuFVP2w28?TTg1u1C-9-1
+z91A{);Ns=l4jtO)sC<8NZ7$#4wfQB>ouAb_!Rbv9b(x^Mq)2p~>{Chz(PhiXHZ4t_
+zWTzeZo%GX6C)=-YhWSZ!V?>OR`JOfbIRqd80SG_<0uX=z1Rwwb2>eRmxvwpkOC{~4
+zE?C>=w?R8jnts@{Dz-)K%0bPd$rZX$pt3xd+Sa8_Pn*?xrP-p#R%=TIAshMuo1~2s
+zn>H?LwMi6tLF9=ctu}1y$ZFEr*ySPbxxCl$csyQwHt({5!-U}7P{ebVh&XeHa?qSO
+z7EEqk)&HJdI%V01AiCp`nmE1_pR<@d{hsjr=}(P=IOH8?0l_$5?4ZV^VW>er5K-gi
+zvJ^Jg^`-J&Nh6+=AH?^*+}k^>F9Owfk_YbWB%jH?K9{^vhHRSoLF9pg00bZa0SG_<
+z0uX=z1Rwwb2teS^39M;Fb0xQ;<yP~As1x@1bakDH`<)KwE_YS0An!{vzlc0g5P$##
+aAOHafKmY;|fB*y_009X6KY?t<%(HK)kGIkQ
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpngwhd5uw/q.db b/tmpngwhd5uw/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..32b53dba625936b03065c26a156645ec19574737
+GIT binary patch
+literal 12288
+zcmeI#u};E390u^aLKI0zC6O?=+=eE`#5lT$rZGf7#hOTrX-+v!wY0T&1c-5R@Cke<
+zCr4hz#Kmh10|TO?=KH4yz5A{Q{k6-Tp443>*i8_1xnkR7nHUDyWsDGF=$6rKQdFO0
+zCmsDA_ve*CHecTg<_9qfBT^Wd@AED|4gm;200Izz00bZa0SG_<0>2V??$O0^sYG8I
+zieGu+F1V6$Gxl3n)wY;j-K$$H9${;FrpxUx+d8+|ajVv-w%Y8_YHuV#$cJ9Q$7%D(
+zX3evDeH=w@5V>l|YE9cZuv%<7?ubzM9pPWQLZ*vP=UqN<xKg4UDmi0`Nbt^3Pnr=+
+z#r4)T`QOt^&snw~ME4>}E==#l6I=?X=PTEn{8SpqP+U9T5TyC{4#}K(7|Em`h$Qo7
+zvgFq*#zJ|gM2V~A2lBzwdwYlXRFL$Y_<=iH@n^iR&&6+4K{slSh(1sdfB*y_009U<
+z00Izz00bZa0SNppfeKwVi@74DtF%btlbn2fy12~bqn_`({;kp9T1f}=eNpq1=mP}-
+d2tWV=5P$##AOHafKmY;|fWZF~$Y#tX`2~F}xE25a
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpnpbwnk4e/q.db b/tmpnpbwnk4e/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..32b53dba625936b03065c26a156645ec19574737
+GIT binary patch
+literal 12288
+zcmeI#u};E390u^aLKI0zC6O?=+=eE`#5lT$rZGf7#hOTrX-+v!wY0T&1c-5R@Cke<
+zCr4hz#Kmh10|TO?=KH4yz5A{Q{k6-Tp443>*i8_1xnkR7nHUDyWsDGF=$6rKQdFO0
+zCmsDA_ve*CHecTg<_9qfBT^Wd@AED|4gm;200Izz00bZa0SG_<0>2V??$O0^sYG8I
+zieGu+F1V6$Gxl3n)wY;j-K$$H9${;FrpxUx+d8+|ajVv-w%Y8_YHuV#$cJ9Q$7%D(
+zX3evDeH=w@5V>l|YE9cZuv%<7?ubzM9pPWQLZ*vP=UqN<xKg4UDmi0`Nbt^3Pnr=+
+z#r4)T`QOt^&snw~ME4>}E==#l6I=?X=PTEn{8SpqP+U9T5TyC{4#}K(7|Em`h$Qo7
+zvgFq*#zJ|gM2V~A2lBzwdwYlXRFL$Y_<=iH@n^iR&&6+4K{slSh(1sdfB*y_009U<
+z00Izz00bZa0SNppfeKwVi@74DtF%btlbn2fy12~bqn_`({;kp9T1f}=eNpq1=mP}-
+d2tWV=5P$##AOHafKmY;|fWZF~$Y#tX`2~F}xE25a
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpo5k9_cgf/q.db b/tmpo5k9_cgf/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..a6817cf40fe2b3de069168e41ad9e5914487c5b8
+GIT binary patch
+literal 12288
+zcmeI$!EVzq7zc328Bi)!?he%sJIo3PK&p_o-QYrjXqxB>lprxxQ{=1$Wh6~WTy52~
+z(++zA-es?_6USY62Tn*xT(F&0s6f|E;)3+I<oI*H&rb7eFV5>%?N~|vF3VG)_&TW*
+zO37o+2_aN>SNBPCbg(d)=+VsQHA)_QI;*kogx1bU?VNp{w*YwvKmY;|fB*y_009U<
+z00I!Wmca4IxwX`2I44_5M2XzXqQZ3gwClG5p9ifcZJ(P@_`NFEE$;Kce;e?Z-Oa65
+zcbh-=x0^OG6yqcl7un8>fOp=s+ZU-k&hl7|`DQ2ZH~cQ2PWR<d4*GJi8_S~Hd^(?s
+zgHR|X)1fM6Y>`XRAM2tS=|Ty8bhY1mdh0pc?q~T2ncIcslO$3UG8_$5oJ?+2CW@il
+z4KE=m^Orl=nt2$u=n5jXZYE3h{#|-==~2TWv6eq5J|_BXABvI6>^w9-c(`h==3HMf
+z|EQYoF3Sn~!cO&o1_1~_00Izz00bZa0SG_<0uX?}KM{E5*4Z6r#i=ao1Go*+Lr-`Q
+zd#la0og>=Qanp;u9oM`*i3jihp7dy)EmjuGU2G5?9`$}LGO_3UUL*dfsp@BP*;m4T
+ruy1-mg8&2|009U<00Izz00bZa0SG|g{};I7GADJ-HKGeHyDfeKk`&Q<
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpojia04gf/q.db b/tmpojia04gf/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..a6817cf40fe2b3de069168e41ad9e5914487c5b8
+GIT binary patch
+literal 12288
+zcmeI$!EVzq7zc328Bi)!?he%sJIo3PK&p_o-QYrjXqxB>lprxxQ{=1$Wh6~WTy52~
+z(++zA-es?_6USY62Tn*xT(F&0s6f|E;)3+I<oI*H&rb7eFV5>%?N~|vF3VG)_&TW*
+zO37o+2_aN>SNBPCbg(d)=+VsQHA)_QI;*kogx1bU?VNp{w*YwvKmY;|fB*y_009U<
+z00I!Wmca4IxwX`2I44_5M2XzXqQZ3gwClG5p9ifcZJ(P@_`NFEE$;Kce;e?Z-Oa65
+zcbh-=x0^OG6yqcl7un8>fOp=s+ZU-k&hl7|`DQ2ZH~cQ2PWR<d4*GJi8_S~Hd^(?s
+zgHR|X)1fM6Y>`XRAM2tS=|Ty8bhY1mdh0pc?q~T2ncIcslO$3UG8_$5oJ?+2CW@il
+z4KE=m^Orl=nt2$u=n5jXZYE3h{#|-==~2TWv6eq5J|_BXABvI6>^w9-c(`h==3HMf
+z|EQYoF3Sn~!cO&o1_1~_00Izz00bZa0SG_<0uX?}KM{E5*4Z6r#i=ao1Go*+Lr-`Q
+zd#la0og>=Qanp;u9oM`*i3jihp7dy)EmjuGU2G5?9`$}LGO_3UUL*dfsp@BP*;m4T
+ruy1-mg8&2|009U<00Izz00bZa0SG|g{};I7GADJ-HKGeHyDfeKk`&Q<
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpp_zmj3b8/q.db b/tmpp_zmj3b8/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..0b5db36ba86bf6c0969b2a7d84e4649ab5a05c11
+GIT binary patch
+literal 12288
+zcmeI%u};E390u@fF^VJv7#aqbTa20*6XWP2n#K?T6>B0fra9m=l|pNKM2K;6@Cke<
+zCr9F&IC^)5fdSA_^ZnC<JHG2df3RG+IInnu)7v2GGC}u9o|q;%pp+0|%9fICQikj-
+zO$PE=jTe<kcHZ8zxi4a7M<hGSeJnZwIRqd80SG_<0uX=z1Rwwb2>eRmrEjbhEz5YV
+z3fA=beb9_mGmq+a$+4+ZI;_}Ky+SuLRF>DKj(z3OvwFE&syFC~-PqPa$cBEv#%b-;
+zp|#6OWgJCb5P4!q%QeS7w(E2{Zu5}$+Pv5Dc$_Rgop;&5WkT?7DB>AQM4YvUa?*@A
+z7EEqk_2-^mdcm@fLDb=qJ~6oxpR<^|{hsjr$y+5s9P*Yshak!4JLox!F!ZD!i0FAU
+zSu$H2=5lf0GKeST2l0b1_x3L9i$ITE^@Y2;>QU|M)9M$MmCeX~5_zB?009U<00Izz
+z00bZa0SG_<0ucCX0_#TJDx?cWdQI;0b*IC5`1E{zlT!C(yxyJeXXJGm^8a~xpdbJN
+e2tWV=5P$##AOHafKmY;|_-6tuDQi{T5cmdq9l4zV
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmppbmhdq_l/q.db b/tmppbmhdq_l/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..97677b9ce25a7146da77e19c7293cf0252db7b00
+GIT binary patch
+literal 12288
+zcmeI#u};E390u^aLKI0zVIT}Hx1otKQAZciG=>PMSQCjc%>k#WmbSJ>fEXtSpTLK5
+za^zJ^T)eh0FaSDgzJGeqyYG6?U%TAJdCiuB-FiWfOSVVyMAOItV}uY*wUlbpqUt0)
+z?WpglzpON}{q~;IKZ%wbliXPUSatz&2tWV=5P$##AOHafKmY;|_?5s*pRSgQMfzHo
+zyzPj4uN_8BJ8Bvg(_m)hux7Amgl%M*D!a=}<H}@b&1${UY_SugwG{_GA2}YMq>WRP
+zH7;wlNfg*#V9OD!HcaE#XtLS3D}3R0h1;=3m@Gb<_xRA_Qi`50!#PU?f_F!1(wsPy
+zTy0(B|2@0(l4S>8@F0Tt!sJdI!9!v7U1>YhpGtzz7aeN>L6R?ai03TBh$sC(B%U{y
+zCA(SHR!aLtN^B)R3?Ch}x3_p-dU4;19=Np=eMbBGO!P+ORHOQsr~?H72tWV=5P$##
+zAOHafKmY;|fWY4pDAT-N$P_4Drv)0FWQI@A*Egwb(05(iz0(G}dNQEyi|SuQ9ViGu
+d00Izz00bZa0SG_<0uX=z1pc2uI;F1-zX6SnxEufg
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmptxsx6hx3/q.db b/tmptxsx6hx3/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..16e5f61d32d5b6e02142dbdacccfbc35d08340c4
+GIT binary patch
+literal 12288
+zcmeI#!Aiq000!W+ib|num$7SZDu^H+y*MSvu$x*dxKqj22-R+_ZHC*~gHPZ?dGfed
+z@o186haI-+b^L*(P5(4)zV?#)J1>@kKBf7POL|J`#J0&frGyY$)h$&Q#Zo8Ri;g<#
+zepRu_@#mLY`ysYFBkrvBU3CL;2tWV=5P$##AOHafKmY;|_?N)@*xGG28rDZg@_r(o
+z(|)0=ed)7Sz-Z9A@EFxs=z&93i6a`Y$AI4Y?M}<@(QDQ_GC{_tNy_JG_a>m-2hW>F
+zd7S34oYHnTU{}ni%W)(!F^a@!5R0Omd^sQTNyw!X!%P+{rpN`4rfSfNxR6|JUCnzh
+zPhBzXTbjR!+}v2MBoVw2;dmtDWbvpnC^9h!*ASHXdIvM63d0QggNPZolEpdPw|AOn
+z4U5D|ep0+9YHuI%u}n=r)E_)N(XHOs@996v)lFSDC=h@E1Rwwb2tWV=5P$##AOHaf
+lY^s2x7l!@+rhZ<m3jz>;00bZa0SG_<0uX=z1R!7pegVEqt4sg@
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpui1df8s3/q.db b/tmpui1df8s3/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..205bf3bb97517244ba5f5e29330998a6a711bf7b
+GIT binary patch
+literal 12288
+zcmeI$O>fgM7zc1Wsn!>%a;qt-CJy+*V2FVRM>tSWgeJNIB}fc}BCqi}Lz<MtQCC$J
+z2M&A!z6Rfe6URyH&Y2_Ju$}f0iLUH8@kB~%_xZ<(f9b`3{;VS;r-yMeWRl)N4P;s9
+zKBWjDOP#hl7YA02(xRijb$``ip_`w-*2ynq)lX3UgnV0d0n|YN1V8`;KmY_l00ck)
+z1V8`;&L!|M!{wIa;7@y!9fbUCe30tXdf0Q@o=d&<gN{q}FZ5cCszU_Sb6<M&X>WJ0
+z-P@;+-TfP;Fk+K1X7g(IiATFHI-Pkb5pg2qgzk1d_mSJ9#d5$$JPLT!7d*`eFV=_b
+z*k@Am;Yg-ShDbOICMvX~oJyvauI9OmL$4Ti94GI1VlK>Q5^|PuKZ~RY7q`j_>4^9J
+zGYInf*$yVN3d4l{LB!;ivedS&T5GMl4n{)BAE)m_wYK+JCS%k0^$YiR^rv3eSM)!s
+zPF|rBDI-!Qx5yXr;avYR2!j9!fB*=900@8p2!H?xfB*=9z{L{S#Etc4wTUa2s|cA!
+z7>}p3*Kh1J>-RYicwl;4R>NuHMNT)4#NcQ;s}+;FOTMEkI*Ko;g|=xNW-?3obQY-U
+zZM``nqU};+BM()H%BplBlw?sPqQUsy{G#i2qoq^%W9o(!e4G9C{^|v6nwgmU>$xqa
+zl;3(_CR9_g5;;ZWl>8*W$&ZWm+TdwH00ck)1V8`;KmY_l00ck)1VG@w7pU1A^WB6}
+X)ox+4Q(#wY2kR{hYt3G-sttiZW83qF
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpvgepm6eg/q.db b/tmpvgepm6eg/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..205bf3bb97517244ba5f5e29330998a6a711bf7b
+GIT binary patch
+literal 12288
+zcmeI$O>fgM7zc1Wsn!>%a;qt-CJy+*V2FVRM>tSWgeJNIB}fc}BCqi}Lz<MtQCC$J
+z2M&A!z6Rfe6URyH&Y2_Ju$}f0iLUH8@kB~%_xZ<(f9b`3{;VS;r-yMeWRl)N4P;s9
+zKBWjDOP#hl7YA02(xRijb$``ip_`w-*2ynq)lX3UgnV0d0n|YN1V8`;KmY_l00ck)
+z1V8`;&L!|M!{wIa;7@y!9fbUCe30tXdf0Q@o=d&<gN{q}FZ5cCszU_Sb6<M&X>WJ0
+z-P@;+-TfP;Fk+K1X7g(IiATFHI-Pkb5pg2qgzk1d_mSJ9#d5$$JPLT!7d*`eFV=_b
+z*k@Am;Yg-ShDbOICMvX~oJyvauI9OmL$4Ti94GI1VlK>Q5^|PuKZ~RY7q`j_>4^9J
+zGYInf*$yVN3d4l{LB!;ivedS&T5GMl4n{)BAE)m_wYK+JCS%k0^$YiR^rv3eSM)!s
+zPF|rBDI-!Qx5yXr;avYR2!j9!fB*=900@8p2!H?xfB*=9z{L{S#Etc4wTUa2s|cA!
+z7>}p3*Kh1J>-RYicwl;4R>NuHMNT)4#NcQ;s}+;FOTMEkI*Ko;g|=xNW-?3obQY-U
+zZM``nqU};+BM()H%BplBlw?sPqQUsy{G#i2qoq^%W9o(!e4G9C{^|v6nwgmU>$xqa
+zl;3(_CR9_g5;;ZWl>8*W$&ZWm+TdwH00ck)1V8`;KmY_l00ck)1VG@w7pU1A^WB6}
+X)ox+4Q(#wY2kR{hYt3G-sttiZW83qF
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpw0v6k38u/q.db b/tmpw0v6k38u/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..912f8e8a27bd34aa4b411a44d0a7f93f9397bf8f
+GIT binary patch
+literal 12288
+zcmeI$L2DC16bJB`NwvERVcJ6|(t`sEDu^H+y%=RF#WZSM!6LFux>Fgu*^Rps+E9A(
+z;3x32^fP$!*o$975WF}un}9i_(TfN9KQfz{eQ#f~zs+Ux@<mS@B@WAKB#n4LHV9+n
+zkr0FsW=G48c~Co9n=kCUTdxX6?tT8!=06B)Uy$|%|GMe|<RJh72tWV=5P$##AOHaf
+zK;W+gK2GTRR;NQh?HM`D)%$W-yTP6e;%*X)r2DuR3wK7`j)V=Ji6nlVi06adz3yON
+zJdOA7`ovgH^HR>T{bz~jzv}g7sY;iXHdC?NPvV_;AQsb^8ml5x#er6J(|j>Mk|(J&
+zMvca%UecmcGMn0>CF$BoyLI*7d$IM3w#Q|4q$+=5b0@iywMr+2(fRzNnnXQT2k9jQ
+zP5yERU$Y9s7yW^VuUpCz-MPiCZawT!qOJT%{UNt|`&3R$>DQ@y;OTvLbo=_i{i51-
+zFn-?R=lq*nBOm|)2tWV=5P$##AOHafKmY;|_%{MK=?32nHfgXOa_T4Y^z6-BR!xdR
+z7w?Xv)3Y1161p7{@>@yd{&TT4zWzG%eZt^cQxpb6cm7c7TxD)%Uy;2f#=jH((;g5I
+ifB*y_009U<00Izz00bZa0SNp*0#{m`4%u3Zhw>LVBFNDI
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpw_klw3go/q.db b/tmpw_klw3go/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..0b5db36ba86bf6c0969b2a7d84e4649ab5a05c11
+GIT binary patch
+literal 12288
+zcmeI%u};E390u@fF^VJv7#aqbTa20*6XWP2n#K?T6>B0fra9m=l|pNKM2K;6@Cke<
+zCr9F&IC^)5fdSA_^ZnC<JHG2df3RG+IInnu)7v2GGC}u9o|q;%pp+0|%9fICQikj-
+zO$PE=jTe<kcHZ8zxi4a7M<hGSeJnZwIRqd80SG_<0uX=z1Rwwb2>eRmrEjbhEz5YV
+z3fA=beb9_mGmq+a$+4+ZI;_}Ky+SuLRF>DKj(z3OvwFE&syFC~-PqPa$cBEv#%b-;
+zp|#6OWgJCb5P4!q%QeS7w(E2{Zu5}$+Pv5Dc$_Rgop;&5WkT?7DB>AQM4YvUa?*@A
+z7EEqk_2-^mdcm@fLDb=qJ~6oxpR<^|{hsjr$y+5s9P*Yshak!4JLox!F!ZD!i0FAU
+zSu$H2=5lf0GKeST2l0b1_x3L9i$ITE^@Y2;>QU|M)9M$MmCeX~5_zB?009U<00Izz
+z00bZa0SG_<0ucCX0_#TJDx?cWdQI;0b*IC5`1E{zlT!C(yxyJeXXJGm^8a~xpdbJN
+e2tWV=5P$##AOHafKmY;|_-6tuDQi{T5cmdq9l4zV
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpx5zg4swc/q.db b/tmpx5zg4swc/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..45c7c0c1eb95f338699f188615f4b33480534adf
+GIT binary patch
+literal 12288
+zcmeI#u}Z^090u@9TC^>M)S-0r20;Z8#L>knL5gkF8o?qGuFVP2w28?TTg1u1C-9-1
+z91A{);Ns=l4jtO)sC<8NZ7$#4wfQB>ouAb_!Rbv9b(x^Mq)2p~>{Chz(PhiXHZ4t_
+zWTzeZo%GX6C)=-YhWSZ!V?>OR`JOfbIRqd80SG_<0uX=z1Rwwb2>eRmxvwpkOC{~4
+zE?C>=w?R8jnts@{Dz-)K%0bPd$rZX$pt3xd+Sa8_Pn*?xrP-p#R%=TIAshMuo1~2s
+zn>H?LwMi6tLF9=ctu}1y$ZFEr*ySPbxxCl$csyQwHt({5!-U}7P{ebVh&XeHa?qSO
+z7EEqk)&HJdI%V01AiCp`nmE1_pR<@d{hsjr=}(P=IOH8?0l_$5?4ZV^VW>er5K-gi
+zvJ^Jg^`-J&Nh6+=AH?^*+}k^>F9Owfk_YbWB%jH?K9{^vhHRSoLF9pg00bZa0SG_<
+z0uX=z1Rwwb2teS^39M;Fb0xQ;<yP~As1x@1bakDH`<)KwE_YS0An!{vzlc0g5P$##
+aAOHafKmY;|fB*y_009X6KY?t<%(HK)kGIkQ
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpyaik0iqv/q.db b/tmpyaik0iqv/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..41ee37daf334aa89e1e341eaa5e68e3e8202d3a1
+GIT binary patch
+literal 12288
+zcmeI%Jxjwt90u^aYtdRLX@??i2ZApkf;hTZC5YHotq~NFa5YzmrcF(**dR_0egZ#~
+zlVb<Jh~VNSX@?GNbyS`|xi**Qa!G#aa`f!9>MF@we$W<*Z<8WnjO=nw2w}QqbQ=}b
+zJK0f3f5-h<#mMICTfz7wtS}&jf$=`;1mqBa00bZa0SG_<0uX=z1R(G$f#)8bUo4mD
+zOHGNUCvW{`7&o@xFe{eHt;$~2<na-{mgl-$hg;@_#ZMZCwMyfXADNdMNzfIM=Zj%l
+zKel-NyjmSbf$ImZiuhsOG7roKACDc`l^sWRZd@6rlaJ?Z(YJ+CvfWkTged|koJbFv
+z5Qj?WrE7BE<5SO=_Q4PCWRRSgK8YtqDD7THx!&kfX%KehjXi}R&8IsgV`gC_gMJ{A
+zjGM@kUteW&i#ugXTrJ-Z?>)V?w?$9+N#BlNxV;sB#_RfA{EI5+MvV`mHxvXQ009U<
+z00Izz00bZa0SG_<0)I?kg%+1-(J19glrHIi>f@bU^!Rjj&GIebdeUKOM?V)ezKGsX
+f5P$##AOHafKmY;|fB*y_009X6KY?t<Sctv>5CXRE
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpyqc_sfws/q.db b/tmpyqc_sfws/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..f58ea4a17de7575a4d3bd453683c82c3c23c9e0e
+GIT binary patch
+literal 12288
+zcmeI#u}Z^090u^aRJ0A0=ujM7ZV*%uK^$GI5=3mP#t4c?IPEFXG^v*>Z4oC2pTLK5
+zaxC~Hf{T}HJ9MbkQThJl+FZW7Yx7H%J3gv}O0erhHn?INWR_SK*<y?kV(FICZCF&F
+zObt8wJL^v>i>$r87M%}b6?>%EbKWLRKn?*2KmY;|fB*y_009U<00O@fcxus^`BI5K
+zR~5gE#BFk!X3g61+_LX7zr0;>S$2gj+e}wjXTE#tvqNvMTK3M^zI(Q6f+p`q2_K}j
+z1E1ASDwRPb!$gLv%l2x%yX$&vG_H%Li0dN03Psvqd^B(HPQaBCjiyS+EFlH2clDq#
+zajLl9x|;tzy7Yu)+ljmr(oF2%NhEkGf>x};X!uk8AZ?1P;2VN|{=I`4GYP{C`hkcU
+zH<ra-S+b_*H%pX+TE3IsM|y7`@RmwUKgb?<u%3Np`}%zLMiq6V&O6Zu3IY&-00bZa
+z0SG_<0uX=z1Rwx`KPRwAXPvqH9L+Bj9BNMF!{hlyPPXDWjBnbu>Dl_esPjqmfr0=8
+cAOHafKmY;|fB*y_009U<;Qt9s<(z{20!$IN-2eap
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpzp2bjjep/q.db b/tmpzp2bjjep/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..dcfbe8c2b8307056b319f40353156b6dd7e49cc2
+GIT binary patch
+literal 12288
+zcmeI#u};E390u^aLKH|yaUcvXH<+l2F)@xVqG=2fP_ZTwW10g_Q!OpFM}Qb72cN))
+za&jc`NlaY49xyNfI%>XudeG~4chFzE-1%AAm4e*_VVg^~OLD|8$Ub9)5JR<uYLlYs
+zBsuA*@3_CH46^<DmNh?#ksXrk(0pGs0XYO9009U<00Izz00bZa0SNp`;JHhe3;8^K
+zsYu@N#9h#c;$|GytfFl(yLeExSbT+TWSA<q#cb=+W~a4MrC6)8W2?TUgAN~f0UxK;
+z6Pr~p%H?qsx<Tm50V`E)>&U9H>9{32!fy$`>56Ey_;lXpeTPda+8r6qSRxd>HBf_Q
+z#F6A`>#G0v^wJBK?FHez2=&C#op^#r!s+_b^(H?x3Zjl^I&%m{`FsaGW)X%S^aBw+
+zZYE1+bKO`f?BywOm3%*X@YLSk;awT%z7s!iXD9xQ_w}jxjmoM<%@3ju6a*ju0SG_<
+z0uX=z1Rwwb2tWV=e@<YH=FFAU3Qeu1O{!1C<I~l3BJBFU>)-Y=x|dP+Ma?gw4ip3+
+c009U<00Izz00bZa0SG_<0{>4SnK0Ah8+!4#!vFvP
+
+literal 0
+HcmV?d00001
+

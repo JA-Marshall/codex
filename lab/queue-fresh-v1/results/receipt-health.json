@@ -1,0 +1,6 @@
+{
+  "completed_phase_long_commands": 88,
+  "successful_receipt_lookups": 139,
+  "oversized_receipts_returned": 11,
+  "receipt_service_faults": 0
+}

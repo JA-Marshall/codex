@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "run": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r3-bba-execution",
+  "workflow_state": "completed",
+  "terminal_change": {
+    "type": "completed"
+  },
+  "all_started_phases_shutdown": true,
+  "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r3-bba/repository",
+  "first_plan_human_approval": true,
+  "phase_turns": 2,
+  "planner_phases": 0,
+  "tool_admissions": 99,
+  "usage": {
+    "input_tokens": 2951589,
+    "output_tokens": 47518,
+    "cached_input_tokens": 2822119
+  },
+  "workflow_terminal_elapsed_ms": 1137641,
+  "human_plan_edits": 0,
+  "plan_amendments": 0,
+  "plan_deviations": null,
+  "source_artifact_sha256": {
+    "events.jsonl": "34969917e2c334c9cef0e952dc0f0952f8dec6970c340211cb0506c9d829b597",
+    "runtime-events.jsonl": "c350959ec3abc1fb58a44fe320ccf4fdc545c5f6573b04489149873f7d27cdee",
+    "evidence/input-01.json": "93f313b1124df1e1f8a985ad03d531e2dcf96c9eeaca849b3bb3e19c56755a15",
+    "evidence/phase-01.json": "ab715a2e4227c8827987cd5ebf2787721992c604b5a20262719834f000ddb1da",
+    "evidence/input-02.json": "046fd8831c79f51031fd55cd79e7e132e7033975dac6d9b1404ecbd7efce7428",
+    "evidence/phase-02.json": "85dd3de2f231fb04c04ba044ef94271e1577078b0c1188937fefe6808e0daf4e",
+    "config/run-spec.json": "ac7326883163530261955b6627e70e3678695e0dd6dd1d3b59aa99cdc9ec47e9"
+  },
+  "authority_restored": false,
+  "git": {
+    "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "files_changed": 30,
+    "changed_files": [
+      "durable_queue/__main__.py",
+      "durable_queue/queue.py",
+      "durable_queue/storage.py",
+      "tests/test_regression.py",
+      "tmp2gv0jzoa/req.json",
+      "tmp33xn2tgv/req.json",
+      "tmp6dc2s2hk/req.json",
+      "tmp_dgn3w2k/req.json",
+      "tmp_fx6kpq9/req.json",
+      "tmpb0s1r247/req.json",
+      "tmpdzq_h7yv/req.json",
+      "tmpfypjqvgm/req.json",
+      "tmpg87lp295/req.json",
+      "tmpgd84uajs/req.json",
+      "tmpgwq7kcgu/req.json",
+      "tmphhdb1fe3/req.json",
+      "tmpjmwu5if1/req.json",
+      "tmpk6a7byz3/req.json",
+      "tmpkuby8e20/req.json",
+      "tmporv5ok72/req.json",
+      "tmpr3dwrra4/req.json",
+      "tmps00dm4tk/req.json",
+      "tmpt39657o2/req.json",
+      "tmptavc75t2/req.json",
+      "tmpu6l7g8op/req.json",
+      "tmpw3uf7ymy/req.json",
+      "tmpyivq28d2/req.json",
+      "tmpyujodga6/req.json",
+      "tmpz19_8nvw/req.json",
+      "tmpzt0te9pb/req.json"
+    ],
+    "diff_bytes": 49126,
+    "diff_sha256": "1cc66589ad54bc32a15469103bd46e972a96fec1492d4e56570a4d979f9a902d"
+  }
+}

@@ -1,0 +1,1174 @@
+diff --git a/durable_queue/__main__.py b/durable_queue/__main__.py
+index 65c8720..45f9921 100644
+--- a/durable_queue/__main__.py
++++ b/durable_queue/__main__.py
+@@ -1,21 +1,80 @@
+ import argparse
+ import json
+-
++import sys
+ from .queue import Queue
+-
+-
+-def main():
++_OPS = {"submit", "get", "list", "claim", "recover", "complete", "fail"}
++_ALLOWED = {"submit": {"jobs"}, "get": {"id"}, "list": set(), "claim": {"worker", "now", "lease_seconds"}, "recover": {"now"}, "complete": {"id", "worker", "attempt", "now"}, "fail": {"id", "worker", "attempt", "now", "retry_delay"}}
++_REQUIRED = {"submit": {"jobs"}, "get": {"id"}, "list": set(), "claim": {"worker", "now", "lease_seconds"}, "recover": {"now"}, "complete": {"id", "worker", "attempt", "now"}, "fail": {"id", "worker", "attempt", "now"}}
++def _fail(msg=None):
++    if msg is not None:
++        try:
++            print(str(msg), file=sys.stderr)
++        except Exception:
++            pass
++    return 2
++def _reject_constant(v):
++    raise ValueError("non-finite JSON")
++def main(argv=None):
+     parser = argparse.ArgumentParser()
+     parser.add_argument("--db", required=True)
+     parser.add_argument("--request", required=True)
+-    args = parser.parse_args()
+-    with open(args.request, encoding="utf-8") as stream:
+-        request = json.load(stream)
+-    operation = request.pop("op")
+-    value = getattr(Queue(args.db), operation)(**request)
+-    print(json.dumps(value, sort_keys=True))
++    try:
++        args = parser.parse_args(argv)
++    except SystemExit as e:
++        code = e.code if isinstance(e.code, int) else 2
++        if code == 0:
++            code = 2
++        raise SystemExit(code)
++    db_path = args.db
++    req_path = args.request
++    try:
++        with open(req_path, encoding="utf-8", errors="strict") as stream:
++            text = stream.read()
++    except Exception as e:
++        return _fail(e)
++    try:
++        request = json.loads(text, parse_constant=_reject_constant)
++    except Exception as e:
++        return _fail(e)
++    if not isinstance(request, dict):
++        return _fail("non-object request")
++    if "op" not in request:
++        return _fail("missing op")
++    op = request["op"]
++    if not isinstance(op, str) or op not in _OPS:
++        return _fail("unknown op")
++    keys = set(request.keys()) - {"op"}
++    allowed = _ALLOWED[op]
++    required = _REQUIRED[op]
++    for k in keys:
++        if k not in allowed:
++            return _fail("unknown field")
++    for k in required:
++        if k not in keys:
++            return _fail("missing field")
++    kwargs = {k: request[k] for k in keys}
++    try:
++        q = Queue(db_path)
++    except Exception as e:
++        return _fail(e)
++    try:
++        method = getattr(q, op)
++        value = method(**kwargs)
++    except ValueError as e:
++        return _fail(e)
++    except TypeError as e:
++        return _fail(e)
++    except Exception as e:
++        return _fail(e)
++    try:
++        out = json.dumps(value, sort_keys=True, allow_nan=False)
++    except Exception as e:
++        return _fail(e)
++    try:
++        sys.stdout.write(out + "\n")
++        sys.stdout.flush()
++    except Exception as e:
++        return _fail(e)
+     return 0
+-
+-
+ if __name__ == "__main__":
+     raise SystemExit(main())
+diff --git a/durable_queue/queue.py b/durable_queue/queue.py
+index 048c736..77a9c40 100644
+--- a/durable_queue/queue.py
++++ b/durable_queue/queue.py
+@@ -1,61 +1,297 @@
+-"""Initial durable storage; scheduling and lease behavior are unfinished."""
+-
++"""Durable queue per CONTRACT.md."""
++import copy
+ import json
+-
+-from .storage import connect
+-
+-
++import math
++from .storage import connect, transaction
++_ALLOWED_FIELDS = {"id", "payload", "priority", "dependencies", "max_attempts", "ready_at"}
++def _is_strict_int(v):
++    return type(v) is int
++def _check_finite_value(v):
++    if v is None:
++        return True
++    if isinstance(v, bool):
++        return True
++    if type(v) is int:
++        return True
++    if isinstance(v, float):
++        return math.isfinite(v)
++    if isinstance(v, str):
++        return True
++    if isinstance(v, list):
++        return all(_check_finite_value(x) for x in v)
++    if isinstance(v, dict):
++        for k, val in v.items():
++            if not isinstance(k, str):
++                return False
++            if not _check_finite_value(val):
++                return False
++        return True
++    return False
++def _validate_payload(payload):
++    if not isinstance(payload, dict):
++        raise ValueError("invalid payload")
++    for k in payload.keys():
++        if not isinstance(k, str):
++            raise ValueError("invalid payload key")
++    if not _check_finite_value(payload):
++        raise ValueError("non-finite payload")
++def _row_to_view(row):
++    _id, payload_s, priority, deps_s, max_attempts, ready_at, state, attempts, worker, lease_until = row
++    payload = json.loads(payload_s)
++    deps = json.loads(deps_s)
++    return {"id": _id, "payload": copy.deepcopy(payload), "priority": priority, "dependencies": list(deps), "max_attempts": max_attempts, "ready_at": ready_at, "state": state, "attempts": attempts, "worker": worker, "lease_until": lease_until}
++def _has_cycle(graph):
++    WHITE, GRAY, BLACK = 0, 1, 2
++    color = {node: WHITE for node in graph}
++    def dfs(node):
++        color[node] = GRAY
++        for nb in graph.get(node, []):
++            if nb not in graph:
++                continue
++            c = color.get(nb, WHITE)
++            if c == GRAY:
++                return True
++            if c == WHITE and dfs(nb):
++                return True
++        color[node] = BLACK
++        return False
++    for n in list(graph.keys()):
++        if color[n] == WHITE:
++            if dfs(n):
++                return True
++    return False
++def _validate_id(v):
++    if not isinstance(v, str) or v == "":
++        raise ValueError("invalid id")
++def _validate_worker(v):
++    if not isinstance(v, str) or v == "":
++        raise ValueError("invalid worker")
++def _validate_now(v):
++    if not _is_strict_int(v) or v < 0:
++        raise ValueError("invalid now")
++def _validate_lease(v):
++    if not _is_strict_int(v) or v <= 0:
++        raise ValueError("invalid lease_seconds")
++def _validate_attempt(v):
++    if not _is_strict_int(v) or v <= 0:
++        raise ValueError("invalid attempt")
++def _validate_retry(v):
++    if not _is_strict_int(v) or v < 0:
++        raise ValueError("invalid retry_delay")
++def _do_recovery(connection, now):
++    rows = connection.execute("SELECT id, attempts, max_attempts, lease_until FROM jobs WHERE state='running'").fetchall()
++    expired = []
++    for _id, attempts, max_attempts, lease_until in rows:
++        if lease_until is None:
++            continue
++        if lease_until <= now:
++            expired.append((_id, attempts, max_attempts, lease_until))
++    expired_sorted = sorted(expired, key=lambda x: x[0])
++    ids = []
++    for _id, attempts, max_attempts, lease_until in expired_sorted:
++        if attempts < max_attempts:
++            connection.execute("UPDATE jobs SET state='pending', worker=NULL, lease_until=NULL, ready_at=? WHERE id=?", (lease_until, _id))
++        else:
++            connection.execute("UPDATE jobs SET state='failed', worker=NULL, lease_until=NULL WHERE id=?", (_id,))
++        ids.append(_id)
++    return sorted(ids)
+ class Queue:
+     def __init__(self, db_path):
+         self.db_path = db_path
+         with connect(db_path):
+             pass
+-
+     def submit(self, jobs):
+-        views = []
+-        with connect(self.db_path) as connection:
+-            for job in jobs:
+-                view = dict(
+-                    id=job["id"],
+-                    payload=job.get("payload", {}),
+-                    priority=job.get("priority", 0),
+-                    dependencies=job.get("dependencies", []),
+-                    max_attempts=job.get("max_attempts", 3),
+-                    ready_at=job.get("ready_at", 0),
+-                    state="pending",
+-                    attempts=0,
+-                    worker=None,
+-                    lease_until=None,
+-                )
+-                connection.execute(
+-                    "INSERT OR REPLACE INTO jobs VALUES (?, ?)",
+-                    (view["id"], json.dumps(view)),
+-                )
+-                views.append(view)
+-        return views
+-
++        if not isinstance(jobs, list):
++            raise ValueError("jobs must be a list")
++        normalized = []
++        seen = set()
++        for job in jobs:
++            if not isinstance(job, dict):
++                raise ValueError("job must be object")
++            for k in job.keys():
++                if k not in _ALLOWED_FIELDS:
++                    raise ValueError("unknown field")
++            if "id" not in job:
++                raise ValueError("missing id")
++            _id = job["id"]
++            if not isinstance(_id, str) or _id == "":
++                raise ValueError("invalid id")
++            if _id in seen:
++                raise ValueError("duplicate id in batch")
++            seen.add(_id)
++            payload = job["payload"] if "payload" in job else {}
++            _validate_payload(payload)
++            payload_copy = copy.deepcopy(payload)
++            priority = job["priority"] if "priority" in job else 0
++            if not _is_strict_int(priority):
++                raise ValueError("invalid priority")
++            deps_raw = job["dependencies"] if "dependencies" in job else []
++            if not isinstance(deps_raw, list):
++                raise ValueError("invalid dependencies")
++            for d in deps_raw:
++                if not isinstance(d, str) or d == "":
++                    raise ValueError("invalid dependency")
++            deps = sorted(set(deps_raw))
++            max_attempts = job["max_attempts"] if "max_attempts" in job else 3
++            if not _is_strict_int(max_attempts) or not (1 <= max_attempts <= 100):
++                raise ValueError("invalid max_attempts")
++            ready_at = job["ready_at"] if "ready_at" in job else 0
++            if not _is_strict_int(ready_at) or ready_at < 0:
++                raise ValueError("invalid ready_at")
++            if _id in deps:
++                raise ValueError("self dependency")
++            normalized.append((_id, payload_copy, priority, deps, max_attempts, ready_at))
++        batch_ids = {n[0] for n in normalized}
++        with transaction(self.db_path) as connection:
++            existing_rows = connection.execute("SELECT id, dependencies FROM jobs").fetchall()
++            existing_ids = {r[0] for r in existing_rows}
++            for (_id, _p, _pri, _deps, _ma, _ra) in normalized:
++                for d in _deps:
++                    if d not in existing_ids and d not in batch_ids:
++                        raise ValueError("unknown dependency")
++            graph = {}
++            for r_id, r_deps_s in existing_rows:
++                try:
++                    graph[r_id] = list(json.loads(r_deps_s))
++                except Exception:
++                    graph[r_id] = []
++            for (_id, _p, _pri, _deps, _ma, _ra) in normalized:
++                graph[_id] = list(_deps)
++            if _has_cycle(graph):
++                raise ValueError("cycle")
++            for (_id, _p, _pri, _deps, _ma, _ra) in normalized:
++                if _id in existing_ids:
++                    spec = connection.execute("SELECT payload, priority, dependencies, max_attempts, ready_at FROM job_specs WHERE id=?", (_id,)).fetchone()
++                    if spec is None:
++                        cur = connection.execute("SELECT payload, priority, dependencies, max_attempts, ready_at FROM jobs WHERE id=?", (_id,)).fetchone()
++                        if cur is None:
++                            raise ValueError("conflict")
++                        s_payload_s, s_pri, s_deps_s, s_ma, s_ra = cur
++                    else:
++                        s_payload_s, s_pri, s_deps_s, s_ma, s_ra = spec
++                    try:
++                        s_payload = json.loads(s_payload_s)
++                        s_deps = list(json.loads(s_deps_s))
++                    except Exception:
++                        raise ValueError("conflict")
++                    if not (s_payload == _p and s_pri == _pri and s_deps == _deps and s_ma == _ma and s_ra == _ra):
++                        raise ValueError("conflict")
++            for (_id, _p, _pri, _deps, _ma, _ra) in normalized:
++                if _id in existing_ids:
++                    continue
++                payload_s = json.dumps(_p, sort_keys=True, separators=(",", ":"))
++                deps_s = json.dumps(_deps, separators=(",", ":"))
++                connection.execute("INSERT INTO job_specs(id,payload,priority,dependencies,max_attempts,ready_at) VALUES(?,?,?,?,?,?)", (_id, payload_s, _pri, deps_s, _ma, _ra))
++                connection.execute("INSERT INTO jobs(id,payload,priority,dependencies,max_attempts,ready_at,state,attempts,worker,lease_until) VALUES(?,?,?,?,?,?,?,?,?,?)", (_id, payload_s, _pri, deps_s, _ma, _ra, "pending", 0, None, None))
++            views = []
++            for (_id, _p, _pri, _deps, _ma, _ra) in normalized:
++                row = connection.execute("SELECT id,payload,priority,dependencies,max_attempts,ready_at,state,attempts,worker,lease_until FROM jobs WHERE id=?", (_id,)).fetchone()
++                if row is None:
++                    raise ValueError("missing job after submit")
++                views.append(_row_to_view(row))
++            return views
+     def get(self, id):
++        _validate_id(id)
+         with connect(self.db_path) as connection:
+-            row = connection.execute(
+-                "SELECT data FROM jobs WHERE id=?", (id,)
+-            ).fetchone()
+-        return json.loads(row[0]) if row else None
+-
++            row = connection.execute("SELECT id,payload,priority,dependencies,max_attempts,ready_at,state,attempts,worker,lease_until FROM jobs WHERE id=?", (id,)).fetchone()
++        if row is None:
++            return None
++        return _row_to_view(row)
+     def list(self):
+         with connect(self.db_path) as connection:
+-            return [
+-                json.loads(row[0])
+-                for row in connection.execute("SELECT data FROM jobs ORDER BY id")
+-            ]
+-
++            rows = connection.execute("SELECT id,payload,priority,dependencies,max_attempts,ready_at,state,attempts,worker,lease_until FROM jobs ORDER BY id").fetchall()
++        return [_row_to_view(r) for r in rows]
+     def claim(self, worker, now, lease_seconds):
+-        raise NotImplementedError("claim scheduling and atomic ownership")
+-
++        _validate_worker(worker)
++        _validate_now(now)
++        _validate_lease(lease_seconds)
++        with transaction(self.db_path) as connection:
++            _do_recovery(connection, now)
++            rows = connection.execute("SELECT id,payload,priority,dependencies,max_attempts,ready_at,state,attempts,worker,lease_until FROM jobs WHERE state='pending' AND ready_at <= ? AND attempts < max_attempts", (now,)).fetchall()
++            if not rows:
++                return None
++            states = {}
++            for r in connection.execute("SELECT id, state FROM jobs").fetchall():
++                states[r[0]] = r[1]
++            eligible = []
++            for r in rows:
++                _id, _ps, _pri, _ds, _ma, _ra, _st, _att, _w, _lu = r
++                try:
++                    deps = list(json.loads(_ds))
++                except Exception:
++                    continue
++                ok = True
++                for d in deps:
++                    if states.get(d) != "succeeded":
++                        ok = False
++                        break
++                if ok:
++                    eligible.append(r)
++            if not eligible:
++                return None
++            eligible.sort(key=lambda r: (-r[2], r[0]))
++            chosen = eligible[0]
++            _id = chosen[0]
++            attempts = chosen[7]
++            new_attempts = attempts + 1
++            new_lease = now + lease_seconds
++            connection.execute("UPDATE jobs SET state='running', attempts=?, worker=?, lease_until=? WHERE id=? AND state='pending'", (new_attempts, worker, new_lease, _id))
++            row = connection.execute("SELECT id,payload,priority,dependencies,max_attempts,ready_at,state,attempts,worker,lease_until FROM jobs WHERE id=?", (_id,)).fetchone()
++            cur = connection.execute("SELECT state FROM jobs WHERE id=?", (_id,)).fetchone()
++            if row is None:
++                return None
++            v = _row_to_view(row)
++            if v["state"] != "running" or v["worker"] != worker or v["attempts"] != new_attempts:
++                return None
++            return v
+     def recover(self, now):
+-        raise NotImplementedError("expired lease recovery")
+-
++        _validate_now(now)
++        with transaction(self.db_path) as connection:
++            return _do_recovery(connection, now)
+     def complete(self, id, worker, attempt, now):
+-        raise NotImplementedError("completion validation")
+-
++        _validate_id(id)
++        _validate_worker(worker)
++        _validate_attempt(attempt)
++        _validate_now(now)
++        with transaction(self.db_path) as connection:
++            row = connection.execute("SELECT id,payload,priority,dependencies,max_attempts,ready_at,state,attempts,worker,lease_until FROM jobs WHERE id=?", (id,)).fetchone()
++            if row is None:
++                raise ValueError("unknown job")
++            _id, _ps, _pri, _ds, _ma, _ra, _st, _att, _w, _lu = row
++            if _st != "running":
++                raise ValueError("not running")
++            if _w != worker:
++                raise ValueError("wrong worker")
++            if _att != attempt:
++                raise ValueError("stale attempt")
++            if _lu is None or not (now < _lu):
++                raise ValueError("expired lease")
++            connection.execute("UPDATE jobs SET state='succeeded', worker=NULL, lease_until=NULL WHERE id=?", (id,))
++            row2 = connection.execute("SELECT id,payload,priority,dependencies,max_attempts,ready_at,state,attempts,worker,lease_until FROM jobs WHERE id=?", (id,)).fetchone()
++            return _row_to_view(row2)
+     def fail(self, id, worker, attempt, now, retry_delay=0):
+-        raise NotImplementedError("retry state transition")
++        _validate_id(id)
++        _validate_worker(worker)
++        _validate_attempt(attempt)
++        _validate_now(now)
++        _validate_retry(retry_delay)
++        with transaction(self.db_path) as connection:
++            row = connection.execute("SELECT id,payload,priority,dependencies,max_attempts,ready_at,state,attempts,worker,lease_until FROM jobs WHERE id=?", (id,)).fetchone()
++            if row is None:
++                raise ValueError("unknown job")
++            _id, _ps, _pri, _ds, _ma, _ra, _st, _att, _w, _lu = row
++            if _st != "running":
++                raise ValueError("not running")
++            if _w != worker:
++                raise ValueError("wrong worker")
++            if _att != attempt:
++                raise ValueError("stale attempt")
++            if _lu is None or not (now < _lu):
++                raise ValueError("expired lease")
++            if _att < _ma:
++                new_ready = now + retry_delay
++                connection.execute("UPDATE jobs SET state='pending', worker=NULL, lease_until=NULL, ready_at=? WHERE id=?", (new_ready, id))
++            else:
++                connection.execute("UPDATE jobs SET state='failed', worker=NULL, lease_until=NULL WHERE id=?", (id,))
++            row2 = connection.execute("SELECT id,payload,priority,dependencies,max_attempts,ready_at,state,attempts,worker,lease_until FROM jobs WHERE id=?", (id,)).fetchone()
++            return _row_to_view(row2)
+diff --git a/durable_queue/storage.py b/durable_queue/storage.py
+index 0eb7fa5..a9b6dbd 100644
+--- a/durable_queue/storage.py
++++ b/durable_queue/storage.py
+@@ -1,9 +1,114 @@
++"""Durable SQLite storage with WAL, timeouts and spec/state split."""
++import contextlib
+ import sqlite3
+ 
++SPEC_SCHEMA = (
++    "CREATE TABLE IF NOT EXISTS job_specs ("
++    "id TEXT PRIMARY KEY, "
++    "payload TEXT NOT NULL, "
++    "priority INTEGER NOT NULL, "
++    "dependencies TEXT NOT NULL, "
++    "max_attempts INTEGER NOT NULL, "
++    "ready_at INTEGER NOT NULL"
++    ")"
++)
+ 
+-def connect(path):
+-    connection = sqlite3.connect(path, timeout=5)
+-    connection.execute(
+-        "CREATE TABLE IF NOT EXISTS jobs (id TEXT PRIMARY KEY, data TEXT NOT NULL)"
+-    )
++JOBS_SCHEMA = (
++    "CREATE TABLE IF NOT EXISTS jobs ("
++    "id TEXT PRIMARY KEY, "
++    "payload TEXT NOT NULL, "
++    "priority INTEGER NOT NULL, "
++    "dependencies TEXT NOT NULL, "
++    "max_attempts INTEGER NOT NULL, "
++    "ready_at INTEGER NOT NULL, "
++    "state TEXT NOT NULL, "
++    "attempts INTEGER NOT NULL, "
++    "worker TEXT, "
++    "lease_until INTEGER"
++    ")"
++)
++
++
++def _apply_pragmas(connection):
++    try:
++        connection.execute("PRAGMA journal_mode=WAL;")
++    except Exception:
++        pass
++    try:
++        connection.execute("PRAGMA busy_timeout=5000;")
++    except Exception:
++        pass
++    try:
++        connection.execute("PRAGMA foreign_keys=ON;")
++    except Exception:
++        pass
++
++
++def _ensure_schema(connection):
++    # Migrate legacy jobs(id, data) table if present.
++    try:
++        rows = connection.execute(
++            "SELECT sql FROM sqlite_master WHERE type='table' AND name='jobs'"
++        ).fetchone()
++    except Exception:
++        rows = None
++    if rows is not None and rows[0] is not None and "data TEXT" in rows[0]:
++        # Legacy schema: try to migrate, else drop.
++        try:
++            legacy = connection.execute("SELECT id, data FROM jobs").fetchall()
++        except Exception:
++            legacy = []
++        connection.execute("DROP TABLE jobs")
++        connection.execute(SPEC_SCHEMA)
++        connection.execute(JOBS_SCHEMA)
++        import json as _json
++        for _id, _data in legacy:
++            try:
++                v = _json.loads(_data)
++                import json as _j2
++                payload = _j2.dumps(v.get("payload", {}), sort_keys=True, separators=(",", ":"))
++                deps = _j2.dumps(sorted(set(v.get("dependencies", []))), separators=(",", ":"))
++                connection.execute(
++                    "INSERT OR IGNORE INTO job_specs(id,payload,priority,dependencies,max_attempts,ready_at) VALUES(?,?,?,?,?,?)",
++                    (v["id"], payload, int(v.get("priority", 0)), deps, int(v.get("max_attempts", 3)), int(v.get("ready_at", 0))),
++                )
++                connection.execute(
++                    "INSERT OR IGNORE INTO jobs(id,payload,priority,dependencies,max_attempts,ready_at,state,attempts,worker,lease_until) VALUES(?,?,?,?,?,?,?,?,?,?)",
++                    (v["id"], payload, int(v.get("priority", 0)), deps, int(v.get("max_attempts", 3)), int(v.get("ready_at", 0)), v.get("state", "pending"), int(v.get("attempts", 0)), v.get("worker"), v.get("lease_until")),
++                )
++            except Exception:
++                continue
++        return
++    connection.execute(SPEC_SCHEMA)
++    connection.execute(JOBS_SCHEMA)
++
++
++def _open(path):
++    connection = sqlite3.connect(str(path), timeout=5.0, isolation_level=None, check_same_thread=False)
++    _apply_pragmas(connection)
++    _ensure_schema(connection)
+     return connection
++
++
++def connect(path):
++    return _open(path)
++
++
++@contextlib.contextmanager
++def transaction(path):
++    connection = _open(path)
++    try:
++        connection.execute("BEGIN IMMEDIATE;")
++        yield connection
++        connection.commit()
++    except Exception:
++        try:
++            connection.rollback()
++        except Exception:
++            pass
++        raise
++    finally:
++        try:
++            connection.close()
++        except Exception:
++            pass
+diff --git a/tests/test_regression.py b/tests/test_regression.py
+new file mode 100644
+index 0000000..58b5de7
+--- /dev/null
++++ b/tests/test_regression.py
+@@ -0,0 +1,391 @@
++import copy
++import json
++import multiprocessing
++import subprocess
++import sys
++import tempfile
++import unittest
++from pathlib import Path
++from durable_queue import Queue
++
++def _mp_submit(path_str, jobs):
++    from durable_queue import Queue as Q
++    Q(path_str).submit(jobs)
++
++def _mp_claim(path_str, worker, now, lease, out_q):
++    try:
++        from durable_queue import Queue as Q
++        v = Q(path_str).claim(worker, now, lease)
++        out_q.put((worker, v["id"] if v else None, v["attempts"] if v else None))
++    except Exception as e:
++        out_q.put((worker, "ERR:" + repr(e), None))
++
++def _run_cli(db, req_obj=None, raw_bytes=None, req_text=None):
++    tmp = Path(tempfile.mkdtemp())
++    # use repo-local fallback if needed: tempfile already works
++    req = tmp / "req.json"
++    if raw_bytes is not None:
++        req.write_bytes(raw_bytes)
++    elif req_text is not None:
++        req.write_bytes(req_text.encode("utf-8"))
++    else:
++        req.write_text(json.dumps(req_obj), encoding="utf-8")
++    p = subprocess.run([sys.executable, "-m", "durable_queue", "--db", str(db), "--request", str(req)], capture_output=True, text=True)
++    return p
++
++class ValidationTests(unittest.TestCase):
++    def _q(self, tmp):
++        return Queue(Path(tmp) / "q.db")
++    def test_bool_rejected_no_write(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = self._q(tmp)
++            q.submit([{"id": "a"}])
++            before = q.list()
++            for bad in [[{"id": "b", "priority": True}], [{"id": "c", "max_attempts": True}], [{"id": "d", "ready_at": False}], [{"id": "e", "payload": {"x": True}, "priority": 0}]]:
++                pass
++            # payload bool is allowed; check int fields bool rejected
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "b", "priority": True}])
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "b", "max_attempts": False}])
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "b", "ready_at": True}])
++            with self.assertRaises(ValueError):
++                q.claim("w", True, 10)
++            with self.assertRaises(ValueError):
++                q.claim("w", 0, True)
++            with self.assertRaises(ValueError):
++                q.recover(True)
++            self.assertEqual(q.list(), before)
++    def test_unknown_self_cycle_duplicate(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = self._q(tmp)
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "a", "bogus": 1}])
++            self.assertEqual(q.list(), [])
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "a"}, {"id": "a"}])
++            self.assertEqual(q.list(), [])
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "a", "dependencies": ["missing"]}])
++            self.assertEqual(q.list(), [])
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "a", "dependencies": ["a"]}])
++            self.assertEqual(q.list(), [])
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "a", "dependencies": ["b"]}, {"id": "b", "dependencies": ["a"]}])
++            self.assertEqual(q.list(), [])
++            q.submit([{"id": "a"}])
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "b", "dependencies": ["b"]}])
++            self.assertEqual(len(q.list()), 1)
++    def test_nonfinite_and_types(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = self._q(tmp)
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "a", "payload": {"x": float("inf")}}])
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "a", "payload": {"x": float("nan")}}])
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "", "payload": {}}])
++            with self.assertRaises(ValueError):
++                q.submit("notalist")
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "a", "dependencies": "x"}])
++            self.assertEqual(q.list(), [])
++            # payload bool allowed
++            v = q.submit([{"id": "ok", "payload": {"b": True, "n": None, "s": "x", "l": [1, 2.5]}}])
++            self.assertEqual(v[0]["payload"]["b"], True)
++    def test_atomic_batch(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = self._q(tmp)
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "a"}, {"id": "b", "priority": "bad"}])
++            self.assertEqual(q.list(), [])
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "a", "priority": 1}, {"id": "a", "priority": 1}])
++            self.assertEqual(q.list(), [])
++    def test_idempotent_and_conflict(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = self._q(tmp)
++            q.submit([{"id": "a", "priority": 5, "payload": {"x": 1}}])
++            c = q.claim("w", 0, 10)
++            self.assertEqual(c["id"], "a")
++            # resubmit original spec after state change should succeed and return current view
++            v = q.submit([{"id": "a", "priority": 5, "payload": {"x": 1}}])
++            self.assertEqual(v[0]["state"], "running")
++            self.assertEqual(v[0]["attempts"], 1)
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "a", "priority": 6, "payload": {"x": 1}}])
++            # failed batch with conflict leaves unchanged
++            self.assertEqual(q.get("a")["priority"], 5)
++    def test_detached_and_no_mutation(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = self._q(tmp)
++            inp = {"id": "a", "payload": {"x": [1]}, "dependencies": ["z", "z"]}
++            orig = copy.deepcopy(inp)
++            # need dep z first
++            q.submit([{"id": "z"}])
++            v = q.submit([inp])
++            self.assertEqual(inp, orig)
++            self.assertEqual(v[0]["dependencies"], ["z"])
++            v[0]["payload"]["x"].append(99)
++            v[0]["dependencies"].append("evil")
++            self.assertEqual(q.get("a")["payload"], {"x": [1]})
++            self.assertEqual(q.get("a")["dependencies"], ["z"])
++            g = q.get("a")
++            g["payload"]["x"] = "mut"
++            self.assertEqual(q.get("a")["payload"], {"x": [1]})
++    def test_get_list_validation_no_recovery(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = self._q(tmp)
++            q.submit([{"id": "a"}])
++            c = q.claim("w", 0, 5)
++            self.assertEqual(c["id"], "a")
++            # get/list do not recover even after expiry
++            self.assertEqual(q.get("a")["state"], "running")
++            self.assertEqual(q.list()[0]["state"], "running")
++            with self.assertRaises(ValueError):
++                q.get("")
++            with self.assertRaises(ValueError):
++                q.get(123)
++            with self.assertRaises(ValueError):
++                q.get(None)
++
++class OrderingLeaseTests(unittest.TestCase):
++    def test_priority_order(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "b", "priority": 1}, {"id": "a", "priority": 5}, {"id": "c", "priority": 5}])
++            c1 = q.claim("w", 0, 10)
++            self.assertEqual(c1["id"], "a")
++            q.complete("a", "w", c1["attempts"], 1)
++            c2 = q.claim("w", 1, 10)
++            self.assertEqual(c2["id"], "c")
++            q.complete("c", "w", c2["attempts"], 2)
++            c3 = q.claim("w", 2, 10)
++            self.assertEqual(c3["id"], "b")
++    def test_dependency_failed_stays_pending(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "dep", "max_attempts": 1}, {"id": "child", "dependencies": ["dep"]}])
++            c = q.claim("w", 0, 5)
++            self.assertEqual(c["id"], "dep")
++            # fail with max 1 -> failed
++            q.fail("dep", "w", c["attempts"], 1)
++            self.assertEqual(q.get("dep")["state"], "failed")
++            self.assertIsNone(q.claim("w", 1, 10))
++            self.assertEqual(q.get("child")["state"], "pending")
++    def test_recover_mapping(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "a", "max_attempts": 3}, {"id": "b", "max_attempts": 1}])
++            ca = q.claim("w", 0, 5)
++            self.assertEqual(ca["id"], "a")
++            # claim b next (a running, so next eligible is b)
++            cb = q.claim("w", 0, 5)
++            self.assertEqual(cb["id"], "b")
++            # both leases expire at 5
++            ids = q.recover(5)
++            self.assertEqual(ids, ["a", "b"])
++            self.assertEqual(q.get("a")["state"], "pending")
++            self.assertEqual(q.get("a")["ready_at"], 5)
++            self.assertIsNone(q.get("a")["worker"])
++            self.assertIsNone(q.get("a")["lease_until"])
++            # b had attempts 1 == max 1 -> failed, ready unchanged (0)
++            self.assertEqual(q.get("b")["state"], "failed")
++            self.assertEqual(q.get("b")["ready_at"], 0)
++            # repeated no-op
++            self.assertEqual(q.recover(5), [])
++            self.assertEqual(q.recover(6), [])
++    def test_claim_recovers_atomically(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "a"}, {"id": "b"}])
++            c = q.claim("w1", 0, 5)
++            self.assertEqual(c["id"], "a")
++            # at now 5, a expired; claim should recover a then claim highest priority smallest id among eligible (a ready_at=5, b ready 0)
++            c2 = q.claim("w2", 5, 5)
++            # eligible: a (ready 5<=5) and b (0<=5); tie priority 0 -> smallest id a
++            self.assertEqual(c2["id"], "a")
++            self.assertEqual(c2["worker"], "w2")
++            self.assertEqual(c2["attempts"], 2)
++    def test_complete_fail_validation_zero_writes(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "a"}, {"id": "b"}])
++            c = q.claim("w", 0, 5)
++            before_b = q.get("b")
++            # wrong worker
++            with self.assertRaises(ValueError):
++                q.complete("a", "other", c["attempts"], 1)
++            # stale attempt
++            with self.assertRaises(ValueError):
++                q.complete("a", "w", c["attempts"] + 1, 1)
++            # expired
++            with self.assertRaises(ValueError):
++                q.complete("a", "w", c["attempts"], 5)
++            # unknown
++            with self.assertRaises(ValueError):
++                q.complete("missing", "w", 1, 1)
++            # invalid args
++            with self.assertRaises(ValueError):
++                q.complete("a", "", c["attempts"], 1)
++            with self.assertRaises(ValueError):
++                q.fail("a", "w", c["attempts"], 1, retry_delay=-1)
++            with self.assertRaises(ValueError):
++                q.fail("a", "w", c["attempts"], True)
++            # state unchanged, no recovery side effects on b (b still pending)
++            self.assertEqual(q.get("a")["state"], "running")
++            self.assertEqual(q.get("b"), before_b)
++            # invalid claim leaves expired unrecovered
++            with self.assertRaises(ValueError):
++                q.claim("", 10, 5)
++            self.assertEqual(q.get("a")["state"], "running")
++            # valid complete
++            v = q.complete("a", "w", c["attempts"], 1)
++            self.assertEqual(v["state"], "succeeded")
++            with self.assertRaises(ValueError):
++                q.complete("a", "w", c["attempts"], 2)
++            with self.assertRaises(ValueError):
++                q.fail("a", "w", c["attempts"], 2)
++    def test_fail_retry_and_terminal(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "a", "max_attempts": 2}])
++            c1 = q.claim("w", 0, 10)
++            v = q.fail("a", "w", c1["attempts"], 1, retry_delay=5)
++            self.assertEqual(v["state"], "pending")
++            self.assertEqual(v["ready_at"], 6)
++            self.assertIsNone(v["worker"])
++            # not eligible before ready
++            self.assertIsNone(q.claim("w", 5, 10))
++            c2 = q.claim("w", 6, 10)
++            self.assertEqual(c2["attempts"], 2)
++            v2 = q.fail("a", "w", c2["attempts"], 7)
++            self.assertEqual(v2["state"], "failed")
++            self.assertIsNone(q.claim("w", 8, 10))
++            # older attempt rejected even same worker reclaimed scenario
++            q2 = Queue(Path(tmp) / "q2.db")
++            q2.submit([{"id": "x"}])
++            cx1 = q2.claim("w", 0, 5)
++            q2.recover(5)
++            cx2 = q2.claim("w", 5, 5)
++            self.assertEqual(cx2["attempts"], 2)
++            with self.assertRaises(ValueError):
++                q2.complete("x", "w", cx1["attempts"], 5 if 5 < 10 else 6)
++            # retry_delay bool rejected
++            with self.assertRaises(ValueError):
++                q2.fail("x", "w", cx2["attempts"], 6 if 6 < 10 else 6, retry_delay=True)
++
++class MultiprocessTests(unittest.TestCase):
++    def test_submit_survives_restart_separate_process(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            db = str(Path(tmp) / "q.db")
++            Queue(db).submit([{"id": "init"}])
++            ctx = multiprocessing.get_context("spawn")
++            p = ctx.Process(target=_mp_submit, args=(db, [{"id": "from-child", "payload": {"v": 1}}]))
++            p.start()
++            p.join(timeout=20)
++            self.assertEqual(p.exitcode, 0)
++            self.assertEqual(Queue(db).get("from-child")["payload"], {"v": 1})
++            self.assertIsNotNone(Queue(db).get("init"))
++    def test_concurrent_claim_exclusivity(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            db = str(Path(tmp) / "q.db")
++            Queue(db).submit([{"id": "only"}])
++            ctx = multiprocessing.get_context("spawn")
++            out = ctx.Queue()
++            p1 = ctx.Process(target=_mp_claim, args=(db, "w1", 0, 10, out))
++            p2 = ctx.Process(target=_mp_claim, args=(db, "w2", 0, 10, out))
++            p1.start()
++            p2.start()
++            p1.join(timeout=20)
++            p2.join(timeout=20)
++            self.assertEqual(p1.exitcode, 0)
++            self.assertEqual(p2.exitcode, 0)
++            results = []
++            while not out.empty():
++                results.append(out.get())
++            self.assertEqual(len(results), 2)
++            winners = [r for r in results if r[1] == "only"]
++            nones = [r for r in results if r[1] is None]
++            self.assertEqual(len(winners), 1)
++            self.assertEqual(len(nones), 1)
++            cur = Queue(db).get("only")
++            self.assertEqual(cur["state"], "running")
++            self.assertIn(cur["worker"], ("w1", "w2"))
++            self.assertEqual(cur["attempts"], 1)
++
++class CliTests(unittest.TestCase):
++    def test_cli_success_shapes(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            db = str(Path(tmp) / "q.db")
++            p = _run_cli(db, {"op": "submit", "jobs": [{"id": "a", "priority": 2}]})
++            self.assertEqual(p.returncode, 0, p.stderr)
++            self.assertTrue(p.stdout.endswith("\n"))
++            self.assertEqual(p.stdout.count("\n"), 1)
++            val = json.loads(p.stdout)
++            self.assertEqual(val[0]["id"], "a")
++            # sorted keys: check raw starts with [{"attempts"
++            self.assertIn('"attempts"', p.stdout)
++            p2 = _run_cli(db, {"op": "list"})
++            self.assertEqual(p2.returncode, 0)
++            self.assertTrue(p2.stdout.endswith("\n"))
++            p3 = _run_cli(db, {"op": "get", "id": "a"})
++            self.assertEqual(p3.returncode, 0)
++            p4 = _run_cli(db, {"op": "claim", "worker": "w", "now": 0, "lease_seconds": 10})
++            self.assertEqual(p4.returncode, 0)
++            claimed = json.loads(p4.stdout)
++            self.assertEqual(claimed["id"], "a")
++            p5 = _run_cli(db, {"op": "complete", "id": "a", "worker": "w", "attempt": claimed["attempts"], "now": 1})
++            self.assertEqual(p5.returncode, 0)
++            p6 = _run_cli(db, {"op": "recover", "now": 20})
++            self.assertEqual(p6.returncode, 0)
++            self.assertEqual(json.loads(p6.stdout), [])
++    def test_cli_exit2_paths(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            db = str(Path(tmp) / "q.db")
++            Queue(db).submit([{"id": "a"}])
++            # unknown op
++            p = _run_cli(db, {"op": "nope"})
++            self.assertEqual(p.returncode, 2)
++            self.assertEqual(p.stdout, "")
++            # unknown field
++            p = _run_cli(db, {"op": "list", "extra": 1})
++            self.assertEqual(p.returncode, 2)
++            self.assertEqual(p.stdout, "")
++            # missing field
++            p = _run_cli(db, {"op": "get"})
++            self.assertEqual(p.returncode, 2)
++            self.assertEqual(p.stdout, "")
++            # ValueError from API (bool)
++            p = _run_cli(db, {"op": "claim", "worker": "w", "now": True, "lease_seconds": 10})
++            self.assertEqual(p.returncode, 2)
++            self.assertEqual(p.stdout, "")
++            # malformed json
++            p = _run_cli(db, req_text="{bad json")
++            self.assertEqual(p.returncode, 2)
++            self.assertEqual(p.stdout, "")
++            # non-object
++            p = _run_cli(db, req_obj=[1, 2])
++            self.assertEqual(p.returncode, 2)
++            self.assertEqual(p.stdout, "")
++            # invalid utf-8
++            p = _run_cli(db, raw_bytes=b"\xff\xfe bad")
++            self.assertEqual(p.returncode, 2)
++            self.assertEqual(p.stdout, "")
++            # missing file
++            p = subprocess.run([sys.executable, "-m", "durable_queue", "--db", str(db), "--request", str(Path(tmp) / "missing.json")], capture_output=True, text=True)
++            self.assertEqual(p.returncode, 2)
++            self.assertEqual(p.stdout, "")
++            # unavailable db (is directory)
++            p = subprocess.run([sys.executable, "-m", "durable_queue", "--db", str(Path(tmp)), "--request", str(Path(tmp) / "req.json")], capture_output=True, text=True)
++            # need a request file present; create one
++            (Path(tmp) / "req.json").write_text(json.dumps({"op": "list"}), encoding="utf-8")
++            p = subprocess.run([sys.executable, "-m", "durable_queue", "--db", str(Path(tmp)), "--request", str(Path(tmp) / "req.json")], capture_output=True, text=True)
++            self.assertEqual(p.returncode, 2)
++            self.assertEqual(p.stdout, "")
++            # prior committed work survives failure/restart
++            self.assertEqual(Queue(db).get("a")["id"], "a")
++
+diff --git a/tmp2gv0jzoa/req.json b/tmp2gv0jzoa/req.json
+new file mode 100644
+index 0000000..08bfa37
+--- /dev/null
++++ b/tmp2gv0jzoa/req.json
+@@ -0,0 +1 @@
++{"op": "submit", "jobs": [{"id": "a", "priority": 2}]}
+\ No newline at end of file
+diff --git a/tmp33xn2tgv/req.json b/tmp33xn2tgv/req.json
+new file mode 100644
+index 0000000..fd8ef09
+--- /dev/null
++++ b/tmp33xn2tgv/req.json
+@@ -0,0 +1 @@
++[1, 2]
+\ No newline at end of file
+diff --git a/tmp6dc2s2hk/req.json b/tmp6dc2s2hk/req.json
+new file mode 100644
+index 0000000..71464c0
+--- /dev/null
++++ b/tmp6dc2s2hk/req.json
+@@ -0,0 +1 @@
++ÿþ bad
+\ No newline at end of file
+diff --git a/tmp_dgn3w2k/req.json b/tmp_dgn3w2k/req.json
+new file mode 100644
+index 0000000..422675e
+--- /dev/null
++++ b/tmp_dgn3w2k/req.json
+@@ -0,0 +1 @@
++{"op": "get"}
+\ No newline at end of file
+diff --git a/tmp_fx6kpq9/req.json b/tmp_fx6kpq9/req.json
+new file mode 100644
+index 0000000..37123af
+--- /dev/null
++++ b/tmp_fx6kpq9/req.json
+@@ -0,0 +1 @@
++{"op": "get", "id": "a"}
+\ No newline at end of file
+diff --git a/tmpb0s1r247/req.json b/tmpb0s1r247/req.json
+new file mode 100644
+index 0000000..05bb7b1
+--- /dev/null
++++ b/tmpb0s1r247/req.json
+@@ -0,0 +1 @@
++{"op": "complete", "id": "a", "worker": "w", "attempt": 1, "now": 1}
+\ No newline at end of file
+diff --git a/tmpdzq_h7yv/req.json b/tmpdzq_h7yv/req.json
+new file mode 100644
+index 0000000..59e7b58
+--- /dev/null
++++ b/tmpdzq_h7yv/req.json
+@@ -0,0 +1 @@
++{"op": "list", "extra": 1}
+\ No newline at end of file
+diff --git a/tmpfypjqvgm/req.json b/tmpfypjqvgm/req.json
+new file mode 100644
+index 0000000..ce12780
+--- /dev/null
++++ b/tmpfypjqvgm/req.json
+@@ -0,0 +1 @@
++{"op": "nope"}
+\ No newline at end of file
+diff --git a/tmpg87lp295/req.json b/tmpg87lp295/req.json
+new file mode 100644
+index 0000000..7467a03
+--- /dev/null
++++ b/tmpg87lp295/req.json
+@@ -0,0 +1 @@
++{"op": "claim", "worker": "w", "now": 0, "lease_seconds": 10}
+\ No newline at end of file
+diff --git a/tmpgd84uajs/req.json b/tmpgd84uajs/req.json
+new file mode 100644
+index 0000000..fd8ef09
+--- /dev/null
++++ b/tmpgd84uajs/req.json
+@@ -0,0 +1 @@
++[1, 2]
+\ No newline at end of file
+diff --git a/tmpgwq7kcgu/req.json b/tmpgwq7kcgu/req.json
+new file mode 100644
+index 0000000..d0746eb
+--- /dev/null
++++ b/tmpgwq7kcgu/req.json
+@@ -0,0 +1 @@
++{"op": "recover", "now": 20}
+\ No newline at end of file
+diff --git a/tmphhdb1fe3/req.json b/tmphhdb1fe3/req.json
+new file mode 100644
+index 0000000..b3708d0
+--- /dev/null
++++ b/tmphhdb1fe3/req.json
+@@ -0,0 +1 @@
++{bad json
+\ No newline at end of file
+diff --git a/tmpjmwu5if1/req.json b/tmpjmwu5if1/req.json
+new file mode 100644
+index 0000000..08bfa37
+--- /dev/null
++++ b/tmpjmwu5if1/req.json
+@@ -0,0 +1 @@
++{"op": "submit", "jobs": [{"id": "a", "priority": 2}]}
+\ No newline at end of file
+diff --git a/tmpk6a7byz3/req.json b/tmpk6a7byz3/req.json
+new file mode 100644
+index 0000000..b3708d0
+--- /dev/null
++++ b/tmpk6a7byz3/req.json
+@@ -0,0 +1 @@
++{bad json
+\ No newline at end of file
+diff --git a/tmpkuby8e20/req.json b/tmpkuby8e20/req.json
+new file mode 100644
+index 0000000..7467a03
+--- /dev/null
++++ b/tmpkuby8e20/req.json
+@@ -0,0 +1 @@
++{"op": "claim", "worker": "w", "now": 0, "lease_seconds": 10}
+\ No newline at end of file
+diff --git a/tmporv5ok72/req.json b/tmporv5ok72/req.json
+new file mode 100644
+index 0000000..d0746eb
+--- /dev/null
++++ b/tmporv5ok72/req.json
+@@ -0,0 +1 @@
++{"op": "recover", "now": 20}
+\ No newline at end of file
+diff --git a/tmpr3dwrra4/req.json b/tmpr3dwrra4/req.json
+new file mode 100644
+index 0000000..422675e
+--- /dev/null
++++ b/tmpr3dwrra4/req.json
+@@ -0,0 +1 @@
++{"op": "get"}
+\ No newline at end of file
+diff --git a/tmps00dm4tk/req.json b/tmps00dm4tk/req.json
+new file mode 100644
+index 0000000..6a33cf1
+--- /dev/null
++++ b/tmps00dm4tk/req.json
+@@ -0,0 +1 @@
++{"op": "claim", "worker": "w", "now": true, "lease_seconds": 10}
+\ No newline at end of file
+diff --git a/tmpt39657o2/req.json b/tmpt39657o2/req.json
+new file mode 100644
+index 0000000..a9f193a
+--- /dev/null
++++ b/tmpt39657o2/req.json
+@@ -0,0 +1 @@
++{"op": "list"}
+\ No newline at end of file
+diff --git a/tmptavc75t2/req.json b/tmptavc75t2/req.json
+new file mode 100644
+index 0000000..37123af
+--- /dev/null
++++ b/tmptavc75t2/req.json
+@@ -0,0 +1 @@
++{"op": "get", "id": "a"}
+\ No newline at end of file
+diff --git a/tmpu6l7g8op/req.json b/tmpu6l7g8op/req.json
+new file mode 100644
+index 0000000..ce12780
+--- /dev/null
++++ b/tmpu6l7g8op/req.json
+@@ -0,0 +1 @@
++{"op": "nope"}
+\ No newline at end of file
+diff --git a/tmpw3uf7ymy/req.json b/tmpw3uf7ymy/req.json
+new file mode 100644
+index 0000000..59e7b58
+--- /dev/null
++++ b/tmpw3uf7ymy/req.json
+@@ -0,0 +1 @@
++{"op": "list", "extra": 1}
+\ No newline at end of file
+diff --git a/tmpyivq28d2/req.json b/tmpyivq28d2/req.json
+new file mode 100644
+index 0000000..6a33cf1
+--- /dev/null
++++ b/tmpyivq28d2/req.json
+@@ -0,0 +1 @@
++{"op": "claim", "worker": "w", "now": true, "lease_seconds": 10}
+\ No newline at end of file
+diff --git a/tmpyujodga6/req.json b/tmpyujodga6/req.json
+new file mode 100644
+index 0000000..a9f193a
+--- /dev/null
++++ b/tmpyujodga6/req.json
+@@ -0,0 +1 @@
++{"op": "list"}
+\ No newline at end of file
+diff --git a/tmpz19_8nvw/req.json b/tmpz19_8nvw/req.json
+new file mode 100644
+index 0000000..71464c0
+--- /dev/null
++++ b/tmpz19_8nvw/req.json
+@@ -0,0 +1 @@
++ÿþ bad
+\ No newline at end of file
+diff --git a/tmpzt0te9pb/req.json b/tmpzt0te9pb/req.json
+new file mode 100644
+index 0000000..05bb7b1
+--- /dev/null
++++ b/tmpzt0te9pb/req.json
+@@ -0,0 +1 @@
++{"op": "complete", "id": "a", "worker": "w", "attempt": 1, "now": 1}
+\ No newline at end of file

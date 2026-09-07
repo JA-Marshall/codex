@@ -1,0 +1,23 @@
+{
+  "config/run-spec.json": "50f73c007b5eeede0257079d03d3c293cff74a26b6caed1f03c39f6d493ec27c",
+  "config/workflow.effective.json": "a60b6c57680c66fbc30b5483ae3b9dcad977ac79aed32fc1ddd907736081db38",
+  "config/workflow.source.toml": "b5cbaafb0b48ba4b73ae3fff2894ff85b5a261d046f97c416dd7cc3b0aa2f007",
+  "decisions/4.json": "6e6029e45aeb5145ab5747918ff2e309e2279428eecf83254820abb90af2cd83",
+  "events.jsonl": "68615e7b9dfc870122e1d58f930c9be7fc2e18311b85186b454f71ad3fd59e14",
+  "evidence/effective-settings.json": "8500004bdfb7c3517bee82987c9482081195089f4b08b837eab2aceb49ce2e67",
+  "evidence/environment.json": "92c3096f9df7c3a11ddf11f23c4ce81d90b85fdc96f8099b58d37903bbd18fc4",
+  "evidence/failure.json": "c6b85e6ba712cf1c74fa678b977adf1a99a3d7531b5b27a19756b48f6669e670",
+  "evidence/input-01.json": "88a70ca7890eebe527555ddd12aed8492dc2a2f568c061af5821a8364f5048dc",
+  "evidence/input-02.json": "ff277819cecf3fa553a0192fe67044bc1818f027f8a9418962e86481ba69fd19",
+  "evidence/parent-preparation.json": "6e945c32d4d91a7f7f9062bcc5d220d04e695a41dab849bcae552413bf1908c9",
+  "evidence/phase-01.json": "9679f997f4e77580b222f2fe7f144c666a27b52d00b8e55b6c7199b6642d5ac5",
+  "evidence/runtime-manifest.json": "d95765a1106ba4041344a43e99d56c8fd303ac39eac869dbcf1e1a88d168a43f",
+  "instructions/executor.SKILL.md": "31568b6537ec10770b55eabeaf48332a7c8821ededabc2cd33959b2c2e2f13e8",
+  "instructions/planner.SKILL.md": "43b125a14cfedd5ee4fcb8e45f2fc75663ba65658706757216b91764c2052978",
+  "instructions/verifier.SKILL.md": "ce96370edcd9e6b3b45bf372caf8be577cdf8779b424e9cfabb8848da63f8e2e",
+  "manifest.json": "ad923ee0f40ebd3845a8f9bb1a7f558606c52128b222e1787357f88d6c09df9a",
+  "metrics.json": "be926661df4aae7b7154c48f973d488a773ef1288c0eff5ca6612eb4c41047ee",
+  "plans/1/PLAN.md": "9db9ca8e6355f8bdbd6f12292898b225d95db15c69f25fe477d71cd2e942077e",
+  "plans/1/plan.json": "3101600527be6df0acaa85a357e08683c77be6053d8684fc503529f62fd1af49",
+  "runtime-events.jsonl": "79ff1a841c1c153c9671365b77320a1a105e5316514236caaabb31562740ac63"
+}
