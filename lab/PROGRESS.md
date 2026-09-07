@@ -2,7 +2,7 @@
 
 ## Current state
 
-- Phase: **approved milestone complete**. F01–F06 foundation and G01–G06 restricted live integration are implemented, verified with the documented upstream/environment exceptions, and prepared as three local checkpoints.
+- Phase: **approved milestone complete**. F01–F06 foundation and G01–G06 restricted live integration are implemented and verified with the documented upstream/environment exceptions. The three implementation checkpoints are listed in the publication follow-up below.
 - Implementation authorization: see `APPROVAL.json` for foundation and `live-integration-approval.json` for the separately approved integration scope and immutable reviewed digests.
 - Working branch: `lab/foundation-v1`.
 - User requirement: implementation starts only after explicit human approval; material changes require a plan amendment.
@@ -47,7 +47,7 @@
 
 ## Next actions
 
-1. The authorized work stops at G06. Inspect `git log -3` on `lab/foundation-v1` for the domain foundation, upstream admission seam and runtime/handoff checkpoints. Nothing has been pushed.
+1. Implementation stops at G06. The user subsequently authorized a GitHub fork and publication of `lab/foundation-v1`; see the publication follow-up below. Use `git log 112be0bd74ce327788613f4f8f92e8b7c92447c7..HEAD` to inspect implementation and publication records.
 2. For a live Muse experiment, first confirm the Contributor endpoint/identifier, configure credentials locally and supply verified catalog capabilities as described in `RUNNING.md` and `providers/README.md`. Each experimental task still needs its own exact plan approval.
 3. Retain both reviewed development plans unchanged. Keep native source and the LF verification mirror at the same committed revision before resuming development; use the documented synchronization script for subsequent authorized edits.
 4. Benchmark/evaluator orchestration, additional representations/roles, broader capability profiles and safe live resume remain future work. Tests were intentionally not repeated after the final fix/format pass, per upstream instructions.
@@ -149,3 +149,10 @@ The approved foundation and restricted live host are complete with the recorded 
 - Archived the obsolete, rejected repository-tool snapshot proposal at `/home/james/.cache/codex-lab-repository-tools-snapshot-rejected.jsonl` and removed its pending marker from the mirror after hash verification. The expected snapshot was unchanged. The three upstream WSL snapshot proposals remain diagnostic only.
 - Refreshed the final Linux/WSL executable with `cargo build -p codex-lab-runtime --bin codex-lab`: passed in 2m10s. Its `--help` check passed. Binary and packaged Bubblewrap hashes are retained in `/home/james/.cache/codex-lab-binary-final.sha256`; build/help logs are `codex-lab-binary-final.log` and `codex-lab-help-final.log`. This is a build/interface check, not a live model request or a post-format test rerun.
 - Final source checks preserve both approved plan digests, keep all new implementation modules below 500 lines, and leave only the approved paths changed. Local checkpoint staging separates the independent foundation, optional upstream admission seam, and restricted runtime/documentation; Cargo workspace and lock contents are staged coherently for each step. No upstream dependency version or Bazel lock content changed.
+
+## Publication follow-up
+
+- The user explicitly requested: "Fork the codebase and push the change pls". This separately authorizes publishing the completed work; the earlier approval records remain unchanged.
+- Created and verified the GitHub fork `https://github.com/JA-Marshall/codex`, whose parent and source are `openai/codex`. Added it as `origin`; `upstream` remains `https://github.com/openai/codex.git`.
+- Publication target: `origin/lab/foundation-v1`. Implementation checkpoints: `c53d2da` (domain foundation), `431693d` (tool admission seam), and `f9d2a83` (restricted runtime and handoff). This additional ledger commit records publication authorization and destination.
+- This follow-up changes documentation and Git hosting only. Existing code validation results still apply; no live model request or further implementation is included. Verify publication by comparing `git rev-parse HEAD` with `git ls-remote origin refs/heads/lab/foundation-v1`.
