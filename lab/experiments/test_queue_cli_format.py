@@ -27,15 +27,15 @@ class QueueCliFormatTests(unittest.TestCase):
             b'{"a":{"z":1,"b":2}}\n',
             b'{"a":1,"a":1}\n',
             b'[{"b":1,"a":2}]\n',
-            b'{}',
-            b'{}\n\n',
-            b'{}\n{}\n',
-            b'{}\nextra',
-            b'\xff\n',
-            b'NaN\n',
+            b"{}",
+            b"{}\n\n",
+            b"{}\n{}\n",
+            b"{}\nextra",
+            b"\xff\n",
+            b"NaN\n",
             b'{"a":Infinity}\n',
-            b'1e999\n',
-            b'\n',
+            b"1e999\n",
+            b"\n",
         ):
             with self.subTest(data=data):
                 with self.assertRaises(ValueError):
