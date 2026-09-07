@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "user_message": "cancel them all",
+  "unix_ms": 1788806626812,
+  "scope": "Stop all remaining work in this 32-trial campaign; preserve completed and partial artifacts.",
+  "coordinator": 1305416,
+  "hosts": [
+    {
+      "pid": 1306468,
+      "run_id": "queue-repair-r2-aaa-execution"
+    },
+    {
+      "pid": 1306743,
+      "run_id": "queue-repair-r3-abb-execution"
+    },
+    {
+      "pid": 1307023,
+      "run_id": "queue-repair-r3-bbb-execution"
+    },
+    {
+      "pid": 1307093,
+      "run_id": "queue-repair-r4-aab-execution"
+    },
+    {
+      "pid": 1307232,
+      "run_id": "queue-repair-r4-abb-execution"
+    },
+    {
+      "pid": 1307367,
+      "run_id": "queue-repair-r4-bab-execution"
+    },
+    {
+      "pid": 1307436,
+      "run_id": "queue-repair-r4-bba-execution"
+    },
+    {
+      "pid": 1307499,
+      "run_id": "queue-repair-r4-bbb-execution"
+    },
+    {
+      "pid": 1307559,
+      "run_id": "queue-repair-r4-aaa-execution"
+    }
+  ],
+  "descendants": [
+    1306468,
+    1306743,
+    1307023,
+    1307093,
+    1307232,
+    1307367,
+    1307436,
+    1307499,
+    1307559,
+    1357503,
+    1357505,
+    1357513,
+    1357514,
+    1357515,
+    1357516,
+    1357518,
+    1357519,
+    1357520,
+    1357763
+  ],
+  "execution_shutdown_evidence": "Forced cancellation may leave nonterminal journals and no phase shutdown receipt; do not classify those candidates as safely evaluated."
+}

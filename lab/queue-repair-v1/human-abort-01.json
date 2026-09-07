@@ -1,0 +1,27 @@
+{
+  "unix_ms": 1788806546669,
+  "user_reply": "End those two as failures (Recommended)",
+  "action": "abort",
+  "requests": [
+    {
+      "request_id": 2,
+      "target": {
+        "content_sha256": "128880279dfb31cd8bc73ba6a5af594212241ecb6c5c8f66d7c9fa4bd3a1530a",
+        "plan_id": "task-plan",
+        "revision": 2,
+        "run_id": "queue-repair-r1-abb-execution",
+        "run_spec_sha256": "55ab93c0e32ed52e3bbafbf33015fb652d91236d4a59e23ddd85e3c4f478d97f"
+      }
+    },
+    {
+      "request_id": 2,
+      "target": {
+        "content_sha256": "4341ba4fc6dc46f218e0effcdd093497cac0f79fd5ddb65b3abb2a82aaca344c",
+        "plan_id": "task-plan",
+        "revision": 2,
+        "run_id": "queue-repair-r2-bbb-execution",
+        "run_spec_sha256": "b5df6d07812b9c829b3d1ed6b6deb6282a5dad141b9e9f29852120554325e072"
+      }
+    }
+  ]
+}
