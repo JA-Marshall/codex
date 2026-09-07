@@ -99,10 +99,13 @@ beyond the initial output excerpt can still be retrieved.
 Replace the hard-coded choice between three function fixtures and the queue
 fixture with an explicit task registry. Preserve adapters for those existing
 fixtures as calibration coverage. Add repository-test adapters for Python and
-Rust so the main study includes different languages and changes to existing code.
+Rust so the main study includes different languages, new builds and changes to
+existing code. The user's required mix includes greenfield coding, extensions
+and bug fixes; report these separately rather than treating all coding as one task.
 
-Each task manifest records a task/version ID, task family, language, repository
-snapshot and baseline commit, instruction text, fixed scope contract, dependency/
+Each task manifest records a task/version ID, task family, size band, capability
+tags, language, repository snapshot and baseline commit, instruction text, fixed
+scope contract, dependency/
 toolchain pins, public checks, private evaluator identity, resource limits and
 development/study/confirmation membership. Public task files and private grader assets have separate
 inventories. Candidate code never receives reference patches or private tests.
@@ -117,29 +120,56 @@ test run. Candidate-controlled build scripts remain sandboxed.
 
 Build the main collection in small task packs:
 
-| Family | Main-study tasks | Example behavior to assess |
+| Family | Main-study tasks | Example assignments and success criteria |
 | --- | ---: | --- |
-| Existing bug fixes | 5 | Fix a parsing, precedence or boundary defect while preserving established behavior. |
-| Feature additions | 5 | Extend a CLI or API, including validation and compatibility. |
-| Changes across modules | 5 | Refactor or extend behavior spanning several files while retaining public contracts. |
-| State and concurrency | 5 | Preserve persistence, transactions, cancellation, idempotency or competing-worker behavior. |
+| Greenfield builds | 5 | Build a file-indexing CLI, a local HTTP booking service or a data importer from a minimal scaffold. Deliver the specified working interfaces, validation and persistence where required. |
+| Extensions to existing code | 5 | Add pagination/filtering to an API, a new format to an importer or cancellation to a job runner. New behavior must work while existing callers and tests remain compatible. |
+| Bug fixes | 5 | Diagnose and fix configuration precedence, duplicate event processing or corrupted state after interrupted writes. Resolve the reproduced defect and preserve surrounding behavior. |
+| Refactoring and maintenance | 5 | Split a coupled module, replace a storage implementation or remove repeated parsing work. Preserve public behavior and meet a measurable structural or performance requirement. |
 
 Target three Python and two Rust tasks per family: twenty tasks in total. These
-are distinct repository changes, not twenty input cases for one queue problem.
+are distinct assignments. Within each family include two small, two medium and
+one larger bounded task. Assign size bands before model runs using integration
+surface and required behaviors; calibrate resource limits on development tasks.
+Do not define difficulty using which model happens to pass.
+
+Spread capability tags across families: CLI/API design, parsing and data handling,
+filesystem operations, persistence, concurrency and changes across modules. State
+and concurrency are capabilities exercised by several kinds of task, rather than
+a substitute for greenfield work. Avoid filling a family with minor variations
+of one problem. The examples above are selection candidates, not implemented or
+validated fixtures.
+
+Greenfield tasks start from a pinned minimal scaffold with dependencies and test
+entry points, without an existing solution. Specify observable behavior and a
+finite deliverable while leaving implementation choices open. Permit new files
+inside declared source/test directories; keep task authority and private grading
+outside those writable directories. A greenfield assignment must not become an
+open-ended request to keep inventing product features.
+
+Extensions and fixes start from a functioning repository with existing tests and
+documented compatibility requirements. Bug tasks provide symptoms or a public
+reproducer without identifying the faulty implementation; private checks exercise
+the cause and neighboring cases. Refactoring tasks need an explicit observable
+requirement beyond an agent's opinion that the code is cleaner. Performance tasks
+need a pinned workload and a repeatable measurement with calibrated tolerance.
+
 Use multiple independent repository snapshots and record common repository ancestry
-so related tasks are not presented as independent projects. Prefer bounded real
-repository changes with clear contracts. Extracted examples must retain enough
+so related tasks are not presented as independent projects. Prefer realistic,
+bounded assignments with clear contracts. Extracted examples must retain enough
 surrounding code and regression tests to exercise integration. Check provenance
 and dependency availability when selecting each task.
 
-Use four separate development tasks for live smoke testing. Reserve eight further
-tasks for confirmation; keep them out of instruction tuning and initial ranking.
+Use four separate development tasks for live smoke testing, one per family.
+Reserve eight further tasks for confirmation, two per family; keep them out of
+instruction tuning and initial ranking. Keep repository/project ancestry within
+one split so close relatives cannot leak from development into confirmation.
 The existing four diagnostic fixtures can validate adapters without joining the
 new main-study scores.
 
 For every task, check that a trusted solution passes, the starting implementation
-fails the intended new behavior, and at least two plausible wrong solutions are
-rejected. A refactor task whose baseline already meets behavioral checks needs an
+or greenfield scaffold fails the intended new behavior, and at least two plausible
+wrong solutions are rejected. A refactor task whose baseline already meets behavioral checks needs an
 explicit, independently checkable structural requirement. Validate accepted output
 equivalences against the written contract. Freeze the grader before model trials;
 any later correction gets a new version and a separately labelled audit.
@@ -265,7 +295,10 @@ incomplete. Report an all-started autonomous-success rate, a graded-only task pa
 rate with its denominator, and missing outcomes alongside both.
 
 Show per-task and per-family results, the effect of evidence-rich handovers, the effect of
-repair, and whether their combination behaves differently. Compare matched tasks
+repair, and whether their combination behaves differently. Show differences by
+size band where the sample supports them. A workflow
+that helps greenfield construction but hurts bug diagnosis must be visible in
+the report; an overall average alone is insufficient. Compare matched tasks
 and resample complete task groups for exploratory uncertainty intervals, preserving
 their conditions and repetitions; account for shared repositories where feasible.
 Three attempts on twenty tasks is an initial screen. Neither repeated attempts
