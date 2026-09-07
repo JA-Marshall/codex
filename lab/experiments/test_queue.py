@@ -68,6 +68,13 @@ class QueueEvaluationTests(unittest.TestCase):
         self.assertFalse(list(Path(other["repository"]).rglob("queue_cases.py")))
         self.assertFalse(list(Path(other["repository"]).rglob("queue_reference.py")))
 
+    def test_unimplemented_baseline_fails(self):
+        other = setup(self.root / "baseline")
+        result = evaluate(Path(other["repository"]), self.sandbox, self.root / "baseline-evaluation", self.root / "baseline/fixture.json")
+        self.assertFalse(result["task_success"])
+        self.assertFalse(result["public_test_success"])
+        self.assertFalse(result["hidden_test_success"])
+
 
 if __name__ == "__main__":
     unittest.main()
