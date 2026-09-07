@@ -12,7 +12,10 @@ def main():
         data = json.loads(Path(sys.argv[1]).read_bytes().decode("utf-8"))
         if not isinstance(data, dict) or set(data) != {"base", "override"}:
             raise ValueError("expected base and override")
-        output = json.dumps(merge_config(data["base"], data["override"]), sort_keys=True) + "\n"
+        output = (
+            json.dumps(merge_config(data["base"], data["override"]), sort_keys=True)
+            + "\n"
+        )
     except (OSError, ValueError) as error:
         print(str(error), file=sys.stderr)
         return 2

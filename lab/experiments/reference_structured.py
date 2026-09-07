@@ -5,10 +5,14 @@ import heapq
 
 
 def order_tasks(graph):
-    if not isinstance(graph, dict) or any(not isinstance(n, str) or not n for n in graph):
+    if not isinstance(graph, dict) or any(
+        not isinstance(n, str) or not n for n in graph
+    ):
         raise ValueError("invalid graph")
     for dependencies in graph.values():
-        if not isinstance(dependencies, list) or any(not isinstance(d, str) or not d or d not in graph for d in dependencies):
+        if not isinstance(dependencies, list) or any(
+            not isinstance(d, str) or not d or d not in graph for d in dependencies
+        ):
             raise ValueError("invalid dependencies")
     remaining = {node: set(deps) for node, deps in graph.items()}
     ready = [node for node, deps in remaining.items() if not deps]

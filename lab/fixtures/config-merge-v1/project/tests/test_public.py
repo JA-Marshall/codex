@@ -8,7 +8,9 @@ class ConfigTests(unittest.TestCase):
         self.assertEqual(merge_config({}, {}), {})
 
     def test_nested_preservation(self):
-        self.assertEqual(merge_config({"a": {"x": 1}}, {"a": {"y": 2}}), {"a": {"x": 1, "y": 2}})
+        self.assertEqual(
+            merge_config({"a": {"x": 1}}, {"a": {"y": 2}}), {"a": {"x": 1, "y": 2}}
+        )
 
     def test_no_mutation(self):
         base = {"a": 1}

@@ -22,7 +22,11 @@ class Fixture:
         return ROOT / self.name
 
     def arguments(self, value):
-        return [value["base"], value["override"]] if self.name == "config-merge-v1" else [value]
+        return (
+            [value["base"], value["override"]]
+            if self.name == "config-merge-v1"
+            else [value]
+        )
 
     def input_bytes(self, value):
         text = value if self.name == "csv-summary-v1" else json.dumps(value)
@@ -31,8 +35,12 @@ class Fixture:
 
 FIXTURES = {
     "csv-summary-v1": Fixture("csv-summary-v1", "csv_summary", "summarize", CSV_CASES),
-    "dependency-order-v1": Fixture("dependency-order-v1", "dependency_order", "order_tasks", GRAPH_CASES),
-    "config-merge-v1": Fixture("config-merge-v1", "config_merge", "merge_config", CONFIG_CASES),
+    "dependency-order-v1": Fixture(
+        "dependency-order-v1", "dependency_order", "order_tasks", GRAPH_CASES
+    ),
+    "config-merge-v1": Fixture(
+        "config-merge-v1", "config_merge", "merge_config", CONFIG_CASES
+    ),
 }
 
 

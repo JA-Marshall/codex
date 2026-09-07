@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "tested_commit": "fe2cdc0706",
+  "command": "CODEX_LAB_TEST_BINARY=/home/james/.cache/codex-lab-target/debug/codex-lab python3.12 -m unittest discover -s lab/experiments -p 'test_*.py' -v",
+  "passed": 8,
+  "failed": 0,
+  "elapsed_seconds": 25.334,
+  "calibration": {
+    "fixtures": ["csv-summary-v1", "dependency-order-v1", "config-merge-v1"],
+    "variants_per_fixture": ["broken baseline fails", "no-op fails", "incomplete fix fails", "reference passes"],
+    "independent_api_cli_cases": [21, 14, 14],
+    "fixed_public_tests_per_fixture": 3,
+    "sandbox": "existing upstream Linux helper, isolated read-only candidate with bounded observations"
+  },
+  "terminal_observation_checks": ["matched phase shutdown artifacts", "malformed/partial/gapped journals rejected", "active calls and unknown shutdown rejected", "linked artifacts rejected", "later artifact drift detected", "wrong checkout rejected", "repository launch lock respected", "failed workflow preserved", "evaluator revision changes require explicit pin", "frozen suite drift rejected before model calls"],
+  "format": {"just_fmt": "passed", "just_fmt_check": "passed", "python_ast_equivalence_files": 22, "tests_rerun_after_format": false},
+  "scope": {"rust_source_changes": false, "new_dependencies": false, "full_workspace_suite_run": false, "new_live_task_implementation": "requires separate human decisions"}
+}

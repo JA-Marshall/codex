@@ -155,7 +155,9 @@ def evaluate(
         raise ValueError("invalid launch lock")
     with lock_path.open("a+b") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        return evaluate_locked(repository, sandbox, output, fixture_manifest, run, evaluator_sha256)
+        return evaluate_locked(
+            repository, sandbox, output, fixture_manifest, run, evaluator_sha256
+        )
 
 
 def evaluate_locked(
@@ -189,7 +191,9 @@ def evaluate_locked(
         raise ValueError("fixture task changed")
     current_evaluator = evaluator_fingerprint(selected.name)
     if (evaluator_sha256 or metadata["evaluator_sha256"]) != current_evaluator:
-        raise ValueError("evaluator changed; explicitly pin the new evaluator SHA-256 for a new evaluation")
+        raise ValueError(
+            "evaluator changed; explicitly pin the new evaluator SHA-256 for a new evaluation"
+        )
     snapshot, observation = None, None
     if run is not None:
         snapshot, spec, observation = observe_terminal(run)
@@ -217,8 +221,15 @@ def evaluate_locked(
             repository,
             scratch,
             "api",
-            json.dumps({"module": selected.module, "function": selected.function,
-                        "arguments": [selected.arguments(case[1]) for case in selected.cases]}).encode(),
+            json.dumps(
+                {
+                    "module": selected.module,
+                    "function": selected.function,
+                    "arguments": [
+                        selected.arguments(case[1]) for case in selected.cases
+                    ],
+                }
+            ).encode(),
         )
         try:
             values = json.loads(api["stdout"]) if api["exit_code"] == 0 else []
@@ -254,7 +265,11 @@ def evaluate_locked(
                 }
             )
         public = observe(
-            sandbox, repository, scratch, "public", argument=selected.root / "project/tests"
+            sandbox,
+            repository,
+            scratch,
+            "public",
+            argument=selected.root / "project/tests",
         )
     result = {
         "schema_version": 1,
@@ -286,7 +301,9 @@ def evaluate_locked(
         if current_snapshot.hashes != snapshot.hashes:
             raise ValueError("run artifact inventory changed during evaluation")
         observation["git"] = git_observation
-        (output / "observation.json").write_text(json.dumps(observation, indent=2) + "\n", encoding="utf-8")
+        (output / "observation.json").write_text(
+            json.dumps(observation, indent=2) + "\n", encoding="utf-8"
+        )
     (output / "candidate.diff").write_bytes(patch)
     result["task_success"] = (
         result["public_test_success"] and result["hidden_test_success"]
@@ -302,10 +319,17 @@ if __name__ == "__main__":
     for option in ["repository", "sandbox", "output", "fixture-manifest"]:
         parser.add_argument("--" + option, type=Path, required=True)
     parser.add_argument("--run", type=Path, required=True)
-    parser.add_argument("--evaluator-sha256", help="Explicit current revision pin when reevaluating an older fixture")
+    parser.add_argument(
+        "--evaluator-sha256",
+        help="Explicit current revision pin when reevaluating an older fixture",
+    )
     args = parser.parse_args()
     result = evaluate(
-        args.repository, args.sandbox, args.output, args.fixture_manifest, args.run,
+        args.repository,
+        args.sandbox,
+        args.output,
+        args.fixture_manifest,
+        args.run,
         evaluator_sha256=args.evaluator_sha256,
     )
     print(
