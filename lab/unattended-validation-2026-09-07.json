@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "feature": "finite unattended campaign queue with explicitly delegated plan decisions",
+  "runtime_platform": "Ubuntu WSL / Python 3.12.14",
+  "tests": {
+    "domain_workflow": 10,
+    "domain_configuration": 6,
+    "runtime_driver_including_campaign_cli": 13,
+    "runtime_cli": 3,
+    "python_campaign_terminal_and_queue_evaluator": 16,
+    "all_passed": true,
+    "skipped": 0,
+    "full_workspace_suite": false,
+    "note": "The two campaign input tests were moved into test_campaign_inputs.py after passing; assertions and setup behaviour were preserved. Tests were not rerun after formatting."
+  },
+  "checks": {
+    "strict_scoped_clippy": "passed",
+    "just_fmt": "passed",
+    "just_fmt_check": "passed",
+    "runtime_build": "passed",
+    "packaged_cli_campaign_policy_help": "passed",
+    "windows_launcher_offline_preparation": "passed",
+    "bash_launcher_syntax": "passed"
+  },
+  "fake_queue": {"trials": 100, "maximum_active_workers": 3, "failures_retained": true},
+  "prepared_example": {
+    "path": "/home/james/.cache/codex-lab-campaigns/unattended-200-prepared-20260907/campaign.json",
+    "trials": 200,
+    "jobs": 16,
+    "workflow": "queue-baa-v2",
+    "max_amendments": 0,
+    "executed": false
+  },
+  "bundle": "/home/james/.cache/codex-lab-binaries/unattended-v1-20260907",
+  "binary_sha256": "c2a7860bd1496d1f8f4be4f9bc5e420ad3aaf5e92cd464b9247b911e42546d52",
+  "source_and_binary_receipt": "/home/james/.cache/codex-lab-binaries/unattended-v1-20260907/build.json",
+  "live_provider_calls": 0,
+  "limits": {"maximum_queued_trials": 1000, "maximum_workers": 32, "maximum_amendments": 4, "automatic_whole_trial_retries": 0, "crash_resume": false, "hard_spend_limit": null}
+}

@@ -1,5 +1,7 @@
 # Codex workflow laboratory: foundation v1
 
+For unattended planning, execution and evaluation of hundreds of queued trials, see [UNATTENDED.md](UNATTENDED.md). The opt-in campaign policy replaces per-plan human review for that campaign and preserves its automatic decision records.
+
 For the new restricted live host, see [RUNNING.md](RUNNING.md). The material below records the original offline foundation milestone; its statements about runtime integration and upstream edits describe that earlier scope. Current validation and remaining work are tracked in [PROGRESS.md](PROGRESS.md).
 
 The approved follow-up in [NEXT_STEPS.md](NEXT_STEPS.md) is implemented: durable prepared-plan review, an evaluated fixture, and a Markdown/JSON pilot. The new commands and contracts are documented in [EXPERIMENTS.md](EXPERIMENTS.md). [Pilot results](pilot/RESULTS.md) record a Markdown workflow failure and a JSON candidate correctness failure; the comparison is descriptive, with no renderer winner.
