@@ -4,3 +4,6 @@ live-integration-plan.json text eol=lf
 next-steps-plan.json text eol=lf
 # Preserve the exact capability-catalog digest recorded during live validation.
 providers/muse-contributor.models.json text eol=lf
+# Fixture and evaluator bytes are experimental controls across native/WSL copies.
+fixtures/** text eol=lf
+experiments/** text eol=lf

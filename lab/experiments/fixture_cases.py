@@ -1,0 +1,25 @@
+"""Independent expected results. Never copied into an agent checkout or prompt."""
+
+CASES = [
+    ("empty", "", {}),
+    ("header", "category,count\n", {}),
+    ("bom", "\ufeffcategory,count\r\na,2\r\n", {"a": 2}),
+    ("quoted-comma", 'category,count\n"red,green",7\n', {"red,green": 7}),
+    ("escaped-quote", 'category,count\n"say ""yes""",1\n', {'say "yes"': 1}),
+    ("quoted-newline", 'category,count\r\n"two\r\nlines",2\r\n', {"two\r\nlines": 2}),
+    ("blank-records", "category,count\n\na,0\n\na,02\n", {"a": 2}),
+    ("preserve-category", "category,count\n a ,1\n,2\n a ,4\n", {" a ": 5, "": 2}),
+    ("wrong-header", "count,category\na,1\n", None),
+    ("extra-field", "category,count\na,1,x\n", None),
+    ("missing-field", "category,count\na\n", None),
+    ("negative", "category,count\na,-1\n", None),
+    ("signed", "category,count\na,+1\n", None),
+    ("whitespace-count", "category,count\na, 1\n", None),
+    ("empty-count", "category,count\na,\n", None),
+    ("unicode-digit", "category,count\na,\u0661\n", None),
+    ("decimal", "category,count\na,1.0\n", None),
+    ("unterminated", 'category,count\n"a,1\n', None),
+    ("after-quote", 'category,count\n"a"x,1\n', None),
+    ("bare-quote", 'category,count\na"b,1\n', None),
+    ("late-error", "category,count\na,1\nb,-2\n", None),
+]
