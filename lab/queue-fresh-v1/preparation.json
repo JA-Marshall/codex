@@ -1,0 +1,56 @@
+{
+  "root": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1",
+  "source_commit": "1adda1a5c0eb708c98380ae92acfa5c3cf320337",
+  "statuses": {
+    "awaiting_plan_approval": 32
+  },
+  "new_plans": [
+    {
+      "id": "queue-r1-aaa",
+      "plan_sha256": "5d89ce42e9c24461349f05e22812a58c3adee2a18b20a584f06a8dae68052a63",
+      "path": "plans/queue-r1-aaa.md"
+    },
+    {
+      "id": "queue-r1-baa",
+      "plan_sha256": "7a0f35e8eabaaee69fa2e4f9a8a6e735f70af91d9a84956d5cd7d86bdf1043bb",
+      "path": "plans/queue-r1-baa.md"
+    },
+    {
+      "id": "queue-r2-baa",
+      "plan_sha256": "5953b37de8f9f60c2a4784c545f0d9b7c03cfb2e5052bc4951cd73868dcd5f45",
+      "path": "plans/queue-r2-baa.md"
+    },
+    {
+      "id": "queue-r2-aaa",
+      "plan_sha256": "41c1adc928ab07ab7d9f84b6d1fbd279beb9c8a98650ee00118796741439457c",
+      "path": "plans/queue-r2-aaa.md"
+    },
+    {
+      "id": "queue-r3-baa",
+      "plan_sha256": "3a5a15b5f055963a5341a87d8e8ed3ea20e8bcef941a7b2c297c4849ec5d7b91",
+      "path": "plans/queue-r3-baa.md"
+    },
+    {
+      "id": "queue-r3-aaa",
+      "plan_sha256": "3101600527be6df0acaa85a357e08683c77be6053d8684fc503529f62fd1af49",
+      "path": "plans/queue-r3-aaa.md"
+    },
+    {
+      "id": "queue-r4-baa",
+      "plan_sha256": "12ae54522cc2e84d2587aa75867d623df24baf35822e1df4a20512383627a4e4",
+      "path": "plans/queue-r4-baa.md"
+    },
+    {
+      "id": "queue-r4-aaa",
+      "plan_sha256": "0b8d9bbefcad6e21535fc72df441b0e8e0a6816d72a5ded3a697b9d3076b9b19",
+      "path": "plans/queue-r4-aaa.md"
+    }
+  ],
+  "batch_sha256": "75c51b0409949b6c56fef573f3e4624408e387505bd3410de8e79f9455f21acf",
+  "matrix_sha256": "cec02bee125a4a44dcc58a1a653eed14e203f59a0c4cf996b9e946dc054b924f",
+  "execution_concurrency": 16,
+  "max_repairs": 2,
+  "provider_requests_per_minute": 100,
+  "implementation_started": false,
+  "historical_results_included": false
+}

@@ -1,0 +1,27 @@
+{
+  "status": "proposed, not human-approved",
+  "reason": "CONTRACT.md lists exactly ten job-view fields. No other changes.",
+  "changes": [
+    {
+      "parent": "queue-r2-baa",
+      "field": "/acceptance_criteria/0/description",
+      "before": "Atomic submit: validation, dedup, unknown/self/cycle rejection, idempotent spec match, zero writes on invalid batch, detached 12-key views, get/list sorted.",
+      "after": "Atomic submit: validation, dedup, unknown/self/cycle rejection, idempotent spec match, zero writes on invalid batch, detached 10-key views, get/list sorted."
+    },
+    {
+      "parent": "queue-r2-baa",
+      "field": "/steps/1/instructions",
+      "before": "Implement atomic submit/get/list: normalize defaults, reject unknown fields, no caller mutation, intra-batch dup, unknown/self/cycle check, idempotent original-spec store, detached 12-key views, ID-sorted list.",
+      "after": "Implement atomic submit/get/list: normalize defaults, reject unknown fields, no caller mutation, intra-batch dup, unknown/self/cycle check, idempotent original-spec store, detached 10-key views, ID-sorted list."
+    },
+    {
+      "parent": "queue-r3-aaa",
+      "field": "/steps/0/instructions",
+      "before": "Add strict validation and atomic submit: no input mutation, sorted-unique deps, batch dup/unknown/self/cycle rejection, idempotent only on normalized original-spec match, rollback with no recovery side-effect, detached 12-key views.",
+      "after": "Add strict validation and atomic submit: no input mutation, sorted-unique deps, batch dup/unknown/self/cycle rejection, idempotent only on normalized original-spec match, rollback with no recovery side-effect, detached 10-key views."
+    }
+  ],
+  "affected_planner_samples": 2,
+  "affected_execution_targets": 8,
+  "original_review_sha256": "20ec7d901cccf63c3f8d997b96d1fda65f9b6ba45a091dd0e1ac3102ed165c6f"
+}

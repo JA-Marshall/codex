@@ -1,0 +1,47 @@
+"""Fresh post-reset plans and candidates; no implementation authority."""
+import json,os,shutil,subprocess,sys
+from pathlib import Path
+from datetime import datetime,timezone
+from urllib.request import urlopen
+source=Path('/home/james/.cache/codex-lab-verify')
+sys.path.insert(0,str(source/'lab/experiments'))
+from setup_matrix import freeze
+from setup_fixture import sha256
+from setup_suite import validate_pins
+from queue_fixture import evaluator_fingerprint,EVALUATOR_VERSION
+binary=Path('/home/james/.cache/codex-lab-binaries/receipt-fix-v1-20260907/codex-lab')
+assert sha256(binary)=='de6b3c0ed3a8bb976b5fe6aa77dc0df1c39318c32892a073a5168b76d819f59b'
+home=Path('/home/james/.config/codex-lab/muse-contributor-limited')
+with urlopen('http://127.0.0.1:8765/health',timeout=5) as response:
+ assert json.load(response)=={'status':'ready','requests_per_minute':100}
+root=Path('/home/james/.cache/codex-lab-queue-matrix')/(datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')+'-fresh-v1')
+manifest=freeze(root,binary,home)
+archive=Path(manifest['archive'])
+# Existing scheduler uses this catalog filename. Freeze an exact copy of the
+# repair-enabled catalog there, record the transformation, and pin its bytes.
+catalog=archive/'workflows/queue-matrix.toml'
+shutil.copyfile(archive/'workflows/queue-repair.toml',catalog)
+manifest['pins'][str(catalog)]=sha256(catalog)
+for entry in manifest['conditions']:
+ entry['workflow']=entry['workflow'].replace('-v1','-repair-v1')
+manifest['limits'].update(concurrency=16,preparation_concurrency=8,execution_attempts_total=32,max_repairs=2,provider_requests_per_minute=100)
+manifest.update(evaluator_version=EVALUATOR_VERSION,evaluator_sha256=evaluator_fingerprint(),
+ reset='All pre-reset plans, candidates, results and approvals excluded. Eight fresh planner samples across four paired blocks; 32 fresh candidates.',
+ catalog_transformation='queue-repair.toml copied byte-for-byte to archived queue-matrix.toml for existing scheduler; both pinned.',
+ analysis='Fresh 2x2x2 planner/executor/verifier matrix, four blocks. Plans shared only within each new block/planner. Analyze only this campaign; no historical results or candidate reuse.')
+service=Path('/home/james/.cache/codex-lab-provider-proxy/v1-20260907')
+for p in [service/'provider_proxy.py',service/'provider_rate_limit.py',service/'service.json']:
+ manifest['pins'][str(p)]=sha256(p)
+manifest['provider_service']={'directory':str(service),'events':str(service/'events.jsonl'),'event_offset_at_start':(service/'events.jsonl').stat().st_size,'requests_per_minute':100}
+(root/'matrix.json').write_text(json.dumps(manifest,indent=2)+'\n')
+shutil.copyfile(__file__,root/'launcher.py')
+(root/'launcher.json').write_text(json.dumps({'launcher_sha256':sha256(root/'launcher.py'),'matrix_sha256':sha256(root/'matrix.json')},indent=2)+'\n')
+validate_pins(manifest)
+Path('/home/james/.cache/codex-lab-fresh-root.txt').write_text(str(root)+'\n')
+environment=dict(os.environ)
+environment['MODEL_API_KEY']=Path('/home/james/.config/codex-lab/credentials/meta-api-key').read_text().strip()
+environment['CODEX_HOME']=str(home)
+environment['CODEX_ROLLOUT_TRACE_ROOT']=str(root/'traces')
+print(json.dumps({'root':str(root),'conditions':32,'fresh_planners':8,'execution_authority':False}),flush=True)
+result=subprocess.run([sys.executable,str(archive/'experiments/setup_matrix.py'),'prepare',str(root)],env=environment)
+sys.exit(result.returncode)
