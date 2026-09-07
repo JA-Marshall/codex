@@ -220,6 +220,10 @@ impl Driver {
             ));
         }
         crate::validate_phase_context(self.roles.executor.content(), &implementation_prompt)?;
+        if self.max_repairs > 0 {
+            crate::validate_phase_context(self.roles.executor.content(),
+                &crate::repair::prompt(&implementation_prompt, self.max_repairs, &"x".repeat(512)))?;
+        }
         crate::validate_phase_context(self.roles.verifier.content(), &verification_prompt)?;
         Ok((rendered, implementation_prompt, verification_prompt))
     }
@@ -230,7 +234,7 @@ impl Driver {
         reviewer: &mut impl HumanReviewer,
     ) -> Result<()> {
         let research = self.prepare_plan(options).await?;
-        loop {
+        'review: loop {
             let plan = self.authority.plan()?.context("canonical plan missing")?;
             let target = self
                 .authority
@@ -279,6 +283,9 @@ impl Driver {
                 }
                 HumanDecision::Abort => bail!("human review ended without approval"),
             }
+            let initial_implementation_prompt = implementation_prompt;
+            let mut implementation_prompt = initial_implementation_prompt.clone();
+            loop {
             let (report, implementation_artifact) = if let Some(input) = &options.verification_input
             {
                 input.validate(&plan, &options.repository_commit)?;
@@ -290,7 +297,7 @@ impl Driver {
                 let Some(index) = self
                     .phase(
                         Phase::Implementation,
-                        implementation_prompt,
+                        implementation_prompt.clone(),
                         Some(reports::implementation_schema()),
                     )
                     .await?
@@ -301,7 +308,7 @@ impl Driver {
                         .context("missing amendment reason")?;
                     self.generate_plan(&options.task, &research, &feedback)
                         .await?;
-                    continue;
+                    continue 'review;
                 };
                 let report: reports::ImplementationReport =
                     serde_json::from_str(&self.outputs[index].1.text)?;
@@ -346,7 +353,7 @@ impl Driver {
             let Some(index) = self
                 .phase(
                     Phase::Verification,
-                    verification_prompt,
+                    verification_prompt.clone(),
                     Some(reports::verification_schema()),
                 )
                 .await?
@@ -361,17 +368,28 @@ impl Driver {
                 );
                 self.generate_plan(&options.task, &research, &feedback)
                     .await?;
-                continue;
+                continue 'review;
             };
             let artifact = format!("evidence/phase-{:02}.json", self.phase_count);
-            for (id, evidence) in
-                reports::verification_evidence(&plan, &self.outputs[index].1, &artifact)?
-            {
-                ensure!(evidence.passed, "verification {id} failed");
-                self.authority
-                    .update(|run| run.record_verification(&id, evidence))?;
+            let checks = reports::verification_evidence(&plan, &self.outputs[index].1, &artifact)?;
+            let failed = checks.iter().filter(|(_, evidence)| !evidence.passed)
+                .map(|(id, _)| id.as_str()).collect::<Vec<_>>();
+            for (id, evidence) in &checks {
+                self.authority.update(|run| run.record_verification(id, evidence.clone()))?;
+            }
+            if !failed.is_empty() {
+                self.authority.update(LabRun::begin_repair)?;
+                self.repairs += 1;
+                self.evidence.write_json(&format!("repair-{:02}.json", self.repairs),
+                    &serde_json::json!({"attempt":self.repairs,"verification_artifact":artifact,
+                        "checks":checks,"target":self.authority.snapshot()?.approved}))?;
+                let failures: String = failed.join(", ").chars().take(128).collect();
+                implementation_prompt = crate::repair::prompt(&initial_implementation_prompt, self.repairs, &failures);
+                crate::validate_phase_context(self.roles.executor.content(), &implementation_prompt)?;
+                continue;
             }
             return Ok(());
+            }
         }
     }
 }

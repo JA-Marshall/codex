@@ -1,6 +1,9 @@
 mod common;
 mod support;
 
+#[path = "workflow/repair.rs"]
+mod repair;
+
 use std::panic::AssertUnwindSafe;
 
 use codex_lab::ActionKind;

@@ -39,6 +39,7 @@ fn inheritance_changes_only_the_selected_dimension() {
     let source = catalog_source();
     let catalog = WorkflowCatalog::parse(&source).unwrap();
     let mut expected = ResolvedWorkflow {
+        max_repairs: 0,
         approval: ApprovalPolicy::HumanRequired,
         plan: PlanConfig {
             renderer: Renderer::Markdown,
@@ -57,6 +58,18 @@ fn inheritance_changes_only_the_selected_dimension() {
         vec!["base", "markdown", "json"]
     );
     assert_eq!(catalog.source(), source);
+}
+
+#[test]
+fn repair_policy_is_inherited_bounded_and_omitted_when_disabled() {
+    let source = catalog_source().replace("[workflows.base]", "[workflows.base]\nmax_repairs = 2");
+    let catalog = WorkflowCatalog::parse(&source).unwrap();
+    assert_eq!(catalog.resolve("json").unwrap().max_repairs, 2);
+    let disabled = source.replace("[workflows.json]", "[workflows.json]\nmax_repairs = 0");
+    let workflow = WorkflowCatalog::parse(&disabled).unwrap().resolve("json").unwrap();
+    assert!(serde_json::to_value(workflow).unwrap().get("max_repairs").is_none());
+    let invalid = source.replace("max_repairs = 2", "max_repairs = 5");
+    assert!(WorkflowCatalog::parse(&invalid).unwrap().resolve("json").is_err());
 }
 
 #[test]

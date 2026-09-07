@@ -76,6 +76,7 @@ pub(crate) struct Workflow {
     run_id: String,
     spec_digest: String,
     retired_ids: BTreeSet<String>,
+    repairs: u8,
 }
 
 pub(crate) enum Command {
@@ -101,6 +102,7 @@ pub(crate) enum Command {
         progress: StepProgress,
     },
     BeginVerification,
+    BeginRepair { limit: u8 },
     RecordVerification {
         id: String,
         evidence: VerificationEvidence,
@@ -139,6 +141,7 @@ pub(crate) enum Change {
         progress: StepProgress,
     },
     VerificationStarted,
+    RepairStarted { attempt: u8 },
     VerificationRecorded {
         id: String,
         evidence: VerificationEvidence,
@@ -171,6 +174,7 @@ impl Workflow {
             run_id,
             spec_digest,
             retired_ids: BTreeSet::new(),
+            repairs: 0,
         }
     }
 
@@ -182,6 +186,23 @@ impl Workflow {
             return Err(LabError::Invalid("workflow is terminal".into()));
         }
         match command {
+            Command::BeginRepair { limit } => {
+                self.require_state(WorkflowState::Verifying)?;
+                if self.snapshot.approved.is_none()
+                    || self.snapshot.approved != self.snapshot.target
+                    || self.repairs >= limit
+                    || !self.snapshot.verification.values().any(|e| !e.passed)
+                {
+                    return Err(LabError::Invalid("repair requires approved failed verification and remaining budget".into()));
+                }
+                self.repairs += 1;
+                self.snapshot.verification.clear();
+                for progress in self.snapshot.progress.values_mut() {
+                    *progress = StepProgress { status: StepStatus::Pending, evidence: None };
+                }
+                self.snapshot.state = WorkflowState::Implementing;
+                Ok(Change::RepairStarted { attempt: self.repairs })
+            }
             Command::BeginPlanning => {
                 self.require_state(WorkflowState::Researching)?;
                 self.snapshot.state = WorkflowState::Planning;

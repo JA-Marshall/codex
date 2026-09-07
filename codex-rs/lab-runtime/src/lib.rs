@@ -19,6 +19,7 @@ mod prepared_journal;
 mod prepared_launch;
 mod prepared_lock;
 mod reports;
+mod repair;
 mod repository_tools;
 mod review;
 mod review_channel;

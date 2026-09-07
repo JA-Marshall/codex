@@ -33,6 +33,8 @@ pub(crate) async fn initialize(
 ) -> Result<Driver> {
     let catalog = WorkflowCatalog::parse(&options.workflow_catalog)?;
     let workflow = catalog.resolve(&options.workflow)?;
+    ensure!(options.verification_input.is_none() || workflow.max_repairs == 0,
+        "verifier-only trials cannot enable executor repairs");
     verify_git_baseline(&options.repository, &options.repository_commit).await?;
     let runtime = Arc::new(
         PreparedRuntime::load(
@@ -118,6 +120,8 @@ pub(crate) async fn initialize(
         amendments: 0,
         first_approval: None,
         amendment_feedback: None,
+        repairs: 0,
+        max_repairs: workflow.max_repairs,
     };
     driver.evidence.write_json("runtime-manifest.json", &serde_json::json!({
         "schema_version":1,"implementation":"codex-lab-runtime-v1",
@@ -152,6 +156,7 @@ pub(crate) async fn finish_run(
         "verification_command_results":"passed; semantic adequacy remains reviewer/evaluator responsibility",
         "first_plan_human_approval":driver.first_approval,"human_plan_edits":driver.human_edits,
         "plan_amendments":driver.amendments,"plan_deviations":null,
+        "repair_attempts":driver.repairs,
         "input_tokens":input_tokens,"output_tokens":output_tokens,"turns":driver.phase_count,
         "planner_calls":null,
         "planner_phases":driver.outputs.iter().filter(|o|o.0 == Phase::Planning).count(),
@@ -183,4 +188,6 @@ pub(crate) struct Driver {
     pub amendments: usize,
     pub first_approval: Option<bool>,
     pub amendment_feedback: Option<String>,
+    pub repairs: u8,
+    pub max_repairs: u8,
 }
