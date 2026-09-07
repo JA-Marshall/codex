@@ -1,0 +1,142 @@
+"""Freeze sixteen fresh imported-plan trials. No credentials, model calls or decisions."""
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timezone
+import copy
+import json
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+import tomllib
+
+source = Path('/home/james/.cache/codex-lab-verify')
+public = Path('/mnt/c/Users/james/Desktop/Code/trees/codex-lab/lab/queue-rerun-v2')
+prior = Path('/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z')
+sys.path.insert(0, str(source/'lab/experiments'))
+from setup_fixture import git, sha256
+from setup_suite import validate_pins
+from queue_fixture import setup, evaluator_fingerprint, EVALUATOR_VERSION
+from batch_inputs import load_batch
+
+def read(path):
+    return json.loads(path.read_text())
+
+def write(path, value):
+    path.write_text(json.dumps(value, indent=2)+'\n')
+
+assert not git(source, 'status', '--porcelain')
+old = read(prior/'matrix.json')
+validate_pins(old)
+root = prior.parent/(datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')+'-v2')
+root.mkdir(exist_ok=False)
+public.mkdir(exist_ok=False)
+for name in ('runs','tasks','preparation','plans','traces'):
+    (root/name).mkdir()
+(public/'plans').mkdir()
+archive = root/'inputs/lab'
+archive.mkdir(parents=True)
+for name in ('experiments','fixtures','workflows','instructions'):
+    shutil.copytree(source/'lab'/name, archive/name, ignore=shutil.ignore_patterns('__pycache__','*.pyc'))
+shutil.copyfile(__file__, root/'prepare.py')
+shutil.copyfile(__file__, public/'prepare.py.txt')
+selected = read(prior/'proposed-edits/batch-input-recommended.json')['runs']
+entries = []
+pins = {p:d for p,d in old['pins'].items() if not Path(p).is_relative_to(prior)}
+pins.update({str(p):sha256(p) for p in archive.rglob('*') if p.is_file()})
+plans = {}
+for entry in old['conditions']:
+    if entry['block'] > 2:
+        continue
+    parent = entry['parent'] or entry['id']
+    old_run = next(r for r in selected if r['run_id'] in (entry['id']+'-execution',entry['id']+'-edited-execution'))
+    descriptor_path = Path(old_run['prepared'])
+    assert sha256(descriptor_path) == old_run['prepared_sha256']
+    old_prepared = descriptor_path.parents[1]
+    descriptor = read(descriptor_path)
+    for name, digest in descriptor['files'].items():
+        assert sha256(old_prepared/name) == digest
+    plan = old_prepared/'plans/1/plan.json'
+    if parent not in plans:
+        target = root/'plans'/(parent+'.json')
+        shutil.copyfile(plan, target)
+        plans[parent] = {'path':str(target),'sha256':sha256(target),'prior_prepared':str(descriptor_path),'canonical_sha256':descriptor['plan_sha256']}
+        pins[str(target)] = sha256(target)
+        shutil.copyfile(target, public/'plans'/target.name)
+        shutil.copyfile(old_prepared/'plans/1/PLAN.md', public/'plans'/(parent+'.md'))
+    assert sha256(plan) == plans[parent]['sha256']
+    name = entry['id'].replace('queue-', 'queue-v2-', 1)
+    fixture = setup(root/'tasks'/name)
+    assert fixture['commit'] == entry['commit']
+    fixture_path = root/'tasks'/name/'fixture.json'
+    pins[str(fixture_path)] = sha256(fixture_path)
+    entries.append(dict(entry, id=name, preparation_id=name+'-prepared', execution_id=name+'-execution',
+        workflow=entry['workflow'].replace('-v1','-v2'), repository=fixture['repository'],
+        fixture_manifest=str(fixture_path), plan_file=plans[parent]['path'], prior_prepared=str(descriptor_path),
+        prior_condition=entry['id'], plan_parent=parent))
+limits = copy.deepcopy(old['limits'])
+limits.update(concurrency=16, aggregate_token_allocation=None, execution_attempts_total=16)
+manifest = dict(schema_version=1, source_commit=git(source,'rev-parse','HEAD'), binary=old['binary'],
+    codex_home=old['codex_home'], requested_model=old['requested_model'], archive=str(archive),
+    conditions=entries, plans=plans, limits=limits, pins=pins, evaluator_version=EVALUATOR_VERSION,
+    evaluator_sha256=evaluator_fingerprint(), prior_campaign=str(prior),
+    analysis='First two existing plan blocks, selected by order, not outcome. Four imported plans; zero new planner samples. Fresh candidates, no repair hints. New verifier protocols and concurrency prevent a single-variable old/new causal comparison.',
+    approval='Preparation only. All sixteen exact fresh targets require human approval; no prior decision may be reused.')
+write(root/'matrix.json', manifest)
+validate_pins(manifest)
+
+def prepare(entry):
+    command = [manifest['binary'],'prepare','--repository',entry['repository'],'--commit',entry['commit'],
+        '--codex-home',manifest['codex_home'],'--runs-directory',str(root/'runs'),'--run-id',entry['preparation_id'],
+        '--task-file',str(archive/'fixtures/durable-queue-v1/task.txt'),'--workflow-catalog',str(archive/'workflows/queue-matrix-v2.toml'),
+        '--instruction-root',str(archive),'--workflow',entry['workflow'],'--plan-file',entry['plan_file']]
+    with (root/'preparation'/(entry['id']+'.stdout')).open('xb') as stdout, (root/'preparation'/(entry['id']+'.stderr')).open('xb') as stderr:
+        result = subprocess.run(command, stdin=subprocess.DEVNULL, stdout=stdout, stderr=stderr, cwd=root, check=False)
+    assert result.returncode == 0, entry['id']
+    run = root/'runs'/entry['preparation_id']
+    path = run/'evidence/prepared.json'
+    descriptor = read(path)
+    assert descriptor['phase_threads'] == 0
+    assert not list((run/'evidence').glob('phase-*.json'))
+    assert not (run/'runtime-events.jsonl').read_text().strip()
+    events = [json.loads(line) for line in (run/'events.jsonl').read_text().splitlines()]
+    assert events[-1]['state'] == 'awaiting_plan_approval'
+    assert all(e['approved'] is None for e in events)
+    assert not git(Path(entry['repository']),'status','--porcelain')
+    assert descriptor['plan_sha256'] == plans[entry['plan_parent']]['canonical_sha256']
+    assert (run/'plans/1/plan.json').read_bytes() == Path(entry['plan_file']).read_bytes()
+    for name,digest in descriptor['files'].items():
+        assert sha256(run/name) == digest
+    previous = read(Path(entry['prior_prepared']).parents[1]/'config/run-spec.json')
+    current = read(run/'config/run-spec.json')
+    a,b = copy.deepcopy(previous),copy.deepcopy(current)
+    # Repository identity excludes its path in current RunSpec. Only verifier
+    # selection/bytes and profile identity may differ from the corresponding v1.
+    for value in (a,b):
+        value.pop('workflow_name')
+        value.pop('inheritance_chain')
+        value['workflow']['roles'].pop('verifier')
+        value['instructions'].pop('verifier')
+        for instruction in value['instructions'].values():
+            instruction.pop('path')
+    assert a == b, (entry['id'], a, b)
+    target = dict(run_id=entry['execution_id'], plan_id=descriptor['plan_id'], revision=descriptor['revision'],
+        content_sha256=descriptor['plan_sha256'],run_spec_sha256=descriptor['run_spec_sha256'])
+    return dict(entry, status='awaiting_plan_approval', prepared=str(path), prepared_sha256=sha256(path),
+        target=target, run_spec=current, artifact_inventory=descriptor['files'])
+
+with ThreadPoolExecutor(max_workers=16) as pool:
+    records = list(pool.map(prepare, entries))
+batch = dict(schema_version=1,binary=manifest['binary'],binary_sha256=manifest['pins'][manifest['binary']],
+    runs=[dict(run_id=r['execution_id'],prepared=r['prepared'],prepared_sha256=r['prepared_sha256']) for r in records])
+write(root/'batch-input.json',batch)
+preflight=load_batch(root/'batch-input.json',root/'batch',16)
+assert len(preflight['runs']) == 16
+validate_pins(manifest)
+for name,value in [('matrix.json',manifest),('conditions.json',records),('batch-input.json',batch),
+    ('preflight.json',preflight),('review-targets.json',dict(status='unapproved',targets=[r['target'] for r in records]))]:
+    write(public/name,value)
+write(root/'review.json',dict(status='awaiting human approval',conditions=records))
+write(public/'preparation.json',dict(root=str(root),source_commit=manifest['source_commit'],model_calls=0,tokens=0,
+    prepared=16,concurrency=16,plan_count=4,batch_sha256=sha256(root/'batch-input.json'),
+    matrix_sha256=sha256(root/'matrix.json'),evaluator_version=EVALUATOR_VERSION))
+print(json.dumps(dict(root=str(root),prepared=16,model_calls=0,batch_sha256=sha256(root/'batch-input.json'))))

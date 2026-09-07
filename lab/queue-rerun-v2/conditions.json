@@ -1,0 +1,1522 @@
+[
+  {
+    "id": "queue-v2-r1-aaa",
+    "block": 1,
+    "planner": "a",
+    "executor": "a",
+    "verifier": "a",
+    "workflow": "queue-aaa-v2",
+    "parent": null,
+    "preparation_id": "queue-v2-r1-aaa-prepared",
+    "execution_id": "queue-v2-r1-aaa-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r1-aaa/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r1-aaa/fixture.json",
+    "plan_file": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/plans/queue-r1-aaa.json",
+    "prior_prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/runs/queue-r1-aaa-prepared/evidence/prepared.json",
+    "prior_condition": "queue-r1-aaa",
+    "plan_parent": "queue-r1-aaa",
+    "status": "awaiting_plan_approval",
+    "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/runs/queue-v2-r1-aaa-prepared/evidence/prepared.json",
+    "prepared_sha256": "75c2027189ede9a78d17eb0aad09678e01394bccead8a39b93cacd42019ec4c4",
+    "target": {
+      "run_id": "queue-v2-r1-aaa-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "4952a928f43056dcd6feb45d7a4f02891c16cfff60d8a1d5716a0ae871ce74b8",
+      "run_spec_sha256": "484a618e2fdbef1418dedd6ca727e29d13d734956db0cbbb1964b3f2ab85ea6d"
+    },
+    "run_spec": {
+      "schema_version": 1,
+      "task": "Complete the durable_queue Python 3.12 standard-library package and JSON CLI according to CONTRACT.md. Preserve Queue and python -m durable_queue entry points. The queue must durably submit dependency graphs, atomically claim jobs across processes, recover expired leases, reject stale completion, schedule bounded retries and roll back invalid batches. Add focused regression tests, including real separate-process durability and claim exclusivity. Research the existing repository, generate a concise concrete canonical plan and wait for explicit human approval before implementation. Verification must cover the full public contract, not just the starter tests. Run the task's relevant tests with python3.12 -m unittest discover -s tests -v. Keep implementation and tests local; no network, external packages, daemon or UI.\n",
+      "repository": {
+        "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+        "initial_dirty_patch_sha256": null
+      },
+      "model": {
+        "provider": "muse-lab",
+        "requested_id": "muse-spark-1.3-contributor",
+        "observed_version": null,
+        "catalog_sha256": "b206e33ba7175f3608ac3f607d169e142f4123c64027138893ad29612f2e46db",
+        "effective_config_sha256": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e"
+      },
+      "workflow_name": "queue-aaa-v2",
+      "inheritance_chain": [
+        "queue-base",
+        "queue-aaa-v2"
+      ],
+      "workflow": {
+        "approval": "human_required",
+        "plan": {
+          "renderer": "markdown"
+        },
+        "roles": {
+          "planner": "planner/queue-concise-v1",
+          "executor": "executor/queue-conservative-v1",
+          "verifier": "verifier/queue-tests-v2"
+        }
+      },
+      "instructions": {
+        "planner": {
+          "selector": "planner/queue-concise-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/planner/queue-concise-v1/SKILL.md",
+          "sha256": "43b125a14cfedd5ee4fcb8e45f2fc75663ba65658706757216b91764c2052978",
+          "content": "---\nname: lab-planner-queue-concise-v1\ndescription: Explicit planner procedure for the durable queue workflow matrix.\n---\n\nRead TASK.md, CONTRACT.md, repository instructions and relevant implementation. Identify the smallest complete repair of the public API and CLI. Produce a concise canonical plan grounded in the actual files. Prioritize direct implementation steps and specific acceptance checks; avoid optional abstractions and unrelated cleanup.\n\nReturn a canonical plan for validation and human review; do not implement. Use at most four concise implementation steps and three aggregate verification items, with stable IDs and valid references. Include the schema's required assumptions, affected files, dependencies, risks, acceptance criteria, discoveries and blockers without repeating the contract. Human approval is a harness boundary, not an unresolved task blocker. Keep prose compact enough for the existing phase context limits. The harness chooses presentation independently of this procedure.\n\n"
+        },
+        "executor": {
+          "selector": "executor/queue-conservative-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/executor/queue-conservative-v1/SKILL.md",
+          "sha256": "31568b6537ec10770b55eabeaf48332a7c8821ededabc2cd33959b2c2e2f13e8",
+          "content": "---\nname: lab-executor-queue-conservative-v1\ndescription: Explicit executor procedure for the durable queue workflow matrix.\n---\n\nFollow the approved canonical plan with minimal coherent changes. Inspect existing behavior before editing, preserve usable interfaces and storage helpers, and implement one approved step at a time. Add focused regression tests for the changed behavior and run them after each coherent change. Avoid speculative refactoring. Record the changes and concrete evidence for the verifier.\n\n\nPreserve stable step IDs. If new information materially invalidates the approved strategy, scope, dependencies or acceptance criteria, request an amendment and stop until the harness provides authority. Instructions guide procedure; the harness controls admission.\n\n"
+        },
+        "verifier": {
+          "selector": "verifier/queue-tests-v2",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/verifier/queue-tests-v2/SKILL.md",
+          "sha256": "4e6e2a5284daad04fbb6fcc55228c77b65d1067f32a8b4d2bc1727adb447c79e",
+          "content": "---\nname: lab-verifier-queue-tests-v2\ndescription: Explicit verifier procedure for the durable queue workflow matrix.\n---\n\nRead the approved plan and implementation evidence. Run the specified relevant tests and focused acceptance assertions. Inspect failures as needed to explain them. Record exact commands, outcomes and evidence references; explicitly report unavailable or unsupported acceptance checks.\n\nNever infer hidden-test success or accept executor claims as verification. Before running checks, copy the exact IDs from the approved plan's verification_strategy and acceptance_criteria into a small evidence ledger. Verification IDs and acceptance IDs are separate namespaces; never invent, rename or interchange them.\n\nFor each verification ID, run one aggregate assertion command that exits nonzero if any required assertion fails. After the command completes, call lab_command_receipt with its 1-based exec_command start index in the current turn (including exploratory commands). Copy receipt.call_id from the returned JSON into the ledger. A displayed Chunk ID, terminal session ID, receipt lookup call ID, or guessed identifier is not the command call_id. If a command is still running, wait for completion before using it as evidence. Receipts identify commands; inspect the actual exit status and output to assess the checks.\n\nBefore submitting the final report, compare it against the ledger: exactly one checks entry for every approved verification ID; each call_id copied from that command's receipt; each acceptance_criteria array nonempty, unique and drawn only from the plan's top-level acceptance IDs; all acceptance IDs covered by actual checks across the report. Exploratory commands do not add final verification IDs. Report failures and unsupported checks honestly; never claim coverage that was not tested. Request an amendment if the approved strategy cannot be carried out without a material change.\n"
+        }
+      }
+    },
+    "artifact_inventory": {
+      "config/run-spec.json": "677da4f4bd8e552b9b743685a505610fd23741309c1856a70e9e179a7752cc03",
+      "config/workflow.effective.json": "2e4b7aa72c13da5c9207ddf22e9c6106f003298b78d93e418a2f496848109817",
+      "config/workflow.source.toml": "a0deb9109cec95a110cdf3530c43f5a7c037b9464e2b999b4eae461947bb4f01",
+      "events.jsonl": "af2c44a223c87a6d4585704d3260f1a6eafbb18b513d1ed08a8cd4b99c2c457d",
+      "evidence/effective-settings.json": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e",
+      "evidence/environment.json": "88010be2557d19790275ed62f75cf0d94d67c87802c8b83d64aaf7322f5d0072",
+      "evidence/runtime-manifest.json": "d95765a1106ba4041344a43e99d56c8fd303ac39eac869dbcf1e1a88d168a43f",
+      "instructions/executor.SKILL.md": "31568b6537ec10770b55eabeaf48332a7c8821ededabc2cd33959b2c2e2f13e8",
+      "instructions/planner.SKILL.md": "43b125a14cfedd5ee4fcb8e45f2fc75663ba65658706757216b91764c2052978",
+      "instructions/verifier.SKILL.md": "4e6e2a5284daad04fbb6fcc55228c77b65d1067f32a8b4d2bc1727adb447c79e",
+      "manifest.json": "1cc465952900bbfc70226b155c95cefb3a271645221ea0217136ab6490ce1b77",
+      "plans/1/PLAN.md": "1da55d793f57577f3e9176eed0884d9904b1b313403d1c1d8be468e8194e9730",
+      "plans/1/plan.json": "4952a928f43056dcd6feb45d7a4f02891c16cfff60d8a1d5716a0ae871ce74b8",
+      "runtime-events.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "id": "queue-v2-r1-aab",
+    "block": 1,
+    "planner": "a",
+    "executor": "a",
+    "verifier": "b",
+    "workflow": "queue-aab-v2",
+    "parent": "queue-r1-aaa",
+    "preparation_id": "queue-v2-r1-aab-prepared",
+    "execution_id": "queue-v2-r1-aab-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r1-aab/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r1-aab/fixture.json",
+    "plan_file": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/plans/queue-r1-aaa.json",
+    "prior_prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/runs/queue-r1-aab-prepared/evidence/prepared.json",
+    "prior_condition": "queue-r1-aab",
+    "plan_parent": "queue-r1-aaa",
+    "status": "awaiting_plan_approval",
+    "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/runs/queue-v2-r1-aab-prepared/evidence/prepared.json",
+    "prepared_sha256": "301851a1f38755d177759a3a1ae9c9cb01594665242f905a2487c42ae3ee6194",
+    "target": {
+      "run_id": "queue-v2-r1-aab-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "4952a928f43056dcd6feb45d7a4f02891c16cfff60d8a1d5716a0ae871ce74b8",
+      "run_spec_sha256": "e926212acd7752d0a7a5424817f28e0d49518cf476fefc2cc5a5beb4a6e40008"
+    },
+    "run_spec": {
+      "schema_version": 1,
+      "task": "Complete the durable_queue Python 3.12 standard-library package and JSON CLI according to CONTRACT.md. Preserve Queue and python -m durable_queue entry points. The queue must durably submit dependency graphs, atomically claim jobs across processes, recover expired leases, reject stale completion, schedule bounded retries and roll back invalid batches. Add focused regression tests, including real separate-process durability and claim exclusivity. Research the existing repository, generate a concise concrete canonical plan and wait for explicit human approval before implementation. Verification must cover the full public contract, not just the starter tests. Run the task's relevant tests with python3.12 -m unittest discover -s tests -v. Keep implementation and tests local; no network, external packages, daemon or UI.\n",
+      "repository": {
+        "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+        "initial_dirty_patch_sha256": null
+      },
+      "model": {
+        "provider": "muse-lab",
+        "requested_id": "muse-spark-1.3-contributor",
+        "observed_version": null,
+        "catalog_sha256": "b206e33ba7175f3608ac3f607d169e142f4123c64027138893ad29612f2e46db",
+        "effective_config_sha256": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e"
+      },
+      "workflow_name": "queue-aab-v2",
+      "inheritance_chain": [
+        "queue-base",
+        "queue-aab-v2"
+      ],
+      "workflow": {
+        "approval": "human_required",
+        "plan": {
+          "renderer": "markdown"
+        },
+        "roles": {
+          "planner": "planner/queue-concise-v1",
+          "executor": "executor/queue-conservative-v1",
+          "verifier": "verifier/queue-adversarial-v2"
+        }
+      },
+      "instructions": {
+        "planner": {
+          "selector": "planner/queue-concise-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/planner/queue-concise-v1/SKILL.md",
+          "sha256": "43b125a14cfedd5ee4fcb8e45f2fc75663ba65658706757216b91764c2052978",
+          "content": "---\nname: lab-planner-queue-concise-v1\ndescription: Explicit planner procedure for the durable queue workflow matrix.\n---\n\nRead TASK.md, CONTRACT.md, repository instructions and relevant implementation. Identify the smallest complete repair of the public API and CLI. Produce a concise canonical plan grounded in the actual files. Prioritize direct implementation steps and specific acceptance checks; avoid optional abstractions and unrelated cleanup.\n\nReturn a canonical plan for validation and human review; do not implement. Use at most four concise implementation steps and three aggregate verification items, with stable IDs and valid references. Include the schema's required assumptions, affected files, dependencies, risks, acceptance criteria, discoveries and blockers without repeating the contract. Human approval is a harness boundary, not an unresolved task blocker. Keep prose compact enough for the existing phase context limits. The harness chooses presentation independently of this procedure.\n\n"
+        },
+        "executor": {
+          "selector": "executor/queue-conservative-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/executor/queue-conservative-v1/SKILL.md",
+          "sha256": "31568b6537ec10770b55eabeaf48332a7c8821ededabc2cd33959b2c2e2f13e8",
+          "content": "---\nname: lab-executor-queue-conservative-v1\ndescription: Explicit executor procedure for the durable queue workflow matrix.\n---\n\nFollow the approved canonical plan with minimal coherent changes. Inspect existing behavior before editing, preserve usable interfaces and storage helpers, and implement one approved step at a time. Add focused regression tests for the changed behavior and run them after each coherent change. Avoid speculative refactoring. Record the changes and concrete evidence for the verifier.\n\n\nPreserve stable step IDs. If new information materially invalidates the approved strategy, scope, dependencies or acceptance criteria, request an amendment and stop until the harness provides authority. Instructions guide procedure; the harness controls admission.\n\n"
+        },
+        "verifier": {
+          "selector": "verifier/queue-adversarial-v2",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/verifier/queue-adversarial-v2/SKILL.md",
+          "sha256": "ce96370edcd9e6b3b45bf372caf8be577cdf8779b424e9cfabb8848da63f8e2e",
+          "content": "---\nname: lab-verifier-queue-adversarial-v2\ndescription: Explicit verifier procedure for the durable queue workflow matrix.\n---\n\nRead the approved plan, changed implementation and executor evidence. Review transaction boundaries and state transitions for counterexamples, especially rollback, lease boundaries, stale workers and competing claims. Design and run adversarial assertions alongside the specified tests. Check that tests would detect plausible wrong implementations, then report acceptance evidence and unresolved defects.\n\nNever infer hidden-test success or accept executor claims as verification. Before running checks, copy the exact IDs from the approved plan's verification_strategy and acceptance_criteria into a small evidence ledger. Verification IDs and acceptance IDs are separate namespaces; never invent, rename or interchange them.\n\nFor each verification ID, run one aggregate assertion command that exits nonzero if any required assertion fails. After the command completes, call lab_command_receipt with its 1-based exec_command start index in the current turn (including exploratory commands). Copy receipt.call_id from the returned JSON into the ledger. A displayed Chunk ID, terminal session ID, receipt lookup call ID, or guessed identifier is not the command call_id. If a command is still running, wait for completion before using it as evidence. Receipts identify commands; inspect the actual exit status and output to assess the checks.\n\nBefore submitting the final report, compare it against the ledger: exactly one checks entry for every approved verification ID; each call_id copied from that command's receipt; each acceptance_criteria array nonempty, unique and drawn only from the plan's top-level acceptance IDs; all acceptance IDs covered by actual checks across the report. Exploratory commands do not add final verification IDs. Report failures and unsupported checks honestly; never claim coverage that was not tested. Request an amendment if the approved strategy cannot be carried out without a material change.\n"
+        }
+      }
+    },
+    "artifact_inventory": {
+      "config/run-spec.json": "08601acfcc528f155065a7634d7afe9e2d14e8e079b1890f2cbfb92c7bc9b69c",
+      "config/workflow.effective.json": "2fecfeb001ba52aad5ef658b88871ce623d781633eb9609c0c41c01f5829342a",
+      "config/workflow.source.toml": "a0deb9109cec95a110cdf3530c43f5a7c037b9464e2b999b4eae461947bb4f01",
+      "events.jsonl": "b4fb3b02374bc5cbdc7827c5ae644836907fd9a38e7760bbdb78047029f47e0b",
+      "evidence/effective-settings.json": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e",
+      "evidence/environment.json": "88010be2557d19790275ed62f75cf0d94d67c87802c8b83d64aaf7322f5d0072",
+      "evidence/runtime-manifest.json": "d95765a1106ba4041344a43e99d56c8fd303ac39eac869dbcf1e1a88d168a43f",
+      "instructions/executor.SKILL.md": "31568b6537ec10770b55eabeaf48332a7c8821ededabc2cd33959b2c2e2f13e8",
+      "instructions/planner.SKILL.md": "43b125a14cfedd5ee4fcb8e45f2fc75663ba65658706757216b91764c2052978",
+      "instructions/verifier.SKILL.md": "ce96370edcd9e6b3b45bf372caf8be577cdf8779b424e9cfabb8848da63f8e2e",
+      "manifest.json": "aa02581c17cebc38eb615c0f4a47aecf6e6b626ee158e1d2ecde6f18ab2bb2ae",
+      "plans/1/PLAN.md": "1da55d793f57577f3e9176eed0884d9904b1b313403d1c1d8be468e8194e9730",
+      "plans/1/plan.json": "4952a928f43056dcd6feb45d7a4f02891c16cfff60d8a1d5716a0ae871ce74b8",
+      "runtime-events.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "id": "queue-v2-r1-aba",
+    "block": 1,
+    "planner": "a",
+    "executor": "b",
+    "verifier": "a",
+    "workflow": "queue-aba-v2",
+    "parent": "queue-r1-aaa",
+    "preparation_id": "queue-v2-r1-aba-prepared",
+    "execution_id": "queue-v2-r1-aba-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r1-aba/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r1-aba/fixture.json",
+    "plan_file": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/plans/queue-r1-aaa.json",
+    "prior_prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/runs/queue-r1-aba-prepared/evidence/prepared.json",
+    "prior_condition": "queue-r1-aba",
+    "plan_parent": "queue-r1-aaa",
+    "status": "awaiting_plan_approval",
+    "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/runs/queue-v2-r1-aba-prepared/evidence/prepared.json",
+    "prepared_sha256": "ba474e473821a7aa7872f7f744b25f0e493a790782aa95da81c0096b81c194e4",
+    "target": {
+      "run_id": "queue-v2-r1-aba-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "4952a928f43056dcd6feb45d7a4f02891c16cfff60d8a1d5716a0ae871ce74b8",
+      "run_spec_sha256": "70a0610c750fdeb6c3337e310c4da1ac0287259d05fc81b3cf60393315d1bbfa"
+    },
+    "run_spec": {
+      "schema_version": 1,
+      "task": "Complete the durable_queue Python 3.12 standard-library package and JSON CLI according to CONTRACT.md. Preserve Queue and python -m durable_queue entry points. The queue must durably submit dependency graphs, atomically claim jobs across processes, recover expired leases, reject stale completion, schedule bounded retries and roll back invalid batches. Add focused regression tests, including real separate-process durability and claim exclusivity. Research the existing repository, generate a concise concrete canonical plan and wait for explicit human approval before implementation. Verification must cover the full public contract, not just the starter tests. Run the task's relevant tests with python3.12 -m unittest discover -s tests -v. Keep implementation and tests local; no network, external packages, daemon or UI.\n",
+      "repository": {
+        "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+        "initial_dirty_patch_sha256": null
+      },
+      "model": {
+        "provider": "muse-lab",
+        "requested_id": "muse-spark-1.3-contributor",
+        "observed_version": null,
+        "catalog_sha256": "b206e33ba7175f3608ac3f607d169e142f4123c64027138893ad29612f2e46db",
+        "effective_config_sha256": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e"
+      },
+      "workflow_name": "queue-aba-v2",
+      "inheritance_chain": [
+        "queue-base",
+        "queue-aba-v2"
+      ],
+      "workflow": {
+        "approval": "human_required",
+        "plan": {
+          "renderer": "markdown"
+        },
+        "roles": {
+          "planner": "planner/queue-concise-v1",
+          "executor": "executor/queue-tdd-v1",
+          "verifier": "verifier/queue-tests-v2"
+        }
+      },
+      "instructions": {
+        "planner": {
+          "selector": "planner/queue-concise-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/planner/queue-concise-v1/SKILL.md",
+          "sha256": "43b125a14cfedd5ee4fcb8e45f2fc75663ba65658706757216b91764c2052978",
+          "content": "---\nname: lab-planner-queue-concise-v1\ndescription: Explicit planner procedure for the durable queue workflow matrix.\n---\n\nRead TASK.md, CONTRACT.md, repository instructions and relevant implementation. Identify the smallest complete repair of the public API and CLI. Produce a concise canonical plan grounded in the actual files. Prioritize direct implementation steps and specific acceptance checks; avoid optional abstractions and unrelated cleanup.\n\nReturn a canonical plan for validation and human review; do not implement. Use at most four concise implementation steps and three aggregate verification items, with stable IDs and valid references. Include the schema's required assumptions, affected files, dependencies, risks, acceptance criteria, discoveries and blockers without repeating the contract. Human approval is a harness boundary, not an unresolved task blocker. Keep prose compact enough for the existing phase context limits. The harness chooses presentation independently of this procedure.\n\n"
+        },
+        "executor": {
+          "selector": "executor/queue-tdd-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/executor/queue-tdd-v1/SKILL.md",
+          "sha256": "8c0c8dac429fe58e0176c64dcc67455e743d110bb9f9225efe4329ef8dc86401",
+          "content": "---\nname: lab-executor-queue-tdd-v1\ndescription: Explicit executor procedure for the durable queue workflow matrix.\n---\n\nFollow the approved canonical plan using a test-first procedure. For each approved behavior, first add a focused test that fails for the intended missing behavior, run it and record the failure; then implement the smallest change that passes it. Refactor only within approved scope while keeping tests green. Include interactions between persistence, leases and dependencies in this cycle. Record red/green evidence and remaining limitations for the verifier.\n\n\nPreserve stable step IDs. If new information materially invalidates the approved strategy, scope, dependencies or acceptance criteria, request an amendment and stop until the harness provides authority. Instructions guide procedure; the harness controls admission.\n\n"
+        },
+        "verifier": {
+          "selector": "verifier/queue-tests-v2",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/verifier/queue-tests-v2/SKILL.md",
+          "sha256": "4e6e2a5284daad04fbb6fcc55228c77b65d1067f32a8b4d2bc1727adb447c79e",
+          "content": "---\nname: lab-verifier-queue-tests-v2\ndescription: Explicit verifier procedure for the durable queue workflow matrix.\n---\n\nRead the approved plan and implementation evidence. Run the specified relevant tests and focused acceptance assertions. Inspect failures as needed to explain them. Record exact commands, outcomes and evidence references; explicitly report unavailable or unsupported acceptance checks.\n\nNever infer hidden-test success or accept executor claims as verification. Before running checks, copy the exact IDs from the approved plan's verification_strategy and acceptance_criteria into a small evidence ledger. Verification IDs and acceptance IDs are separate namespaces; never invent, rename or interchange them.\n\nFor each verification ID, run one aggregate assertion command that exits nonzero if any required assertion fails. After the command completes, call lab_command_receipt with its 1-based exec_command start index in the current turn (including exploratory commands). Copy receipt.call_id from the returned JSON into the ledger. A displayed Chunk ID, terminal session ID, receipt lookup call ID, or guessed identifier is not the command call_id. If a command is still running, wait for completion before using it as evidence. Receipts identify commands; inspect the actual exit status and output to assess the checks.\n\nBefore submitting the final report, compare it against the ledger: exactly one checks entry for every approved verification ID; each call_id copied from that command's receipt; each acceptance_criteria array nonempty, unique and drawn only from the plan's top-level acceptance IDs; all acceptance IDs covered by actual checks across the report. Exploratory commands do not add final verification IDs. Report failures and unsupported checks honestly; never claim coverage that was not tested. Request an amendment if the approved strategy cannot be carried out without a material change.\n"
+        }
+      }
+    },
+    "artifact_inventory": {
+      "config/run-spec.json": "c9a237be35c283fde3c20851d7968e1c1db6df46696323adb48eb67727defc59",
+      "config/workflow.effective.json": "4d6fdaefe7f2ee2d0ec748b4b2b1d183be20ce116a7a31c15f2584269b497414",
+      "config/workflow.source.toml": "a0deb9109cec95a110cdf3530c43f5a7c037b9464e2b999b4eae461947bb4f01",
+      "events.jsonl": "76e2a3dbbdb921f9538ea8edf2757e7903e0254a6ecdb972c1b539664b2f6d1f",
+      "evidence/effective-settings.json": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e",
+      "evidence/environment.json": "88010be2557d19790275ed62f75cf0d94d67c87802c8b83d64aaf7322f5d0072",
+      "evidence/runtime-manifest.json": "d95765a1106ba4041344a43e99d56c8fd303ac39eac869dbcf1e1a88d168a43f",
+      "instructions/executor.SKILL.md": "8c0c8dac429fe58e0176c64dcc67455e743d110bb9f9225efe4329ef8dc86401",
+      "instructions/planner.SKILL.md": "43b125a14cfedd5ee4fcb8e45f2fc75663ba65658706757216b91764c2052978",
+      "instructions/verifier.SKILL.md": "4e6e2a5284daad04fbb6fcc55228c77b65d1067f32a8b4d2bc1727adb447c79e",
+      "manifest.json": "cea844d32b0c8854c99b83d6e9dd234c17e346ec953681ae585b0c704cb1054a",
+      "plans/1/PLAN.md": "1da55d793f57577f3e9176eed0884d9904b1b313403d1c1d8be468e8194e9730",
+      "plans/1/plan.json": "4952a928f43056dcd6feb45d7a4f02891c16cfff60d8a1d5716a0ae871ce74b8",
+      "runtime-events.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "id": "queue-v2-r1-abb",
+    "block": 1,
+    "planner": "a",
+    "executor": "b",
+    "verifier": "b",
+    "workflow": "queue-abb-v2",
+    "parent": "queue-r1-aaa",
+    "preparation_id": "queue-v2-r1-abb-prepared",
+    "execution_id": "queue-v2-r1-abb-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r1-abb/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r1-abb/fixture.json",
+    "plan_file": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/plans/queue-r1-aaa.json",
+    "prior_prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/runs/queue-r1-abb-prepared/evidence/prepared.json",
+    "prior_condition": "queue-r1-abb",
+    "plan_parent": "queue-r1-aaa",
+    "status": "awaiting_plan_approval",
+    "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/runs/queue-v2-r1-abb-prepared/evidence/prepared.json",
+    "prepared_sha256": "3691c42cd42292b3a7e0cb1073a81c46eea44220f64867050e90cd12d5c51f70",
+    "target": {
+      "run_id": "queue-v2-r1-abb-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "4952a928f43056dcd6feb45d7a4f02891c16cfff60d8a1d5716a0ae871ce74b8",
+      "run_spec_sha256": "b1c7a40d43b5d272886113c91d61af697e21316cf63edbad7ab24cc2bd49757a"
+    },
+    "run_spec": {
+      "schema_version": 1,
+      "task": "Complete the durable_queue Python 3.12 standard-library package and JSON CLI according to CONTRACT.md. Preserve Queue and python -m durable_queue entry points. The queue must durably submit dependency graphs, atomically claim jobs across processes, recover expired leases, reject stale completion, schedule bounded retries and roll back invalid batches. Add focused regression tests, including real separate-process durability and claim exclusivity. Research the existing repository, generate a concise concrete canonical plan and wait for explicit human approval before implementation. Verification must cover the full public contract, not just the starter tests. Run the task's relevant tests with python3.12 -m unittest discover -s tests -v. Keep implementation and tests local; no network, external packages, daemon or UI.\n",
+      "repository": {
+        "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+        "initial_dirty_patch_sha256": null
+      },
+      "model": {
+        "provider": "muse-lab",
+        "requested_id": "muse-spark-1.3-contributor",
+        "observed_version": null,
+        "catalog_sha256": "b206e33ba7175f3608ac3f607d169e142f4123c64027138893ad29612f2e46db",
+        "effective_config_sha256": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e"
+      },
+      "workflow_name": "queue-abb-v2",
+      "inheritance_chain": [
+        "queue-base",
+        "queue-abb-v2"
+      ],
+      "workflow": {
+        "approval": "human_required",
+        "plan": {
+          "renderer": "markdown"
+        },
+        "roles": {
+          "planner": "planner/queue-concise-v1",
+          "executor": "executor/queue-tdd-v1",
+          "verifier": "verifier/queue-adversarial-v2"
+        }
+      },
+      "instructions": {
+        "planner": {
+          "selector": "planner/queue-concise-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/planner/queue-concise-v1/SKILL.md",
+          "sha256": "43b125a14cfedd5ee4fcb8e45f2fc75663ba65658706757216b91764c2052978",
+          "content": "---\nname: lab-planner-queue-concise-v1\ndescription: Explicit planner procedure for the durable queue workflow matrix.\n---\n\nRead TASK.md, CONTRACT.md, repository instructions and relevant implementation. Identify the smallest complete repair of the public API and CLI. Produce a concise canonical plan grounded in the actual files. Prioritize direct implementation steps and specific acceptance checks; avoid optional abstractions and unrelated cleanup.\n\nReturn a canonical plan for validation and human review; do not implement. Use at most four concise implementation steps and three aggregate verification items, with stable IDs and valid references. Include the schema's required assumptions, affected files, dependencies, risks, acceptance criteria, discoveries and blockers without repeating the contract. Human approval is a harness boundary, not an unresolved task blocker. Keep prose compact enough for the existing phase context limits. The harness chooses presentation independently of this procedure.\n\n"
+        },
+        "executor": {
+          "selector": "executor/queue-tdd-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/executor/queue-tdd-v1/SKILL.md",
+          "sha256": "8c0c8dac429fe58e0176c64dcc67455e743d110bb9f9225efe4329ef8dc86401",
+          "content": "---\nname: lab-executor-queue-tdd-v1\ndescription: Explicit executor procedure for the durable queue workflow matrix.\n---\n\nFollow the approved canonical plan using a test-first procedure. For each approved behavior, first add a focused test that fails for the intended missing behavior, run it and record the failure; then implement the smallest change that passes it. Refactor only within approved scope while keeping tests green. Include interactions between persistence, leases and dependencies in this cycle. Record red/green evidence and remaining limitations for the verifier.\n\n\nPreserve stable step IDs. If new information materially invalidates the approved strategy, scope, dependencies or acceptance criteria, request an amendment and stop until the harness provides authority. Instructions guide procedure; the harness controls admission.\n\n"
+        },
+        "verifier": {
+          "selector": "verifier/queue-adversarial-v2",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/verifier/queue-adversarial-v2/SKILL.md",
+          "sha256": "ce96370edcd9e6b3b45bf372caf8be577cdf8779b424e9cfabb8848da63f8e2e",
+          "content": "---\nname: lab-verifier-queue-adversarial-v2\ndescription: Explicit verifier procedure for the durable queue workflow matrix.\n---\n\nRead the approved plan, changed implementation and executor evidence. Review transaction boundaries and state transitions for counterexamples, especially rollback, lease boundaries, stale workers and competing claims. Design and run adversarial assertions alongside the specified tests. Check that tests would detect plausible wrong implementations, then report acceptance evidence and unresolved defects.\n\nNever infer hidden-test success or accept executor claims as verification. Before running checks, copy the exact IDs from the approved plan's verification_strategy and acceptance_criteria into a small evidence ledger. Verification IDs and acceptance IDs are separate namespaces; never invent, rename or interchange them.\n\nFor each verification ID, run one aggregate assertion command that exits nonzero if any required assertion fails. After the command completes, call lab_command_receipt with its 1-based exec_command start index in the current turn (including exploratory commands). Copy receipt.call_id from the returned JSON into the ledger. A displayed Chunk ID, terminal session ID, receipt lookup call ID, or guessed identifier is not the command call_id. If a command is still running, wait for completion before using it as evidence. Receipts identify commands; inspect the actual exit status and output to assess the checks.\n\nBefore submitting the final report, compare it against the ledger: exactly one checks entry for every approved verification ID; each call_id copied from that command's receipt; each acceptance_criteria array nonempty, unique and drawn only from the plan's top-level acceptance IDs; all acceptance IDs covered by actual checks across the report. Exploratory commands do not add final verification IDs. Report failures and unsupported checks honestly; never claim coverage that was not tested. Request an amendment if the approved strategy cannot be carried out without a material change.\n"
+        }
+      }
+    },
+    "artifact_inventory": {
+      "config/run-spec.json": "6835e065f640cf55481d5fdb72db4e718eeb70ca0727219c50c8046aebba1ab7",
+      "config/workflow.effective.json": "4771b00f3362779e56c0898731feadcb720778373c09fb813dc6486721bf948e",
+      "config/workflow.source.toml": "a0deb9109cec95a110cdf3530c43f5a7c037b9464e2b999b4eae461947bb4f01",
+      "events.jsonl": "7a92805973198afc0db66ac2fd6d2bae717c9a4911bfd021fdb9deb552f0db91",
+      "evidence/effective-settings.json": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e",
+      "evidence/environment.json": "88010be2557d19790275ed62f75cf0d94d67c87802c8b83d64aaf7322f5d0072",
+      "evidence/runtime-manifest.json": "d95765a1106ba4041344a43e99d56c8fd303ac39eac869dbcf1e1a88d168a43f",
+      "instructions/executor.SKILL.md": "8c0c8dac429fe58e0176c64dcc67455e743d110bb9f9225efe4329ef8dc86401",
+      "instructions/planner.SKILL.md": "43b125a14cfedd5ee4fcb8e45f2fc75663ba65658706757216b91764c2052978",
+      "instructions/verifier.SKILL.md": "ce96370edcd9e6b3b45bf372caf8be577cdf8779b424e9cfabb8848da63f8e2e",
+      "manifest.json": "8bf13d0f70f7151d54b8cfe4037015aca002e14afd9e458ce96c196f6e41866c",
+      "plans/1/PLAN.md": "1da55d793f57577f3e9176eed0884d9904b1b313403d1c1d8be468e8194e9730",
+      "plans/1/plan.json": "4952a928f43056dcd6feb45d7a4f02891c16cfff60d8a1d5716a0ae871ce74b8",
+      "runtime-events.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "id": "queue-v2-r1-baa",
+    "block": 1,
+    "planner": "b",
+    "executor": "a",
+    "verifier": "a",
+    "workflow": "queue-baa-v2",
+    "parent": null,
+    "preparation_id": "queue-v2-r1-baa-prepared",
+    "execution_id": "queue-v2-r1-baa-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r1-baa/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r1-baa/fixture.json",
+    "plan_file": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/plans/queue-r1-baa.json",
+    "prior_prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r1-baa-edited-prepared/evidence/prepared.json",
+    "prior_condition": "queue-r1-baa",
+    "plan_parent": "queue-r1-baa",
+    "status": "awaiting_plan_approval",
+    "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/runs/queue-v2-r1-baa-prepared/evidence/prepared.json",
+    "prepared_sha256": "7057bd74da236af90340ba7cd80a4d5e3233f4044cec5aab27797daa25f40777",
+    "target": {
+      "run_id": "queue-v2-r1-baa-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "41d966bb3d0558662c963ffb3587d041b62bdedc36542790757a262bc13b37dc",
+      "run_spec_sha256": "dcaad081f90b3bfaf8643d965e7c43d5f41b8d1072a306561f5910668430e7fc"
+    },
+    "run_spec": {
+      "schema_version": 1,
+      "task": "Complete the durable_queue Python 3.12 standard-library package and JSON CLI according to CONTRACT.md. Preserve Queue and python -m durable_queue entry points. The queue must durably submit dependency graphs, atomically claim jobs across processes, recover expired leases, reject stale completion, schedule bounded retries and roll back invalid batches. Add focused regression tests, including real separate-process durability and claim exclusivity. Research the existing repository, generate a concise concrete canonical plan and wait for explicit human approval before implementation. Verification must cover the full public contract, not just the starter tests. Run the task's relevant tests with python3.12 -m unittest discover -s tests -v. Keep implementation and tests local; no network, external packages, daemon or UI.\n",
+      "repository": {
+        "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+        "initial_dirty_patch_sha256": null
+      },
+      "model": {
+        "provider": "muse-lab",
+        "requested_id": "muse-spark-1.3-contributor",
+        "observed_version": null,
+        "catalog_sha256": "b206e33ba7175f3608ac3f607d169e142f4123c64027138893ad29612f2e46db",
+        "effective_config_sha256": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e"
+      },
+      "workflow_name": "queue-baa-v2",
+      "inheritance_chain": [
+        "queue-base",
+        "queue-baa-v2"
+      ],
+      "workflow": {
+        "approval": "human_required",
+        "plan": {
+          "renderer": "markdown"
+        },
+        "roles": {
+          "planner": "planner/queue-architecture-v1",
+          "executor": "executor/queue-conservative-v1",
+          "verifier": "verifier/queue-tests-v2"
+        }
+      },
+      "instructions": {
+        "planner": {
+          "selector": "planner/queue-architecture-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/planner/queue-architecture-v1/SKILL.md",
+          "sha256": "caae1863a3e8f91f99fbd0f372c78e5ce2b8b76315fa3eb000d6ca699b8f9655",
+          "content": "---\nname: lab-planner-queue-architecture-v1\ndescription: Explicit planner procedure for the durable queue workflow matrix.\n---\n\nRead TASK.md, CONTRACT.md, repository instructions and relevant implementation. Before proposing changes, reason through transaction boundaries, state invariants, dependency readiness and stale-worker hazards. Identify failure paths and concurrency risks, then sequence the implementation around those invariants. Record the important architectural discoveries and connect risks to acceptance checks.\n\nReturn a canonical plan for validation and human review; do not implement. Use at most four concise implementation steps and three aggregate verification items, with stable IDs and valid references. Include the schema's required assumptions, affected files, dependencies, risks, acceptance criteria, discoveries and blockers without repeating the contract. Human approval is a harness boundary, not an unresolved task blocker. Keep prose compact enough for the existing phase context limits. The harness chooses presentation independently of this procedure.\n\n"
+        },
+        "executor": {
+          "selector": "executor/queue-conservative-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/executor/queue-conservative-v1/SKILL.md",
+          "sha256": "31568b6537ec10770b55eabeaf48332a7c8821ededabc2cd33959b2c2e2f13e8",
+          "content": "---\nname: lab-executor-queue-conservative-v1\ndescription: Explicit executor procedure for the durable queue workflow matrix.\n---\n\nFollow the approved canonical plan with minimal coherent changes. Inspect existing behavior before editing, preserve usable interfaces and storage helpers, and implement one approved step at a time. Add focused regression tests for the changed behavior and run them after each coherent change. Avoid speculative refactoring. Record the changes and concrete evidence for the verifier.\n\n\nPreserve stable step IDs. If new information materially invalidates the approved strategy, scope, dependencies or acceptance criteria, request an amendment and stop until the harness provides authority. Instructions guide procedure; the harness controls admission.\n\n"
+        },
+        "verifier": {
+          "selector": "verifier/queue-tests-v2",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/verifier/queue-tests-v2/SKILL.md",
+          "sha256": "4e6e2a5284daad04fbb6fcc55228c77b65d1067f32a8b4d2bc1727adb447c79e",
+          "content": "---\nname: lab-verifier-queue-tests-v2\ndescription: Explicit verifier procedure for the durable queue workflow matrix.\n---\n\nRead the approved plan and implementation evidence. Run the specified relevant tests and focused acceptance assertions. Inspect failures as needed to explain them. Record exact commands, outcomes and evidence references; explicitly report unavailable or unsupported acceptance checks.\n\nNever infer hidden-test success or accept executor claims as verification. Before running checks, copy the exact IDs from the approved plan's verification_strategy and acceptance_criteria into a small evidence ledger. Verification IDs and acceptance IDs are separate namespaces; never invent, rename or interchange them.\n\nFor each verification ID, run one aggregate assertion command that exits nonzero if any required assertion fails. After the command completes, call lab_command_receipt with its 1-based exec_command start index in the current turn (including exploratory commands). Copy receipt.call_id from the returned JSON into the ledger. A displayed Chunk ID, terminal session ID, receipt lookup call ID, or guessed identifier is not the command call_id. If a command is still running, wait for completion before using it as evidence. Receipts identify commands; inspect the actual exit status and output to assess the checks.\n\nBefore submitting the final report, compare it against the ledger: exactly one checks entry for every approved verification ID; each call_id copied from that command's receipt; each acceptance_criteria array nonempty, unique and drawn only from the plan's top-level acceptance IDs; all acceptance IDs covered by actual checks across the report. Exploratory commands do not add final verification IDs. Report failures and unsupported checks honestly; never claim coverage that was not tested. Request an amendment if the approved strategy cannot be carried out without a material change.\n"
+        }
+      }
+    },
+    "artifact_inventory": {
+      "config/run-spec.json": "3b5f4699a88b756851d6a2fa74bf6718c4f733e9938a39e15ed37e5d1ba29e8e",
+      "config/workflow.effective.json": "69bb537a156e6c9b2b5f34141ad3b5737bdbcd7c7d43fe39a35ae30e9703897d",
+      "config/workflow.source.toml": "a0deb9109cec95a110cdf3530c43f5a7c037b9464e2b999b4eae461947bb4f01",
+      "events.jsonl": "e66605c28e5cf748648a8044636c9457306e8911f64486393e581cdb1ddc0a16",
+      "evidence/effective-settings.json": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e",
+      "evidence/environment.json": "88010be2557d19790275ed62f75cf0d94d67c87802c8b83d64aaf7322f5d0072",
+      "evidence/runtime-manifest.json": "d95765a1106ba4041344a43e99d56c8fd303ac39eac869dbcf1e1a88d168a43f",
+      "instructions/executor.SKILL.md": "31568b6537ec10770b55eabeaf48332a7c8821ededabc2cd33959b2c2e2f13e8",
+      "instructions/planner.SKILL.md": "caae1863a3e8f91f99fbd0f372c78e5ce2b8b76315fa3eb000d6ca699b8f9655",
+      "instructions/verifier.SKILL.md": "4e6e2a5284daad04fbb6fcc55228c77b65d1067f32a8b4d2bc1727adb447c79e",
+      "manifest.json": "6cf50c5d094dc4f843573ef0b7ab4a1ec8da2d720096f409db35b77f685a89fe",
+      "plans/1/PLAN.md": "7f68bdf3b19183fb7950b666acfce9f439b4b667abd0b64f9dc6ee6f83e327f2",
+      "plans/1/plan.json": "41d966bb3d0558662c963ffb3587d041b62bdedc36542790757a262bc13b37dc",
+      "runtime-events.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "id": "queue-v2-r1-bab",
+    "block": 1,
+    "planner": "b",
+    "executor": "a",
+    "verifier": "b",
+    "workflow": "queue-bab-v2",
+    "parent": "queue-r1-baa",
+    "preparation_id": "queue-v2-r1-bab-prepared",
+    "execution_id": "queue-v2-r1-bab-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r1-bab/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r1-bab/fixture.json",
+    "plan_file": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/plans/queue-r1-baa.json",
+    "prior_prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r1-bab-edited-prepared/evidence/prepared.json",
+    "prior_condition": "queue-r1-bab",
+    "plan_parent": "queue-r1-baa",
+    "status": "awaiting_plan_approval",
+    "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/runs/queue-v2-r1-bab-prepared/evidence/prepared.json",
+    "prepared_sha256": "039a15e8f1244598e039405986eb0c9a8dd6dad6b1877bb08e95817a23a4b49e",
+    "target": {
+      "run_id": "queue-v2-r1-bab-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "41d966bb3d0558662c963ffb3587d041b62bdedc36542790757a262bc13b37dc",
+      "run_spec_sha256": "a93a4f8f8bff107f42bc038080be96f72e88836a2a67ab4b00e874904c99a716"
+    },
+    "run_spec": {
+      "schema_version": 1,
+      "task": "Complete the durable_queue Python 3.12 standard-library package and JSON CLI according to CONTRACT.md. Preserve Queue and python -m durable_queue entry points. The queue must durably submit dependency graphs, atomically claim jobs across processes, recover expired leases, reject stale completion, schedule bounded retries and roll back invalid batches. Add focused regression tests, including real separate-process durability and claim exclusivity. Research the existing repository, generate a concise concrete canonical plan and wait for explicit human approval before implementation. Verification must cover the full public contract, not just the starter tests. Run the task's relevant tests with python3.12 -m unittest discover -s tests -v. Keep implementation and tests local; no network, external packages, daemon or UI.\n",
+      "repository": {
+        "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+        "initial_dirty_patch_sha256": null
+      },
+      "model": {
+        "provider": "muse-lab",
+        "requested_id": "muse-spark-1.3-contributor",
+        "observed_version": null,
+        "catalog_sha256": "b206e33ba7175f3608ac3f607d169e142f4123c64027138893ad29612f2e46db",
+        "effective_config_sha256": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e"
+      },
+      "workflow_name": "queue-bab-v2",
+      "inheritance_chain": [
+        "queue-base",
+        "queue-bab-v2"
+      ],
+      "workflow": {
+        "approval": "human_required",
+        "plan": {
+          "renderer": "markdown"
+        },
+        "roles": {
+          "planner": "planner/queue-architecture-v1",
+          "executor": "executor/queue-conservative-v1",
+          "verifier": "verifier/queue-adversarial-v2"
+        }
+      },
+      "instructions": {
+        "planner": {
+          "selector": "planner/queue-architecture-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/planner/queue-architecture-v1/SKILL.md",
+          "sha256": "caae1863a3e8f91f99fbd0f372c78e5ce2b8b76315fa3eb000d6ca699b8f9655",
+          "content": "---\nname: lab-planner-queue-architecture-v1\ndescription: Explicit planner procedure for the durable queue workflow matrix.\n---\n\nRead TASK.md, CONTRACT.md, repository instructions and relevant implementation. Before proposing changes, reason through transaction boundaries, state invariants, dependency readiness and stale-worker hazards. Identify failure paths and concurrency risks, then sequence the implementation around those invariants. Record the important architectural discoveries and connect risks to acceptance checks.\n\nReturn a canonical plan for validation and human review; do not implement. Use at most four concise implementation steps and three aggregate verification items, with stable IDs and valid references. Include the schema's required assumptions, affected files, dependencies, risks, acceptance criteria, discoveries and blockers without repeating the contract. Human approval is a harness boundary, not an unresolved task blocker. Keep prose compact enough for the existing phase context limits. The harness chooses presentation independently of this procedure.\n\n"
+        },
+        "executor": {
+          "selector": "executor/queue-conservative-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/executor/queue-conservative-v1/SKILL.md",
+          "sha256": "31568b6537ec10770b55eabeaf48332a7c8821ededabc2cd33959b2c2e2f13e8",
+          "content": "---\nname: lab-executor-queue-conservative-v1\ndescription: Explicit executor procedure for the durable queue workflow matrix.\n---\n\nFollow the approved canonical plan with minimal coherent changes. Inspect existing behavior before editing, preserve usable interfaces and storage helpers, and implement one approved step at a time. Add focused regression tests for the changed behavior and run them after each coherent change. Avoid speculative refactoring. Record the changes and concrete evidence for the verifier.\n\n\nPreserve stable step IDs. If new information materially invalidates the approved strategy, scope, dependencies or acceptance criteria, request an amendment and stop until the harness provides authority. Instructions guide procedure; the harness controls admission.\n\n"
+        },
+        "verifier": {
+          "selector": "verifier/queue-adversarial-v2",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/verifier/queue-adversarial-v2/SKILL.md",
+          "sha256": "ce96370edcd9e6b3b45bf372caf8be577cdf8779b424e9cfabb8848da63f8e2e",
+          "content": "---\nname: lab-verifier-queue-adversarial-v2\ndescription: Explicit verifier procedure for the durable queue workflow matrix.\n---\n\nRead the approved plan, changed implementation and executor evidence. Review transaction boundaries and state transitions for counterexamples, especially rollback, lease boundaries, stale workers and competing claims. Design and run adversarial assertions alongside the specified tests. Check that tests would detect plausible wrong implementations, then report acceptance evidence and unresolved defects.\n\nNever infer hidden-test success or accept executor claims as verification. Before running checks, copy the exact IDs from the approved plan's verification_strategy and acceptance_criteria into a small evidence ledger. Verification IDs and acceptance IDs are separate namespaces; never invent, rename or interchange them.\n\nFor each verification ID, run one aggregate assertion command that exits nonzero if any required assertion fails. After the command completes, call lab_command_receipt with its 1-based exec_command start index in the current turn (including exploratory commands). Copy receipt.call_id from the returned JSON into the ledger. A displayed Chunk ID, terminal session ID, receipt lookup call ID, or guessed identifier is not the command call_id. If a command is still running, wait for completion before using it as evidence. Receipts identify commands; inspect the actual exit status and output to assess the checks.\n\nBefore submitting the final report, compare it against the ledger: exactly one checks entry for every approved verification ID; each call_id copied from that command's receipt; each acceptance_criteria array nonempty, unique and drawn only from the plan's top-level acceptance IDs; all acceptance IDs covered by actual checks across the report. Exploratory commands do not add final verification IDs. Report failures and unsupported checks honestly; never claim coverage that was not tested. Request an amendment if the approved strategy cannot be carried out without a material change.\n"
+        }
+      }
+    },
+    "artifact_inventory": {
+      "config/run-spec.json": "67943d0ee2162a7f951876d85ce71b2128c4275daf3f663993d1ba7524ba6b6d",
+      "config/workflow.effective.json": "500e85331e98b033f6dc7c7782187c71a2e0f18db7fa9b23adcfadf290cda42f",
+      "config/workflow.source.toml": "a0deb9109cec95a110cdf3530c43f5a7c037b9464e2b999b4eae461947bb4f01",
+      "events.jsonl": "5411c4a5075c3360a59baf1f11a258d1ee9f928eb62026577b390caad222553c",
+      "evidence/effective-settings.json": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e",
+      "evidence/environment.json": "88010be2557d19790275ed62f75cf0d94d67c87802c8b83d64aaf7322f5d0072",
+      "evidence/runtime-manifest.json": "d95765a1106ba4041344a43e99d56c8fd303ac39eac869dbcf1e1a88d168a43f",
+      "instructions/executor.SKILL.md": "31568b6537ec10770b55eabeaf48332a7c8821ededabc2cd33959b2c2e2f13e8",
+      "instructions/planner.SKILL.md": "caae1863a3e8f91f99fbd0f372c78e5ce2b8b76315fa3eb000d6ca699b8f9655",
+      "instructions/verifier.SKILL.md": "ce96370edcd9e6b3b45bf372caf8be577cdf8779b424e9cfabb8848da63f8e2e",
+      "manifest.json": "343ab415cce3f34e593e8d841d1e8f0a7ea4e6012fd9c2bbf867b3da48ab1f10",
+      "plans/1/PLAN.md": "7f68bdf3b19183fb7950b666acfce9f439b4b667abd0b64f9dc6ee6f83e327f2",
+      "plans/1/plan.json": "41d966bb3d0558662c963ffb3587d041b62bdedc36542790757a262bc13b37dc",
+      "runtime-events.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "id": "queue-v2-r1-bba",
+    "block": 1,
+    "planner": "b",
+    "executor": "b",
+    "verifier": "a",
+    "workflow": "queue-bba-v2",
+    "parent": "queue-r1-baa",
+    "preparation_id": "queue-v2-r1-bba-prepared",
+    "execution_id": "queue-v2-r1-bba-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r1-bba/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r1-bba/fixture.json",
+    "plan_file": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/plans/queue-r1-baa.json",
+    "prior_prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r1-bba-edited-prepared/evidence/prepared.json",
+    "prior_condition": "queue-r1-bba",
+    "plan_parent": "queue-r1-baa",
+    "status": "awaiting_plan_approval",
+    "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/runs/queue-v2-r1-bba-prepared/evidence/prepared.json",
+    "prepared_sha256": "8e6c687cb0072a287f9d1da82ebe159ac5b6a4045292b60f670411e09ad6b4a1",
+    "target": {
+      "run_id": "queue-v2-r1-bba-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "41d966bb3d0558662c963ffb3587d041b62bdedc36542790757a262bc13b37dc",
+      "run_spec_sha256": "5e35b228bb44cbd96d22b8fbc85f1f13051bcf609fb7dc74aa78a85ab9eebfea"
+    },
+    "run_spec": {
+      "schema_version": 1,
+      "task": "Complete the durable_queue Python 3.12 standard-library package and JSON CLI according to CONTRACT.md. Preserve Queue and python -m durable_queue entry points. The queue must durably submit dependency graphs, atomically claim jobs across processes, recover expired leases, reject stale completion, schedule bounded retries and roll back invalid batches. Add focused regression tests, including real separate-process durability and claim exclusivity. Research the existing repository, generate a concise concrete canonical plan and wait for explicit human approval before implementation. Verification must cover the full public contract, not just the starter tests. Run the task's relevant tests with python3.12 -m unittest discover -s tests -v. Keep implementation and tests local; no network, external packages, daemon or UI.\n",
+      "repository": {
+        "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+        "initial_dirty_patch_sha256": null
+      },
+      "model": {
+        "provider": "muse-lab",
+        "requested_id": "muse-spark-1.3-contributor",
+        "observed_version": null,
+        "catalog_sha256": "b206e33ba7175f3608ac3f607d169e142f4123c64027138893ad29612f2e46db",
+        "effective_config_sha256": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e"
+      },
+      "workflow_name": "queue-bba-v2",
+      "inheritance_chain": [
+        "queue-base",
+        "queue-bba-v2"
+      ],
+      "workflow": {
+        "approval": "human_required",
+        "plan": {
+          "renderer": "markdown"
+        },
+        "roles": {
+          "planner": "planner/queue-architecture-v1",
+          "executor": "executor/queue-tdd-v1",
+          "verifier": "verifier/queue-tests-v2"
+        }
+      },
+      "instructions": {
+        "planner": {
+          "selector": "planner/queue-architecture-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/planner/queue-architecture-v1/SKILL.md",
+          "sha256": "caae1863a3e8f91f99fbd0f372c78e5ce2b8b76315fa3eb000d6ca699b8f9655",
+          "content": "---\nname: lab-planner-queue-architecture-v1\ndescription: Explicit planner procedure for the durable queue workflow matrix.\n---\n\nRead TASK.md, CONTRACT.md, repository instructions and relevant implementation. Before proposing changes, reason through transaction boundaries, state invariants, dependency readiness and stale-worker hazards. Identify failure paths and concurrency risks, then sequence the implementation around those invariants. Record the important architectural discoveries and connect risks to acceptance checks.\n\nReturn a canonical plan for validation and human review; do not implement. Use at most four concise implementation steps and three aggregate verification items, with stable IDs and valid references. Include the schema's required assumptions, affected files, dependencies, risks, acceptance criteria, discoveries and blockers without repeating the contract. Human approval is a harness boundary, not an unresolved task blocker. Keep prose compact enough for the existing phase context limits. The harness chooses presentation independently of this procedure.\n\n"
+        },
+        "executor": {
+          "selector": "executor/queue-tdd-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/executor/queue-tdd-v1/SKILL.md",
+          "sha256": "8c0c8dac429fe58e0176c64dcc67455e743d110bb9f9225efe4329ef8dc86401",
+          "content": "---\nname: lab-executor-queue-tdd-v1\ndescription: Explicit executor procedure for the durable queue workflow matrix.\n---\n\nFollow the approved canonical plan using a test-first procedure. For each approved behavior, first add a focused test that fails for the intended missing behavior, run it and record the failure; then implement the smallest change that passes it. Refactor only within approved scope while keeping tests green. Include interactions between persistence, leases and dependencies in this cycle. Record red/green evidence and remaining limitations for the verifier.\n\n\nPreserve stable step IDs. If new information materially invalidates the approved strategy, scope, dependencies or acceptance criteria, request an amendment and stop until the harness provides authority. Instructions guide procedure; the harness controls admission.\n\n"
+        },
+        "verifier": {
+          "selector": "verifier/queue-tests-v2",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/verifier/queue-tests-v2/SKILL.md",
+          "sha256": "4e6e2a5284daad04fbb6fcc55228c77b65d1067f32a8b4d2bc1727adb447c79e",
+          "content": "---\nname: lab-verifier-queue-tests-v2\ndescription: Explicit verifier procedure for the durable queue workflow matrix.\n---\n\nRead the approved plan and implementation evidence. Run the specified relevant tests and focused acceptance assertions. Inspect failures as needed to explain them. Record exact commands, outcomes and evidence references; explicitly report unavailable or unsupported acceptance checks.\n\nNever infer hidden-test success or accept executor claims as verification. Before running checks, copy the exact IDs from the approved plan's verification_strategy and acceptance_criteria into a small evidence ledger. Verification IDs and acceptance IDs are separate namespaces; never invent, rename or interchange them.\n\nFor each verification ID, run one aggregate assertion command that exits nonzero if any required assertion fails. After the command completes, call lab_command_receipt with its 1-based exec_command start index in the current turn (including exploratory commands). Copy receipt.call_id from the returned JSON into the ledger. A displayed Chunk ID, terminal session ID, receipt lookup call ID, or guessed identifier is not the command call_id. If a command is still running, wait for completion before using it as evidence. Receipts identify commands; inspect the actual exit status and output to assess the checks.\n\nBefore submitting the final report, compare it against the ledger: exactly one checks entry for every approved verification ID; each call_id copied from that command's receipt; each acceptance_criteria array nonempty, unique and drawn only from the plan's top-level acceptance IDs; all acceptance IDs covered by actual checks across the report. Exploratory commands do not add final verification IDs. Report failures and unsupported checks honestly; never claim coverage that was not tested. Request an amendment if the approved strategy cannot be carried out without a material change.\n"
+        }
+      }
+    },
+    "artifact_inventory": {
+      "config/run-spec.json": "c08c5bceea6be15597420e25159f62083a907deb5b38adfb4199cd717eb796ad",
+      "config/workflow.effective.json": "0f16da4843cad52d2b730634aa69882c22e7159b89772f907860dfac3d2c3555",
+      "config/workflow.source.toml": "a0deb9109cec95a110cdf3530c43f5a7c037b9464e2b999b4eae461947bb4f01",
+      "events.jsonl": "866fcb9f3e9a808f30b542d60d513f9f6b57691ff123573dd0077b4988b9d915",
+      "evidence/effective-settings.json": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e",
+      "evidence/environment.json": "88010be2557d19790275ed62f75cf0d94d67c87802c8b83d64aaf7322f5d0072",
+      "evidence/runtime-manifest.json": "d95765a1106ba4041344a43e99d56c8fd303ac39eac869dbcf1e1a88d168a43f",
+      "instructions/executor.SKILL.md": "8c0c8dac429fe58e0176c64dcc67455e743d110bb9f9225efe4329ef8dc86401",
+      "instructions/planner.SKILL.md": "caae1863a3e8f91f99fbd0f372c78e5ce2b8b76315fa3eb000d6ca699b8f9655",
+      "instructions/verifier.SKILL.md": "4e6e2a5284daad04fbb6fcc55228c77b65d1067f32a8b4d2bc1727adb447c79e",
+      "manifest.json": "7ab77cf73e9094171c1581135523b6c1bb6d1a6f3a4d495a2530f2848da07893",
+      "plans/1/PLAN.md": "7f68bdf3b19183fb7950b666acfce9f439b4b667abd0b64f9dc6ee6f83e327f2",
+      "plans/1/plan.json": "41d966bb3d0558662c963ffb3587d041b62bdedc36542790757a262bc13b37dc",
+      "runtime-events.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "id": "queue-v2-r1-bbb",
+    "block": 1,
+    "planner": "b",
+    "executor": "b",
+    "verifier": "b",
+    "workflow": "queue-bbb-v2",
+    "parent": "queue-r1-baa",
+    "preparation_id": "queue-v2-r1-bbb-prepared",
+    "execution_id": "queue-v2-r1-bbb-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r1-bbb/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r1-bbb/fixture.json",
+    "plan_file": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/plans/queue-r1-baa.json",
+    "prior_prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r1-bbb-edited-prepared/evidence/prepared.json",
+    "prior_condition": "queue-r1-bbb",
+    "plan_parent": "queue-r1-baa",
+    "status": "awaiting_plan_approval",
+    "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/runs/queue-v2-r1-bbb-prepared/evidence/prepared.json",
+    "prepared_sha256": "53971a0cf3f2a302ba7a5d7f72f58fbf743796813fa22bc9e128c1eb3ce0af5c",
+    "target": {
+      "run_id": "queue-v2-r1-bbb-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "41d966bb3d0558662c963ffb3587d041b62bdedc36542790757a262bc13b37dc",
+      "run_spec_sha256": "375c05fc790187a0ac9909582b4097bfa508cf5f2818f61ffa51364aa3b56a99"
+    },
+    "run_spec": {
+      "schema_version": 1,
+      "task": "Complete the durable_queue Python 3.12 standard-library package and JSON CLI according to CONTRACT.md. Preserve Queue and python -m durable_queue entry points. The queue must durably submit dependency graphs, atomically claim jobs across processes, recover expired leases, reject stale completion, schedule bounded retries and roll back invalid batches. Add focused regression tests, including real separate-process durability and claim exclusivity. Research the existing repository, generate a concise concrete canonical plan and wait for explicit human approval before implementation. Verification must cover the full public contract, not just the starter tests. Run the task's relevant tests with python3.12 -m unittest discover -s tests -v. Keep implementation and tests local; no network, external packages, daemon or UI.\n",
+      "repository": {
+        "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+        "initial_dirty_patch_sha256": null
+      },
+      "model": {
+        "provider": "muse-lab",
+        "requested_id": "muse-spark-1.3-contributor",
+        "observed_version": null,
+        "catalog_sha256": "b206e33ba7175f3608ac3f607d169e142f4123c64027138893ad29612f2e46db",
+        "effective_config_sha256": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e"
+      },
+      "workflow_name": "queue-bbb-v2",
+      "inheritance_chain": [
+        "queue-base",
+        "queue-bbb-v2"
+      ],
+      "workflow": {
+        "approval": "human_required",
+        "plan": {
+          "renderer": "markdown"
+        },
+        "roles": {
+          "planner": "planner/queue-architecture-v1",
+          "executor": "executor/queue-tdd-v1",
+          "verifier": "verifier/queue-adversarial-v2"
+        }
+      },
+      "instructions": {
+        "planner": {
+          "selector": "planner/queue-architecture-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/planner/queue-architecture-v1/SKILL.md",
+          "sha256": "caae1863a3e8f91f99fbd0f372c78e5ce2b8b76315fa3eb000d6ca699b8f9655",
+          "content": "---\nname: lab-planner-queue-architecture-v1\ndescription: Explicit planner procedure for the durable queue workflow matrix.\n---\n\nRead TASK.md, CONTRACT.md, repository instructions and relevant implementation. Before proposing changes, reason through transaction boundaries, state invariants, dependency readiness and stale-worker hazards. Identify failure paths and concurrency risks, then sequence the implementation around those invariants. Record the important architectural discoveries and connect risks to acceptance checks.\n\nReturn a canonical plan for validation and human review; do not implement. Use at most four concise implementation steps and three aggregate verification items, with stable IDs and valid references. Include the schema's required assumptions, affected files, dependencies, risks, acceptance criteria, discoveries and blockers without repeating the contract. Human approval is a harness boundary, not an unresolved task blocker. Keep prose compact enough for the existing phase context limits. The harness chooses presentation independently of this procedure.\n\n"
+        },
+        "executor": {
+          "selector": "executor/queue-tdd-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/executor/queue-tdd-v1/SKILL.md",
+          "sha256": "8c0c8dac429fe58e0176c64dcc67455e743d110bb9f9225efe4329ef8dc86401",
+          "content": "---\nname: lab-executor-queue-tdd-v1\ndescription: Explicit executor procedure for the durable queue workflow matrix.\n---\n\nFollow the approved canonical plan using a test-first procedure. For each approved behavior, first add a focused test that fails for the intended missing behavior, run it and record the failure; then implement the smallest change that passes it. Refactor only within approved scope while keeping tests green. Include interactions between persistence, leases and dependencies in this cycle. Record red/green evidence and remaining limitations for the verifier.\n\n\nPreserve stable step IDs. If new information materially invalidates the approved strategy, scope, dependencies or acceptance criteria, request an amendment and stop until the harness provides authority. Instructions guide procedure; the harness controls admission.\n\n"
+        },
+        "verifier": {
+          "selector": "verifier/queue-adversarial-v2",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/verifier/queue-adversarial-v2/SKILL.md",
+          "sha256": "ce96370edcd9e6b3b45bf372caf8be577cdf8779b424e9cfabb8848da63f8e2e",
+          "content": "---\nname: lab-verifier-queue-adversarial-v2\ndescription: Explicit verifier procedure for the durable queue workflow matrix.\n---\n\nRead the approved plan, changed implementation and executor evidence. Review transaction boundaries and state transitions for counterexamples, especially rollback, lease boundaries, stale workers and competing claims. Design and run adversarial assertions alongside the specified tests. Check that tests would detect plausible wrong implementations, then report acceptance evidence and unresolved defects.\n\nNever infer hidden-test success or accept executor claims as verification. Before running checks, copy the exact IDs from the approved plan's verification_strategy and acceptance_criteria into a small evidence ledger. Verification IDs and acceptance IDs are separate namespaces; never invent, rename or interchange them.\n\nFor each verification ID, run one aggregate assertion command that exits nonzero if any required assertion fails. After the command completes, call lab_command_receipt with its 1-based exec_command start index in the current turn (including exploratory commands). Copy receipt.call_id from the returned JSON into the ledger. A displayed Chunk ID, terminal session ID, receipt lookup call ID, or guessed identifier is not the command call_id. If a command is still running, wait for completion before using it as evidence. Receipts identify commands; inspect the actual exit status and output to assess the checks.\n\nBefore submitting the final report, compare it against the ledger: exactly one checks entry for every approved verification ID; each call_id copied from that command's receipt; each acceptance_criteria array nonempty, unique and drawn only from the plan's top-level acceptance IDs; all acceptance IDs covered by actual checks across the report. Exploratory commands do not add final verification IDs. Report failures and unsupported checks honestly; never claim coverage that was not tested. Request an amendment if the approved strategy cannot be carried out without a material change.\n"
+        }
+      }
+    },
+    "artifact_inventory": {
+      "config/run-spec.json": "d95960934307ac9ccd79da85c5fce96a903de0b81e7122dbccb9dd8a1fa08831",
+      "config/workflow.effective.json": "a21b7de660a87cb592b08352ecc49f7ce23a7c7877cc729f03ddf7d40fb72215",
+      "config/workflow.source.toml": "a0deb9109cec95a110cdf3530c43f5a7c037b9464e2b999b4eae461947bb4f01",
+      "events.jsonl": "0fa301696815b40c6f19da83a4fde33a8997c8630d32cc04f16cfa233e12dd41",
+      "evidence/effective-settings.json": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e",
+      "evidence/environment.json": "88010be2557d19790275ed62f75cf0d94d67c87802c8b83d64aaf7322f5d0072",
+      "evidence/runtime-manifest.json": "d95765a1106ba4041344a43e99d56c8fd303ac39eac869dbcf1e1a88d168a43f",
+      "instructions/executor.SKILL.md": "8c0c8dac429fe58e0176c64dcc67455e743d110bb9f9225efe4329ef8dc86401",
+      "instructions/planner.SKILL.md": "caae1863a3e8f91f99fbd0f372c78e5ce2b8b76315fa3eb000d6ca699b8f9655",
+      "instructions/verifier.SKILL.md": "ce96370edcd9e6b3b45bf372caf8be577cdf8779b424e9cfabb8848da63f8e2e",
+      "manifest.json": "168303884b5f75a9bdd86160dc3e5cfab6498a0ec5111ac077ccde5c316fcb6b",
+      "plans/1/PLAN.md": "7f68bdf3b19183fb7950b666acfce9f439b4b667abd0b64f9dc6ee6f83e327f2",
+      "plans/1/plan.json": "41d966bb3d0558662c963ffb3587d041b62bdedc36542790757a262bc13b37dc",
+      "runtime-events.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "id": "queue-v2-r2-aab",
+    "block": 2,
+    "planner": "a",
+    "executor": "a",
+    "verifier": "b",
+    "workflow": "queue-aab-v2",
+    "parent": "queue-r2-aaa",
+    "preparation_id": "queue-v2-r2-aab-prepared",
+    "execution_id": "queue-v2-r2-aab-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r2-aab/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r2-aab/fixture.json",
+    "plan_file": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/plans/queue-r2-aaa.json",
+    "prior_prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/runs/queue-r2-aab-prepared/evidence/prepared.json",
+    "prior_condition": "queue-r2-aab",
+    "plan_parent": "queue-r2-aaa",
+    "status": "awaiting_plan_approval",
+    "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/runs/queue-v2-r2-aab-prepared/evidence/prepared.json",
+    "prepared_sha256": "0db20a252f42ed33fded7463ca8ad2e910095b91ec3840027abada3660869d7c",
+    "target": {
+      "run_id": "queue-v2-r2-aab-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "2f4cc33c069cb7df820a8cfb17c079c618f82a3468a4638096b88db3e09e000c",
+      "run_spec_sha256": "e926212acd7752d0a7a5424817f28e0d49518cf476fefc2cc5a5beb4a6e40008"
+    },
+    "run_spec": {
+      "schema_version": 1,
+      "task": "Complete the durable_queue Python 3.12 standard-library package and JSON CLI according to CONTRACT.md. Preserve Queue and python -m durable_queue entry points. The queue must durably submit dependency graphs, atomically claim jobs across processes, recover expired leases, reject stale completion, schedule bounded retries and roll back invalid batches. Add focused regression tests, including real separate-process durability and claim exclusivity. Research the existing repository, generate a concise concrete canonical plan and wait for explicit human approval before implementation. Verification must cover the full public contract, not just the starter tests. Run the task's relevant tests with python3.12 -m unittest discover -s tests -v. Keep implementation and tests local; no network, external packages, daemon or UI.\n",
+      "repository": {
+        "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+        "initial_dirty_patch_sha256": null
+      },
+      "model": {
+        "provider": "muse-lab",
+        "requested_id": "muse-spark-1.3-contributor",
+        "observed_version": null,
+        "catalog_sha256": "b206e33ba7175f3608ac3f607d169e142f4123c64027138893ad29612f2e46db",
+        "effective_config_sha256": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e"
+      },
+      "workflow_name": "queue-aab-v2",
+      "inheritance_chain": [
+        "queue-base",
+        "queue-aab-v2"
+      ],
+      "workflow": {
+        "approval": "human_required",
+        "plan": {
+          "renderer": "markdown"
+        },
+        "roles": {
+          "planner": "planner/queue-concise-v1",
+          "executor": "executor/queue-conservative-v1",
+          "verifier": "verifier/queue-adversarial-v2"
+        }
+      },
+      "instructions": {
+        "planner": {
+          "selector": "planner/queue-concise-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/planner/queue-concise-v1/SKILL.md",
+          "sha256": "43b125a14cfedd5ee4fcb8e45f2fc75663ba65658706757216b91764c2052978",
+          "content": "---\nname: lab-planner-queue-concise-v1\ndescription: Explicit planner procedure for the durable queue workflow matrix.\n---\n\nRead TASK.md, CONTRACT.md, repository instructions and relevant implementation. Identify the smallest complete repair of the public API and CLI. Produce a concise canonical plan grounded in the actual files. Prioritize direct implementation steps and specific acceptance checks; avoid optional abstractions and unrelated cleanup.\n\nReturn a canonical plan for validation and human review; do not implement. Use at most four concise implementation steps and three aggregate verification items, with stable IDs and valid references. Include the schema's required assumptions, affected files, dependencies, risks, acceptance criteria, discoveries and blockers without repeating the contract. Human approval is a harness boundary, not an unresolved task blocker. Keep prose compact enough for the existing phase context limits. The harness chooses presentation independently of this procedure.\n\n"
+        },
+        "executor": {
+          "selector": "executor/queue-conservative-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/executor/queue-conservative-v1/SKILL.md",
+          "sha256": "31568b6537ec10770b55eabeaf48332a7c8821ededabc2cd33959b2c2e2f13e8",
+          "content": "---\nname: lab-executor-queue-conservative-v1\ndescription: Explicit executor procedure for the durable queue workflow matrix.\n---\n\nFollow the approved canonical plan with minimal coherent changes. Inspect existing behavior before editing, preserve usable interfaces and storage helpers, and implement one approved step at a time. Add focused regression tests for the changed behavior and run them after each coherent change. Avoid speculative refactoring. Record the changes and concrete evidence for the verifier.\n\n\nPreserve stable step IDs. If new information materially invalidates the approved strategy, scope, dependencies or acceptance criteria, request an amendment and stop until the harness provides authority. Instructions guide procedure; the harness controls admission.\n\n"
+        },
+        "verifier": {
+          "selector": "verifier/queue-adversarial-v2",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/verifier/queue-adversarial-v2/SKILL.md",
+          "sha256": "ce96370edcd9e6b3b45bf372caf8be577cdf8779b424e9cfabb8848da63f8e2e",
+          "content": "---\nname: lab-verifier-queue-adversarial-v2\ndescription: Explicit verifier procedure for the durable queue workflow matrix.\n---\n\nRead the approved plan, changed implementation and executor evidence. Review transaction boundaries and state transitions for counterexamples, especially rollback, lease boundaries, stale workers and competing claims. Design and run adversarial assertions alongside the specified tests. Check that tests would detect plausible wrong implementations, then report acceptance evidence and unresolved defects.\n\nNever infer hidden-test success or accept executor claims as verification. Before running checks, copy the exact IDs from the approved plan's verification_strategy and acceptance_criteria into a small evidence ledger. Verification IDs and acceptance IDs are separate namespaces; never invent, rename or interchange them.\n\nFor each verification ID, run one aggregate assertion command that exits nonzero if any required assertion fails. After the command completes, call lab_command_receipt with its 1-based exec_command start index in the current turn (including exploratory commands). Copy receipt.call_id from the returned JSON into the ledger. A displayed Chunk ID, terminal session ID, receipt lookup call ID, or guessed identifier is not the command call_id. If a command is still running, wait for completion before using it as evidence. Receipts identify commands; inspect the actual exit status and output to assess the checks.\n\nBefore submitting the final report, compare it against the ledger: exactly one checks entry for every approved verification ID; each call_id copied from that command's receipt; each acceptance_criteria array nonempty, unique and drawn only from the plan's top-level acceptance IDs; all acceptance IDs covered by actual checks across the report. Exploratory commands do not add final verification IDs. Report failures and unsupported checks honestly; never claim coverage that was not tested. Request an amendment if the approved strategy cannot be carried out without a material change.\n"
+        }
+      }
+    },
+    "artifact_inventory": {
+      "config/run-spec.json": "08601acfcc528f155065a7634d7afe9e2d14e8e079b1890f2cbfb92c7bc9b69c",
+      "config/workflow.effective.json": "2fecfeb001ba52aad5ef658b88871ce623d781633eb9609c0c41c01f5829342a",
+      "config/workflow.source.toml": "a0deb9109cec95a110cdf3530c43f5a7c037b9464e2b999b4eae461947bb4f01",
+      "events.jsonl": "739c4f52e1ef86045ee2fb1c1668ae6c382f5d941a5ac35236f8f912f488a1af",
+      "evidence/effective-settings.json": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e",
+      "evidence/environment.json": "88010be2557d19790275ed62f75cf0d94d67c87802c8b83d64aaf7322f5d0072",
+      "evidence/runtime-manifest.json": "d95765a1106ba4041344a43e99d56c8fd303ac39eac869dbcf1e1a88d168a43f",
+      "instructions/executor.SKILL.md": "31568b6537ec10770b55eabeaf48332a7c8821ededabc2cd33959b2c2e2f13e8",
+      "instructions/planner.SKILL.md": "43b125a14cfedd5ee4fcb8e45f2fc75663ba65658706757216b91764c2052978",
+      "instructions/verifier.SKILL.md": "ce96370edcd9e6b3b45bf372caf8be577cdf8779b424e9cfabb8848da63f8e2e",
+      "manifest.json": "459babf7fde7e47032dcde4dbc456cf1fd88168eb647ba215bc7d112ca279d11",
+      "plans/1/PLAN.md": "13b5be3f05d31838f0224a67711abfa073a86bb87b1e45505cab1f361c29b7bc",
+      "plans/1/plan.json": "2f4cc33c069cb7df820a8cfb17c079c618f82a3468a4638096b88db3e09e000c",
+      "runtime-events.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "id": "queue-v2-r2-aba",
+    "block": 2,
+    "planner": "a",
+    "executor": "b",
+    "verifier": "a",
+    "workflow": "queue-aba-v2",
+    "parent": "queue-r2-aaa",
+    "preparation_id": "queue-v2-r2-aba-prepared",
+    "execution_id": "queue-v2-r2-aba-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r2-aba/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r2-aba/fixture.json",
+    "plan_file": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/plans/queue-r2-aaa.json",
+    "prior_prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/runs/queue-r2-aba-prepared/evidence/prepared.json",
+    "prior_condition": "queue-r2-aba",
+    "plan_parent": "queue-r2-aaa",
+    "status": "awaiting_plan_approval",
+    "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/runs/queue-v2-r2-aba-prepared/evidence/prepared.json",
+    "prepared_sha256": "54dcc56dadbcb33e1dc25394696cdd612308da3e90be1a0bab9d0422d60fce01",
+    "target": {
+      "run_id": "queue-v2-r2-aba-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "2f4cc33c069cb7df820a8cfb17c079c618f82a3468a4638096b88db3e09e000c",
+      "run_spec_sha256": "70a0610c750fdeb6c3337e310c4da1ac0287259d05fc81b3cf60393315d1bbfa"
+    },
+    "run_spec": {
+      "schema_version": 1,
+      "task": "Complete the durable_queue Python 3.12 standard-library package and JSON CLI according to CONTRACT.md. Preserve Queue and python -m durable_queue entry points. The queue must durably submit dependency graphs, atomically claim jobs across processes, recover expired leases, reject stale completion, schedule bounded retries and roll back invalid batches. Add focused regression tests, including real separate-process durability and claim exclusivity. Research the existing repository, generate a concise concrete canonical plan and wait for explicit human approval before implementation. Verification must cover the full public contract, not just the starter tests. Run the task's relevant tests with python3.12 -m unittest discover -s tests -v. Keep implementation and tests local; no network, external packages, daemon or UI.\n",
+      "repository": {
+        "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+        "initial_dirty_patch_sha256": null
+      },
+      "model": {
+        "provider": "muse-lab",
+        "requested_id": "muse-spark-1.3-contributor",
+        "observed_version": null,
+        "catalog_sha256": "b206e33ba7175f3608ac3f607d169e142f4123c64027138893ad29612f2e46db",
+        "effective_config_sha256": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e"
+      },
+      "workflow_name": "queue-aba-v2",
+      "inheritance_chain": [
+        "queue-base",
+        "queue-aba-v2"
+      ],
+      "workflow": {
+        "approval": "human_required",
+        "plan": {
+          "renderer": "markdown"
+        },
+        "roles": {
+          "planner": "planner/queue-concise-v1",
+          "executor": "executor/queue-tdd-v1",
+          "verifier": "verifier/queue-tests-v2"
+        }
+      },
+      "instructions": {
+        "planner": {
+          "selector": "planner/queue-concise-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/planner/queue-concise-v1/SKILL.md",
+          "sha256": "43b125a14cfedd5ee4fcb8e45f2fc75663ba65658706757216b91764c2052978",
+          "content": "---\nname: lab-planner-queue-concise-v1\ndescription: Explicit planner procedure for the durable queue workflow matrix.\n---\n\nRead TASK.md, CONTRACT.md, repository instructions and relevant implementation. Identify the smallest complete repair of the public API and CLI. Produce a concise canonical plan grounded in the actual files. Prioritize direct implementation steps and specific acceptance checks; avoid optional abstractions and unrelated cleanup.\n\nReturn a canonical plan for validation and human review; do not implement. Use at most four concise implementation steps and three aggregate verification items, with stable IDs and valid references. Include the schema's required assumptions, affected files, dependencies, risks, acceptance criteria, discoveries and blockers without repeating the contract. Human approval is a harness boundary, not an unresolved task blocker. Keep prose compact enough for the existing phase context limits. The harness chooses presentation independently of this procedure.\n\n"
+        },
+        "executor": {
+          "selector": "executor/queue-tdd-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/executor/queue-tdd-v1/SKILL.md",
+          "sha256": "8c0c8dac429fe58e0176c64dcc67455e743d110bb9f9225efe4329ef8dc86401",
+          "content": "---\nname: lab-executor-queue-tdd-v1\ndescription: Explicit executor procedure for the durable queue workflow matrix.\n---\n\nFollow the approved canonical plan using a test-first procedure. For each approved behavior, first add a focused test that fails for the intended missing behavior, run it and record the failure; then implement the smallest change that passes it. Refactor only within approved scope while keeping tests green. Include interactions between persistence, leases and dependencies in this cycle. Record red/green evidence and remaining limitations for the verifier.\n\n\nPreserve stable step IDs. If new information materially invalidates the approved strategy, scope, dependencies or acceptance criteria, request an amendment and stop until the harness provides authority. Instructions guide procedure; the harness controls admission.\n\n"
+        },
+        "verifier": {
+          "selector": "verifier/queue-tests-v2",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/verifier/queue-tests-v2/SKILL.md",
+          "sha256": "4e6e2a5284daad04fbb6fcc55228c77b65d1067f32a8b4d2bc1727adb447c79e",
+          "content": "---\nname: lab-verifier-queue-tests-v2\ndescription: Explicit verifier procedure for the durable queue workflow matrix.\n---\n\nRead the approved plan and implementation evidence. Run the specified relevant tests and focused acceptance assertions. Inspect failures as needed to explain them. Record exact commands, outcomes and evidence references; explicitly report unavailable or unsupported acceptance checks.\n\nNever infer hidden-test success or accept executor claims as verification. Before running checks, copy the exact IDs from the approved plan's verification_strategy and acceptance_criteria into a small evidence ledger. Verification IDs and acceptance IDs are separate namespaces; never invent, rename or interchange them.\n\nFor each verification ID, run one aggregate assertion command that exits nonzero if any required assertion fails. After the command completes, call lab_command_receipt with its 1-based exec_command start index in the current turn (including exploratory commands). Copy receipt.call_id from the returned JSON into the ledger. A displayed Chunk ID, terminal session ID, receipt lookup call ID, or guessed identifier is not the command call_id. If a command is still running, wait for completion before using it as evidence. Receipts identify commands; inspect the actual exit status and output to assess the checks.\n\nBefore submitting the final report, compare it against the ledger: exactly one checks entry for every approved verification ID; each call_id copied from that command's receipt; each acceptance_criteria array nonempty, unique and drawn only from the plan's top-level acceptance IDs; all acceptance IDs covered by actual checks across the report. Exploratory commands do not add final verification IDs. Report failures and unsupported checks honestly; never claim coverage that was not tested. Request an amendment if the approved strategy cannot be carried out without a material change.\n"
+        }
+      }
+    },
+    "artifact_inventory": {
+      "config/run-spec.json": "c9a237be35c283fde3c20851d7968e1c1db6df46696323adb48eb67727defc59",
+      "config/workflow.effective.json": "4d6fdaefe7f2ee2d0ec748b4b2b1d183be20ce116a7a31c15f2584269b497414",
+      "config/workflow.source.toml": "a0deb9109cec95a110cdf3530c43f5a7c037b9464e2b999b4eae461947bb4f01",
+      "events.jsonl": "37a0840714857036eda235ef50b2938712239dca7fd551bc09ec01d1df2a9aac",
+      "evidence/effective-settings.json": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e",
+      "evidence/environment.json": "88010be2557d19790275ed62f75cf0d94d67c87802c8b83d64aaf7322f5d0072",
+      "evidence/runtime-manifest.json": "d95765a1106ba4041344a43e99d56c8fd303ac39eac869dbcf1e1a88d168a43f",
+      "instructions/executor.SKILL.md": "8c0c8dac429fe58e0176c64dcc67455e743d110bb9f9225efe4329ef8dc86401",
+      "instructions/planner.SKILL.md": "43b125a14cfedd5ee4fcb8e45f2fc75663ba65658706757216b91764c2052978",
+      "instructions/verifier.SKILL.md": "4e6e2a5284daad04fbb6fcc55228c77b65d1067f32a8b4d2bc1727adb447c79e",
+      "manifest.json": "aa99cc294f19e869d4c7d769aea7764347ddde62e6782eccb653127c008dbabe",
+      "plans/1/PLAN.md": "13b5be3f05d31838f0224a67711abfa073a86bb87b1e45505cab1f361c29b7bc",
+      "plans/1/plan.json": "2f4cc33c069cb7df820a8cfb17c079c618f82a3468a4638096b88db3e09e000c",
+      "runtime-events.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "id": "queue-v2-r2-abb",
+    "block": 2,
+    "planner": "a",
+    "executor": "b",
+    "verifier": "b",
+    "workflow": "queue-abb-v2",
+    "parent": "queue-r2-aaa",
+    "preparation_id": "queue-v2-r2-abb-prepared",
+    "execution_id": "queue-v2-r2-abb-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r2-abb/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r2-abb/fixture.json",
+    "plan_file": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/plans/queue-r2-aaa.json",
+    "prior_prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/runs/queue-r2-abb-prepared/evidence/prepared.json",
+    "prior_condition": "queue-r2-abb",
+    "plan_parent": "queue-r2-aaa",
+    "status": "awaiting_plan_approval",
+    "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/runs/queue-v2-r2-abb-prepared/evidence/prepared.json",
+    "prepared_sha256": "c42136cefd355c4e4c81800788c133cda23fd26c5e08911cce7341a0f0052268",
+    "target": {
+      "run_id": "queue-v2-r2-abb-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "2f4cc33c069cb7df820a8cfb17c079c618f82a3468a4638096b88db3e09e000c",
+      "run_spec_sha256": "b1c7a40d43b5d272886113c91d61af697e21316cf63edbad7ab24cc2bd49757a"
+    },
+    "run_spec": {
+      "schema_version": 1,
+      "task": "Complete the durable_queue Python 3.12 standard-library package and JSON CLI according to CONTRACT.md. Preserve Queue and python -m durable_queue entry points. The queue must durably submit dependency graphs, atomically claim jobs across processes, recover expired leases, reject stale completion, schedule bounded retries and roll back invalid batches. Add focused regression tests, including real separate-process durability and claim exclusivity. Research the existing repository, generate a concise concrete canonical plan and wait for explicit human approval before implementation. Verification must cover the full public contract, not just the starter tests. Run the task's relevant tests with python3.12 -m unittest discover -s tests -v. Keep implementation and tests local; no network, external packages, daemon or UI.\n",
+      "repository": {
+        "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+        "initial_dirty_patch_sha256": null
+      },
+      "model": {
+        "provider": "muse-lab",
+        "requested_id": "muse-spark-1.3-contributor",
+        "observed_version": null,
+        "catalog_sha256": "b206e33ba7175f3608ac3f607d169e142f4123c64027138893ad29612f2e46db",
+        "effective_config_sha256": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e"
+      },
+      "workflow_name": "queue-abb-v2",
+      "inheritance_chain": [
+        "queue-base",
+        "queue-abb-v2"
+      ],
+      "workflow": {
+        "approval": "human_required",
+        "plan": {
+          "renderer": "markdown"
+        },
+        "roles": {
+          "planner": "planner/queue-concise-v1",
+          "executor": "executor/queue-tdd-v1",
+          "verifier": "verifier/queue-adversarial-v2"
+        }
+      },
+      "instructions": {
+        "planner": {
+          "selector": "planner/queue-concise-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/planner/queue-concise-v1/SKILL.md",
+          "sha256": "43b125a14cfedd5ee4fcb8e45f2fc75663ba65658706757216b91764c2052978",
+          "content": "---\nname: lab-planner-queue-concise-v1\ndescription: Explicit planner procedure for the durable queue workflow matrix.\n---\n\nRead TASK.md, CONTRACT.md, repository instructions and relevant implementation. Identify the smallest complete repair of the public API and CLI. Produce a concise canonical plan grounded in the actual files. Prioritize direct implementation steps and specific acceptance checks; avoid optional abstractions and unrelated cleanup.\n\nReturn a canonical plan for validation and human review; do not implement. Use at most four concise implementation steps and three aggregate verification items, with stable IDs and valid references. Include the schema's required assumptions, affected files, dependencies, risks, acceptance criteria, discoveries and blockers without repeating the contract. Human approval is a harness boundary, not an unresolved task blocker. Keep prose compact enough for the existing phase context limits. The harness chooses presentation independently of this procedure.\n\n"
+        },
+        "executor": {
+          "selector": "executor/queue-tdd-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/executor/queue-tdd-v1/SKILL.md",
+          "sha256": "8c0c8dac429fe58e0176c64dcc67455e743d110bb9f9225efe4329ef8dc86401",
+          "content": "---\nname: lab-executor-queue-tdd-v1\ndescription: Explicit executor procedure for the durable queue workflow matrix.\n---\n\nFollow the approved canonical plan using a test-first procedure. For each approved behavior, first add a focused test that fails for the intended missing behavior, run it and record the failure; then implement the smallest change that passes it. Refactor only within approved scope while keeping tests green. Include interactions between persistence, leases and dependencies in this cycle. Record red/green evidence and remaining limitations for the verifier.\n\n\nPreserve stable step IDs. If new information materially invalidates the approved strategy, scope, dependencies or acceptance criteria, request an amendment and stop until the harness provides authority. Instructions guide procedure; the harness controls admission.\n\n"
+        },
+        "verifier": {
+          "selector": "verifier/queue-adversarial-v2",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/verifier/queue-adversarial-v2/SKILL.md",
+          "sha256": "ce96370edcd9e6b3b45bf372caf8be577cdf8779b424e9cfabb8848da63f8e2e",
+          "content": "---\nname: lab-verifier-queue-adversarial-v2\ndescription: Explicit verifier procedure for the durable queue workflow matrix.\n---\n\nRead the approved plan, changed implementation and executor evidence. Review transaction boundaries and state transitions for counterexamples, especially rollback, lease boundaries, stale workers and competing claims. Design and run adversarial assertions alongside the specified tests. Check that tests would detect plausible wrong implementations, then report acceptance evidence and unresolved defects.\n\nNever infer hidden-test success or accept executor claims as verification. Before running checks, copy the exact IDs from the approved plan's verification_strategy and acceptance_criteria into a small evidence ledger. Verification IDs and acceptance IDs are separate namespaces; never invent, rename or interchange them.\n\nFor each verification ID, run one aggregate assertion command that exits nonzero if any required assertion fails. After the command completes, call lab_command_receipt with its 1-based exec_command start index in the current turn (including exploratory commands). Copy receipt.call_id from the returned JSON into the ledger. A displayed Chunk ID, terminal session ID, receipt lookup call ID, or guessed identifier is not the command call_id. If a command is still running, wait for completion before using it as evidence. Receipts identify commands; inspect the actual exit status and output to assess the checks.\n\nBefore submitting the final report, compare it against the ledger: exactly one checks entry for every approved verification ID; each call_id copied from that command's receipt; each acceptance_criteria array nonempty, unique and drawn only from the plan's top-level acceptance IDs; all acceptance IDs covered by actual checks across the report. Exploratory commands do not add final verification IDs. Report failures and unsupported checks honestly; never claim coverage that was not tested. Request an amendment if the approved strategy cannot be carried out without a material change.\n"
+        }
+      }
+    },
+    "artifact_inventory": {
+      "config/run-spec.json": "6835e065f640cf55481d5fdb72db4e718eeb70ca0727219c50c8046aebba1ab7",
+      "config/workflow.effective.json": "4771b00f3362779e56c0898731feadcb720778373c09fb813dc6486721bf948e",
+      "config/workflow.source.toml": "a0deb9109cec95a110cdf3530c43f5a7c037b9464e2b999b4eae461947bb4f01",
+      "events.jsonl": "230c584667f59f15b6a2347a07177a3f86c500f770b9a70dc767ce76f8543a92",
+      "evidence/effective-settings.json": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e",
+      "evidence/environment.json": "88010be2557d19790275ed62f75cf0d94d67c87802c8b83d64aaf7322f5d0072",
+      "evidence/runtime-manifest.json": "d95765a1106ba4041344a43e99d56c8fd303ac39eac869dbcf1e1a88d168a43f",
+      "instructions/executor.SKILL.md": "8c0c8dac429fe58e0176c64dcc67455e743d110bb9f9225efe4329ef8dc86401",
+      "instructions/planner.SKILL.md": "43b125a14cfedd5ee4fcb8e45f2fc75663ba65658706757216b91764c2052978",
+      "instructions/verifier.SKILL.md": "ce96370edcd9e6b3b45bf372caf8be577cdf8779b424e9cfabb8848da63f8e2e",
+      "manifest.json": "dcbef88dc3d9f8da254b97e874e0844a0d03cc4885607550807c85cd2c6619e1",
+      "plans/1/PLAN.md": "13b5be3f05d31838f0224a67711abfa073a86bb87b1e45505cab1f361c29b7bc",
+      "plans/1/plan.json": "2f4cc33c069cb7df820a8cfb17c079c618f82a3468a4638096b88db3e09e000c",
+      "runtime-events.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "id": "queue-v2-r2-baa",
+    "block": 2,
+    "planner": "b",
+    "executor": "a",
+    "verifier": "a",
+    "workflow": "queue-baa-v2",
+    "parent": null,
+    "preparation_id": "queue-v2-r2-baa-prepared",
+    "execution_id": "queue-v2-r2-baa-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r2-baa/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r2-baa/fixture.json",
+    "plan_file": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/plans/queue-r2-baa.json",
+    "prior_prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r2-baa-edited-prepared/evidence/prepared.json",
+    "prior_condition": "queue-r2-baa",
+    "plan_parent": "queue-r2-baa",
+    "status": "awaiting_plan_approval",
+    "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/runs/queue-v2-r2-baa-prepared/evidence/prepared.json",
+    "prepared_sha256": "5bbd62fb8d7b0497af7a3401b5fc31df6f369f0a23fee719fb3e8a992fe25b6b",
+    "target": {
+      "run_id": "queue-v2-r2-baa-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "2a03422cc7cf39a67ff732aac55bcdd6d159389e4c631494cbf6b2700e0274a4",
+      "run_spec_sha256": "dcaad081f90b3bfaf8643d965e7c43d5f41b8d1072a306561f5910668430e7fc"
+    },
+    "run_spec": {
+      "schema_version": 1,
+      "task": "Complete the durable_queue Python 3.12 standard-library package and JSON CLI according to CONTRACT.md. Preserve Queue and python -m durable_queue entry points. The queue must durably submit dependency graphs, atomically claim jobs across processes, recover expired leases, reject stale completion, schedule bounded retries and roll back invalid batches. Add focused regression tests, including real separate-process durability and claim exclusivity. Research the existing repository, generate a concise concrete canonical plan and wait for explicit human approval before implementation. Verification must cover the full public contract, not just the starter tests. Run the task's relevant tests with python3.12 -m unittest discover -s tests -v. Keep implementation and tests local; no network, external packages, daemon or UI.\n",
+      "repository": {
+        "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+        "initial_dirty_patch_sha256": null
+      },
+      "model": {
+        "provider": "muse-lab",
+        "requested_id": "muse-spark-1.3-contributor",
+        "observed_version": null,
+        "catalog_sha256": "b206e33ba7175f3608ac3f607d169e142f4123c64027138893ad29612f2e46db",
+        "effective_config_sha256": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e"
+      },
+      "workflow_name": "queue-baa-v2",
+      "inheritance_chain": [
+        "queue-base",
+        "queue-baa-v2"
+      ],
+      "workflow": {
+        "approval": "human_required",
+        "plan": {
+          "renderer": "markdown"
+        },
+        "roles": {
+          "planner": "planner/queue-architecture-v1",
+          "executor": "executor/queue-conservative-v1",
+          "verifier": "verifier/queue-tests-v2"
+        }
+      },
+      "instructions": {
+        "planner": {
+          "selector": "planner/queue-architecture-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/planner/queue-architecture-v1/SKILL.md",
+          "sha256": "caae1863a3e8f91f99fbd0f372c78e5ce2b8b76315fa3eb000d6ca699b8f9655",
+          "content": "---\nname: lab-planner-queue-architecture-v1\ndescription: Explicit planner procedure for the durable queue workflow matrix.\n---\n\nRead TASK.md, CONTRACT.md, repository instructions and relevant implementation. Before proposing changes, reason through transaction boundaries, state invariants, dependency readiness and stale-worker hazards. Identify failure paths and concurrency risks, then sequence the implementation around those invariants. Record the important architectural discoveries and connect risks to acceptance checks.\n\nReturn a canonical plan for validation and human review; do not implement. Use at most four concise implementation steps and three aggregate verification items, with stable IDs and valid references. Include the schema's required assumptions, affected files, dependencies, risks, acceptance criteria, discoveries and blockers without repeating the contract. Human approval is a harness boundary, not an unresolved task blocker. Keep prose compact enough for the existing phase context limits. The harness chooses presentation independently of this procedure.\n\n"
+        },
+        "executor": {
+          "selector": "executor/queue-conservative-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/executor/queue-conservative-v1/SKILL.md",
+          "sha256": "31568b6537ec10770b55eabeaf48332a7c8821ededabc2cd33959b2c2e2f13e8",
+          "content": "---\nname: lab-executor-queue-conservative-v1\ndescription: Explicit executor procedure for the durable queue workflow matrix.\n---\n\nFollow the approved canonical plan with minimal coherent changes. Inspect existing behavior before editing, preserve usable interfaces and storage helpers, and implement one approved step at a time. Add focused regression tests for the changed behavior and run them after each coherent change. Avoid speculative refactoring. Record the changes and concrete evidence for the verifier.\n\n\nPreserve stable step IDs. If new information materially invalidates the approved strategy, scope, dependencies or acceptance criteria, request an amendment and stop until the harness provides authority. Instructions guide procedure; the harness controls admission.\n\n"
+        },
+        "verifier": {
+          "selector": "verifier/queue-tests-v2",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/verifier/queue-tests-v2/SKILL.md",
+          "sha256": "4e6e2a5284daad04fbb6fcc55228c77b65d1067f32a8b4d2bc1727adb447c79e",
+          "content": "---\nname: lab-verifier-queue-tests-v2\ndescription: Explicit verifier procedure for the durable queue workflow matrix.\n---\n\nRead the approved plan and implementation evidence. Run the specified relevant tests and focused acceptance assertions. Inspect failures as needed to explain them. Record exact commands, outcomes and evidence references; explicitly report unavailable or unsupported acceptance checks.\n\nNever infer hidden-test success or accept executor claims as verification. Before running checks, copy the exact IDs from the approved plan's verification_strategy and acceptance_criteria into a small evidence ledger. Verification IDs and acceptance IDs are separate namespaces; never invent, rename or interchange them.\n\nFor each verification ID, run one aggregate assertion command that exits nonzero if any required assertion fails. After the command completes, call lab_command_receipt with its 1-based exec_command start index in the current turn (including exploratory commands). Copy receipt.call_id from the returned JSON into the ledger. A displayed Chunk ID, terminal session ID, receipt lookup call ID, or guessed identifier is not the command call_id. If a command is still running, wait for completion before using it as evidence. Receipts identify commands; inspect the actual exit status and output to assess the checks.\n\nBefore submitting the final report, compare it against the ledger: exactly one checks entry for every approved verification ID; each call_id copied from that command's receipt; each acceptance_criteria array nonempty, unique and drawn only from the plan's top-level acceptance IDs; all acceptance IDs covered by actual checks across the report. Exploratory commands do not add final verification IDs. Report failures and unsupported checks honestly; never claim coverage that was not tested. Request an amendment if the approved strategy cannot be carried out without a material change.\n"
+        }
+      }
+    },
+    "artifact_inventory": {
+      "config/run-spec.json": "3b5f4699a88b756851d6a2fa74bf6718c4f733e9938a39e15ed37e5d1ba29e8e",
+      "config/workflow.effective.json": "69bb537a156e6c9b2b5f34141ad3b5737bdbcd7c7d43fe39a35ae30e9703897d",
+      "config/workflow.source.toml": "a0deb9109cec95a110cdf3530c43f5a7c037b9464e2b999b4eae461947bb4f01",
+      "events.jsonl": "01d8ce9d5d0cf134230aa471c0f00d16d89ba30343637c2198b80dc715725945",
+      "evidence/effective-settings.json": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e",
+      "evidence/environment.json": "88010be2557d19790275ed62f75cf0d94d67c87802c8b83d64aaf7322f5d0072",
+      "evidence/runtime-manifest.json": "d95765a1106ba4041344a43e99d56c8fd303ac39eac869dbcf1e1a88d168a43f",
+      "instructions/executor.SKILL.md": "31568b6537ec10770b55eabeaf48332a7c8821ededabc2cd33959b2c2e2f13e8",
+      "instructions/planner.SKILL.md": "caae1863a3e8f91f99fbd0f372c78e5ce2b8b76315fa3eb000d6ca699b8f9655",
+      "instructions/verifier.SKILL.md": "4e6e2a5284daad04fbb6fcc55228c77b65d1067f32a8b4d2bc1727adb447c79e",
+      "manifest.json": "57e8cc4321a089cfdc15b6713360ade432714d8776e170547c9e3ce417832638",
+      "plans/1/PLAN.md": "505bff827da20feb8f04750a477b00dfb2367a3877ad7d1846c9dc4c4a13ef83",
+      "plans/1/plan.json": "2a03422cc7cf39a67ff732aac55bcdd6d159389e4c631494cbf6b2700e0274a4",
+      "runtime-events.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "id": "queue-v2-r2-bab",
+    "block": 2,
+    "planner": "b",
+    "executor": "a",
+    "verifier": "b",
+    "workflow": "queue-bab-v2",
+    "parent": "queue-r2-baa",
+    "preparation_id": "queue-v2-r2-bab-prepared",
+    "execution_id": "queue-v2-r2-bab-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r2-bab/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r2-bab/fixture.json",
+    "plan_file": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/plans/queue-r2-baa.json",
+    "prior_prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r2-bab-edited-prepared/evidence/prepared.json",
+    "prior_condition": "queue-r2-bab",
+    "plan_parent": "queue-r2-baa",
+    "status": "awaiting_plan_approval",
+    "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/runs/queue-v2-r2-bab-prepared/evidence/prepared.json",
+    "prepared_sha256": "2d93579e4dce5bed82c89847eaffdedc46be0a56aa56d613c11573e542036fd8",
+    "target": {
+      "run_id": "queue-v2-r2-bab-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "2a03422cc7cf39a67ff732aac55bcdd6d159389e4c631494cbf6b2700e0274a4",
+      "run_spec_sha256": "a93a4f8f8bff107f42bc038080be96f72e88836a2a67ab4b00e874904c99a716"
+    },
+    "run_spec": {
+      "schema_version": 1,
+      "task": "Complete the durable_queue Python 3.12 standard-library package and JSON CLI according to CONTRACT.md. Preserve Queue and python -m durable_queue entry points. The queue must durably submit dependency graphs, atomically claim jobs across processes, recover expired leases, reject stale completion, schedule bounded retries and roll back invalid batches. Add focused regression tests, including real separate-process durability and claim exclusivity. Research the existing repository, generate a concise concrete canonical plan and wait for explicit human approval before implementation. Verification must cover the full public contract, not just the starter tests. Run the task's relevant tests with python3.12 -m unittest discover -s tests -v. Keep implementation and tests local; no network, external packages, daemon or UI.\n",
+      "repository": {
+        "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+        "initial_dirty_patch_sha256": null
+      },
+      "model": {
+        "provider": "muse-lab",
+        "requested_id": "muse-spark-1.3-contributor",
+        "observed_version": null,
+        "catalog_sha256": "b206e33ba7175f3608ac3f607d169e142f4123c64027138893ad29612f2e46db",
+        "effective_config_sha256": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e"
+      },
+      "workflow_name": "queue-bab-v2",
+      "inheritance_chain": [
+        "queue-base",
+        "queue-bab-v2"
+      ],
+      "workflow": {
+        "approval": "human_required",
+        "plan": {
+          "renderer": "markdown"
+        },
+        "roles": {
+          "planner": "planner/queue-architecture-v1",
+          "executor": "executor/queue-conservative-v1",
+          "verifier": "verifier/queue-adversarial-v2"
+        }
+      },
+      "instructions": {
+        "planner": {
+          "selector": "planner/queue-architecture-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/planner/queue-architecture-v1/SKILL.md",
+          "sha256": "caae1863a3e8f91f99fbd0f372c78e5ce2b8b76315fa3eb000d6ca699b8f9655",
+          "content": "---\nname: lab-planner-queue-architecture-v1\ndescription: Explicit planner procedure for the durable queue workflow matrix.\n---\n\nRead TASK.md, CONTRACT.md, repository instructions and relevant implementation. Before proposing changes, reason through transaction boundaries, state invariants, dependency readiness and stale-worker hazards. Identify failure paths and concurrency risks, then sequence the implementation around those invariants. Record the important architectural discoveries and connect risks to acceptance checks.\n\nReturn a canonical plan for validation and human review; do not implement. Use at most four concise implementation steps and three aggregate verification items, with stable IDs and valid references. Include the schema's required assumptions, affected files, dependencies, risks, acceptance criteria, discoveries and blockers without repeating the contract. Human approval is a harness boundary, not an unresolved task blocker. Keep prose compact enough for the existing phase context limits. The harness chooses presentation independently of this procedure.\n\n"
+        },
+        "executor": {
+          "selector": "executor/queue-conservative-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/executor/queue-conservative-v1/SKILL.md",
+          "sha256": "31568b6537ec10770b55eabeaf48332a7c8821ededabc2cd33959b2c2e2f13e8",
+          "content": "---\nname: lab-executor-queue-conservative-v1\ndescription: Explicit executor procedure for the durable queue workflow matrix.\n---\n\nFollow the approved canonical plan with minimal coherent changes. Inspect existing behavior before editing, preserve usable interfaces and storage helpers, and implement one approved step at a time. Add focused regression tests for the changed behavior and run them after each coherent change. Avoid speculative refactoring. Record the changes and concrete evidence for the verifier.\n\n\nPreserve stable step IDs. If new information materially invalidates the approved strategy, scope, dependencies or acceptance criteria, request an amendment and stop until the harness provides authority. Instructions guide procedure; the harness controls admission.\n\n"
+        },
+        "verifier": {
+          "selector": "verifier/queue-adversarial-v2",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/verifier/queue-adversarial-v2/SKILL.md",
+          "sha256": "ce96370edcd9e6b3b45bf372caf8be577cdf8779b424e9cfabb8848da63f8e2e",
+          "content": "---\nname: lab-verifier-queue-adversarial-v2\ndescription: Explicit verifier procedure for the durable queue workflow matrix.\n---\n\nRead the approved plan, changed implementation and executor evidence. Review transaction boundaries and state transitions for counterexamples, especially rollback, lease boundaries, stale workers and competing claims. Design and run adversarial assertions alongside the specified tests. Check that tests would detect plausible wrong implementations, then report acceptance evidence and unresolved defects.\n\nNever infer hidden-test success or accept executor claims as verification. Before running checks, copy the exact IDs from the approved plan's verification_strategy and acceptance_criteria into a small evidence ledger. Verification IDs and acceptance IDs are separate namespaces; never invent, rename or interchange them.\n\nFor each verification ID, run one aggregate assertion command that exits nonzero if any required assertion fails. After the command completes, call lab_command_receipt with its 1-based exec_command start index in the current turn (including exploratory commands). Copy receipt.call_id from the returned JSON into the ledger. A displayed Chunk ID, terminal session ID, receipt lookup call ID, or guessed identifier is not the command call_id. If a command is still running, wait for completion before using it as evidence. Receipts identify commands; inspect the actual exit status and output to assess the checks.\n\nBefore submitting the final report, compare it against the ledger: exactly one checks entry for every approved verification ID; each call_id copied from that command's receipt; each acceptance_criteria array nonempty, unique and drawn only from the plan's top-level acceptance IDs; all acceptance IDs covered by actual checks across the report. Exploratory commands do not add final verification IDs. Report failures and unsupported checks honestly; never claim coverage that was not tested. Request an amendment if the approved strategy cannot be carried out without a material change.\n"
+        }
+      }
+    },
+    "artifact_inventory": {
+      "config/run-spec.json": "67943d0ee2162a7f951876d85ce71b2128c4275daf3f663993d1ba7524ba6b6d",
+      "config/workflow.effective.json": "500e85331e98b033f6dc7c7782187c71a2e0f18db7fa9b23adcfadf290cda42f",
+      "config/workflow.source.toml": "a0deb9109cec95a110cdf3530c43f5a7c037b9464e2b999b4eae461947bb4f01",
+      "events.jsonl": "4a330cf2e470de5821e32a86c1942be60bc147e3032005d11d689e56839bf393",
+      "evidence/effective-settings.json": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e",
+      "evidence/environment.json": "88010be2557d19790275ed62f75cf0d94d67c87802c8b83d64aaf7322f5d0072",
+      "evidence/runtime-manifest.json": "d95765a1106ba4041344a43e99d56c8fd303ac39eac869dbcf1e1a88d168a43f",
+      "instructions/executor.SKILL.md": "31568b6537ec10770b55eabeaf48332a7c8821ededabc2cd33959b2c2e2f13e8",
+      "instructions/planner.SKILL.md": "caae1863a3e8f91f99fbd0f372c78e5ce2b8b76315fa3eb000d6ca699b8f9655",
+      "instructions/verifier.SKILL.md": "ce96370edcd9e6b3b45bf372caf8be577cdf8779b424e9cfabb8848da63f8e2e",
+      "manifest.json": "20b45071e0ae95f41a2f56f26edb159a28c266c5cfd09e13f727aafd58507e6a",
+      "plans/1/PLAN.md": "505bff827da20feb8f04750a477b00dfb2367a3877ad7d1846c9dc4c4a13ef83",
+      "plans/1/plan.json": "2a03422cc7cf39a67ff732aac55bcdd6d159389e4c631494cbf6b2700e0274a4",
+      "runtime-events.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "id": "queue-v2-r2-bba",
+    "block": 2,
+    "planner": "b",
+    "executor": "b",
+    "verifier": "a",
+    "workflow": "queue-bba-v2",
+    "parent": "queue-r2-baa",
+    "preparation_id": "queue-v2-r2-bba-prepared",
+    "execution_id": "queue-v2-r2-bba-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r2-bba/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r2-bba/fixture.json",
+    "plan_file": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/plans/queue-r2-baa.json",
+    "prior_prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r2-bba-edited-prepared/evidence/prepared.json",
+    "prior_condition": "queue-r2-bba",
+    "plan_parent": "queue-r2-baa",
+    "status": "awaiting_plan_approval",
+    "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/runs/queue-v2-r2-bba-prepared/evidence/prepared.json",
+    "prepared_sha256": "38c9b7552c341ef14bd0ab4ea439d55c8e5298de191516752853af5b9bf5baad",
+    "target": {
+      "run_id": "queue-v2-r2-bba-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "2a03422cc7cf39a67ff732aac55bcdd6d159389e4c631494cbf6b2700e0274a4",
+      "run_spec_sha256": "5e35b228bb44cbd96d22b8fbc85f1f13051bcf609fb7dc74aa78a85ab9eebfea"
+    },
+    "run_spec": {
+      "schema_version": 1,
+      "task": "Complete the durable_queue Python 3.12 standard-library package and JSON CLI according to CONTRACT.md. Preserve Queue and python -m durable_queue entry points. The queue must durably submit dependency graphs, atomically claim jobs across processes, recover expired leases, reject stale completion, schedule bounded retries and roll back invalid batches. Add focused regression tests, including real separate-process durability and claim exclusivity. Research the existing repository, generate a concise concrete canonical plan and wait for explicit human approval before implementation. Verification must cover the full public contract, not just the starter tests. Run the task's relevant tests with python3.12 -m unittest discover -s tests -v. Keep implementation and tests local; no network, external packages, daemon or UI.\n",
+      "repository": {
+        "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+        "initial_dirty_patch_sha256": null
+      },
+      "model": {
+        "provider": "muse-lab",
+        "requested_id": "muse-spark-1.3-contributor",
+        "observed_version": null,
+        "catalog_sha256": "b206e33ba7175f3608ac3f607d169e142f4123c64027138893ad29612f2e46db",
+        "effective_config_sha256": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e"
+      },
+      "workflow_name": "queue-bba-v2",
+      "inheritance_chain": [
+        "queue-base",
+        "queue-bba-v2"
+      ],
+      "workflow": {
+        "approval": "human_required",
+        "plan": {
+          "renderer": "markdown"
+        },
+        "roles": {
+          "planner": "planner/queue-architecture-v1",
+          "executor": "executor/queue-tdd-v1",
+          "verifier": "verifier/queue-tests-v2"
+        }
+      },
+      "instructions": {
+        "planner": {
+          "selector": "planner/queue-architecture-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/planner/queue-architecture-v1/SKILL.md",
+          "sha256": "caae1863a3e8f91f99fbd0f372c78e5ce2b8b76315fa3eb000d6ca699b8f9655",
+          "content": "---\nname: lab-planner-queue-architecture-v1\ndescription: Explicit planner procedure for the durable queue workflow matrix.\n---\n\nRead TASK.md, CONTRACT.md, repository instructions and relevant implementation. Before proposing changes, reason through transaction boundaries, state invariants, dependency readiness and stale-worker hazards. Identify failure paths and concurrency risks, then sequence the implementation around those invariants. Record the important architectural discoveries and connect risks to acceptance checks.\n\nReturn a canonical plan for validation and human review; do not implement. Use at most four concise implementation steps and three aggregate verification items, with stable IDs and valid references. Include the schema's required assumptions, affected files, dependencies, risks, acceptance criteria, discoveries and blockers without repeating the contract. Human approval is a harness boundary, not an unresolved task blocker. Keep prose compact enough for the existing phase context limits. The harness chooses presentation independently of this procedure.\n\n"
+        },
+        "executor": {
+          "selector": "executor/queue-tdd-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/executor/queue-tdd-v1/SKILL.md",
+          "sha256": "8c0c8dac429fe58e0176c64dcc67455e743d110bb9f9225efe4329ef8dc86401",
+          "content": "---\nname: lab-executor-queue-tdd-v1\ndescription: Explicit executor procedure for the durable queue workflow matrix.\n---\n\nFollow the approved canonical plan using a test-first procedure. For each approved behavior, first add a focused test that fails for the intended missing behavior, run it and record the failure; then implement the smallest change that passes it. Refactor only within approved scope while keeping tests green. Include interactions between persistence, leases and dependencies in this cycle. Record red/green evidence and remaining limitations for the verifier.\n\n\nPreserve stable step IDs. If new information materially invalidates the approved strategy, scope, dependencies or acceptance criteria, request an amendment and stop until the harness provides authority. Instructions guide procedure; the harness controls admission.\n\n"
+        },
+        "verifier": {
+          "selector": "verifier/queue-tests-v2",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/verifier/queue-tests-v2/SKILL.md",
+          "sha256": "4e6e2a5284daad04fbb6fcc55228c77b65d1067f32a8b4d2bc1727adb447c79e",
+          "content": "---\nname: lab-verifier-queue-tests-v2\ndescription: Explicit verifier procedure for the durable queue workflow matrix.\n---\n\nRead the approved plan and implementation evidence. Run the specified relevant tests and focused acceptance assertions. Inspect failures as needed to explain them. Record exact commands, outcomes and evidence references; explicitly report unavailable or unsupported acceptance checks.\n\nNever infer hidden-test success or accept executor claims as verification. Before running checks, copy the exact IDs from the approved plan's verification_strategy and acceptance_criteria into a small evidence ledger. Verification IDs and acceptance IDs are separate namespaces; never invent, rename or interchange them.\n\nFor each verification ID, run one aggregate assertion command that exits nonzero if any required assertion fails. After the command completes, call lab_command_receipt with its 1-based exec_command start index in the current turn (including exploratory commands). Copy receipt.call_id from the returned JSON into the ledger. A displayed Chunk ID, terminal session ID, receipt lookup call ID, or guessed identifier is not the command call_id. If a command is still running, wait for completion before using it as evidence. Receipts identify commands; inspect the actual exit status and output to assess the checks.\n\nBefore submitting the final report, compare it against the ledger: exactly one checks entry for every approved verification ID; each call_id copied from that command's receipt; each acceptance_criteria array nonempty, unique and drawn only from the plan's top-level acceptance IDs; all acceptance IDs covered by actual checks across the report. Exploratory commands do not add final verification IDs. Report failures and unsupported checks honestly; never claim coverage that was not tested. Request an amendment if the approved strategy cannot be carried out without a material change.\n"
+        }
+      }
+    },
+    "artifact_inventory": {
+      "config/run-spec.json": "c08c5bceea6be15597420e25159f62083a907deb5b38adfb4199cd717eb796ad",
+      "config/workflow.effective.json": "0f16da4843cad52d2b730634aa69882c22e7159b89772f907860dfac3d2c3555",
+      "config/workflow.source.toml": "a0deb9109cec95a110cdf3530c43f5a7c037b9464e2b999b4eae461947bb4f01",
+      "events.jsonl": "bb0ed0c731d4e27f5ca5d68dc8aa84d90608222fb48986a175baaeed4f75185b",
+      "evidence/effective-settings.json": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e",
+      "evidence/environment.json": "88010be2557d19790275ed62f75cf0d94d67c87802c8b83d64aaf7322f5d0072",
+      "evidence/runtime-manifest.json": "d95765a1106ba4041344a43e99d56c8fd303ac39eac869dbcf1e1a88d168a43f",
+      "instructions/executor.SKILL.md": "8c0c8dac429fe58e0176c64dcc67455e743d110bb9f9225efe4329ef8dc86401",
+      "instructions/planner.SKILL.md": "caae1863a3e8f91f99fbd0f372c78e5ce2b8b76315fa3eb000d6ca699b8f9655",
+      "instructions/verifier.SKILL.md": "4e6e2a5284daad04fbb6fcc55228c77b65d1067f32a8b4d2bc1727adb447c79e",
+      "manifest.json": "7af06a3517c110c669056e0776e782541feac22d367ea7f5226701d94647aef0",
+      "plans/1/PLAN.md": "505bff827da20feb8f04750a477b00dfb2367a3877ad7d1846c9dc4c4a13ef83",
+      "plans/1/plan.json": "2a03422cc7cf39a67ff732aac55bcdd6d159389e4c631494cbf6b2700e0274a4",
+      "runtime-events.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "id": "queue-v2-r2-bbb",
+    "block": 2,
+    "planner": "b",
+    "executor": "b",
+    "verifier": "b",
+    "workflow": "queue-bbb-v2",
+    "parent": "queue-r2-baa",
+    "preparation_id": "queue-v2-r2-bbb-prepared",
+    "execution_id": "queue-v2-r2-bbb-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r2-bbb/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r2-bbb/fixture.json",
+    "plan_file": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/plans/queue-r2-baa.json",
+    "prior_prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r2-bbb-edited-prepared/evidence/prepared.json",
+    "prior_condition": "queue-r2-bbb",
+    "plan_parent": "queue-r2-baa",
+    "status": "awaiting_plan_approval",
+    "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/runs/queue-v2-r2-bbb-prepared/evidence/prepared.json",
+    "prepared_sha256": "9b0bd375d6ee93b7ba8244c3667dafd427a790d523131d0eca3664618ebd9c8a",
+    "target": {
+      "run_id": "queue-v2-r2-bbb-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "2a03422cc7cf39a67ff732aac55bcdd6d159389e4c631494cbf6b2700e0274a4",
+      "run_spec_sha256": "375c05fc790187a0ac9909582b4097bfa508cf5f2818f61ffa51364aa3b56a99"
+    },
+    "run_spec": {
+      "schema_version": 1,
+      "task": "Complete the durable_queue Python 3.12 standard-library package and JSON CLI according to CONTRACT.md. Preserve Queue and python -m durable_queue entry points. The queue must durably submit dependency graphs, atomically claim jobs across processes, recover expired leases, reject stale completion, schedule bounded retries and roll back invalid batches. Add focused regression tests, including real separate-process durability and claim exclusivity. Research the existing repository, generate a concise concrete canonical plan and wait for explicit human approval before implementation. Verification must cover the full public contract, not just the starter tests. Run the task's relevant tests with python3.12 -m unittest discover -s tests -v. Keep implementation and tests local; no network, external packages, daemon or UI.\n",
+      "repository": {
+        "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+        "initial_dirty_patch_sha256": null
+      },
+      "model": {
+        "provider": "muse-lab",
+        "requested_id": "muse-spark-1.3-contributor",
+        "observed_version": null,
+        "catalog_sha256": "b206e33ba7175f3608ac3f607d169e142f4123c64027138893ad29612f2e46db",
+        "effective_config_sha256": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e"
+      },
+      "workflow_name": "queue-bbb-v2",
+      "inheritance_chain": [
+        "queue-base",
+        "queue-bbb-v2"
+      ],
+      "workflow": {
+        "approval": "human_required",
+        "plan": {
+          "renderer": "markdown"
+        },
+        "roles": {
+          "planner": "planner/queue-architecture-v1",
+          "executor": "executor/queue-tdd-v1",
+          "verifier": "verifier/queue-adversarial-v2"
+        }
+      },
+      "instructions": {
+        "planner": {
+          "selector": "planner/queue-architecture-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/planner/queue-architecture-v1/SKILL.md",
+          "sha256": "caae1863a3e8f91f99fbd0f372c78e5ce2b8b76315fa3eb000d6ca699b8f9655",
+          "content": "---\nname: lab-planner-queue-architecture-v1\ndescription: Explicit planner procedure for the durable queue workflow matrix.\n---\n\nRead TASK.md, CONTRACT.md, repository instructions and relevant implementation. Before proposing changes, reason through transaction boundaries, state invariants, dependency readiness and stale-worker hazards. Identify failure paths and concurrency risks, then sequence the implementation around those invariants. Record the important architectural discoveries and connect risks to acceptance checks.\n\nReturn a canonical plan for validation and human review; do not implement. Use at most four concise implementation steps and three aggregate verification items, with stable IDs and valid references. Include the schema's required assumptions, affected files, dependencies, risks, acceptance criteria, discoveries and blockers without repeating the contract. Human approval is a harness boundary, not an unresolved task blocker. Keep prose compact enough for the existing phase context limits. The harness chooses presentation independently of this procedure.\n\n"
+        },
+        "executor": {
+          "selector": "executor/queue-tdd-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/executor/queue-tdd-v1/SKILL.md",
+          "sha256": "8c0c8dac429fe58e0176c64dcc67455e743d110bb9f9225efe4329ef8dc86401",
+          "content": "---\nname: lab-executor-queue-tdd-v1\ndescription: Explicit executor procedure for the durable queue workflow matrix.\n---\n\nFollow the approved canonical plan using a test-first procedure. For each approved behavior, first add a focused test that fails for the intended missing behavior, run it and record the failure; then implement the smallest change that passes it. Refactor only within approved scope while keeping tests green. Include interactions between persistence, leases and dependencies in this cycle. Record red/green evidence and remaining limitations for the verifier.\n\n\nPreserve stable step IDs. If new information materially invalidates the approved strategy, scope, dependencies or acceptance criteria, request an amendment and stop until the harness provides authority. Instructions guide procedure; the harness controls admission.\n\n"
+        },
+        "verifier": {
+          "selector": "verifier/queue-adversarial-v2",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/verifier/queue-adversarial-v2/SKILL.md",
+          "sha256": "ce96370edcd9e6b3b45bf372caf8be577cdf8779b424e9cfabb8848da63f8e2e",
+          "content": "---\nname: lab-verifier-queue-adversarial-v2\ndescription: Explicit verifier procedure for the durable queue workflow matrix.\n---\n\nRead the approved plan, changed implementation and executor evidence. Review transaction boundaries and state transitions for counterexamples, especially rollback, lease boundaries, stale workers and competing claims. Design and run adversarial assertions alongside the specified tests. Check that tests would detect plausible wrong implementations, then report acceptance evidence and unresolved defects.\n\nNever infer hidden-test success or accept executor claims as verification. Before running checks, copy the exact IDs from the approved plan's verification_strategy and acceptance_criteria into a small evidence ledger. Verification IDs and acceptance IDs are separate namespaces; never invent, rename or interchange them.\n\nFor each verification ID, run one aggregate assertion command that exits nonzero if any required assertion fails. After the command completes, call lab_command_receipt with its 1-based exec_command start index in the current turn (including exploratory commands). Copy receipt.call_id from the returned JSON into the ledger. A displayed Chunk ID, terminal session ID, receipt lookup call ID, or guessed identifier is not the command call_id. If a command is still running, wait for completion before using it as evidence. Receipts identify commands; inspect the actual exit status and output to assess the checks.\n\nBefore submitting the final report, compare it against the ledger: exactly one checks entry for every approved verification ID; each call_id copied from that command's receipt; each acceptance_criteria array nonempty, unique and drawn only from the plan's top-level acceptance IDs; all acceptance IDs covered by actual checks across the report. Exploratory commands do not add final verification IDs. Report failures and unsupported checks honestly; never claim coverage that was not tested. Request an amendment if the approved strategy cannot be carried out without a material change.\n"
+        }
+      }
+    },
+    "artifact_inventory": {
+      "config/run-spec.json": "d95960934307ac9ccd79da85c5fce96a903de0b81e7122dbccb9dd8a1fa08831",
+      "config/workflow.effective.json": "a21b7de660a87cb592b08352ecc49f7ce23a7c7877cc729f03ddf7d40fb72215",
+      "config/workflow.source.toml": "a0deb9109cec95a110cdf3530c43f5a7c037b9464e2b999b4eae461947bb4f01",
+      "events.jsonl": "459be980862f7affb8016c50064d721c3b2d6380b50aa54223855bdb3b3ccbc3",
+      "evidence/effective-settings.json": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e",
+      "evidence/environment.json": "88010be2557d19790275ed62f75cf0d94d67c87802c8b83d64aaf7322f5d0072",
+      "evidence/runtime-manifest.json": "d95765a1106ba4041344a43e99d56c8fd303ac39eac869dbcf1e1a88d168a43f",
+      "instructions/executor.SKILL.md": "8c0c8dac429fe58e0176c64dcc67455e743d110bb9f9225efe4329ef8dc86401",
+      "instructions/planner.SKILL.md": "caae1863a3e8f91f99fbd0f372c78e5ce2b8b76315fa3eb000d6ca699b8f9655",
+      "instructions/verifier.SKILL.md": "ce96370edcd9e6b3b45bf372caf8be577cdf8779b424e9cfabb8848da63f8e2e",
+      "manifest.json": "7c61c9ab5648d06ea0910ac4c875ec004efaca2b742f078998b97f995d3e03e6",
+      "plans/1/PLAN.md": "505bff827da20feb8f04750a477b00dfb2367a3877ad7d1846c9dc4c4a13ef83",
+      "plans/1/plan.json": "2a03422cc7cf39a67ff732aac55bcdd6d159389e4c631494cbf6b2700e0274a4",
+      "runtime-events.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "id": "queue-v2-r2-aaa",
+    "block": 2,
+    "planner": "a",
+    "executor": "a",
+    "verifier": "a",
+    "workflow": "queue-aaa-v2",
+    "parent": null,
+    "preparation_id": "queue-v2-r2-aaa-prepared",
+    "execution_id": "queue-v2-r2-aaa-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r2-aaa/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/tasks/queue-v2-r2-aaa/fixture.json",
+    "plan_file": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/plans/queue-r2-aaa.json",
+    "prior_prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/runs/queue-r2-aaa-prepared/evidence/prepared.json",
+    "prior_condition": "queue-r2-aaa",
+    "plan_parent": "queue-r2-aaa",
+    "status": "awaiting_plan_approval",
+    "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/runs/queue-v2-r2-aaa-prepared/evidence/prepared.json",
+    "prepared_sha256": "0e7e6fb5ab9a1228c10ea379750a516bac019722f4a66b5b723fd44cf25f8a33",
+    "target": {
+      "run_id": "queue-v2-r2-aaa-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "2f4cc33c069cb7df820a8cfb17c079c618f82a3468a4638096b88db3e09e000c",
+      "run_spec_sha256": "484a618e2fdbef1418dedd6ca727e29d13d734956db0cbbb1964b3f2ab85ea6d"
+    },
+    "run_spec": {
+      "schema_version": 1,
+      "task": "Complete the durable_queue Python 3.12 standard-library package and JSON CLI according to CONTRACT.md. Preserve Queue and python -m durable_queue entry points. The queue must durably submit dependency graphs, atomically claim jobs across processes, recover expired leases, reject stale completion, schedule bounded retries and roll back invalid batches. Add focused regression tests, including real separate-process durability and claim exclusivity. Research the existing repository, generate a concise concrete canonical plan and wait for explicit human approval before implementation. Verification must cover the full public contract, not just the starter tests. Run the task's relevant tests with python3.12 -m unittest discover -s tests -v. Keep implementation and tests local; no network, external packages, daemon or UI.\n",
+      "repository": {
+        "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+        "initial_dirty_patch_sha256": null
+      },
+      "model": {
+        "provider": "muse-lab",
+        "requested_id": "muse-spark-1.3-contributor",
+        "observed_version": null,
+        "catalog_sha256": "b206e33ba7175f3608ac3f607d169e142f4123c64027138893ad29612f2e46db",
+        "effective_config_sha256": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e"
+      },
+      "workflow_name": "queue-aaa-v2",
+      "inheritance_chain": [
+        "queue-base",
+        "queue-aaa-v2"
+      ],
+      "workflow": {
+        "approval": "human_required",
+        "plan": {
+          "renderer": "markdown"
+        },
+        "roles": {
+          "planner": "planner/queue-concise-v1",
+          "executor": "executor/queue-conservative-v1",
+          "verifier": "verifier/queue-tests-v2"
+        }
+      },
+      "instructions": {
+        "planner": {
+          "selector": "planner/queue-concise-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/planner/queue-concise-v1/SKILL.md",
+          "sha256": "43b125a14cfedd5ee4fcb8e45f2fc75663ba65658706757216b91764c2052978",
+          "content": "---\nname: lab-planner-queue-concise-v1\ndescription: Explicit planner procedure for the durable queue workflow matrix.\n---\n\nRead TASK.md, CONTRACT.md, repository instructions and relevant implementation. Identify the smallest complete repair of the public API and CLI. Produce a concise canonical plan grounded in the actual files. Prioritize direct implementation steps and specific acceptance checks; avoid optional abstractions and unrelated cleanup.\n\nReturn a canonical plan for validation and human review; do not implement. Use at most four concise implementation steps and three aggregate verification items, with stable IDs and valid references. Include the schema's required assumptions, affected files, dependencies, risks, acceptance criteria, discoveries and blockers without repeating the contract. Human approval is a harness boundary, not an unresolved task blocker. Keep prose compact enough for the existing phase context limits. The harness chooses presentation independently of this procedure.\n\n"
+        },
+        "executor": {
+          "selector": "executor/queue-conservative-v1",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/executor/queue-conservative-v1/SKILL.md",
+          "sha256": "31568b6537ec10770b55eabeaf48332a7c8821ededabc2cd33959b2c2e2f13e8",
+          "content": "---\nname: lab-executor-queue-conservative-v1\ndescription: Explicit executor procedure for the durable queue workflow matrix.\n---\n\nFollow the approved canonical plan with minimal coherent changes. Inspect existing behavior before editing, preserve usable interfaces and storage helpers, and implement one approved step at a time. Add focused regression tests for the changed behavior and run them after each coherent change. Avoid speculative refactoring. Record the changes and concrete evidence for the verifier.\n\n\nPreserve stable step IDs. If new information materially invalidates the approved strategy, scope, dependencies or acceptance criteria, request an amendment and stop until the harness provides authority. Instructions guide procedure; the harness controls admission.\n\n"
+        },
+        "verifier": {
+          "selector": "verifier/queue-tests-v2",
+          "path": "/home/james/.cache/codex-lab-queue-matrix/20260907T180348Z-v2/inputs/lab/instructions/verifier/queue-tests-v2/SKILL.md",
+          "sha256": "4e6e2a5284daad04fbb6fcc55228c77b65d1067f32a8b4d2bc1727adb447c79e",
+          "content": "---\nname: lab-verifier-queue-tests-v2\ndescription: Explicit verifier procedure for the durable queue workflow matrix.\n---\n\nRead the approved plan and implementation evidence. Run the specified relevant tests and focused acceptance assertions. Inspect failures as needed to explain them. Record exact commands, outcomes and evidence references; explicitly report unavailable or unsupported acceptance checks.\n\nNever infer hidden-test success or accept executor claims as verification. Before running checks, copy the exact IDs from the approved plan's verification_strategy and acceptance_criteria into a small evidence ledger. Verification IDs and acceptance IDs are separate namespaces; never invent, rename or interchange them.\n\nFor each verification ID, run one aggregate assertion command that exits nonzero if any required assertion fails. After the command completes, call lab_command_receipt with its 1-based exec_command start index in the current turn (including exploratory commands). Copy receipt.call_id from the returned JSON into the ledger. A displayed Chunk ID, terminal session ID, receipt lookup call ID, or guessed identifier is not the command call_id. If a command is still running, wait for completion before using it as evidence. Receipts identify commands; inspect the actual exit status and output to assess the checks.\n\nBefore submitting the final report, compare it against the ledger: exactly one checks entry for every approved verification ID; each call_id copied from that command's receipt; each acceptance_criteria array nonempty, unique and drawn only from the plan's top-level acceptance IDs; all acceptance IDs covered by actual checks across the report. Exploratory commands do not add final verification IDs. Report failures and unsupported checks honestly; never claim coverage that was not tested. Request an amendment if the approved strategy cannot be carried out without a material change.\n"
+        }
+      }
+    },
+    "artifact_inventory": {
+      "config/run-spec.json": "677da4f4bd8e552b9b743685a505610fd23741309c1856a70e9e179a7752cc03",
+      "config/workflow.effective.json": "2e4b7aa72c13da5c9207ddf22e9c6106f003298b78d93e418a2f496848109817",
+      "config/workflow.source.toml": "a0deb9109cec95a110cdf3530c43f5a7c037b9464e2b999b4eae461947bb4f01",
+      "events.jsonl": "6e08714ce4ffede2fe47c084ea9741579e5eb16e77c0b210e28db4e908ec0b22",
+      "evidence/effective-settings.json": "dbdab75da596ceea99dc62d9e44e93149ed4e526742cfe4f2c6877295ed4cb7e",
+      "evidence/environment.json": "88010be2557d19790275ed62f75cf0d94d67c87802c8b83d64aaf7322f5d0072",
+      "evidence/runtime-manifest.json": "d95765a1106ba4041344a43e99d56c8fd303ac39eac869dbcf1e1a88d168a43f",
+      "instructions/executor.SKILL.md": "31568b6537ec10770b55eabeaf48332a7c8821ededabc2cd33959b2c2e2f13e8",
+      "instructions/planner.SKILL.md": "43b125a14cfedd5ee4fcb8e45f2fc75663ba65658706757216b91764c2052978",
+      "instructions/verifier.SKILL.md": "4e6e2a5284daad04fbb6fcc55228c77b65d1067f32a8b4d2bc1727adb447c79e",
+      "manifest.json": "2a622b5456b88afa60d74a0f52e293abc8b995212963fee94ef6f85036e635c2",
+      "plans/1/PLAN.md": "13b5be3f05d31838f0224a67711abfa073a86bb87b1e45505cab1f361c29b7bc",
+      "plans/1/plan.json": "2f4cc33c069cb7df820a8cfb17c079c618f82a3468a4638096b88db3e09e000c",
+      "runtime-events.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+]
