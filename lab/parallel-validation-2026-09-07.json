@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "source_commit": "1f64ad13b7b513c97a73c21288f0f2dbcefc3591",
+  "rust_tests": {
+    "passed": 23,
+    "selections": [
+      "test(review) | test(cli)",
+      "test(json_review_wait) | test(amendment_stops) | test(prepared_survives)",
+      "test(prepared_review_channel)"
+    ],
+    "nextest_runs": [
+      "8c7b2994-1114-4f9d-8536-5413d8f132b1",
+      "b6984729-1a00-4a7e-be83-8eda3e610956",
+      "5b33577f-e30e-4f0a-a8ee-c4d82d78ed88"
+    ]
+  },
+  "python_tests": {
+    "linux_affected_suite": {
+      "passed": 15,
+      "seconds": 25.902
+    },
+    "windows_scheduler": {
+      "passed": 7,
+      "seconds": 1.666
+    },
+    "initial_linux_on_windows_checkout": "14 passed; existing suite setup hit Git status 20-second timeout; native Linux mirror rerun passed without changing test"
+  },
+  "format": {
+    "scoped_clippy_fix": "passed",
+    "just_fmt": "passed",
+    "just_fmt_check": "passed",
+    "python_asts_unchanged": 16,
+    "tests_repeated_after_format": false
+  },
+  "build": {
+    "status": "passed",
+    "clean_source_seconds": 5.15,
+    "binary": "/home/james/.cache/codex-lab-binaries/parallel-v1-20260907/codex-lab",
+    "binary_sha256": "9a75fbe6671079eb1eac3436934a5a4a847e24f331cb02b490015b5ef27e7529",
+    "bwrap_sha256": "0e7ab2fc4e2f142999034d624e1f6b190e251677e9d267048a95005d1243d618"
+  },
+  "legacy_binary": {
+    "original_path": "/home/james/.cache/codex-lab-target/debug/codex-lab",
+    "archived_path": "/home/james/.cache/codex-lab-frozen-binaries/codex-lab-995b7fad",
+    "sha256": "995b7fad6135a27e7a9490b7ca4d9686d4ea69a3b7be837df709e143691fd42f",
+    "note": "Cargo test/build updated the mutable original build output. Exact historical bytes are archived here; frozen suite manifests and journals are unchanged and will reject the new binary at the old path. Do not bypass their pins or reuse approvals."
+  },
+  "paid_model_runs": 0,
+  "full_workspace_tests": false,
+  "source_sha256": {
+    "lab/experiments/run_batch.py": "8aa5ea98beca1a32efd28e60abaf8ad3b819f2f0837d6b98ed26568061fd3c3c",
+    "lab/experiments/batch_inputs.py": "eb8f129b1938ff1db0171f9f11be2568daac1f63dbbd2944bd188e4c9cd7ce24",
+    "lab/experiments/test_batch.py": "0db7d45c55101240b437a66ecdda037719ef3792511fa36c1feb49f5a0592ac0",
+    "codex-rs/lab-runtime/src/review_channel.rs": "147b14ea5f7f40580b7ca207177a352ea27b1841022d5f86b8c8eb98ffc21a6b",
+    "codex-rs/lab-runtime/src/review_channel_tests.rs": "d209366215523da460bbfa09820676ab11a713aedfeca0b19b9bfa9b8c484113"
+  }
+}
