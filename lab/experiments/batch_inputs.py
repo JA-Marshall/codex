@@ -21,7 +21,13 @@ def fingerprint(path):
         return hashlib.file_digest(source, "sha256").hexdigest()
 
 
-def load_batch(path, output, jobs):
+def load_batch(path, output, jobs, purpose="throughput"):
+    if purpose not in ("throughput", "isolated-timing"):
+        raise ValueError("unknown measurement purpose")
+    if purpose == "isolated-timing" and jobs != 1:
+        raise ValueError(
+            "isolated-timing requires jobs=1; parallel runs measure shared throughput"
+        )
     path = path.resolve(strict=True)
     manifest, manifest_hash = read_json(path)
     if set(manifest) - {"schema_version", "binary", "binary_sha256", "runs"}:
@@ -104,6 +110,8 @@ def load_batch(path, output, jobs):
         "binary": str(binary),
         "binary_sha256": binary_hash,
         "jobs": jobs,
+        "measurement_purpose": purpose,
+        "phase_timeout_clock": "wall_clock_including_provider_queue",
         "max_hosts": 32,
         "runs": entries,
         "scheduler_sha256": {

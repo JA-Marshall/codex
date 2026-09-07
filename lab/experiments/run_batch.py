@@ -235,6 +235,9 @@ class Batch:
             self.event(
                 "batch_started",
                 jobs=self.config["jobs"],
+                measurement_purpose=self.config.get(
+                    "measurement_purpose", "throughput"
+                ),
                 max_hosts=32,
                 cpu_count=os.cpu_count(),
                 platform=sys.platform,
@@ -356,8 +359,11 @@ if __name__ == "__main__":
     parser.add_argument("manifest", type=Path)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--jobs", type=int, default=2)
+    parser.add_argument(
+        "--purpose", choices=("throughput", "isolated-timing"), default="throughput"
+    )
     args = parser.parse_args()
-    config = load_batch(args.manifest, args.output, args.jobs)
+    config = load_batch(args.manifest, args.output, args.jobs, args.purpose)
     print(
         "Decisions: RUN_ID REQUEST_ID approve DIGEST | reject REASON | edit PATH | abort",
         flush=True,
