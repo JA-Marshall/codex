@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "binary": "/home/james/.cache/codex-lab-binaries/verifier-replay-v1-20260907/codex-lab",
+  "binary_sha256": "dc5b99261abbfb0831836c1586125a3db0a2a4b6f54d51ac26243dedfcfd01d1",
+  "runs": [
+    {
+      "run_id": "verifier-v1-r01-execution",
+      "prepared": "/home/james/.cache/codex-lab-verifier-replays/20260907T155700Z/runs/verifier-v1-r01-prepared/evidence/prepared.json",
+      "prepared_sha256": "b5787b891f0a169d0919a1a27cd8bf6b0022dc821b39d43d72dc8c42f0e0a452"
+    },
+    {
+      "run_id": "verifier-v2-r01-execution",
+      "prepared": "/home/james/.cache/codex-lab-verifier-replays/20260907T155700Z/runs/verifier-v2-r01-prepared/evidence/prepared.json",
+      "prepared_sha256": "5ae34d55345833332309c8ea0b90f76f3f375aae71608112a768ed5733593337"
+    },
+    {
+      "run_id": "verifier-v2-r02-execution",
+      "prepared": "/home/james/.cache/codex-lab-verifier-replays/20260907T155700Z/runs/verifier-v2-r02-prepared/evidence/prepared.json",
+      "prepared_sha256": "320b7164cbde45ed5c460c2007e4632515000f26a733856807943d972b23be67"
+    },
+    {
+      "run_id": "verifier-v1-r02-execution",
+      "prepared": "/home/james/.cache/codex-lab-verifier-replays/20260907T155700Z/runs/verifier-v1-r02-prepared/evidence/prepared.json",
+      "prepared_sha256": "96f55c1a2c82ba83d71a8bb2cc9ac496f0cffc5f75d3376a35f9c5d737e5ac84"
+    },
+    {
+      "run_id": "verifier-v1-r03-execution",
+      "prepared": "/home/james/.cache/codex-lab-verifier-replays/20260907T155700Z/runs/verifier-v1-r03-prepared/evidence/prepared.json",
+      "prepared_sha256": "e0301c01bbe8ee97c6bd689cfd78e2a1e87715cc18aa87d630b3abdb8f857669"
+    },
+    {
+      "run_id": "verifier-v2-r03-execution",
+      "prepared": "/home/james/.cache/codex-lab-verifier-replays/20260907T155700Z/runs/verifier-v2-r03-prepared/evidence/prepared.json",
+      "prepared_sha256": "5e33f4cec06cd84e27a541cdd23b0870b5eabd029cae106fe3baf21934134c5f"
+    },
+    {
+      "run_id": "verifier-v2-r04-execution",
+      "prepared": "/home/james/.cache/codex-lab-verifier-replays/20260907T155700Z/runs/verifier-v2-r04-prepared/evidence/prepared.json",
+      "prepared_sha256": "d9ee18ec039db4362552e3b3fd4ac2f80bb05e2a3c46b96a0c2d127df505b515"
+    },
+    {
+      "run_id": "verifier-v1-r04-execution",
+      "prepared": "/home/james/.cache/codex-lab-verifier-replays/20260907T155700Z/runs/verifier-v1-r04-prepared/evidence/prepared.json",
+      "prepared_sha256": "6bb54dd697a66803ccaf83be28099fb2622dd2763cf8d5cbf3b4937375a67ee7"
+    },
+    {
+      "run_id": "verifier-v1-r05-execution",
+      "prepared": "/home/james/.cache/codex-lab-verifier-replays/20260907T155700Z/runs/verifier-v1-r05-prepared/evidence/prepared.json",
+      "prepared_sha256": "bc922766ec2098245a58448ec94176b40a2af6441bb66779040c988d6bdd388b"
+    },
+    {
+      "run_id": "verifier-v2-r05-execution",
+      "prepared": "/home/james/.cache/codex-lab-verifier-replays/20260907T155700Z/runs/verifier-v2-r05-prepared/evidence/prepared.json",
+      "prepared_sha256": "a423f3c3d428ddc53a25da998f3046bdf777bed78747c737d90d0f6a2531af14"
+    }
+  ]
+}
