@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "run": "/home/james/.cache/codex-lab-varied-pilot/20260907T134224Z/runs/config-merge-v1-md-execution",
+  "workflow_state": "completed",
+  "terminal_change": {
+    "type": "completed"
+  },
+  "all_started_phases_shutdown": true,
+  "repository": "/home/james/.cache/codex-lab-varied-pilot/20260907T134224Z/tasks/config-merge-v1/md/repository",
+  "first_plan_human_approval": true,
+  "phase_turns": 2,
+  "planner_phases": 0,
+  "tool_admissions": 33,
+  "usage": {
+    "input_tokens": 268130,
+    "output_tokens": 9490,
+    "cached_input_tokens": 242878
+  },
+  "workflow_terminal_elapsed_ms": 126072,
+  "human_plan_edits": 0,
+  "plan_amendments": 0,
+  "plan_deviations": null,
+  "source_artifact_sha256": {
+    "events.jsonl": "455f47562c4f0e132a19d8b5de7cda293f78993336cb2357c0a0ceaf9b01fc11",
+    "runtime-events.jsonl": "8f88bc3cf3883a269c05854a83b687ea40f16f839ec22d19673edd189a752a4e",
+    "evidence/input-01.json": "d76636f54468a5509b1b1a9a90af21a4bb32e552d0cebadf37db6f95da7140d6",
+    "evidence/phase-01.json": "564b92f54f48337fbeecaa02ef773906a12ef11bf52bb7c114aaad9a700780ba",
+    "evidence/input-02.json": "6b82936deedef0d3856416e209d501f8153e10f779b0fcc6e33473a9ba998f16",
+    "evidence/phase-02.json": "113857a56833d91c03d3ac7a5fd61e26b2f2a66ab32756c08044ab41dc842cc6",
+    "config/run-spec.json": "09f2ff387ea765d21433e542f93d0fd8954af21337f2788aaac828d00a3d97c1"
+  },
+  "authority_restored": false,
+  "git": {
+    "base_commit": "01b53c7dd2d4f0c58e130aa3dd1b27a75f82d48c",
+    "final_commit": "01b53c7dd2d4f0c58e130aa3dd1b27a75f82d48c",
+    "files_changed": 3,
+    "changed_files": [
+      "cli.py",
+      "config_merge.py",
+      "tests/test_regression.py"
+    ],
+    "diff_bytes": 7001,
+    "diff_sha256": "0e9560cc06a90be21d983a61c4f5881ce1353bb24f5d3d8c4b60da172374a51c"
+  }
+}

@@ -1,0 +1,208 @@
+{
+  "schema_version": 1,
+  "fixture": "dependency-order-v1",
+  "fixture_commit": "8e166376f2a0a057c828d33d7fee32170ab136b4",
+  "task_sha256": "2337915f18fd3b28dd7b23e53a37a672a899bfd62d8f259153c6c7ff7fce8aa1",
+  "python": {
+    "path": "/home/james/.local/share/codex-lab-toolchain/python/cpython-3.12.14-linux-x86_64-gnu/bin/python3.12",
+    "version": "3.12.14 (main, Sep  1 2026, 14:16:52) [Clang 22.1.3 ]",
+    "sha256": "f7c6210eb40fadcd3c2889dddd24a15fc2c9f926aec5a03bf9da66e12d581526"
+  },
+  "evaluator_sha256": "59031f96e13e47cc27d778577f2f7d38a36c346fd833b57deaa9647a0f50f1d3",
+  "fixture_evaluator_sha256": "59031f96e13e47cc27d778577f2f7d38a36c346fd833b57deaa9647a0f50f1d3",
+  "sandbox_sha256": "995b7fad6135a27e7a9490b7ca4d9686d4ea69a3b7be837df709e143691fd42f",
+  "run": "/home/james/.cache/codex-lab-varied-pilot/20260907T134224Z/runs/dependency-order-v1-md-execution",
+  "candidate_files": {
+    "cli.py": "a756ce8f7f0898a65d996ece5b890f5d845f5c8b8298b011635efc94cf5c2372",
+    "dependency_order.py": "9225c364ba7f867d4b9cddd7e195092c83078e8b04782940decf75bf9120798a",
+    "tests/test_public.py": "1b343155d270f06156df5077260eaa2f9ad7e971151e257d9d7756ac57df2d42",
+    "tests/test_regression.py": "9d832734e19f51487fbe479a6750ae9e749a675f7cd7acd3d0098f053ff78fad"
+  },
+  "public_test_success": true,
+  "hidden_test_success": true,
+  "api": {
+    "exit_code": 0,
+    "timeout": false,
+    "stdout": "[{\"value\": []}, {\"value\": [\"a\", \"m\", \"z\"]}, {\"value\": [\"setup\", \"build\"]}, {\"value\": [\"a\", \"b\", \"z\"]}, {\"value\": [\"a\", \"b\", \"c\", \"d\"]}, {\"value\": [\"b\", \"a\"]}, {\"error\": \"ValueError\"}, {\"error\": \"ValueError\"}, {\"error\": \"ValueError\"}, {\"error\": \"ValueError\"}, {\"error\": \"ValueError\"}, {\"error\": \"ValueError\"}, {\"error\": \"ValueError\"}, {\"error\": \"ValueError\"}]\n",
+    "stderr": "",
+    "wall_clock_ms": 66
+  },
+  "public": {
+    "exit_code": 0,
+    "timeout": false,
+    "stdout": "",
+    "stderr": "test_available_order (test_public.OrderTests.test_available_order) ... ok\ntest_dependency_precedes_task (test_public.OrderTests.test_dependency_precedes_task) ... ok\ntest_empty (test_public.OrderTests.test_empty) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 0.000s\n\nOK\n",
+    "wall_clock_ms": 66
+  },
+  "checks": [
+    {
+      "case": "empty",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[]\n",
+        "stderr": "",
+        "wall_clock_ms": 66
+      }
+    },
+    {
+      "case": "independent",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[\"a\", \"m\", \"z\"]\n",
+        "stderr": "",
+        "wall_clock_ms": 66
+      }
+    },
+    {
+      "case": "dependency",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[\"setup\", \"build\"]\n",
+        "stderr": "",
+        "wall_clock_ms": 67
+      }
+    },
+    {
+      "case": "newly-ready",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[\"a\", \"b\", \"z\"]\n",
+        "stderr": "",
+        "wall_clock_ms": 66
+      }
+    },
+    {
+      "case": "diamond",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[\"a\", \"b\", \"c\", \"d\"]\n",
+        "stderr": "",
+        "wall_clock_ms": 66
+      }
+    },
+    {
+      "case": "duplicate-edge",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 0,
+        "timeout": false,
+        "stdout": "[\"b\", \"a\"]\n",
+        "stderr": "",
+        "wall_clock_ms": 66
+      }
+    },
+    {
+      "case": "cycle",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 2,
+        "timeout": false,
+        "stdout": "",
+        "stderr": "cycle detected\n",
+        "wall_clock_ms": 67
+      }
+    },
+    {
+      "case": "self-cycle",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 2,
+        "timeout": false,
+        "stdout": "",
+        "stderr": "cycle detected\n",
+        "wall_clock_ms": 66
+      }
+    },
+    {
+      "case": "disconnected-cycle",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 2,
+        "timeout": false,
+        "stdout": "",
+        "stderr": "cycle detected\n",
+        "wall_clock_ms": 67
+      }
+    },
+    {
+      "case": "missing-node",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 2,
+        "timeout": false,
+        "stdout": "",
+        "stderr": "unknown dependency\n",
+        "wall_clock_ms": 66
+      }
+    },
+    {
+      "case": "bad-root",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 2,
+        "timeout": false,
+        "stdout": "",
+        "stderr": "graph must be a dict\n",
+        "wall_clock_ms": 66
+      }
+    },
+    {
+      "case": "bad-dependencies",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 2,
+        "timeout": false,
+        "stdout": "",
+        "stderr": "invalid dependencies\n",
+        "wall_clock_ms": 66
+      }
+    },
+    {
+      "case": "bad-dependency-item",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 2,
+        "timeout": false,
+        "stdout": "",
+        "stderr": "invalid dependency\n",
+        "wall_clock_ms": 66
+      }
+    },
+    {
+      "case": "empty-name",
+      "api_passed": true,
+      "cli_passed": true,
+      "cli": {
+        "exit_code": 2,
+        "timeout": false,
+        "stdout": "",
+        "stderr": "invalid task name\n",
+        "wall_clock_ms": 66
+      }
+    }
+  ],
+  "task_success": true
+}
