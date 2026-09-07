@@ -1,0 +1,632 @@
+{
+  "schema_version": 1,
+  "fixture": "durable-queue-v1",
+  "fixture_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+  "task_sha256": "83388e667e6c1a65e2378f3dc9aed92432db88f93845a2ada3ee5a89f1ea4bc1",
+  "evaluator_sha256": "28b5955eaa215ba5c0530f454748ea453789a35c049b87ea1d5cf3e955da8f77",
+  "sandbox_sha256": "de6b3c0ed3a8bb976b5fe6aa77dc0df1c39318c32892a073a5168b76d819f59b",
+  "python": {
+    "path": "/home/james/.local/share/codex-lab-toolchain/python/cpython-3.12.14-linux-x86_64-gnu/bin/python3.12",
+    "version": "3.12.14 (main, Sep  1 2026, 14:16:52) [Clang 22.1.3 ]",
+    "sha256": "f7c6210eb40fadcd3c2889dddd24a15fc2c9f926aec5a03bf9da66e12d581526"
+  },
+  "candidate_files": {
+    "durable_queue/__init__.py": "39448ab39d64659f7d82b955333b9aee654efe632e4b21349adccb72c34ce299",
+    "durable_queue/__main__.py": "71dbaaebc6c0ecea0e54a44a158bee1100dbe0b0a576dd493900fecb52d9cb98",
+    "durable_queue/queue.py": "115a89757570ef9d06ff9dca120ced899a1d33eacecf045f3f153499beb7f441",
+    "durable_queue/storage.py": "71b898d1cd67392fe0ba8c468f7ad7bbb9cd67b373b077af14c342e9d380b3b1",
+    "tests/test_public.py": "42faa585c342eefcd7a0b8899f1e1cf1ee6e16a19868b5e25cabf9918cdf8134",
+    "tests/test_regression.py": "2474e0924a61b59edd91f3ddc624f19be08be0e0a849bd88ba7d48e45f7b739e"
+  },
+  "public_test_success": true,
+  "hidden_test_success": true,
+  "task_success": true,
+  "public": {
+    "exit_code": 0,
+    "timeout": false,
+    "stdout": "",
+    "stderr": "test_claim_dependency_and_complete (test_public.QueueTests.test_claim_dependency_and_complete) ... ok\ntest_empty (test_public.QueueTests.test_empty) ... ok\ntest_submission_survives_reopen (test_public.QueueTests.test_submission_survives_reopen) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 0.551s\n\nOK\n",
+    "wall_clock_ms": 668
+  },
+  "git": {
+    "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "files_changed": 4,
+    "changed_files": [
+      "durable_queue/__main__.py",
+      "durable_queue/queue.py",
+      "durable_queue/storage.py",
+      "tests/test_regression.py"
+    ],
+    "diff_bytes": 55543,
+    "diff_sha256": "75acd5b42bddbfa17c6e6681b717dbfe44bb7e0ceaa648d70a816a7158d43e55"
+  },
+  "full_evaluation_path": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/evaluations/queue-r3-aba-execution-reviewed/evaluation.json",
+  "full_evaluation_sha256": "9fa7b24ab5e39ab484285eaaad1652c9b579346af16c68f9bb51ca4298b27252",
+  "checks": [
+    {
+      "case": "empty",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "empty",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "durable_views",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 167
+    },
+    {
+      "case": "durable_views",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "priority_and_ties",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 367
+    },
+    {
+      "case": "priority_and_ties",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 467
+    },
+    {
+      "case": "dependency_diamond",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 467
+    },
+    {
+      "case": "dependency_diamond",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 567
+    },
+    {
+      "case": "expiry_boundary",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 416
+    },
+    {
+      "case": "expiry_boundary",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 467
+    },
+    {
+      "case": "same_worker_stale_attempt",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 417
+    },
+    {
+      "case": "same_worker_stale_attempt",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 517
+    },
+    {
+      "case": "retry_delay_and_limit",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 467
+    },
+    {
+      "case": "retry_delay_and_limit",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 617
+    },
+    {
+      "case": "exhausted_expiry_blocks_dependent",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 417
+    },
+    {
+      "case": "exhausted_expiry_blocks_dependent",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 417
+    },
+    {
+      "case": "idempotency_after_retry",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 367
+    },
+    {
+      "case": "idempotency_after_retry",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 467
+    },
+    {
+      "case": "invalid_completion_no_recovery",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 316
+    },
+    {
+      "case": "invalid_completion_no_recovery",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 417
+    },
+    {
+      "case": "rollback_unknown",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "rollback_unknown",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 266
+    },
+    {
+      "case": "rollback_cycle",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 166
+    },
+    {
+      "case": "rollback_cycle",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 266
+    },
+    {
+      "case": "rollback_self",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 166
+    },
+    {
+      "case": "rollback_self",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 266
+    },
+    {
+      "case": "rollback_duplicate",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "rollback_duplicate",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "rollback_bool_priority",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 166
+    },
+    {
+      "case": "rollback_bool_priority",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 217
+    },
+    {
+      "case": "rollback_bool_attempts",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 166
+    },
+    {
+      "case": "rollback_bool_attempts",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "rollback_negative_ready",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "rollback_negative_ready",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "rollback_empty_id",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "rollback_empty_id",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "rollback_numeric_id",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "rollback_numeric_id",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 217
+    },
+    {
+      "case": "rollback_unknown_field",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 166
+    },
+    {
+      "case": "rollback_unknown_field",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "rollback_payload_array",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 166
+    },
+    {
+      "case": "rollback_payload_array",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "rollback_nonfinite_payload",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "rollback_nonfinite_payload",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "rollback_dependencies_string",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 166
+    },
+    {
+      "case": "rollback_dependencies_string",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 266
+    },
+    {
+      "case": "rollback_attempts_limit",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 166
+    },
+    {
+      "case": "rollback_attempts_limit",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "rollback_batch_object",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 166
+    },
+    {
+      "case": "rollback_batch_object",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "invalid_claim_no_recovery",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "invalid_claim_no_recovery",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 366
+    },
+    {
+      "case": "json_type_idempotency",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 216
+    },
+    {
+      "case": "json_type_idempotency",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 317
+    },
+    {
+      "case": "terminal_and_invalid_fail",
+      "mode": "api",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 367
+    },
+    {
+      "case": "terminal_and_invalid_fail",
+      "mode": "cli",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 467
+    },
+    {
+      "case": "invalid-request-0",
+      "mode": "cli_invalid",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 266
+    },
+    {
+      "case": "invalid-request-1",
+      "mode": "cli_invalid",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 266
+    },
+    {
+      "case": "invalid-request-2",
+      "mode": "cli_invalid",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 266
+    },
+    {
+      "case": "invalid-request-3",
+      "mode": "cli_invalid",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 266
+    },
+    {
+      "case": "invalid-request-4",
+      "mode": "cli_invalid",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 266
+    },
+    {
+      "case": "invalid-request-5",
+      "mode": "cli_invalid",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 266
+    },
+    {
+      "case": "invalid-request-6",
+      "mode": "cli_invalid",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 266
+    },
+    {
+      "case": "invalid-request-7",
+      "mode": "cli_invalid",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 266
+    },
+    {
+      "case": "invalid-request-8",
+      "mode": "cli_invalid",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 266
+    },
+    {
+      "case": "invalid-request-9",
+      "mode": "cli_invalid",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 217
+    },
+    {
+      "case": "invalid-request-10",
+      "mode": "cli_invalid",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 266
+    },
+    {
+      "case": "atomic-claim-1-0",
+      "mode": "race",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 317
+    },
+    {
+      "case": "atomic-claim-1-1",
+      "mode": "race",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 316
+    },
+    {
+      "case": "atomic-claim-1-2",
+      "mode": "race",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 317
+    },
+    {
+      "case": "atomic-claim-2-0",
+      "mode": "race",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 366
+    },
+    {
+      "case": "atomic-claim-2-1",
+      "mode": "race",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 316
+    },
+    {
+      "case": "atomic-claim-2-2",
+      "mode": "race",
+      "passed": true,
+      "exit_code": 0,
+      "timeout": false,
+      "wall_clock_ms": 316
+    }
+  ]
+}

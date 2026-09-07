@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "experiment": "fresh queue instruction matrix",
+  "historical_results_included": false,
+  "runs": 32,
+  "task_passed": 7,
+  "evaluation_unavailable": 0,
+  "workflow_states": {
+    "completed": 31,
+    "failed": 1
+  },
+  "execution_usage": {
+    "input_tokens": 38663725,
+    "output_tokens": 1405763,
+    "cached_input_tokens": 35998510,
+    "total_tokens": 40069488
+  },
+  "execution_usage_scope": "confirmed terminal runs only; excludes failed run with incomplete phase evidence",
+  "preparation_usage": {
+    "scope": "fresh preparation including original planner samples and proposed corrections, not implementation",
+    "input_tokens": 208089,
+    "output_tokens": 45526,
+    "phase_threads": 16,
+    "provider_events": {
+      "request_queued": 64,
+      "request_dispatched": 64,
+      "request_finished": 64
+    },
+    "http_statuses": {
+      "200": 64
+    },
+    "task_success": null,
+    "human_approval": false,
+    "historical_results_included": false
+  },
+  "repairs_started": 0,
+  "execution_wall_clock_ms": 1432854,
+  "peak_active_jobs": 16,
+  "model_calls_from_recorded_stopped_phases": 1521,
+  "combinations": [
+    {
+      "combination": "aaa",
+      "executed": 4,
+      "task_passed": 0,
+      "evaluation_unavailable": 0,
+      "workflow_completed": 4,
+      "repairs_started": 0,
+      "input_tokens": 2889494,
+      "output_tokens": 167196,
+      "median_decision_to_exit_ms": 490560.0
+    },
+    {
+      "combination": "aab",
+      "executed": 4,
+      "task_passed": 2,
+      "evaluation_unavailable": 0,
+      "workflow_completed": 3,
+      "repairs_started": 0,
+      "input_tokens": 2994978,
+      "output_tokens": 139115,
+      "median_decision_to_exit_ms": 576871.0
+    },
+    {
+      "combination": "aba",
+      "executed": 4,
+      "task_passed": 1,
+      "evaluation_unavailable": 0,
+      "workflow_completed": 4,
+      "repairs_started": 0,
+      "input_tokens": 4390578,
+      "output_tokens": 188746,
+      "median_decision_to_exit_ms": 545268.0
+    },
+    {
+      "combination": "abb",
+      "executed": 4,
+      "task_passed": 0,
+      "evaluation_unavailable": 0,
+      "workflow_completed": 4,
+      "repairs_started": 0,
+      "input_tokens": 5353474,
+      "output_tokens": 183431,
+      "median_decision_to_exit_ms": 590602.0
+    },
+    {
+      "combination": "baa",
+      "executed": 4,
+      "task_passed": 2,
+      "evaluation_unavailable": 0,
+      "workflow_completed": 4,
+      "repairs_started": 0,
+      "input_tokens": 4081393,
+      "output_tokens": 173218,
+      "median_decision_to_exit_ms": 507304.5
+    },
+    {
+      "combination": "bab",
+      "executed": 4,
+      "task_passed": 0,
+      "evaluation_unavailable": 0,
+      "workflow_completed": 4,
+      "repairs_started": 0,
+      "input_tokens": 5217176,
+      "output_tokens": 187947,
+      "median_decision_to_exit_ms": 564917.0
+    },
+    {
+      "combination": "bba",
+      "executed": 4,
+      "task_passed": 1,
+      "evaluation_unavailable": 0,
+      "workflow_completed": 4,
+      "repairs_started": 0,
+      "input_tokens": 8328043,
+      "output_tokens": 176106,
+      "median_decision_to_exit_ms": 568868.5
+    },
+    {
+      "combination": "bbb",
+      "executed": 4,
+      "task_passed": 1,
+      "evaluation_unavailable": 0,
+      "workflow_completed": 4,
+      "repairs_started": 0,
+      "input_tokens": 5408589,
+      "output_tokens": 190004,
+      "median_decision_to_exit_ms": 578504.0
+    }
+  ],
+  "planner_samples": {
+    "total": 8,
+    "schema_valid": 8,
+    "approved_without_edit": 6,
+    "approved_after_correction": 2,
+    "accepted_text_changes": 3
+  },
+  "max_repairs": 2,
+  "automatic_replacement_trials": 0,
+  "automatic_amendment_approvals": 0,
+  "plan_deviations": null,
+  "limitations": [
+    "One task with eight shared planner samples; four executions per combination.",
+    "Two plans include accepted contract corrections; scores do not describe raw planner quality alone.",
+    "Independent finite evaluator; no universal winner or unobserved-test claim.",
+    "No immutable provider revision or enforced cumulative token/spend cap.",
+    "Request overlap includes proxy/provider queueing, not proof of simultaneous model computation."
+  ],
+  "provider_event_counts": {
+    "request_queued": 1535,
+    "request_dispatched": 1535,
+    "request_finished": 1535
+  },
+  "provider_http_statuses": {
+    "200": 1535
+  },
+  "peak_requests_in_60_seconds": 92
+}

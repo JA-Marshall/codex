@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "run": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r4-bab-execution",
+  "workflow_state": "completed",
+  "terminal_change": {
+    "type": "completed"
+  },
+  "all_started_phases_shutdown": true,
+  "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r4-bab/repository",
+  "first_plan_human_approval": true,
+  "phase_turns": 2,
+  "planner_phases": 0,
+  "tool_admissions": 60,
+  "usage": {
+    "input_tokens": 1171337,
+    "output_tokens": 46926,
+    "cached_input_tokens": 1085232
+  },
+  "workflow_terminal_elapsed_ms": 1127206,
+  "human_plan_edits": 0,
+  "plan_amendments": 0,
+  "plan_deviations": null,
+  "source_artifact_sha256": {
+    "events.jsonl": "fd1db027b6df0c8132df33683a3ac19c84b3e5606b68c95c9e7f8e64aa5818a1",
+    "runtime-events.jsonl": "32f2783e4bed95428399f0bd50aeab1a6d45442ca85bf7cf1004e21e9d47c0e7",
+    "evidence/input-01.json": "1ebfec78e19920db80bf1826555535d2bdbfe9153b239a23438464ef7e1492b2",
+    "evidence/phase-01.json": "3f9286cc9e71baa6a8df1c9c40f474e446ec91754089fd1e17ad72f031101a91",
+    "evidence/input-02.json": "c21433f4ab856fc412ec8b3c9bc0bf9052ba40c9598d5c80341333130e2c39f6",
+    "evidence/phase-02.json": "f69feba160f29d43e042976ec391eb8b2e04c2f1b1731363b042cc58caa12118",
+    "config/run-spec.json": "4064ac397ebbc5afd08b98787a921b06daa20f4b9d8b51710adcc16b1cb25f06"
+  },
+  "authority_restored": false,
+  "git": {
+    "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "files_changed": 10,
+    "changed_files": [
+      "durable_queue/__main__.py",
+      "durable_queue/queue.py",
+      "durable_queue/storage.py",
+      "tests/test_regression.py",
+      "tmp2bq3j3gh/legacy.db",
+      "tmpnis27v9t/q.db",
+      "tmpnis27v9t/req.json",
+      "tmpshgvlynp/q.db",
+      "tmpx1kgscdr/q.db",
+      "tmpx1kgscdr/req.json"
+    ],
+    "diff_bytes": 54811,
+    "diff_sha256": "a70ec95a79db60c6f0b761c4abfca663ba6e4176abc9b808eda205d68aaa8853"
+  }
+}

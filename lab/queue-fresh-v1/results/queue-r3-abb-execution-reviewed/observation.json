@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "run": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r3-abb-execution-reviewed",
+  "workflow_state": "completed",
+  "terminal_change": {
+    "type": "completed"
+  },
+  "all_started_phases_shutdown": true,
+  "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r3-abb/repository",
+  "first_plan_human_approval": true,
+  "phase_turns": 2,
+  "planner_phases": 0,
+  "tool_admissions": 50,
+  "usage": {
+    "input_tokens": 879136,
+    "output_tokens": 38295,
+    "cached_input_tokens": 792330
+  },
+  "workflow_terminal_elapsed_ms": 914351,
+  "human_plan_edits": 0,
+  "plan_amendments": 0,
+  "plan_deviations": null,
+  "source_artifact_sha256": {
+    "events.jsonl": "09b09ab5251325ea7fe714bb4bab52e194197df33cbc930d314f1cb8ef539b28",
+    "runtime-events.jsonl": "fd1958ae520e88af226df8bbda8cbcae7d3f20e07d8e01901631919d1b98a8d8",
+    "evidence/input-01.json": "5e9ad72f111d58791d11722e3534f0e0d58aa7c319dd5204e0e5766dce3cf644",
+    "evidence/phase-01.json": "4eca3df71db5876cdd87937a808ae9a5b3113d3f9f5b0de0ff95584ff4964483",
+    "evidence/input-02.json": "ff277819cecf3fa553a0192fe67044bc1818f027f8a9418962e86481ba69fd19",
+    "evidence/phase-02.json": "56153400d1f9ee89a1d4ee510871b42491030583471c2aebf1c57ba9c888a5ad",
+    "config/run-spec.json": "f705bc4c6258627312c6dbaba99449ed9189ad4dde947a92868c650de21fb779"
+  },
+  "authority_restored": false,
+  "git": {
+    "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "files_changed": 12,
+    "changed_files": [
+      "durable_queue/__main__.py",
+      "durable_queue/queue.py",
+      "durable_queue/storage.py",
+      "tests/test_regression.py",
+      "tmp1dx44cjc/db.sqlite",
+      "tmp1dx44cjc/req.json",
+      "tmpe27rcioi/c.sqlite",
+      "tmpe27rcioi/r-w0.json",
+      "tmpe27rcioi/r-w1.json",
+      "tmpe27rcioi/r-w2.json",
+      "tmpe27rcioi/r-w3.json",
+      "tmpe27rcioi/r-w4.json"
+    ],
+    "diff_bytes": 56219,
+    "diff_sha256": "c66977c1a5a257a11904d7b307454fde861ae3f2c65a39d3b69f54af531675bd"
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "run": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r1-aba-execution",
+  "workflow_state": "completed",
+  "terminal_change": {
+    "type": "completed"
+  },
+  "all_started_phases_shutdown": true,
+  "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r1-aba/repository",
+  "first_plan_human_approval": true,
+  "phase_turns": 2,
+  "planner_phases": 0,
+  "tool_admissions": 44,
+  "usage": {
+    "input_tokens": 737567,
+    "output_tokens": 42331,
+    "cached_input_tokens": 669261
+  },
+  "workflow_terminal_elapsed_ms": 460401,
+  "human_plan_edits": 0,
+  "plan_amendments": 0,
+  "plan_deviations": null,
+  "source_artifact_sha256": {
+    "events.jsonl": "cb437073f4eda02cdbfaab4445734f9cd28e1501cf85d0a3999340de2542ac57",
+    "runtime-events.jsonl": "289ec5709742f0e6704571c385217695a41a4dc8a7ef56f1dd949be6b3424ecb",
+    "evidence/input-01.json": "06e187c0c61b48587193ef18459f4133cb65052e6646863c00a3b509a905f06c",
+    "evidence/phase-01.json": "a996a8a0cda314210f380779f807976f01913887ecf8f23f0a889a74ed54dadf",
+    "evidence/input-02.json": "f5a778de8d90fa96f065c60fcb774f640ca28532dfe9173f3474d105e1d18963",
+    "evidence/phase-02.json": "f0a58626e38f597d3db3b524145f86514f8907f60c47b549bc064dcd021175e0",
+    "config/run-spec.json": "42e4e9db11d864548d938957f2abbe0f3b0410e45f3cfb5a10a64c9f5bb68605"
+  },
+  "authority_restored": false,
+  "git": {
+    "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "files_changed": 22,
+    "changed_files": [
+      "durable_queue/__main__.py",
+      "durable_queue/queue.py",
+      "durable_queue/storage.py",
+      "tests/test_regression.py",
+      "tmp775es92d.json",
+      "tmp8iwcc9te.json",
+      "tmp9c404haw.json",
+      "tmp9v9drko0.json",
+      "tmpa3yh4b27.json",
+      "tmpb308p4ew.json",
+      "tmpcyamx6u6.json",
+      "tmpd73ql6ak.json",
+      "tmpertasjeq.json",
+      "tmpf2va2r_u.json",
+      "tmpfx1jyitt.json",
+      "tmpg8e0uewk.json",
+      "tmpgg6o0i_l.json",
+      "tmpin4go6lf.json",
+      "tmpk84s_thm.json",
+      "tmpkmx1u8b2.json",
+      "tmpn42y9d1y.json",
+      "tmpwfbw6a6n.json"
+    ],
+    "diff_bytes": 50497,
+    "diff_sha256": "df680e8c071b0dd9a013052544db0f25a11036792c91f9b5323f8814f0962741"
+  }
+}

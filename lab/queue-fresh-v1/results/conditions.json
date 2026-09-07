@@ -1,0 +1,4613 @@
+[
+  {
+    "id": "queue-r1-aaa",
+    "block": 1,
+    "planner": "a",
+    "executor": "a",
+    "verifier": "a",
+    "workflow": "queue-aaa-repair-v1",
+    "parent": null,
+    "preparation_id": "queue-r1-aaa-prepared",
+    "execution_id": "queue-r1-aaa-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r1-aaa/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r1-aaa/fixture.json",
+    "run_id": "queue-r1-aaa-execution",
+    "target": {
+      "run_id": "queue-r1-aaa-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "5d89ce42e9c24461349f05e22812a58c3adee2a18b20a584f06a8dae68052a63",
+      "run_spec_sha256": "b8001ffb6bfa4f3b3ca5e7ef840e2f649473b03979e3fcb4fa9e147f27df11dd"
+    },
+    "parent_plan": "queue-r1-aaa",
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_and_terminal_run",
+    "accepted_plan_text_changes": 0,
+    "original_plan_approved_without_edit": true,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 14,
+      "exec_command": 15,
+      "lab_command_receipt": 3
+    },
+    "plan_deviations": null,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 519042,
+      "output_tokens": 39396,
+      "cached_input_tokens": 409767
+    },
+    "tool_calls": 38,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 17,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py",
+        "tmp64bws22h.json",
+        "tmp85jwpmps.json",
+        "tmpb6kzveap/q.db",
+        "tmpca2ezo9z.json",
+        "tmpd6e3r7w0.json",
+        "tmpj36qvl_8.json",
+        "tmpkvg0ljoc.json",
+        "tmpmto12_ps.json",
+        "tmpprkoo1sv.json",
+        "tmpqkl_vt3_.json",
+        "tmpqnn0fji4.json",
+        "tmpqprg4ilw.json",
+        "tmpsx222fyh.json"
+      ],
+      "diff_bytes": 57707,
+      "diff_sha256": "5460791dce5f1d2aff4aad641577e56c1ce3589ed121e1ffec32651281454604"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d4c-5d12-7f53-8345-f58faef053f8",
+        "started_ms": 1788808551663,
+        "ended_ms": 1788808894857,
+        "usage": {
+          "input_tokens": 416915,
+          "cached_input_tokens": 322606,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 33557,
+          "reasoning_output_tokens": 18310,
+          "total_tokens": 450472
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07d51-9a3e-74c0-9dd2-c8ab2ff4dffe",
+        "started_ms": 1788808894995,
+        "ended_ms": 1788809010237,
+        "usage": {
+          "input_tokens": 102127,
+          "cached_input_tokens": 87161,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 5839,
+          "reasoning_output_tokens": 3100,
+          "total_tokens": 107966
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "AC-1",
+                "AC-2",
+                "AC-3",
+                "AC-4",
+                "AC-5"
+              ],
+              "call_id": "call_01a07d523e4173f1b0ad164604cfc304",
+              "verification_id": "VER-1"
+            },
+            {
+              "acceptance_criteria": [
+                "AC-2",
+                "AC-3"
+              ],
+              "call_id": "call_01a07d5291187021a3d06f7053632735",
+              "verification_id": "VER-2"
+            },
+            {
+              "acceptance_criteria": [
+                "AC-4"
+              ],
+              "call_id": "call_01a07d52cbd971d083b8edd4c46dca6e",
+              "verification_id": "VER-3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 458990
+  },
+  {
+    "id": "queue-r1-aab",
+    "block": 1,
+    "planner": "a",
+    "executor": "a",
+    "verifier": "b",
+    "workflow": "queue-aab-repair-v1",
+    "parent": "queue-r1-aaa",
+    "preparation_id": "queue-r1-aab-prepared",
+    "execution_id": "queue-r1-aab-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r1-aab/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r1-aab/fixture.json",
+    "run_id": "queue-r1-aab-execution",
+    "target": {
+      "run_id": "queue-r1-aab-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "5d89ce42e9c24461349f05e22812a58c3adee2a18b20a584f06a8dae68052a63",
+      "run_spec_sha256": "13a1c4aea2b15284e5b57d4c364c264a3e9fce7a4ffbadf6fbf53add7b9cf6a5"
+    },
+    "parent_plan": "queue-r1-aaa",
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_and_terminal_run",
+    "accepted_plan_text_changes": 0,
+    "original_plan_approved_without_edit": true,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 11,
+      "exec_command": 22,
+      "lab_command_receipt": 3
+    },
+    "plan_deviations": null,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 713068,
+      "output_tokens": 42152,
+      "cached_input_tokens": 639294
+    },
+    "tool_calls": 42,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "all_phases_shutdown": true,
+    "task_success": true,
+    "public_test_success": true,
+    "hidden_test_success": true,
+    "private_passed": 73,
+    "private_total": 73,
+    "failed_checks": [],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 4,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 46451,
+      "diff_sha256": "bf1b084abb2d8093c938a128dbe8d22ab0aa7fa35316b80e899e48cbd5be9e00"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d4c-5d11-7df0-ab27-84e1e5a66889",
+        "started_ms": 1788808551663,
+        "ended_ms": 1788808895985,
+        "usage": {
+          "input_tokens": 426199,
+          "cached_input_tokens": 382367,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 29194,
+          "reasoning_output_tokens": 15807,
+          "total_tokens": 455393
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07d51-9eb7-76f2-bf71-a81e04a810e7",
+        "started_ms": 1788808896132,
+        "ended_ms": 1788809063305,
+        "usage": {
+          "input_tokens": 286869,
+          "cached_input_tokens": 256927,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 12958,
+          "reasoning_output_tokens": 4821,
+          "total_tokens": 299827
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "AC-1",
+                "AC-3"
+              ],
+              "call_id": "call_01a07d52e16b7f408a05a42a5c4020f2",
+              "verification_id": "VER-1"
+            },
+            {
+              "acceptance_criteria": [
+                "AC-2",
+                "AC-5"
+              ],
+              "call_id": "call_01a07d53873474d3a5d3950ea134cc51",
+              "verification_id": "VER-2"
+            },
+            {
+              "acceptance_criteria": [
+                "AC-4"
+              ],
+              "call_id": "call_01a07d53bada7693bf6e3dfb199de226",
+              "verification_id": "VER-3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 511881
+  },
+  {
+    "id": "queue-r1-aba",
+    "block": 1,
+    "planner": "a",
+    "executor": "b",
+    "verifier": "a",
+    "workflow": "queue-aba-repair-v1",
+    "parent": "queue-r1-aaa",
+    "preparation_id": "queue-r1-aba-prepared",
+    "execution_id": "queue-r1-aba-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r1-aba/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r1-aba/fixture.json",
+    "run_id": "queue-r1-aba-execution",
+    "target": {
+      "run_id": "queue-r1-aba-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "5d89ce42e9c24461349f05e22812a58c3adee2a18b20a584f06a8dae68052a63",
+      "run_spec_sha256": "069a4846cdc2f01b1cdfcc28124ee7cc30389382bb03c2528c13111f73d40bb3"
+    },
+    "parent_plan": "queue-r1-aaa",
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_and_terminal_run",
+    "accepted_plan_text_changes": 0,
+    "original_plan_approved_without_edit": true,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 15,
+      "exec_command": 20,
+      "lab_command_receipt": 3
+    },
+    "plan_deviations": null,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 737567,
+      "output_tokens": 42331,
+      "cached_input_tokens": 669261
+    },
+    "tool_calls": 44,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 22,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py",
+        "tmp775es92d.json",
+        "tmp8iwcc9te.json",
+        "tmp9c404haw.json",
+        "tmp9v9drko0.json",
+        "tmpa3yh4b27.json",
+        "tmpb308p4ew.json",
+        "tmpcyamx6u6.json",
+        "tmpd73ql6ak.json",
+        "tmpertasjeq.json",
+        "tmpf2va2r_u.json",
+        "tmpfx1jyitt.json",
+        "tmpg8e0uewk.json",
+        "tmpgg6o0i_l.json",
+        "tmpin4go6lf.json",
+        "tmpk84s_thm.json",
+        "tmpkmx1u8b2.json",
+        "tmpn42y9d1y.json",
+        "tmpwfbw6a6n.json"
+      ],
+      "diff_bytes": 50497,
+      "diff_sha256": "df680e8c071b0dd9a013052544db0f25a11036792c91f9b5323f8814f0962741"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d4c-5d0b-7d70-987c-de6ec1bc8c3c",
+        "started_ms": 1788808551663,
+        "ended_ms": 1788808899484,
+        "usage": {
+          "input_tokens": 638566,
+          "cached_input_tokens": 586196,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 35538,
+          "reasoning_output_tokens": 19528,
+          "total_tokens": 674104
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07d51-abfd-7161-9f65-b0995344d89f",
+        "started_ms": 1788808899556,
+        "ended_ms": 1788809011041,
+        "usage": {
+          "input_tokens": 99001,
+          "cached_input_tokens": 83065,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 6793,
+          "reasoning_output_tokens": 3290,
+          "total_tokens": 105794
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "AC-1",
+                "AC-2",
+                "AC-3",
+                "AC-5"
+              ],
+              "call_id": "call_01a07d5276c77e21942f70b23d1f0d8d",
+              "verification_id": "VER-1"
+            },
+            {
+              "acceptance_criteria": [
+                "AC-2",
+                "AC-3"
+              ],
+              "call_id": "call_01a07d52bda075d1bb76a030a41b9ebc",
+              "verification_id": "VER-2"
+            },
+            {
+              "acceptance_criteria": [
+                "AC-4"
+              ],
+              "call_id": "call_01a07d5318ad7b6284384c1121f0d6f9",
+              "verification_id": "VER-3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 459757
+  },
+  {
+    "id": "queue-r1-abb",
+    "block": 1,
+    "planner": "a",
+    "executor": "b",
+    "verifier": "b",
+    "workflow": "queue-abb-repair-v1",
+    "parent": "queue-r1-aaa",
+    "preparation_id": "queue-r1-abb-prepared",
+    "execution_id": "queue-r1-abb-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r1-abb/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r1-abb/fixture.json",
+    "run_id": "queue-r1-abb-execution",
+    "target": {
+      "run_id": "queue-r1-abb-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "5d89ce42e9c24461349f05e22812a58c3adee2a18b20a584f06a8dae68052a63",
+      "run_spec_sha256": "ec167ed9ef78bf3a8327177fe4885e80243e70543d2442a8425cdbcd64e6606b"
+    },
+    "parent_plan": "queue-r1-aaa",
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_and_terminal_run",
+    "accepted_plan_text_changes": 0,
+    "original_plan_approved_without_edit": true,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 14,
+      "exec_command": 37,
+      "lab_command_receipt": 3
+    },
+    "plan_deviations": null,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 1121987,
+      "output_tokens": 38800,
+      "cached_input_tokens": 1048225
+    },
+    "tool_calls": 60,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 4,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 36205,
+      "diff_sha256": "578f4eb3125a490040653280d1e50b77971347a916e4732af3a65d5810dc0234"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d4c-5d0b-7302-a1d8-c475313ada63",
+        "started_ms": 1788808551663,
+        "ended_ms": 1788808927697,
+        "usage": {
+          "input_tokens": 848660,
+          "cached_input_tokens": 801726,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 28665,
+          "reasoning_output_tokens": 13032,
+          "total_tokens": 877325
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07d52-1a29-7841-93fd-67d43f4a3f5c",
+        "started_ms": 1788808927768,
+        "ended_ms": 1788809116199,
+        "usage": {
+          "input_tokens": 273327,
+          "cached_input_tokens": 246499,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 10135,
+          "reasoning_output_tokens": 3428,
+          "total_tokens": 283462
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "AC-1",
+                "AC-5"
+              ],
+              "call_id": "call_01a07d53d6827b31bb9d6223c1d27687",
+              "verification_id": "VER-1"
+            },
+            {
+              "acceptance_criteria": [
+                "AC-2",
+                "AC-3"
+              ],
+              "call_id": "call_01a07d5437407d629b366400b4e46aee",
+              "verification_id": "VER-2"
+            },
+            {
+              "acceptance_criteria": [
+                "AC-4"
+              ],
+              "call_id": "call_01a07d5499d37b33937de34a5e74b6be",
+              "verification_id": "VER-3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 564835
+  },
+  {
+    "id": "queue-r1-baa",
+    "block": 1,
+    "planner": "b",
+    "executor": "a",
+    "verifier": "a",
+    "workflow": "queue-baa-repair-v1",
+    "parent": null,
+    "preparation_id": "queue-r1-baa-prepared",
+    "execution_id": "queue-r1-baa-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r1-baa/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r1-baa/fixture.json",
+    "run_id": "queue-r1-baa-execution",
+    "target": {
+      "run_id": "queue-r1-baa-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "7a0f35e8eabaaee69fa2e4f9a8a6e735f70af91d9a84956d5cd7d86bdf1043bb",
+      "run_spec_sha256": "bca6c2ef041cb7830e31c3f133d76ee4807f535b1125836b7bcd1e60d6ffd1d1"
+    },
+    "parent_plan": "queue-r1-baa",
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_and_terminal_run",
+    "accepted_plan_text_changes": 0,
+    "original_plan_approved_without_edit": true,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 16,
+      "exec_command": 21,
+      "lab_command_receipt": 3
+    },
+    "plan_deviations": null,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 864255,
+      "output_tokens": 45736,
+      "cached_input_tokens": 787089
+    },
+    "tool_calls": 46,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 5,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_processes.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 51111,
+      "diff_sha256": "05631d5accb9df4ae312e5df63c80a273499d47f51206d3e8efb3ac5dcadead6"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d4c-60f8-78f1-80e5-e77e39a2dfe9",
+        "started_ms": 1788808552657,
+        "ended_ms": 1788808924576,
+        "usage": {
+          "input_tokens": 684469,
+          "cached_input_tokens": 629204,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 34296,
+          "reasoning_output_tokens": 17377,
+          "total_tokens": 718765
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07d52-0dff-77b1-bf28-07d625d6d0b3",
+        "started_ms": 1788808924647,
+        "ended_ms": 1788809096619,
+        "usage": {
+          "input_tokens": 179786,
+          "cached_input_tokens": 157885,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 11440,
+          "reasoning_output_tokens": 5257,
+          "total_tokens": 191226
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "A1",
+                "A2",
+                "A3",
+                "A4"
+              ],
+              "call_id": "call_01a07d539b957883b82340edbf536d6f",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "A2",
+                "A4"
+              ],
+              "call_id": "call_01a07d540e0376e19eed0c0bf75e6bd3",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "A4"
+              ],
+              "call_id": "call_01a07d5441e47250ab02830c81a88fe7",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 544159
+  },
+  {
+    "id": "queue-r1-bab",
+    "block": 1,
+    "planner": "b",
+    "executor": "a",
+    "verifier": "b",
+    "workflow": "queue-bab-repair-v1",
+    "parent": "queue-r1-baa",
+    "preparation_id": "queue-r1-bab-prepared",
+    "execution_id": "queue-r1-bab-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r1-bab/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r1-bab/fixture.json",
+    "run_id": "queue-r1-bab-execution",
+    "target": {
+      "run_id": "queue-r1-bab-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "7a0f35e8eabaaee69fa2e4f9a8a6e735f70af91d9a84956d5cd7d86bdf1043bb",
+      "run_spec_sha256": "f2aef0059074f83de8bb73fcd31d5261e36c2de553dc2129ac92e7097a484d4c"
+    },
+    "parent_plan": "queue-r1-baa",
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_and_terminal_run",
+    "accepted_plan_text_changes": 0,
+    "original_plan_approved_without_edit": true,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 13,
+      "exec_command": 24,
+      "lab_command_receipt": 3
+    },
+    "plan_deviations": null,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 808791,
+      "output_tokens": 42514,
+      "cached_input_tokens": 734579
+    },
+    "tool_calls": 46,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 5,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_processes.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 56025,
+      "diff_sha256": "d7bc8506df013ade66b70c1fbec823da35ef3a746d79038f6928757fd3c90520"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d4c-64f6-7253-9147-2a932c5bc46d",
+        "started_ms": 1788808553676,
+        "ended_ms": 1788808879902,
+        "usage": {
+          "input_tokens": 523408,
+          "cached_input_tokens": 476673,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 30732,
+          "reasoning_output_tokens": 15504,
+          "total_tokens": 554140
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07d51-5f75-70c3-8ee6-9200802ddafe",
+        "started_ms": 1788808879970,
+        "ended_ms": 1788809069687,
+        "usage": {
+          "input_tokens": 285383,
+          "cached_input_tokens": 257906,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 11782,
+          "reasoning_output_tokens": 3627,
+          "total_tokens": 297165
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "A1",
+                "A2",
+                "A3"
+              ],
+              "call_id": "call_01a07d52fc1d7d11949ed53b5457e80e",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "A2"
+              ],
+              "call_id": "call_01a07d537d06778381d57e9a6162190c",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "A4"
+              ],
+              "call_id": "call_01a07d53d6767b338fc97ff6df1fc1b6",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 516230
+  },
+  {
+    "id": "queue-r1-bba",
+    "block": 1,
+    "planner": "b",
+    "executor": "b",
+    "verifier": "a",
+    "workflow": "queue-bba-repair-v1",
+    "parent": "queue-r1-baa",
+    "preparation_id": "queue-r1-bba-prepared",
+    "execution_id": "queue-r1-bba-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r1-bba/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r1-bba/fixture.json",
+    "run_id": "queue-r1-bba-execution",
+    "target": {
+      "run_id": "queue-r1-bba-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "7a0f35e8eabaaee69fa2e4f9a8a6e735f70af91d9a84956d5cd7d86bdf1043bb",
+      "run_spec_sha256": "92e87681b9bd4c745daee6cfabfee7ee184a257fab2efb9167297e92aa7311ec"
+    },
+    "parent_plan": "queue-r1-baa",
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_and_terminal_run",
+    "accepted_plan_text_changes": 0,
+    "original_plan_approved_without_edit": true,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 14,
+      "exec_command": 83,
+      "lab_command_receipt": 4
+    },
+    "plan_deviations": null,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 3751979,
+      "output_tokens": 61372,
+      "cached_input_tokens": 3653118
+    },
+    "tool_calls": 107,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "all_phases_shutdown": true,
+    "task_success": true,
+    "public_test_success": true,
+    "hidden_test_success": true,
+    "private_passed": 73,
+    "private_total": 73,
+    "failed_checks": [],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 7,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_processes.py",
+        "tests/test_regression.py",
+        "tmpusgxbkxe/q.db",
+        "tmpusgxbkxe/req.json"
+      ],
+      "diff_bytes": 47057,
+      "diff_sha256": "706b160c64a20e75e6fc6c03be7f854c1cb2e9e1c499e44f8d0b243ebd6e71d5"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d4c-6106-75c1-8df8-b532d98711cb",
+        "started_ms": 1788808552671,
+        "ended_ms": 1788809447757,
+        "usage": {
+          "input_tokens": 3632749,
+          "cached_input_tokens": 3549091,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 54570,
+          "reasoning_output_tokens": 30213,
+          "total_tokens": 3687319
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07d5a-09e9-7221-bff4-21b6571ab4a5",
+        "started_ms": 1788809447873,
+        "ended_ms": 1788809567630,
+        "usage": {
+          "input_tokens": 119230,
+          "cached_input_tokens": 104027,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 6802,
+          "reasoning_output_tokens": 3772,
+          "total_tokens": 126032
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "A1",
+                "A3"
+              ],
+              "call_id": "call_01a07d5abf1e79129bccdba8b3ad8384",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "A2"
+              ],
+              "call_id": "call_01a07d5af5a07181b86c9fdc9315e7da",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "A4"
+              ],
+              "call_id": "call_01a07d5b61457eb1bfd49b7f3277dd19",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 1015261
+  },
+  {
+    "id": "queue-r1-bbb",
+    "block": 1,
+    "planner": "b",
+    "executor": "b",
+    "verifier": "b",
+    "workflow": "queue-bbb-repair-v1",
+    "parent": "queue-r1-baa",
+    "preparation_id": "queue-r1-bbb-prepared",
+    "execution_id": "queue-r1-bbb-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r1-bbb/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r1-bbb/fixture.json",
+    "run_id": "queue-r1-bbb-execution",
+    "target": {
+      "run_id": "queue-r1-bbb-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "7a0f35e8eabaaee69fa2e4f9a8a6e735f70af91d9a84956d5cd7d86bdf1043bb",
+      "run_spec_sha256": "0b63d5acb492292dfc4d507d23b37a31200cc976390c21b5bcc37447f7d2af42"
+    },
+    "parent_plan": "queue-r1-baa",
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_and_terminal_run",
+    "accepted_plan_text_changes": 0,
+    "original_plan_approved_without_edit": true,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 8,
+      "lab_repo_read": 13,
+      "exec_command": 62,
+      "lab_command_receipt": 9
+    },
+    "plan_deviations": null,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 2134607,
+      "output_tokens": 50960,
+      "cached_input_tokens": 2047967
+    },
+    "tool_calls": 92,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 5,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_processes.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 45528,
+      "diff_sha256": "76a3cc4269f4f6e184e2d2d3327a07e5d68fa6ec9308e462c2d4789946d78cc9"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d4c-64f5-7911-bb05-f62a050b76e4",
+        "started_ms": 1788808553676,
+        "ended_ms": 1788809038802,
+        "usage": {
+          "input_tokens": 1704611,
+          "cached_input_tokens": 1648553,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 38130,
+          "reasoning_output_tokens": 19543,
+          "total_tokens": 1742741
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07d53-cc39-74b3-97d7-0ef730f53f5c",
+        "started_ms": 1788809038888,
+        "ended_ms": 1788809211959,
+        "usage": {
+          "input_tokens": 429996,
+          "cached_input_tokens": 399414,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 12830,
+          "reasoning_output_tokens": 6185,
+          "total_tokens": 442826
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "A1",
+                "A3"
+              ],
+              "call_id": "call_01a07d550e597d00aa2687e30e0d4cc8",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "A2"
+              ],
+              "call_id": "call_01a07d55cf817560b9b6eb225aa7dcb4",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "A4"
+              ],
+              "call_id": "call_01a07d56065b7c50b1fb0ba4f72df530",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 658484
+  },
+  {
+    "id": "queue-r2-aab",
+    "block": 2,
+    "planner": "a",
+    "executor": "a",
+    "verifier": "b",
+    "workflow": "queue-aab-repair-v1",
+    "parent": "queue-r2-aaa",
+    "preparation_id": "queue-r2-aab-prepared",
+    "execution_id": "queue-r2-aab-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r2-aab/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r2-aab/fixture.json",
+    "run_id": "queue-r2-aab-execution",
+    "target": {
+      "run_id": "queue-r2-aab-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "41c1adc928ab07ab7d9f84b6d1fbd279beb9c8a98650ee00118796741439457c",
+      "run_spec_sha256": "13a1c4aea2b15284e5b57d4c364c264a3e9fce7a4ffbadf6fbf53add7b9cf6a5"
+    },
+    "parent_plan": "queue-r2-aaa",
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_and_terminal_run",
+    "accepted_plan_text_changes": 0,
+    "original_plan_approved_without_edit": true,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 14,
+      "exec_command": 31,
+      "lab_command_receipt": 4
+    },
+    "plan_deviations": null,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 1074814,
+      "output_tokens": 46228,
+      "cached_input_tokens": 961832
+    },
+    "tool_calls": 55,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 42,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py",
+        "tmp0znx72tg.json",
+        "tmp2l9x9nc2.json",
+        "tmp3_krltl1.json",
+        "tmp3ghokkhm.json",
+        "tmp4105mbns.json",
+        "tmp5sjmo_gp.json",
+        "tmp8c1z7peq.json",
+        "tmp9fae7vtx.json",
+        "tmp9ys80m7v.json",
+        "tmp_740ny7h.json",
+        "tmpb81mthjr.json",
+        "tmpc5edt5ao.json",
+        "tmpcddqeu0w.json",
+        "tmpcvyiv4_j.json",
+        "tmpdel0l851.json",
+        "tmpdjy6d2m2.json",
+        "tmpdo5p96y8.json",
+        "tmpfibupagm.json",
+        "tmpgg0hcrps.json",
+        "tmpgwkn18_3.json",
+        "tmpiev_ghdp.json",
+        "tmpjd2c2623.json",
+        "tmpjl52frty.json",
+        "tmpjnze7549.json",
+        "tmpla498nbz.json",
+        "tmpmh1t_kyh.json",
+        "tmpngxz0c1y.json",
+        "tmpo5nzaopp.json",
+        "tmpot7yo4rf.json",
+        "tmpp6noqnec.json",
+        "tmpra9mho4x.json",
+        "tmptam78xj6.json",
+        "tmpu9fgnnzq.json",
+        "tmpvn_ozky0.json",
+        "tmpwpqdlcsz.json",
+        "tmpxp_k342r.json",
+        "tmpxxn2rgse.json",
+        "tmpyyztftc7.json"
+      ],
+      "diff_bytes": 58321,
+      "diff_sha256": "a3b51619affa01231484935013997961d6dce6135a305e129b304b157a45335f"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d4c-64f6-7763-8137-c1d896e7d465",
+        "started_ms": 1788808553676,
+        "ended_ms": 1788809017117,
+        "usage": {
+          "input_tokens": 761795,
+          "cached_input_tokens": 680231,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 33154,
+          "reasoning_output_tokens": 17185,
+          "total_tokens": 794949
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07d53-777b-79a3-b263-f3fc398d8028",
+        "started_ms": 1788809017194,
+        "ended_ms": 1788809187755,
+        "usage": {
+          "input_tokens": 313019,
+          "cached_input_tokens": 281601,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 13074,
+          "reasoning_output_tokens": 4091,
+          "total_tokens": 326093
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "ac-submit"
+              ],
+              "call_id": "call_01a07d5493147f3389a85e87eb304381",
+              "verification_id": "v1"
+            },
+            {
+              "acceptance_criteria": [
+                "ac-claim",
+                "ac-lifecycle"
+              ],
+              "call_id": "call_01a07d54cf2c78f1a8327f38cb36deb8",
+              "verification_id": "v2"
+            },
+            {
+              "acceptance_criteria": [
+                "ac-cli"
+              ],
+              "call_id": "call_01a07d554dab79e281323f1b5d0bf383",
+              "verification_id": "v3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 634389
+  },
+  {
+    "id": "queue-r2-aba",
+    "block": 2,
+    "planner": "a",
+    "executor": "b",
+    "verifier": "a",
+    "workflow": "queue-aba-repair-v1",
+    "parent": "queue-r2-aaa",
+    "preparation_id": "queue-r2-aba-prepared",
+    "execution_id": "queue-r2-aba-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r2-aba/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r2-aba/fixture.json",
+    "run_id": "queue-r2-aba-execution",
+    "target": {
+      "run_id": "queue-r2-aba-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "41c1adc928ab07ab7d9f84b6d1fbd279beb9c8a98650ee00118796741439457c",
+      "run_spec_sha256": "069a4846cdc2f01b1cdfcc28124ee7cc30389382bb03c2528c13111f73d40bb3"
+    },
+    "parent_plan": "queue-r2-aaa",
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_and_terminal_run",
+    "accepted_plan_text_changes": 0,
+    "original_plan_approved_without_edit": true,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 14,
+      "exec_command": 36,
+      "lab_command_receipt": 3
+    },
+    "plan_deviations": null,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 1300024,
+      "output_tokens": 44578,
+      "cached_input_tokens": 1228366
+    },
+    "tool_calls": 59,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 25,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py",
+        "tmp5s2f7gas.json",
+        "tmp8d21wwfx.json",
+        "tmp8slirl3i/q2.db",
+        "tmp8uautohm.json",
+        "tmp96n17vfb.json",
+        "tmp_7ybih9l.json",
+        "tmp_h9_ey4c.json",
+        "tmpbwe7fa29.json",
+        "tmpd22n5rgu/a.db",
+        "tmpe15mrtwc/q3.db",
+        "tmpe2htq9la.json",
+        "tmpfesnkmtx.json",
+        "tmpflvd1exd.json",
+        "tmph8ig3pqh.json",
+        "tmpipias762.json",
+        "tmpqs7gbsyy.json",
+        "tmptd9jll9r.json",
+        "tmptor7lntz.json",
+        "tmpu01zj1rj.json",
+        "tmpulqfw4xm.json",
+        "tmpy5n7q00t/q.db"
+      ],
+      "diff_bytes": 51021,
+      "diff_sha256": "d19d81b8dfd713a0f61b85a78534ba58e6ca959d2b062ec498f2da1428dc9b6c"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d4c-64f6-7c32-93ec-abeed186a3a2",
+        "started_ms": 1788808553676,
+        "ended_ms": 1788808974317,
+        "usage": {
+          "input_tokens": 1185518,
+          "cached_input_tokens": 1132117,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 34583,
+          "reasoning_output_tokens": 17606,
+          "total_tokens": 1220101
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07d52-d085-7121-8cde-66f0d90a4c76",
+        "started_ms": 1788808974444,
+        "ended_ms": 1788809128534,
+        "usage": {
+          "input_tokens": 114506,
+          "cached_input_tokens": 96249,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 9995,
+          "reasoning_output_tokens": 6382,
+          "total_tokens": 124501
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "ac-submit",
+                "ac-claim",
+                "ac-lifecycle",
+                "ac-cli"
+              ],
+              "call_id": "call_01a07d53fb6b7aa3bbd329e0f0d40782",
+              "verification_id": "v1"
+            },
+            {
+              "acceptance_criteria": [
+                "ac-claim",
+                "ac-lifecycle",
+                "ac-cli"
+              ],
+              "call_id": "call_01a07d54501c78b0aafe83e0d2adfa08",
+              "verification_id": "v2"
+            },
+            {
+              "acceptance_criteria": [
+                "ac-submit",
+                "ac-cli"
+              ],
+              "call_id": "call_01a07d54a09a74539c4de5d5a3f0c03b",
+              "verification_id": "v3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 575179
+  },
+  {
+    "id": "queue-r2-abb",
+    "block": 2,
+    "planner": "a",
+    "executor": "b",
+    "verifier": "b",
+    "workflow": "queue-abb-repair-v1",
+    "parent": "queue-r2-aaa",
+    "preparation_id": "queue-r2-abb-prepared",
+    "execution_id": "queue-r2-abb-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r2-abb/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r2-abb/fixture.json",
+    "run_id": "queue-r2-abb-execution",
+    "target": {
+      "run_id": "queue-r2-abb-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "41c1adc928ab07ab7d9f84b6d1fbd279beb9c8a98650ee00118796741439457c",
+      "run_spec_sha256": "ec167ed9ef78bf3a8327177fe4885e80243e70543d2442a8425cdbcd64e6606b"
+    },
+    "parent_plan": "queue-r2-aaa",
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_and_terminal_run",
+    "accepted_plan_text_changes": 0,
+    "original_plan_approved_without_edit": true,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 13,
+      "exec_command": 36,
+      "lab_command_receipt": 11
+    },
+    "plan_deviations": null,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 1654284,
+      "output_tokens": 50482,
+      "cached_input_tokens": 1557959
+    },
+    "tool_calls": 66,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 4,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 49148,
+      "diff_sha256": "9ac402032285c9ceeccc1011c18aafc34b4bf5830b4146f231e33c104f460f26"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d4c-64f5-7a60-9a34-0ab19614169e",
+        "started_ms": 1788808553669,
+        "ended_ms": 1788809008561,
+        "usage": {
+          "input_tokens": 1187830,
+          "cached_input_tokens": 1125438,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 37746,
+          "reasoning_output_tokens": 20187,
+          "total_tokens": 1225576
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07d53-5639-7d91-b87f-d7e4aca3125d",
+        "started_ms": 1788809008660,
+        "ended_ms": 1788809193307,
+        "usage": {
+          "input_tokens": 466454,
+          "cached_input_tokens": 432521,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 12736,
+          "reasoning_output_tokens": 5089,
+          "total_tokens": 479190
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "ac-submit",
+                "ac-claim",
+                "ac-lifecycle",
+                "ac-cli"
+              ],
+              "call_id": "call_01a07d550ea77d61bc90e0361f3baef7",
+              "verification_id": "v1"
+            },
+            {
+              "acceptance_criteria": [
+                "ac-claim",
+                "ac-lifecycle",
+                "ac-cli"
+              ],
+              "call_id": "call_01a07d558a4672f1bee3e7061984424a",
+              "verification_id": "v2"
+            },
+            {
+              "acceptance_criteria": [
+                "ac-submit",
+                "ac-cli"
+              ],
+              "call_id": "call_01a07d55d66971c28332a561f9d11104",
+              "verification_id": "v3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 639914
+  },
+  {
+    "id": "queue-r2-baa",
+    "block": 2,
+    "planner": "b",
+    "executor": "a",
+    "verifier": "a",
+    "workflow": "queue-baa-repair-v1",
+    "parent": null,
+    "preparation_id": "queue-r2-baa-prepared",
+    "execution_id": "queue-r2-baa-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r2-baa/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r2-baa/fixture.json",
+    "run_id": "queue-r2-baa-execution-reviewed",
+    "target": {
+      "run_id": "queue-r2-baa-execution-reviewed",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "5953b37de8f9f60c2a4784c545f0d9b7c03cfb2e5052bc4951cd73868dcd5f45",
+      "run_spec_sha256": "bca6c2ef041cb7830e31c3f133d76ee4807f535b1125836b7bcd1e60d6ffd1d1"
+    },
+    "parent_plan": "queue-r2-baa",
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_and_terminal_run",
+    "accepted_plan_text_changes": 2,
+    "original_plan_approved_without_edit": false,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 16,
+      "exec_command": 16,
+      "lab_command_receipt": 3
+    },
+    "plan_deviations": null,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 495977,
+      "output_tokens": 32431,
+      "cached_input_tokens": 441692
+    },
+    "tool_calls": 41,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "all_phases_shutdown": true,
+    "task_success": true,
+    "public_test_success": true,
+    "hidden_test_success": true,
+    "private_passed": 73,
+    "private_total": 73,
+    "failed_checks": [],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 4,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 44786,
+      "diff_sha256": "3840756aed73e3e4f144de4a9d67ca295a9c7eb51048603609bada89659e8234"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d4c-68dd-7aa1-a368-99a938674007",
+        "started_ms": 1788808554676,
+        "ended_ms": 1788808820668,
+        "usage": {
+          "input_tokens": 363729,
+          "cached_input_tokens": 325136,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 26262,
+          "reasoning_output_tokens": 13578,
+          "total_tokens": 389991
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07d50-7845-7812-8885-23324099f720",
+        "started_ms": 1788808820766,
+        "ended_ms": 1788808945939,
+        "usage": {
+          "input_tokens": 132248,
+          "cached_input_tokens": 116556,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 6169,
+          "reasoning_output_tokens": 3765,
+          "total_tokens": 138417
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "AC1",
+                "AC2"
+              ],
+              "call_id": "call_01a07d518eab76618315846411ef8e07",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "AC3"
+              ],
+              "call_id": "call_01a07d51d0ee7bf18a00e4c3006321e8",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "AC4",
+                "AC5"
+              ],
+              "call_id": "call_01a07d5216b47ac1ac0e2a90596356e1",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 391625
+  },
+  {
+    "id": "queue-r2-bab",
+    "block": 2,
+    "planner": "b",
+    "executor": "a",
+    "verifier": "b",
+    "workflow": "queue-bab-repair-v1",
+    "parent": "queue-r2-baa",
+    "preparation_id": "queue-r2-bab-prepared",
+    "execution_id": "queue-r2-bab-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r2-bab/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r2-bab/fixture.json",
+    "run_id": "queue-r2-bab-execution-reviewed",
+    "target": {
+      "run_id": "queue-r2-bab-execution-reviewed",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "5953b37de8f9f60c2a4784c545f0d9b7c03cfb2e5052bc4951cd73868dcd5f45",
+      "run_spec_sha256": "f2aef0059074f83de8bb73fcd31d5261e36c2de553dc2129ac92e7097a484d4c"
+    },
+    "parent_plan": "queue-r2-baa",
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_and_terminal_run",
+    "accepted_plan_text_changes": 2,
+    "original_plan_approved_without_edit": false,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 8,
+      "lab_repo_read": 15,
+      "exec_command": 41,
+      "lab_command_receipt": 4
+    },
+    "plan_deviations": null,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 1561368,
+      "output_tokens": 43653,
+      "cached_input_tokens": 1446787
+    },
+    "tool_calls": 68,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 4,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 52163,
+      "diff_sha256": "d5747cf670779d7083e7ee6827f7553e9be1989874856e0effe2c430e76ac697"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d4c-68dc-78a2-956b-56b6f717bcee",
+        "started_ms": 1788808554676,
+        "ended_ms": 1788808962282,
+        "usage": {
+          "input_tokens": 1223082,
+          "cached_input_tokens": 1168258,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 34003,
+          "reasoning_output_tokens": 14404,
+          "total_tokens": 1257085
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07d52-a18b-7603-b1bb-c4de7030ee95",
+        "started_ms": 1788808962408,
+        "ended_ms": 1788809129547,
+        "usage": {
+          "input_tokens": 338286,
+          "cached_input_tokens": 278529,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 9650,
+          "reasoning_output_tokens": 2978,
+          "total_tokens": 347936
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "AC1",
+                "AC2"
+              ],
+              "call_id": "call_01a07d5455e578708415e69963592a7d",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "AC3"
+              ],
+              "call_id": "call_01a07d54b8cf70b08e52c4b24944a853",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "AC4",
+                "AC5"
+              ],
+              "call_id": "call_01a07d54ea817ce2bd962a43a609a980",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 575100
+  },
+  {
+    "id": "queue-r2-bba",
+    "block": 2,
+    "planner": "b",
+    "executor": "b",
+    "verifier": "a",
+    "workflow": "queue-bba-repair-v1",
+    "parent": "queue-r2-baa",
+    "preparation_id": "queue-r2-bba-prepared",
+    "execution_id": "queue-r2-bba-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r2-bba/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r2-bba/fixture.json",
+    "run_id": "queue-r2-bba-execution-reviewed",
+    "target": {
+      "run_id": "queue-r2-bba-execution-reviewed",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "5953b37de8f9f60c2a4784c545f0d9b7c03cfb2e5052bc4951cd73868dcd5f45",
+      "run_spec_sha256": "92e87681b9bd4c745daee6cfabfee7ee184a257fab2efb9167297e92aa7311ec"
+    },
+    "parent_plan": "queue-r2-baa",
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_and_terminal_run",
+    "accepted_plan_text_changes": 2,
+    "original_plan_approved_without_edit": false,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 16,
+      "exec_command": 33,
+      "lab_command_receipt": 4
+    },
+    "plan_deviations": null,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 866930,
+      "output_tokens": 30913,
+      "cached_input_tokens": 812253
+    },
+    "tool_calls": 59,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 4,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 34227,
+      "diff_sha256": "b35992e726719c7b8c3db8b4cd2b96b6f75724986dc5f8dd2c99dfc27e104ce7"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d4c-68dd-70f3-aa10-199bdb93c1f5",
+        "started_ms": 1788808554676,
+        "ended_ms": 1788808904990,
+        "usage": {
+          "input_tokens": 754993,
+          "cached_input_tokens": 715394,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 25139,
+          "reasoning_output_tokens": 10581,
+          "total_tokens": 780132
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07d51-c173-7dc3-bfea-b25cd1efc878",
+        "started_ms": 1788808905058,
+        "ended_ms": 1788809018880,
+        "usage": {
+          "input_tokens": 111937,
+          "cached_input_tokens": 96859,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 5774,
+          "reasoning_output_tokens": 3067,
+          "total_tokens": 117711
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "AC1",
+                "AC2"
+              ],
+              "call_id": "call_01a07d529f2079f29bf81bccf801a2f2",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "AC3"
+              ],
+              "call_id": "call_01a07d52dd6a7272825ef1a1eceec4fb",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "AC4",
+                "AC5"
+              ],
+              "call_id": "call_01a07d531a127b02a95a3fbe19f26510",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 464439
+  },
+  {
+    "id": "queue-r2-bbb",
+    "block": 2,
+    "planner": "b",
+    "executor": "b",
+    "verifier": "b",
+    "workflow": "queue-bbb-repair-v1",
+    "parent": "queue-r2-baa",
+    "preparation_id": "queue-r2-bbb-prepared",
+    "execution_id": "queue-r2-bbb-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r2-bbb/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r2-bbb/fixture.json",
+    "run_id": "queue-r2-bbb-execution-reviewed",
+    "target": {
+      "run_id": "queue-r2-bbb-execution-reviewed",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "5953b37de8f9f60c2a4784c545f0d9b7c03cfb2e5052bc4951cd73868dcd5f45",
+      "run_spec_sha256": "0b63d5acb492292dfc4d507d23b37a31200cc976390c21b5bcc37447f7d2af42"
+    },
+    "parent_plan": "queue-r2-baa",
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_and_terminal_run",
+    "accepted_plan_text_changes": 2,
+    "original_plan_approved_without_edit": false,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 15,
+      "exec_command": 22,
+      "lab_command_receipt": 10
+    },
+    "plan_deviations": null,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 705166,
+      "output_tokens": 43127,
+      "cached_input_tokens": 632902
+    },
+    "tool_calls": 53,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "all_phases_shutdown": true,
+    "task_success": true,
+    "public_test_success": true,
+    "hidden_test_success": true,
+    "private_passed": 73,
+    "private_total": 73,
+    "failed_checks": [],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 4,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 50415,
+      "diff_sha256": "3f16029387f71c63b2606132fd3035360c9942541160569f44151dfef0eac07f"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d4c-68d5-74a0-90db-71ae8be4b6f0",
+        "started_ms": 1788808554669,
+        "ended_ms": 1788808778281,
+        "usage": {
+          "input_tokens": 284161,
+          "cached_input_tokens": 249119,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 22843,
+          "reasoning_output_tokens": 9986,
+          "total_tokens": 307004
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07d4f-d2c6-73a2-ab67-0176f398591a",
+        "started_ms": 1788808778399,
+        "ended_ms": 1788809052833,
+        "usage": {
+          "input_tokens": 421005,
+          "cached_input_tokens": 383783,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 20284,
+          "reasoning_output_tokens": 9984,
+          "total_tokens": 441289
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "AC1",
+                "AC2"
+              ],
+              "call_id": "call_01a07d52c92e7ad19549a115e8f3e36a",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "AC3"
+              ],
+              "call_id": "call_01a07d533dae7c23bded6efde407bc3c",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "AC4",
+                "AC5"
+              ],
+              "call_id": "call_01a07d53a8b079a08b10fac517ab39e9",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 498524
+  },
+  {
+    "id": "queue-r2-aaa",
+    "block": 2,
+    "planner": "a",
+    "executor": "a",
+    "verifier": "a",
+    "workflow": "queue-aaa-repair-v1",
+    "parent": null,
+    "preparation_id": "queue-r2-aaa-prepared",
+    "execution_id": "queue-r2-aaa-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r2-aaa/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r2-aaa/fixture.json",
+    "run_id": "queue-r2-aaa-execution",
+    "target": {
+      "run_id": "queue-r2-aaa-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "41c1adc928ab07ab7d9f84b6d1fbd279beb9c8a98650ee00118796741439457c",
+      "run_spec_sha256": "b8001ffb6bfa4f3b3ca5e7ef840e2f649473b03979e3fcb4fa9e147f27df11dd"
+    },
+    "parent_plan": "queue-r2-aaa",
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_and_terminal_run",
+    "accepted_plan_text_changes": 0,
+    "original_plan_approved_without_edit": true,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 14,
+      "exec_command": 16,
+      "lab_command_receipt": 4
+    },
+    "plan_deviations": null,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 542027,
+      "output_tokens": 40549,
+      "cached_input_tokens": 479738
+    },
+    "tool_calls": 40,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 8,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py",
+        "tmp1inmsbb9.json",
+        "tmp2h985y74.json",
+        "tmp98q46edw.json",
+        "tmpfvj1735n.json"
+      ],
+      "diff_bytes": 44719,
+      "diff_sha256": "b377e0a1194cf5294c39f918bedca902b3e8396139eb9901fa04d2286aeec555"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d4c-68db-76a1-9421-6b78ee3596a4",
+        "started_ms": 1788808554676,
+        "ended_ms": 1788808865287,
+        "usage": {
+          "input_tokens": 414122,
+          "cached_input_tokens": 369183,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 31359,
+          "reasoning_output_tokens": 18012,
+          "total_tokens": 445481
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07d51-265d-7452-a285-77fae4f71d40",
+        "started_ms": 1788808865357,
+        "ended_ms": 1788809000781,
+        "usage": {
+          "input_tokens": 127905,
+          "cached_input_tokens": 110555,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 9190,
+          "reasoning_output_tokens": 3477,
+          "total_tokens": 137095
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "ac-submit",
+                "ac-claim",
+                "ac-lifecycle",
+                "ac-cli"
+              ],
+              "call_id": "call_01a07d51e6f77d609d7ffaa2545effc9",
+              "verification_id": "v1"
+            },
+            {
+              "acceptance_criteria": [
+                "ac-claim",
+                "ac-lifecycle"
+              ],
+              "call_id": "call_01a07d523a817d52b8ccfd2b4df8d1c7",
+              "verification_id": "v2"
+            },
+            {
+              "acceptance_criteria": [
+                "ac-submit",
+                "ac-cli"
+              ],
+              "call_id": "call_01a07d52e71179108812c3bf79f4c224",
+              "verification_id": "v3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 446316
+  },
+  {
+    "id": "queue-r3-aba",
+    "block": 3,
+    "planner": "a",
+    "executor": "b",
+    "verifier": "a",
+    "workflow": "queue-aba-repair-v1",
+    "parent": "queue-r3-aaa",
+    "preparation_id": "queue-r3-aba-prepared",
+    "execution_id": "queue-r3-aba-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r3-aba/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r3-aba/fixture.json",
+    "run_id": "queue-r3-aba-execution-reviewed",
+    "target": {
+      "run_id": "queue-r3-aba-execution-reviewed",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "3101600527be6df0acaa85a357e08683c77be6053d8684fc503529f62fd1af49",
+      "run_spec_sha256": "069a4846cdc2f01b1cdfcc28124ee7cc30389382bb03c2528c13111f73d40bb3"
+    },
+    "parent_plan": "queue-r3-aaa",
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_and_terminal_run",
+    "accepted_plan_text_changes": 1,
+    "original_plan_approved_without_edit": false,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 16,
+      "exec_command": 31,
+      "lab_command_receipt": 3
+    },
+    "plan_deviations": null,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 1245984,
+      "output_tokens": 52944,
+      "cached_input_tokens": 1165209
+    },
+    "tool_calls": 56,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "all_phases_shutdown": true,
+    "task_success": true,
+    "public_test_success": true,
+    "hidden_test_success": true,
+    "private_passed": 73,
+    "private_total": 73,
+    "failed_checks": [],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 4,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 55543,
+      "diff_sha256": "75acd5b42bddbfa17c6e6681b717dbfe44bb7e0ceaa648d70a816a7158d43e55"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d52-629f-71b3-be6d-cfb589e76fa9",
+        "started_ms": 1788808946297,
+        "ended_ms": 1788809360695,
+        "usage": {
+          "input_tokens": 1076483,
+          "cached_input_tokens": 1019582,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 37701,
+          "reasoning_output_tokens": 19300,
+          "total_tokens": 1114184
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07d58-b5cb-7120-98ac-e7f6dd035272",
+        "started_ms": 1788809360811,
+        "ended_ms": 1788809536028,
+        "usage": {
+          "input_tokens": 169501,
+          "cached_input_tokens": 145627,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 15243,
+          "reasoning_output_tokens": 7922,
+          "total_tokens": 184744
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "V1",
+                "V2"
+              ],
+              "call_id": "call_01a07d59c32c70238de5bf8001be9010",
+              "verification_id": "CHK1"
+            },
+            {
+              "acceptance_criteria": [
+                "V2",
+                "V3"
+              ],
+              "call_id": "call_01a07d5a475c7b93857b88b1c3c2d6cf",
+              "verification_id": "CHK2"
+            },
+            {
+              "acceptance_criteria": [
+                "V3"
+              ],
+              "call_id": "call_01a07d5b1f2c71f1a28952b8749586ab",
+              "verification_id": "CHK3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 590199
+  },
+  {
+    "id": "queue-r3-abb",
+    "block": 3,
+    "planner": "a",
+    "executor": "b",
+    "verifier": "b",
+    "workflow": "queue-abb-repair-v1",
+    "parent": "queue-r3-aaa",
+    "preparation_id": "queue-r3-abb-prepared",
+    "execution_id": "queue-r3-abb-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r3-abb/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r3-abb/fixture.json",
+    "run_id": "queue-r3-abb-execution-reviewed",
+    "target": {
+      "run_id": "queue-r3-abb-execution-reviewed",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "3101600527be6df0acaa85a357e08683c77be6053d8684fc503529f62fd1af49",
+      "run_spec_sha256": "ec167ed9ef78bf3a8327177fe4885e80243e70543d2442a8425cdbcd64e6606b"
+    },
+    "parent_plan": "queue-r3-aaa",
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_and_terminal_run",
+    "accepted_plan_text_changes": 1,
+    "original_plan_approved_without_edit": false,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 5,
+      "lab_repo_read": 9,
+      "exec_command": 33,
+      "lab_command_receipt": 3
+    },
+    "plan_deviations": null,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 879136,
+      "output_tokens": 38295,
+      "cached_input_tokens": 792330
+    },
+    "tool_calls": 50,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 12,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py",
+        "tmp1dx44cjc/db.sqlite",
+        "tmp1dx44cjc/req.json",
+        "tmpe27rcioi/c.sqlite",
+        "tmpe27rcioi/r-w0.json",
+        "tmpe27rcioi/r-w1.json",
+        "tmpe27rcioi/r-w2.json",
+        "tmpe27rcioi/r-w3.json",
+        "tmpe27rcioi/r-w4.json"
+      ],
+      "diff_bytes": 56219,
+      "diff_sha256": "c66977c1a5a257a11904d7b307454fde861ae3f2c65a39d3b69f54af531675bd"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d53-381f-7a11-b4c4-2659af514adc",
+        "started_ms": 1788809000972,
+        "ended_ms": 1788809315118,
+        "usage": {
+          "input_tokens": 659572,
+          "cached_input_tokens": 615034,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 28662,
+          "reasoning_output_tokens": 13052,
+          "total_tokens": 688234
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07d58-038d-7a83-8dd5-45123a5e2c24",
+        "started_ms": 1788809315196,
+        "ended_ms": 1788809468740,
+        "usage": {
+          "input_tokens": 219564,
+          "cached_input_tokens": 177296,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 9633,
+          "reasoning_output_tokens": 4225,
+          "total_tokens": 229197
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "V1"
+              ],
+              "call_id": "call_01a07d5953037ad09ad2c8ace3876b4a",
+              "verification_id": "CHK1"
+            },
+            {
+              "acceptance_criteria": [
+                "V2",
+                "V3"
+              ],
+              "call_id": "call_01a07d5999b77f52a38672fb6e025751",
+              "verification_id": "CHK2"
+            },
+            {
+              "acceptance_criteria": [
+                "V3"
+              ],
+              "call_id": "call_01a07d59e7be7ca094985e6cd1ce1830",
+              "verification_id": "CHK3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 468174
+  },
+  {
+    "id": "queue-r3-baa",
+    "block": 3,
+    "planner": "b",
+    "executor": "a",
+    "verifier": "a",
+    "workflow": "queue-baa-repair-v1",
+    "parent": null,
+    "preparation_id": "queue-r3-baa-prepared",
+    "execution_id": "queue-r3-baa-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r3-baa/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r3-baa/fixture.json",
+    "run_id": "queue-r3-baa-execution",
+    "target": {
+      "run_id": "queue-r3-baa-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "3a5a15b5f055963a5341a87d8e8ed3ea20e8bcef941a7b2c297c4849ec5d7b91",
+      "run_spec_sha256": "bca6c2ef041cb7830e31c3f133d76ee4807f535b1125836b7bcd1e60d6ffd1d1"
+    },
+    "parent_plan": "queue-r3-baa",
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_and_terminal_run",
+    "accepted_plan_text_changes": 0,
+    "original_plan_approved_without_edit": true,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 14,
+      "exec_command": 51,
+      "lab_command_receipt": 13
+    },
+    "plan_deviations": null,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 1985536,
+      "output_tokens": 58728,
+      "cached_input_tokens": 1858895
+    },
+    "tool_calls": 84,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 10,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py",
+        "tmp.kXnJ3D75cE/err.txt",
+        "tmp.kXnJ3D75cE/out.txt",
+        "tmp.kXnJ3D75cE/q.db",
+        "tmp.kXnJ3D75cE/req.json",
+        "tmp6g5uuzdf/race.db",
+        "tmpwo68jgzc/q.db"
+      ],
+      "diff_bytes": 48466,
+      "diff_sha256": "35fc79d68bdedc4ff5faac6fa6b5b6fa60b7fed082382c55d8ebdd93ad7163e6"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d53-5e16-74a3-9203-fd7b90d27109",
+        "started_ms": 1788809010667,
+        "ended_ms": 1788809449803,
+        "usage": {
+          "input_tokens": 1444656,
+          "cached_input_tokens": 1356456,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 38776,
+          "reasoning_output_tokens": 16922,
+          "total_tokens": 1483432
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07d5a-11ad-7780-b9bc-916e5a5110c4",
+        "started_ms": 1788809449877,
+        "ended_ms": 1788809677633,
+        "usage": {
+          "input_tokens": 540880,
+          "cached_input_tokens": 502439,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 19952,
+          "reasoning_output_tokens": 7555,
+          "total_tokens": 560832
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "AC1",
+                "AC2"
+              ],
+              "call_id": "call_01a07d5d2dd07c839ce27fcbd1349321",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "AC3"
+              ],
+              "call_id": "call_01a07d5d44377182bf4a7ebb102416e5",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "AC4"
+              ],
+              "call_id": "call_01a07d5d619573b1a3f934d028cfce59",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 667202
+  },
+  {
+    "id": "queue-r3-bab",
+    "block": 3,
+    "planner": "b",
+    "executor": "a",
+    "verifier": "b",
+    "workflow": "queue-bab-repair-v1",
+    "parent": "queue-r3-baa",
+    "preparation_id": "queue-r3-bab-prepared",
+    "execution_id": "queue-r3-bab-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r3-bab/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r3-bab/fixture.json",
+    "run_id": "queue-r3-bab-execution",
+    "target": {
+      "run_id": "queue-r3-bab-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "3a5a15b5f055963a5341a87d8e8ed3ea20e8bcef941a7b2c297c4849ec5d7b91",
+      "run_spec_sha256": "f2aef0059074f83de8bb73fcd31d5261e36c2de553dc2129ac92e7097a484d4c"
+    },
+    "parent_plan": "queue-r3-baa",
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_and_terminal_run",
+    "accepted_plan_text_changes": 0,
+    "original_plan_approved_without_edit": true,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 15,
+      "exec_command": 41,
+      "lab_command_receipt": 3
+    },
+    "plan_deviations": null,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 1675680,
+      "output_tokens": 54854,
+      "cached_input_tokens": 1540114
+    },
+    "tool_calls": 65,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 4,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 51104,
+      "diff_sha256": "8aea57b5cc5af28bf19f218c93609394f27d52370a79a8eb26902e800ae64cb4"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d53-610b-7843-8b41-0a63b2c0c142",
+        "started_ms": 1788809011426,
+        "ended_ms": 1788809541428,
+        "usage": {
+          "input_tokens": 1405294,
+          "cached_input_tokens": 1303923,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 40428,
+          "reasoning_output_tokens": 18043,
+          "total_tokens": 1445722
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07d5b-77b9-7101-92d7-5071875e3798",
+        "started_ms": 1788809541536,
+        "ended_ms": 1788809695042,
+        "usage": {
+          "input_tokens": 270386,
+          "cached_input_tokens": 236191,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 14426,
+          "reasoning_output_tokens": 3967,
+          "total_tokens": 284812
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "AC1",
+                "AC2",
+                "AC3"
+              ],
+              "call_id": "call_01a07d5c81b779c18bbb1f912da0dd68",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "AC3",
+                "AC4"
+              ],
+              "call_id": "call_01a07d5d335571c1bf3170478a057a18",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "AC4"
+              ],
+              "call_id": "call_01a07d5da0d37832a06ce74cf99c4a45",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 683837
+  },
+  {
+    "id": "queue-r3-bba",
+    "block": 3,
+    "planner": "b",
+    "executor": "b",
+    "verifier": "a",
+    "workflow": "queue-bba-repair-v1",
+    "parent": "queue-r3-baa",
+    "preparation_id": "queue-r3-bba-prepared",
+    "execution_id": "queue-r3-bba-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r3-bba/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r3-bba/fixture.json",
+    "run_id": "queue-r3-bba-execution",
+    "target": {
+      "run_id": "queue-r3-bba-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "3a5a15b5f055963a5341a87d8e8ed3ea20e8bcef941a7b2c297c4849ec5d7b91",
+      "run_spec_sha256": "92e87681b9bd4c745daee6cfabfee7ee184a257fab2efb9167297e92aa7311ec"
+    },
+    "parent_plan": "queue-r3-baa",
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_and_terminal_run",
+    "accepted_plan_text_changes": 0,
+    "original_plan_approved_without_edit": true,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 8,
+      "lab_repo_read": 14,
+      "exec_command": 72,
+      "lab_command_receipt": 5
+    },
+    "plan_deviations": null,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 2951589,
+      "output_tokens": 47518,
+      "cached_input_tokens": 2822119
+    },
+    "tool_calls": 99,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 30,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py",
+        "tmp2gv0jzoa/req.json",
+        "tmp33xn2tgv/req.json",
+        "tmp6dc2s2hk/req.json",
+        "tmp_dgn3w2k/req.json",
+        "tmp_fx6kpq9/req.json",
+        "tmpb0s1r247/req.json",
+        "tmpdzq_h7yv/req.json",
+        "tmpfypjqvgm/req.json",
+        "tmpg87lp295/req.json",
+        "tmpgd84uajs/req.json",
+        "tmpgwq7kcgu/req.json",
+        "tmphhdb1fe3/req.json",
+        "tmpjmwu5if1/req.json",
+        "tmpk6a7byz3/req.json",
+        "tmpkuby8e20/req.json",
+        "tmporv5ok72/req.json",
+        "tmpr3dwrra4/req.json",
+        "tmps00dm4tk/req.json",
+        "tmpt39657o2/req.json",
+        "tmptavc75t2/req.json",
+        "tmpu6l7g8op/req.json",
+        "tmpw3uf7ymy/req.json",
+        "tmpyivq28d2/req.json",
+        "tmpyujodga6/req.json",
+        "tmpz19_8nvw/req.json",
+        "tmpzt0te9pb/req.json"
+      ],
+      "diff_bytes": 49126,
+      "diff_sha256": "1cc66589ad54bc32a15469103bd46e972a96fec1492d4e56570a4d979f9a902d"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d53-7ef2-7081-a3bf-a8a1dbbdc8f6",
+        "started_ms": 1788809019097,
+        "ended_ms": 1788809605163,
+        "usage": {
+          "input_tokens": 2823780,
+          "cached_input_tokens": 2708394,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 40854,
+          "reasoning_output_tokens": 21375,
+          "total_tokens": 2864634
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07d5c-712d-7920-ad50-41975811cc55",
+        "started_ms": 1788809605318,
+        "ended_ms": 1788809692144,
+        "usage": {
+          "input_tokens": 127809,
+          "cached_input_tokens": 113725,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 6664,
+          "reasoning_output_tokens": 4281,
+          "total_tokens": 134473
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "AC1",
+                "AC2"
+              ],
+              "call_id": "call_01a07d5d0ce976a0bdf7d35950d9229d",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "AC3"
+              ],
+              "call_id": "call_01a07d5d51807dd2b627826813d5e118",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "AC4"
+              ],
+              "call_id": "call_01a07d5d7e727551b199d3c4c742d53f",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 673298
+  },
+  {
+    "id": "queue-r3-bbb",
+    "block": 3,
+    "planner": "b",
+    "executor": "b",
+    "verifier": "b",
+    "workflow": "queue-bbb-repair-v1",
+    "parent": "queue-r3-baa",
+    "preparation_id": "queue-r3-bbb-prepared",
+    "execution_id": "queue-r3-bbb-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r3-bbb/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r3-bbb/fixture.json",
+    "run_id": "queue-r3-bbb-execution",
+    "target": {
+      "run_id": "queue-r3-bbb-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "3a5a15b5f055963a5341a87d8e8ed3ea20e8bcef941a7b2c297c4849ec5d7b91",
+      "run_spec_sha256": "0b63d5acb492292dfc4d507d23b37a31200cc976390c21b5bcc37447f7d2af42"
+    },
+    "parent_plan": "queue-r3-baa",
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_and_terminal_run",
+    "accepted_plan_text_changes": 0,
+    "original_plan_approved_without_edit": true,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 17,
+      "exec_command": 49,
+      "lab_command_receipt": 5
+    },
+    "plan_deviations": null,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 1701955,
+      "output_tokens": 53659,
+      "cached_input_tokens": 1591533
+    },
+    "tool_calls": 77,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 4,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 46931,
+      "diff_sha256": "0aa13e081e23e65e65e49504931cba989dc1198bd0e61fcca01656d3d81f72e3"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d54-042e-7f01-bb77-7cbbe1493650",
+        "started_ms": 1788809053193,
+        "ended_ms": 1788809499543,
+        "usage": {
+          "input_tokens": 1148685,
+          "cached_input_tokens": 1078086,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 34210,
+          "reasoning_output_tokens": 17431,
+          "total_tokens": 1182895
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07d5a-d445-7241-b08c-0224ee6dd4de",
+        "started_ms": 1788809499665,
+        "ended_ms": 1788809751639,
+        "usage": {
+          "input_tokens": 553270,
+          "cached_input_tokens": 513447,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 19449,
+          "reasoning_output_tokens": 9354,
+          "total_tokens": 572719
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "AC1",
+                "AC2",
+                "AC3"
+              ],
+              "call_id": "call_01a07d5cb1f272d096d2fbcf983fc0a9",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "AC3",
+                "AC4"
+              ],
+              "call_id": "call_01a07d5dd4c175c18136a5039a709105",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "AC4"
+              ],
+              "call_id": "call_01a07d5df2a77132b3e7d1c1b4056bbd",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 698644
+  },
+  {
+    "id": "queue-r3-aaa",
+    "block": 3,
+    "planner": "a",
+    "executor": "a",
+    "verifier": "a",
+    "workflow": "queue-aaa-repair-v1",
+    "parent": null,
+    "preparation_id": "queue-r3-aaa-prepared",
+    "execution_id": "queue-r3-aaa-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r3-aaa/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r3-aaa/fixture.json",
+    "run_id": "queue-r3-aaa-execution-reviewed",
+    "target": {
+      "run_id": "queue-r3-aaa-execution-reviewed",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "3101600527be6df0acaa85a357e08683c77be6053d8684fc503529f62fd1af49",
+      "run_spec_sha256": "b8001ffb6bfa4f3b3ca5e7ef840e2f649473b03979e3fcb4fa9e147f27df11dd"
+    },
+    "parent_plan": "queue-r3-aaa",
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_and_terminal_run",
+    "accepted_plan_text_changes": 1,
+    "original_plan_approved_without_edit": false,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 13,
+      "exec_command": 32,
+      "lab_command_receipt": 3
+    },
+    "plan_deviations": null,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 1161852,
+      "output_tokens": 41747,
+      "cached_input_tokens": 1087498
+    },
+    "tool_calls": 54,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 6,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py",
+        "tmpnwdkg_ap/db.sqlite",
+        "tmpnwdkg_ap/req.json"
+      ],
+      "diff_bytes": 47114,
+      "diff_sha256": "80e2a87d58b9bb5393aa02426b466ef28bf6603230828fec77fc00ff42be75b6"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d54-2c96-7fa3-a542-b4fe2f79ab46",
+        "started_ms": 1788809063541,
+        "ended_ms": 1788809460724,
+        "usage": {
+          "input_tokens": 1001961,
+          "cached_input_tokens": 948015,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 28861,
+          "reasoning_output_tokens": 13912,
+          "total_tokens": 1030822
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07d5a-3c63-7082-b140-933a3b1d3eb7",
+        "started_ms": 1788809460803,
+        "ended_ms": 1788809601831,
+        "usage": {
+          "input_tokens": 159891,
+          "cached_input_tokens": 139483,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 12886,
+          "reasoning_output_tokens": 6463,
+          "total_tokens": 172777
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "V1",
+                "V2"
+              ],
+              "call_id": "call_01a07d5b497c7663b41c6030c4111db1",
+              "verification_id": "CHK1"
+            },
+            {
+              "acceptance_criteria": [
+                "V3"
+              ],
+              "call_id": "call_01a07d5b842b742194bd1bd2ee580a29",
+              "verification_id": "CHK2"
+            },
+            {
+              "acceptance_criteria": [
+                "V3"
+              ],
+              "call_id": "call_01a07d5c1a6c70d0ab3e9c9bd857e5e3",
+              "verification_id": "CHK3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 538534
+  },
+  {
+    "id": "queue-r3-aab",
+    "block": 3,
+    "planner": "a",
+    "executor": "a",
+    "verifier": "b",
+    "workflow": "queue-aab-repair-v1",
+    "parent": "queue-r3-aaa",
+    "preparation_id": "queue-r3-aab-prepared",
+    "execution_id": "queue-r3-aab-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r3-aab/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r3-aab/fixture.json",
+    "run_id": "queue-r3-aab-execution-reviewed",
+    "target": {
+      "run_id": "queue-r3-aab-execution-reviewed",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "3101600527be6df0acaa85a357e08683c77be6053d8684fc503529f62fd1af49",
+      "run_spec_sha256": "13a1c4aea2b15284e5b57d4c364c264a3e9fce7a4ffbadf6fbf53add7b9cf6a5"
+    },
+    "parent_plan": "queue-r3-aaa",
+    "exit_code": 1,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_only",
+    "accepted_plan_text_changes": 1,
+    "original_plan_approved_without_edit": false,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 8,
+      "lab_repo_read": 13,
+      "exec_command": 31,
+      "lab_command_receipt": 2
+    },
+    "plan_deviations": null,
+    "observation_error": "runtime event outside active phase",
+    "workflow_state": "failed",
+    "all_phases_shutdown": false,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 7,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py",
+        "tmpwic1n_nx/conc.sqlite",
+        "tmpwic1n_nx/db.sqlite",
+        "tmpwic1n_nx/req.json"
+      ],
+      "diff_bytes": 42175,
+      "diff_sha256": "eaeb5a511993ced3ec8e574ee6d0f80fd9939849d42d119e07b752dfd7f20d8b"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d54-454f-70a0-acf2-c4aca9cba665",
+        "started_ms": 1788809069885,
+        "ended_ms": 1788809424787,
+        "usage": {
+          "input_tokens": 781951,
+          "cached_input_tokens": 730475,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 34617,
+          "reasoning_output_tokens": 17581,
+          "total_tokens": 816568
+        }
+      }
+    ],
+    "decision_to_exit_ms": 533641
+  },
+  {
+    "id": "queue-r4-abb",
+    "block": 4,
+    "planner": "a",
+    "executor": "b",
+    "verifier": "b",
+    "workflow": "queue-abb-repair-v1",
+    "parent": "queue-r4-aaa",
+    "preparation_id": "queue-r4-abb-prepared",
+    "execution_id": "queue-r4-abb-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r4-abb/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r4-abb/fixture.json",
+    "run_id": "queue-r4-abb-execution",
+    "target": {
+      "run_id": "queue-r4-abb-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "0b8d9bbefcad6e21535fc72df441b0e8e0a6816d72a5ded3a697b9d3076b9b19",
+      "run_spec_sha256": "ec167ed9ef78bf3a8327177fe4885e80243e70543d2442a8425cdbcd64e6606b"
+    },
+    "parent_plan": "queue-r4-aaa",
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_and_terminal_run",
+    "accepted_plan_text_changes": 0,
+    "original_plan_approved_without_edit": true,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 8,
+      "lab_repo_read": 15,
+      "exec_command": 52,
+      "lab_command_receipt": 3
+    },
+    "plan_deviations": null,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 1698067,
+      "output_tokens": 55854,
+      "cached_input_tokens": 1602639
+    },
+    "tool_calls": 78,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 4,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 48320,
+      "diff_sha256": "36e1ccae92bf4b8166d230a5311a7e6f196fddf3e9930862a80b636e78b1e8f4"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d54-ae7f-72a1-9397-c97d50984f0c",
+        "started_ms": 1788809096813,
+        "ended_ms": 1788809552196,
+        "usage": {
+          "input_tokens": 1411462,
+          "cached_input_tokens": 1353249,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 34468,
+          "reasoning_output_tokens": 16575,
+          "total_tokens": 1445930
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07d5b-a1a3-7a80-8406-f85e8b3cd881",
+        "started_ms": 1788809552274,
+        "ended_ms": 1788809712982,
+        "usage": {
+          "input_tokens": 286605,
+          "cached_input_tokens": 249390,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 21386,
+          "reasoning_output_tokens": 8711,
+          "total_tokens": 307991
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "AC2",
+                "AC4"
+              ],
+              "call_id": "call_01a07d5cc67f7640b22ee118721c3844",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "AC1",
+                "AC2",
+                "AC3"
+              ],
+              "call_id": "call_01a07d5d94b478f1ac7d5025c7eaebeb",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "AC4"
+              ],
+              "call_id": "call_01a07d5ddcd67810aef8dc03890018c8",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 616369
+  },
+  {
+    "id": "queue-r4-baa",
+    "block": 4,
+    "planner": "b",
+    "executor": "a",
+    "verifier": "a",
+    "workflow": "queue-baa-repair-v1",
+    "parent": null,
+    "preparation_id": "queue-r4-baa-prepared",
+    "execution_id": "queue-r4-baa-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r4-baa/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r4-baa/fixture.json",
+    "run_id": "queue-r4-baa-execution",
+    "target": {
+      "run_id": "queue-r4-baa-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "12ae54522cc2e84d2587aa75867d623df24baf35822e1df4a20512383627a4e4",
+      "run_spec_sha256": "bca6c2ef041cb7830e31c3f133d76ee4807f535b1125836b7bcd1e60d6ffd1d1"
+    },
+    "parent_plan": "queue-r4-baa",
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_and_terminal_run",
+    "accepted_plan_text_changes": 0,
+    "original_plan_approved_without_edit": true,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 3,
+      "lab_repo_read": 7,
+      "exec_command": 25,
+      "lab_command_receipt": 4
+    },
+    "plan_deviations": null,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 735625,
+      "output_tokens": 36323,
+      "cached_input_tokens": 671407
+    },
+    "tool_calls": 39,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "all_phases_shutdown": true,
+    "task_success": true,
+    "public_test_success": true,
+    "hidden_test_success": true,
+    "private_passed": 73,
+    "private_total": 73,
+    "failed_checks": [],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 108,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py",
+        "tmp05t4n188/q.db",
+        "tmp05t4n188/r.json",
+        "tmp084odb6e.json",
+        "tmp0s04gx8s.json",
+        "tmp1a0phdyv.json",
+        "tmp2xn4zfux.json",
+        "tmp3lvgumds.json",
+        "tmp464puaj5.json",
+        "tmp5aui80x_.json",
+        "tmp5gv_djt0.json",
+        "tmp66h08hfr.json",
+        "tmp67gxy796.json",
+        "tmp6_lvjcsv.json",
+        "tmp6hntcyvd.json",
+        "tmp6l54yljf.json",
+        "tmp6oefwwll.json",
+        "tmp75xfm949.json",
+        "tmp78fqnoj5.json",
+        "tmp8c3gcws9.json",
+        "tmp8icqbn3s.json",
+        "tmp8jmljwwj.json",
+        "tmp8oyaszfb.json",
+        "tmp91iqb3lw.json",
+        "tmp98tleqyu.json",
+        "tmp9c2il9uy.json",
+        "tmp9kgsl9tf.json",
+        "tmp9lyn3dej.json",
+        "tmp_io9l11j.json",
+        "tmp_o9rybv_.json",
+        "tmpamzt93a7.json",
+        "tmpaszaat7o.json",
+        "tmpb0v9rgrn/q.db",
+        "tmpb7ouere2.json",
+        "tmpbhm9op3r/q.db",
+        "tmpbtxmrxqg.json",
+        "tmpc0nzcn6v.json",
+        "tmpc8uagxsi.json",
+        "tmpcz7k5dya.json",
+        "tmpd3w9xm18.json",
+        "tmpdz0og_yw.json",
+        "tmpebrsbk9b.json",
+        "tmpeqvpp9z7.json",
+        "tmperjf4se6.json",
+        "tmpf2ubt0ib/q.db",
+        "tmpf5pm4mus.json",
+        "tmpf98kyak4/q.db",
+        "tmpfos8m8zs.json",
+        "tmpg1ggbrbx.json",
+        "tmpg1iumjpo.json",
+        "tmpg2srukdq.json",
+        "tmpg862l2q6.json",
+        "tmpgsqslytw.json",
+        "tmphs9v84vs.json",
+        "tmpihq2vpsu/q.db",
+        "tmpihq2vpsu/r.json",
+        "tmpik50aukm.json",
+        "tmpiy9xuidw.json",
+        "tmpj3v3_cnl.json",
+        "tmpj7_7h7of.json",
+        "tmpjpmcvr28.json",
+        "tmpjrq0qxft.json",
+        "tmpjxgchovk.json",
+        "tmpk4kircxx.json",
+        "tmpk80fonv9.json",
+        "tmpkn9aa5i9.json",
+        "tmpkr8gq0e1.json",
+        "tmpku_c8txc.json",
+        "tmpl9021tbp.json",
+        "tmplcricf9v.json",
+        "tmplq5asu1q.json",
+        "tmpmmcv6h42.json",
+        "tmpmn9h9eho.json",
+        "tmpmnxpr485.json",
+        "tmpmoujc7wz/q.db",
+        "tmpmt4cl657.json",
+        "tmpnl1obrl6.json",
+        "tmpnvkt2yal.json",
+        "tmpop4kcqpj.json",
+        "tmporkppdf1.json",
+        "tmpq_c4s7n0/bad.json",
+        "tmpq_c4s7n0/r.json",
+        "tmprr9sf6b0.json",
+        "tmpsnpnj8gd.json",
+        "tmpsoym11zi.json",
+        "tmpspewfvd1.json",
+        "tmptbv5z2vb.json",
+        "tmpurcsfm0d.json",
+        "tmpuuy91mpb.json",
+        "tmpuva7u8wp.json",
+        "tmpv2jayahj.json",
+        "tmpvfg23qqn.json",
+        "tmpvjav8nz9.json",
+        "tmpwrlsaeaq.json",
+        "tmpxcvgrxdz.json",
+        "tmpxfpujab3.json",
+        "tmpxil8bf56.json",
+        "tmpxlzzpxvq/q.db",
+        "tmpxo2nwre0.json",
+        "tmpxpt9n9hl.json",
+        "tmpy48mzptn/q2.db",
+        "tmpy48mzptn/r.json",
+        "tmpymwldjlp.json",
+        "tmpyxfs8mi0.json",
+        "tmpzdwi5q2g.json"
+      ],
+      "diff_bytes": 83757,
+      "diff_sha256": "5b36d2893f306180f128f65d088a5ba9b3a21c45a2372d7f5f06c6519ae74cdb"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d54-fb71-7170-bdb7-26989558aa54",
+        "started_ms": 1788809116498,
+        "ended_ms": 1788809498833,
+        "usage": {
+          "input_tokens": 666877,
+          "cached_input_tokens": 611909,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 33069,
+          "reasoning_output_tokens": 15840,
+          "total_tokens": 699946
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07d5a-d17b-7f13-8a1f-6d90d333cb79",
+        "started_ms": 1788809498961,
+        "ended_ms": 1788809586335,
+        "usage": {
+          "input_tokens": 68748,
+          "cached_input_tokens": 59498,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 3254,
+          "reasoning_output_tokens": 1996,
+          "total_tokens": 72002
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "C1"
+              ],
+              "call_id": "call_01a07d5b3cae7891879e35a3c949f9b2",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "C2"
+              ],
+              "call_id": "call_01a07d5b7e637483bed213d92ed4cd2c",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "C3"
+              ],
+              "call_id": "call_01a07d5be2eb7c0280bbbb5237ca76da",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 470450
+  },
+  {
+    "id": "queue-r4-bab",
+    "block": 4,
+    "planner": "b",
+    "executor": "a",
+    "verifier": "b",
+    "workflow": "queue-bab-repair-v1",
+    "parent": "queue-r4-baa",
+    "preparation_id": "queue-r4-bab-prepared",
+    "execution_id": "queue-r4-bab-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r4-bab/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r4-bab/fixture.json",
+    "run_id": "queue-r4-bab-execution",
+    "target": {
+      "run_id": "queue-r4-bab-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "12ae54522cc2e84d2587aa75867d623df24baf35822e1df4a20512383627a4e4",
+      "run_spec_sha256": "f2aef0059074f83de8bb73fcd31d5261e36c2de553dc2129ac92e7097a484d4c"
+    },
+    "parent_plan": "queue-r4-baa",
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_and_terminal_run",
+    "accepted_plan_text_changes": 0,
+    "original_plan_approved_without_edit": true,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 14,
+      "exec_command": 34,
+      "lab_command_receipt": 6
+    },
+    "plan_deviations": null,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 1171337,
+      "output_tokens": 46926,
+      "cached_input_tokens": 1085232
+    },
+    "tool_calls": 60,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 10,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py",
+        "tmp2bq3j3gh/legacy.db",
+        "tmpnis27v9t/q.db",
+        "tmpnis27v9t/req.json",
+        "tmpshgvlynp/q.db",
+        "tmpx1kgscdr/q.db",
+        "tmpx1kgscdr/req.json"
+      ],
+      "diff_bytes": 54811,
+      "diff_sha256": "a70ec95a79db60c6f0b761c4abfca663ba6e4176abc9b808eda205d68aaa8853"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d55-2bb3-7450-a2d7-76b09f2e8a8f",
+        "started_ms": 1788809128847,
+        "ended_ms": 1788809438146,
+        "usage": {
+          "input_tokens": 515950,
+          "cached_input_tokens": 471892,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 28410,
+          "reasoning_output_tokens": 13562,
+          "total_tokens": 544360
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07d59-e417-7130-a383-3429fca47b1e",
+        "started_ms": 1788809438213,
+        "ended_ms": 1788809683366,
+        "usage": {
+          "input_tokens": 655387,
+          "cached_input_tokens": 613340,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 18516,
+          "reasoning_output_tokens": 8236,
+          "total_tokens": 673903
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "C1"
+              ],
+              "call_id": "call_01a07d5c2ad075229dc478226dee5979",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "C1",
+                "C2"
+              ],
+              "call_id": "call_01a07d5c9f3c79b28c7985bda8df47d8",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "C2",
+                "C3"
+              ],
+              "call_id": "call_01a07d5cf0877772bbd689fc9bb149a8",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 554734
+  },
+  {
+    "id": "queue-r4-bba",
+    "block": 4,
+    "planner": "b",
+    "executor": "b",
+    "verifier": "a",
+    "workflow": "queue-bba-repair-v1",
+    "parent": "queue-r4-baa",
+    "preparation_id": "queue-r4-bba-prepared",
+    "execution_id": "queue-r4-bba-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r4-bba/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r4-bba/fixture.json",
+    "run_id": "queue-r4-bba-execution",
+    "target": {
+      "run_id": "queue-r4-bba-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "12ae54522cc2e84d2587aa75867d623df24baf35822e1df4a20512383627a4e4",
+      "run_spec_sha256": "92e87681b9bd4c745daee6cfabfee7ee184a257fab2efb9167297e92aa7311ec"
+    },
+    "parent_plan": "queue-r4-baa",
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_and_terminal_run",
+    "accepted_plan_text_changes": 0,
+    "original_plan_approved_without_edit": true,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 3,
+      "lab_repo_read": 7,
+      "exec_command": 25,
+      "lab_command_receipt": 5
+    },
+    "plan_deviations": null,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 757545,
+      "output_tokens": 36303,
+      "cached_input_tokens": 699793
+    },
+    "tool_calls": 40,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 4,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 36097,
+      "diff_sha256": "653730c2dc2c00e92ea2eb84cdc963a3f3d385299738e598765ac6e0e814cf79"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d55-2f2e-7e83-99f4-77e51b623831",
+        "started_ms": 1788809129756,
+        "ended_ms": 1788809486809,
+        "usage": {
+          "input_tokens": 678124,
+          "cached_input_tokens": 630695,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 31625,
+          "reasoning_output_tokens": 17711,
+          "total_tokens": 709749
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07d5a-a23b-7062-9909-3332250f0589",
+        "started_ms": 1788809486882,
+        "ended_ms": 1788809581567,
+        "usage": {
+          "input_tokens": 79421,
+          "cached_input_tokens": 69098,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 4678,
+          "reasoning_output_tokens": 3426,
+          "total_tokens": 84099
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "C1"
+              ],
+              "call_id": "call_01a07d5b31d079108adc821495228bfb",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "C2"
+              ],
+              "call_id": "call_01a07d5bae4772319ee6a4103c4fbd5c",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "C3"
+              ],
+              "call_id": "call_01a07d5be8497a41a27736941014853a",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 451986
+  },
+  {
+    "id": "queue-r4-bbb",
+    "block": 4,
+    "planner": "b",
+    "executor": "b",
+    "verifier": "b",
+    "workflow": "queue-bbb-repair-v1",
+    "parent": "queue-r4-baa",
+    "preparation_id": "queue-r4-bbb-prepared",
+    "execution_id": "queue-r4-bbb-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r4-bbb/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r4-bbb/fixture.json",
+    "run_id": "queue-r4-bbb-execution",
+    "target": {
+      "run_id": "queue-r4-bbb-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "12ae54522cc2e84d2587aa75867d623df24baf35822e1df4a20512383627a4e4",
+      "run_spec_sha256": "0b63d5acb492292dfc4d507d23b37a31200cc976390c21b5bcc37447f7d2af42"
+    },
+    "parent_plan": "queue-r4-baa",
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_and_terminal_run",
+    "accepted_plan_text_changes": 0,
+    "original_plan_approved_without_edit": true,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 16,
+      "exec_command": 26,
+      "lab_command_receipt": 3
+    },
+    "plan_deviations": null,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 866861,
+      "output_tokens": 42258,
+      "cached_input_tokens": 797924
+    },
+    "tool_calls": 51,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 4,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 49628,
+      "diff_sha256": "746f532cabe1bcf0105a3973c02321af4ecb7ec1e34fdfa3f022474606dce8a2"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d56-12de-78f1-b3a2-595ea0a23ba3",
+        "started_ms": 1788809188043,
+        "ended_ms": 1788809540647,
+        "usage": {
+          "input_tokens": 722858,
+          "cached_input_tokens": 674810,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 30574,
+          "reasoning_output_tokens": 14691,
+          "total_tokens": 753432
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07d5b-74b2-7462-b209-036eecb0f582",
+        "started_ms": 1788809540749,
+        "ended_ms": 1788809685425,
+        "usage": {
+          "input_tokens": 144003,
+          "cached_input_tokens": 123114,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 11684,
+          "reasoning_output_tokens": 5578,
+          "total_tokens": 155687
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "C1"
+              ],
+              "call_id": "call_01a07d5cc7e57181a5aca06417136b56",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "C2"
+              ],
+              "call_id": "call_01a07d5d34f272138f4f6404c3e3b892",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "C3"
+              ],
+              "call_id": "call_01a07d5d69f8751082fd4c24b6e8defb",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 497560
+  },
+  {
+    "id": "queue-r4-aaa",
+    "block": 4,
+    "planner": "a",
+    "executor": "a",
+    "verifier": "a",
+    "workflow": "queue-aaa-repair-v1",
+    "parent": null,
+    "preparation_id": "queue-r4-aaa-prepared",
+    "execution_id": "queue-r4-aaa-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r4-aaa/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r4-aaa/fixture.json",
+    "run_id": "queue-r4-aaa-execution",
+    "target": {
+      "run_id": "queue-r4-aaa-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "0b8d9bbefcad6e21535fc72df441b0e8e0a6816d72a5ded3a697b9d3076b9b19",
+      "run_spec_sha256": "b8001ffb6bfa4f3b3ca5e7ef840e2f649473b03979e3fcb4fa9e147f27df11dd"
+    },
+    "parent_plan": "queue-r4-aaa",
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_and_terminal_run",
+    "accepted_plan_text_changes": 0,
+    "original_plan_approved_without_edit": true,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 14,
+      "exec_command": 21,
+      "lab_command_receipt": 3
+    },
+    "plan_deviations": null,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 666573,
+      "output_tokens": 45504,
+      "cached_input_tokens": 594351
+    },
+    "tool_calls": 44,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 16,
+      "changed_files": [
+        ".v2_check.py",
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py",
+        "tmp2kg0x0l6.json",
+        "tmp4c3kq7x1.json",
+        "tmp6fpjioxf.json",
+        "tmp6t16jscy/q.db",
+        "tmp97r685pp.json",
+        "tmpas777lu6.json",
+        "tmpc1fzhhk0.json",
+        "tmpcttcum4n.json",
+        "tmpigiveu5i.json",
+        "tmpx99dp95x.json",
+        "tmpzblunu_b.json"
+      ],
+      "diff_bytes": 72666,
+      "diff_sha256": "19646d946eb91183dd48d8ca19e7aa27c15c8a55b0b5a3b4f81b861b06dee027"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d56-2891-7881-bb32-afa8138d8a7a",
+        "started_ms": 1788809193579,
+        "ended_ms": 1788809546212,
+        "usage": {
+          "input_tokens": 343618,
+          "cached_input_tokens": 299709,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 30837,
+          "reasoning_output_tokens": 15122,
+          "total_tokens": 374455
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07d5b-8a62-76e2-81bd-a39499ff2e36",
+        "started_ms": 1788809546301,
+        "ended_ms": 1788809715351,
+        "usage": {
+          "input_tokens": 322955,
+          "cached_input_tokens": 294642,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 14667,
+          "reasoning_output_tokens": 5822,
+          "total_tokens": 337622
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "AC2",
+                "AC4"
+              ],
+              "call_id": "call_01a07d5cc0da79d098e5a02903e66aa3",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "AC1",
+                "AC2",
+                "AC3"
+              ],
+              "call_id": "call_01a07d5d96ee75a29d21a9d8c111520a",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "AC4"
+              ],
+              "call_id": "call_01a07d5db0fc75839fd9c9cd0eca4718",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 522130
+  },
+  {
+    "id": "queue-r4-aab",
+    "block": 4,
+    "planner": "a",
+    "executor": "a",
+    "verifier": "b",
+    "workflow": "queue-aab-repair-v1",
+    "parent": "queue-r4-aaa",
+    "preparation_id": "queue-r4-aab-prepared",
+    "execution_id": "queue-r4-aab-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r4-aab/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r4-aab/fixture.json",
+    "run_id": "queue-r4-aab-execution",
+    "target": {
+      "run_id": "queue-r4-aab-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "0b8d9bbefcad6e21535fc72df441b0e8e0a6816d72a5ded3a697b9d3076b9b19",
+      "run_spec_sha256": "13a1c4aea2b15284e5b57d4c364c264a3e9fce7a4ffbadf6fbf53add7b9cf6a5"
+    },
+    "parent_plan": "queue-r4-aaa",
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_and_terminal_run",
+    "accepted_plan_text_changes": 0,
+    "original_plan_approved_without_edit": true,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 15,
+      "exec_command": 38,
+      "lab_command_receipt": 3
+    },
+    "plan_deviations": null,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 1207096,
+      "output_tokens": 50735,
+      "cached_input_tokens": 1123120
+    },
+    "tool_calls": 62,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "all_phases_shutdown": true,
+    "task_success": true,
+    "public_test_success": true,
+    "hidden_test_success": true,
+    "private_passed": 73,
+    "private_total": 73,
+    "failed_checks": [],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 36,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py",
+        "tmp02c7dvdo/q.db",
+        "tmp1n1_l1c_/q.db",
+        "tmp2lw55gjq/q.db",
+        "tmp574j8ubb/q.db",
+        "tmp6jrqdl0v/q.db",
+        "tmp8l9m3opp/q.db",
+        "tmp9izmqqup/q.db",
+        "tmp_y1_om29/q.db",
+        "tmpaazzq1dv/q.db",
+        "tmpax3hdfyk/q.db",
+        "tmpfcunh874/q.db",
+        "tmpfg5zu7iq/q.db",
+        "tmpgiq7i3ia/q.db",
+        "tmpi51x3xyr/q.db",
+        "tmpicsucxhn/q.db",
+        "tmplen8hr0f/q.db",
+        "tmpn81fmghg/q.db",
+        "tmpngwhd5uw/q.db",
+        "tmpnpbwnk4e/q.db",
+        "tmpo5k9_cgf/q.db",
+        "tmpojia04gf/q.db",
+        "tmpp_zmj3b8/q.db",
+        "tmppbmhdq_l/q.db",
+        "tmptxsx6hx3/q.db",
+        "tmpui1df8s3/q.db",
+        "tmpvgepm6eg/q.db",
+        "tmpw0v6k38u/q.db",
+        "tmpw_klw3go/q.db",
+        "tmpx5zg4swc/q.db",
+        "tmpyaik0iqv/q.db",
+        "tmpyqc_sfws/q.db",
+        "tmpzp2bjjep/q.db"
+      ],
+      "diff_bytes": 81765,
+      "diff_sha256": "8ca431f5e45332529f9584e600e3954809d61d2980ab9cf71b4ca16773886561"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d56-70fb-7562-8663-b66c71c0d824",
+        "started_ms": 1788809212137,
+        "ended_ms": 1788809679260,
+        "usage": {
+          "input_tokens": 882021,
+          "cached_input_tokens": 831535,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 36589,
+          "reasoning_output_tokens": 16312,
+          "total_tokens": 918610
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07d5d-9213-70e3-9f6e-fbd485e3b044",
+        "started_ms": 1788809679348,
+        "ended_ms": 1788809831953,
+        "usage": {
+          "input_tokens": 325075,
+          "cached_input_tokens": 291585,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 14146,
+          "reasoning_output_tokens": 5006,
+          "total_tokens": 339221
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "AC2",
+                "AC4"
+              ],
+              "call_id": "call_01a07d5eea5d7cb0b169f7e52d8d1505",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "AC1",
+                "AC2",
+                "AC3"
+              ],
+              "call_id": "call_01a07d5f561874f2bd17260b02bcb1fa",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "AC4"
+              ],
+              "call_id": "call_01a07d5f81e07030a26df43d8eadc5d6",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 620101
+  },
+  {
+    "id": "queue-r4-aba",
+    "block": 4,
+    "planner": "a",
+    "executor": "b",
+    "verifier": "a",
+    "workflow": "queue-aba-repair-v1",
+    "parent": "queue-r4-aaa",
+    "preparation_id": "queue-r4-aba-prepared",
+    "execution_id": "queue-r4-aba-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r4-aba/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/tasks/queue-r4-aba/fixture.json",
+    "run_id": "queue-r4-aba-execution",
+    "target": {
+      "run_id": "queue-r4-aba-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "0b8d9bbefcad6e21535fc72df441b0e8e0a6816d72a5ded3a697b9d3076b9b19",
+      "run_spec_sha256": "069a4846cdc2f01b1cdfcc28124ee7cc30389382bb03c2528c13111f73d40bb3"
+    },
+    "parent_plan": "queue-r4-aaa",
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "evaluation_scope": "candidate_and_terminal_run",
+    "accepted_plan_text_changes": 0,
+    "original_plan_approved_without_edit": true,
+    "repairs_started": 0,
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 16,
+      "exec_command": 36,
+      "lab_command_receipt": 3
+    },
+    "plan_deviations": null,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 1107003,
+      "output_tokens": 48893,
+      "cached_input_tokens": 1015517
+    },
+    "tool_calls": 61,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 4,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 42683,
+      "diff_sha256": "a02b434339635c9873a79d45285ebd324887f7b45ed7b6c80090da729f3b1aed"
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07d5a-5d41-78f2-976e-7162c4ba0e6d",
+        "started_ms": 1788809469175,
+        "ended_ms": 1788809820096,
+        "usage": {
+          "input_tokens": 788193,
+          "cached_input_tokens": 728284,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 33313,
+          "reasoning_output_tokens": 15255,
+          "total_tokens": 821506
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07d5f-b83b-7c21-8984-e65ab77e1e70",
+        "started_ms": 1788809820194,
+        "ended_ms": 1788809984316,
+        "usage": {
+          "input_tokens": 318810,
+          "cached_input_tokens": 287233,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 15580,
+          "reasoning_output_tokens": 7243,
+          "total_tokens": 334390
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "AC2",
+                "AC4"
+              ],
+              "call_id": "call_01a07d60ced270b29228ccc882a04461",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "AC1",
+                "AC2",
+                "AC3"
+              ],
+              "call_id": "call_01a07d6175747e13ae69a428a98c12c7",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "AC4"
+              ],
+              "call_id": "call_01a07d61f8b97ef0bd185124bda16dcf",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 515357
+  }
+]

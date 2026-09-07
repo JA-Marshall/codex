@@ -1,0 +1,4 @@
+{
+  "error": "upstream phase shutdown failed",
+  "partial_phase_evidence": "consult upstream rollout; collection failure may leave gaps"
+}
