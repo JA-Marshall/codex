@@ -2,7 +2,7 @@
 
 `codex-lab` is the experimental executable in `codex-rs/lab-runtime`. It embeds upstream Codex thread management, model/provider configuration, tool execution, sandboxing, authentication and shutdown. The separate `codex-rs/lab` library remains the canonical plan/configuration/approval foundation. Ordinary upstream Codex invocations do not opt into this host automatically, and no upstream `codex --workflow` flag has been added.
 
-This first runtime targets Linux, including the prepared Ubuntu WSL environment. Current validation results and outstanding checks belong in [PROGRESS.md](PROGRESS.md). Live Muse Contributor inference and command execution passed; the first approved workflow run failed its verification-reference check. See [the live report](providers/MUSE_VALIDATION.md).
+This first runtime targets Linux, including the prepared Ubuntu WSL environment. Current validation results and outstanding checks belong in [PROGRESS.md](PROGRESS.md). Live Muse Contributor approved-plan execution now completes, including command-receipt verification. Research/planning succeeded in a preceding host that ended while awaiting approval; the replacement imported the unchanged reviewed plan. See [the live report](providers/MUSE_INTERFACE_VALIDATION.md) for that boundary and the preserved earlier failure.
 
 ## Before starting a task
 
