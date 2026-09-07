@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "status": "corrected_smoke_passed",
+  "attempted_live_trials": 4,
+  "corrected_pipeline_passed": 2,
+  "corrected_pipeline_total": 2,
+  "timing_source_commit": "a359dd91e5e4d51a05a332e37b975b57a464c64a",
+  "corrected_source_commit": "8e089018fd0fe6841f72f3ba858b4dc7de4f08cb",
+  "bundle": "/home/james/.cache/codex-lab-binaries/task-library-timing-v2-20260907",
+  "phase_timeout_minutes": 30,
+  "phase_timeout_clock": "wall_clock_including_provider_queue",
+  "rate_limiter_requests_per_minute": 100,
+  "rate_limiter_policy_changed": false,
+  "fixes": [
+    "Preserve codex-linux-sandbox alias during campaign freezing",
+    "Planner v2 explicitly requires relative affected_files and each phase's current scratch directory"
+  ],
+  "validation": {
+    "unique_focused_tests_passed": 31,
+    "fmt": "passed",
+    "fmt_check": "passed",
+    "rust_source_changed": false,
+    "binary_rebuilt": false,
+    "full_workspace_suite": false
+  },
+  "attempts": [
+    {
+      "revision": "v1",
+      "campaign": "/home/james/.cache/codex-lab-campaigns/varied-smoke-timing-v1-20260907/campaign.json",
+      "campaign_sha256": "6d0adb7ada58217a8179f594ef76a7fbf3055abdf68e0c025b584aa8fd01303e",
+      "results_sha256": "81258e3c00bc57c935da05d281e5e55f7c036010ffc302bdd2fb40a4a787fa70",
+      "timing": "/home/james/.cache/codex-lab-timing/varied-smoke-v1-20260907/audit/timing.json",
+      "timing_sha256": "e325722e0042dd0cb2f6a39d6743dbb7f054c966f89bc5ff493df5420b25da81",
+      "jobs": 1,
+      "purpose": "isolated-timing",
+      "pipeline_passed": 0,
+      "total": 2,
+      "runs": [
+        {
+          "run_id": "trial-0001",
+          "fixture": "py-log-tally",
+          "workflow": "repository-repair-v1",
+          "status": "failed",
+          "task_success": null,
+          "host_exit_code": 1,
+          "evaluation_exit_code": 1,
+          "elapsed_ms": 112980,
+          "request_count": 8,
+          "queue_wait_union_ms": 2,
+          "request_wait_sum_ms": 2,
+          "observed_elapsed_excluding_queue_ms": 112978,
+          "competing_proxy_requests": 0,
+          "isolated_timing_eligible": false,
+          "exclusion_reasons": [
+            "runtime_failure",
+            "host_failure"
+          ],
+          "separate_posthoc_task_success": false,
+          "separate_posthoc_grade_sha256": "d418e43526cc85d659a22aae1381741d12620e5f9bb0997fa054fa58cd0a6919"
+        },
+        {
+          "run_id": "trial-0002",
+          "fixture": "rust_ranges",
+          "workflow": "repository-repair-v1",
+          "status": "failed",
+          "task_success": null,
+          "host_exit_code": 0,
+          "evaluation_exit_code": 1,
+          "elapsed_ms": 246927,
+          "request_count": 33,
+          "queue_wait_union_ms": 4,
+          "request_wait_sum_ms": 4,
+          "observed_elapsed_excluding_queue_ms": 246923,
+          "competing_proxy_requests": 0,
+          "isolated_timing_eligible": true,
+          "exclusion_reasons": [],
+          "separate_posthoc_task_success": true,
+          "separate_posthoc_grade_sha256": "149ca0f8fd2f7b6f5b2360dede17792af03c9ccfff6052f049b33fb4dfc13d42"
+        }
+      ]
+    },
+    {
+      "revision": "v2",
+      "campaign": "/home/james/.cache/codex-lab-campaigns/varied-smoke-timing-v2-20260907/campaign.json",
+      "campaign_sha256": "72fbc4f09547c7adbaa1096696ec9b9eb5995168e8ae6c7f08b0ce566c3bf38c",
+      "results_sha256": "eb3ff9b9382bbf498b394a4b5841a90d991eaaaab8754e8d8dbb5a38cd27321c",
+      "timing": "/home/james/.cache/codex-lab-timing/varied-smoke-v2-20260907/audit/timing.json",
+      "timing_sha256": "697b944a470c1940bae318477656b5619e7ec0eab755b3b0c7f069d6fce9e61d",
+      "jobs": 1,
+      "purpose": "isolated-timing",
+      "pipeline_passed": 2,
+      "total": 2,
+      "runs": [
+        {
+          "run_id": "trial-0001",
+          "fixture": "py-log-tally",
+          "workflow": "repository-repair-v2",
+          "status": "finished",
+          "task_success": true,
+          "host_exit_code": 0,
+          "evaluation_exit_code": 0,
+          "elapsed_ms": 313283,
+          "request_count": 27,
+          "queue_wait_union_ms": 1,
+          "request_wait_sum_ms": 1,
+          "observed_elapsed_excluding_queue_ms": 313282,
+          "competing_proxy_requests": 0,
+          "isolated_timing_eligible": true,
+          "exclusion_reasons": [],
+          "public_test_success": true,
+          "private_test_success": true,
+          "private_checks": 7,
+          "scope_violations": [],
+          "phase_turns": 4,
+          "all_phases_stopped": true
+        },
+        {
+          "run_id": "trial-0002",
+          "fixture": "rust_ranges",
+          "workflow": "repository-repair-v2",
+          "status": "finished",
+          "task_success": true,
+          "host_exit_code": 0,
+          "evaluation_exit_code": 0,
+          "elapsed_ms": 269924,
+          "request_count": 30,
+          "queue_wait_union_ms": 1,
+          "request_wait_sum_ms": 1,
+          "observed_elapsed_excluding_queue_ms": 269923,
+          "competing_proxy_requests": 0,
+          "isolated_timing_eligible": true,
+          "exclusion_reasons": [],
+          "public_test_success": true,
+          "private_test_success": true,
+          "private_checks": 7,
+          "scope_violations": [],
+          "phase_turns": 4,
+          "all_phases_stopped": true
+        }
+      ]
+    }
+  ],
+  "next_campaign": {
+    "path": "/home/james/.cache/codex-lab-campaigns/varied-library-v2-200-20260907/campaign.json",
+    "sha256": "8458f9b7de7644a3fafc6aead65e0ddf494277aa3892f80c585352a05e03b94b",
+    "trials": 200,
+    "jobs": 8,
+    "started": false
+  },
+  "old_200_trial_preparation_unchanged": true,
+  "limitations": [
+    "Two small tasks establish a smoke check, not a broad success rate.",
+    "Near-zero live queue wait does not exercise heavy limiter contention.",
+    "Observed remainder includes model, tools, network and host overhead; it is not pure model time."
+  ]
+}

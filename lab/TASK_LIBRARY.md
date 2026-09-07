@@ -10,7 +10,8 @@ two generic workflows differing only in their maximum repair rounds. Final share
 sandbox calibration passed: all 80 variants matched their expected outcomes with zero model calls.
 The frozen offline preparation contains **200 trials = 20 tasks ×
 2 workflows × 5 repetitions**, with eight active hosts by default if subsequently executed. Preparation
-does not launch model hosts. No live campaign has been launched for this library.
+does not launch model hosts. Two corrected live smoke trials have passed; the 200-trial batch
+remains stopped. See [the smoke results](TASK_LIBRARY_SMOKE.md) for the bugs found and corrected.
 
 ## Inventory
 
@@ -107,12 +108,13 @@ every reference passes and every starter/mutant fails independent acceptance. It
 self-checks are documented in the pack READMEs; they precede final contract and evaluator fixes
 and are superseded for current acceptance by the completed shared sandbox calibration below.
 
-The actual generic catalog is [repository-v1.toml](workflows/repository-v1.toml):
+The current generic catalog is [repository-v2.toml](workflows/repository-v2.toml). Its planner makes
+relative file paths and phase-local scratch explicit; executor/verifier v1 remain unchanged.
 
 | Workflow | Role instructions and renderer | Maximum repairs |
 |---|---|---:|
-| `repository-v1` | Generic repository planner/executor/verifier; Markdown plan | 0 |
-| `repository-repair-v1` | Inherits the same instructions and renderer | 1 |
+| `repository-v2` | Generic repository planner/executor/verifier; Markdown plan | 0 |
+| `repository-repair-v2` | Inherits the same instructions and renderer | 1 |
 
 Research, planning, implementation, and verification retain separate bounded phases. A repair
 uses a separate executor phase after a valid failed verification under the unchanged contract.
@@ -123,14 +125,14 @@ For the 200-trial offline preparation, use the existing
 home/service receipt, catalog, instruction root, sandbox, and fresh output arguments. Add:
 
 ```text
---catalog lab/workflows/repository-v1.toml
+--catalog lab/workflows/repository-v2.toml
 --instruction-root lab
 --task-root lab/tasks
 --task-split study
 --task-toolchain /ABSOLUTE/PATH/rust-1.95.0
 --task-just /ABSOLUTE/PATH/just
---workflow repository-v1
---workflow repository-repair-v1
+--workflow repository-v2
+--workflow repository-repair-v2
 --repetitions 5
 --jobs 8
 --max-amendments 0
@@ -151,10 +153,10 @@ all 20 study tasks, both workflows, five repetitions, and eight jobs. Freeze wit
 ```
 
 `-Execute <Linuxcampaign.json>` executes an existing frozen campaign. Invoking the launcher without
-`-PrepareOnly` or `-Execute` prepares and starts a new campaign. The launcher has not been used to
-launch live trials for this library.
+`-PrepareOnly` or `-Execute` prepares and starts a new campaign. Use the current v2 preparation;
+the earlier v1 200-trial preparation predates the sandbox alias fix and should not be launched.
 
-The installed bundle is `/home/james/.cache/codex-lab-binaries/task-library-v1-20260907`. It reuses
+The current bundle is `/home/james/.cache/codex-lab-binaries/task-library-timing-v2-20260907`. It reuses
 `/home/james/.config/codex-lab/muse-contributor-unattended-v2` unchanged and the existing shared
 provider service. Final shared calibration completed successfully:
 
@@ -170,16 +172,17 @@ crate passed 104 tests, and the subsequent four focused context-bound regression
 Scope/permission context bounds are enforced before a model call, with an 8,192-byte cap per
 bounded section. This limits injected authority text; it is not a model-context capacity claim.
 Lint, formatting, format checking, and the final build passed. No tests were rerun after formatting.
-The prepared campaign is `/home/james/.cache/codex-lab-campaigns/varied-library-v1-200-20260907/campaign.json`;
-all frozen pins validate, and it contains no started trials. Binary identity and preparation hashes
-are in [the release receipt](task-library-release-2026-09-07.json); detailed validation is in
-[TASK_LIBRARY_VALIDATION.json](TASK_LIBRARY_VALIDATION.json).
+The current prepared campaign is `/home/james/.cache/codex-lab-campaigns/varied-library-v2-200-20260907/campaign.json`;
+all frozen pins validate, and it contains no started trials. The [smoke receipt](task-library-smoke-2026-09-07.json)
+records the current version and preparation. [Initial offline validation](TASK_LIBRARY_VALIDATION.json)
+and the [initial release receipt](task-library-release-2026-09-07.json) remain historical evidence.
+The same queue-aware timing calculation is now available through [campaign timing reports](TIMING.md).
 
 ## Remaining study work
 
 The broader [workflow study plan](WORKFLOW_STUDY_PLAN.md) remains a roadmap. The compact/evidence
-handover matrix, four separate development tasks, eight reserved confirmation tasks, live smoke
-campaign, richer context retrieval controls, and comparative study report are not implemented by
+handover matrix, four separate development tasks, eight reserved confirmation tasks, the handover
+study's live pilot, richer context retrieval controls, and comparative study report are not implemented by
 this task-library increment. All 20 current assignments are in the study split. Existing historical
 results remain separate; no previous runs, approvals, candidates, or outcome-based rankings have
 been imported into this collection. Repetitions do not turn these synthetic assignments into

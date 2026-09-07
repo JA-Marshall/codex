@@ -65,5 +65,6 @@ the older human-approved batch's first-decision boundary. A single worker does n
 traffic from the shared limiter; the report flags that traffic instead of claiming isolated speed.
 
 The earlier 200-trial task-library preparation remains frozen with its original scripts. It must
-be replaced by a new preparation to use this timing adapter. A two-trial live smoke run is the next
-step; this change does not launch the 200-trial batch.
+be replaced by a new preparation to use this timing adapter. The [corrected two-trial live smoke](TASK_LIBRARY_SMOKE.md)
+passed, and a new v2 200-trial preparation is ready but unstarted. Neither the limiter policy nor
+the phase timeout was changed.

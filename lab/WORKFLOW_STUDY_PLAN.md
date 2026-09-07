@@ -5,7 +5,10 @@ the current increment adds a 20-task Python/Rust library, repository-task adapte
 scope controls, and two generic workflows with zero or one repair. Final shared
 WSL sandbox calibration passed all 80 expected variant outcomes with zero model calls.
 Final lint/format/build checks passed. The separate release and 200-trial offline preparation are complete;
-their identities are recorded in [the release receipt](task-library-release-2026-09-07.json).
+their initial identities are recorded in [the release receipt](task-library-release-2026-09-07.json).
+The subsequent [live smoke](TASK_LIBRARY_SMOKE.md) passed two corrected trials after fixing sandbox
+dispatch and planner path instructions. Queue-aware reporting now matches the published timing fix;
+the current v2 200-trial preparation remains unstarted.
 The actual inventory, interfaces, evidence limits, and artifact locations
 are recorded in [TASK_LIBRARY.md](TASK_LIBRARY.md). The earlier installed release and its focused
 checks are recorded in
