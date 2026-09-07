@@ -99,15 +99,28 @@ fn creation_freezes_exact_configuration_and_instruction_bytes() {
 fn verification_input_changes_approval_digest_without_changing_ordinary_specs() {
     let temp = tempfile::tempdir().unwrap();
     let ordinary = support::run_spec(temp.path()).unwrap();
-    assert!(serde_json::to_value(&ordinary).unwrap().get("verification_input_sha256").is_none());
-    let first = ordinary.clone().with_verification_input(b"first fixed report");
-    let second = ordinary.clone().with_verification_input(b"different fixed report");
+    assert!(
+        serde_json::to_value(&ordinary)
+            .unwrap()
+            .get("verification_input_sha256")
+            .is_none()
+    );
+    let first = ordinary
+        .clone()
+        .with_verification_input(b"first fixed report");
+    let second = ordinary
+        .clone()
+        .with_verification_input(b"different fixed report");
     assert_ne!(ordinary.digest().unwrap(), first.digest().unwrap());
     assert_ne!(first.digest().unwrap(), second.digest().unwrap());
     let mut a = serde_json::to_value(&first).unwrap();
     let mut b = serde_json::to_value(&second).unwrap();
-    a.as_object_mut().unwrap().remove("verification_input_sha256");
-    b.as_object_mut().unwrap().remove("verification_input_sha256");
+    a.as_object_mut()
+        .unwrap()
+        .remove("verification_input_sha256");
+    b.as_object_mut()
+        .unwrap()
+        .remove("verification_input_sha256");
     assert_eq!(a, serde_json::to_value(&ordinary).unwrap());
     assert_eq!(a, b);
 }

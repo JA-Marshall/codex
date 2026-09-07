@@ -151,9 +151,15 @@ impl Arguments {
             instruction_root: self.instruction_root,
             workflow: self.workflow,
             plan,
-            verification_input: self.verification_input.as_ref().map(|path| {
-                codex_lab_runtime::VerificationInput::from_json(read_bounded(path, 8192)?.as_bytes())
-            }).transpose()?,
+            verification_input: self
+                .verification_input
+                .as_ref()
+                .map(|path| {
+                    codex_lab_runtime::VerificationInput::from_json(
+                        read_bounded(path, 8192)?.as_bytes(),
+                    )
+                })
+                .transpose()?,
         })
     }
 }

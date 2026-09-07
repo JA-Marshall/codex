@@ -14,14 +14,32 @@ fn verification_input_binds_plan_commit_and_exact_step_evidence() -> Result<()> 
     let input = VerificationInput::from_json(&serde_json::to_vec(&value)?)?;
     input.validate(&plan, &"a".repeat(40))?;
     assert!(input.validate(&plan, &"c".repeat(40)).is_err());
-    assert!(input.validate(&authority_support::plan(2)?, &"a".repeat(40)).is_err());
-    for steps in [json!([]), json!([plan.steps[0].id, plan.steps[0].id]), json!(["foreign"])] {
+    assert!(
+        input
+            .validate(&authority_support::plan(2)?, &"a".repeat(40))
+            .is_err()
+    );
+    for steps in [
+        json!([]),
+        json!([plan.steps[0].id, plan.steps[0].id]),
+        json!(["foreign"]),
+    ] {
         let mut changed = value.clone();
         changed["implementation_report"]["completed_steps"] = steps;
-        assert!(VerificationInput::from_json(&serde_json::to_vec(&changed)?)?.validate(&plan, &"a".repeat(40)).is_err());
+        assert!(
+            VerificationInput::from_json(&serde_json::to_vec(&changed)?)?
+                .validate(&plan, &"a".repeat(40))
+                .is_err()
+        );
     }
     assert!(VerificationInput::from_json(&vec![b' '; 8193]).is_err());
-    for (field, invalid) in [("schema_version", json!(2)), ("source_run", json!("../escape")), ("plan_sha256", json!("bad")), ("source_phase_sha256", json!("bad")), ("authority", json!(true))] {
+    for (field, invalid) in [
+        ("schema_version", json!(2)),
+        ("source_run", json!("../escape")),
+        ("plan_sha256", json!("bad")),
+        ("source_phase_sha256", json!("bad")),
+        ("authority", json!(true)),
+    ] {
         let mut changed = value.clone();
         changed[field] = invalid;
         assert!(VerificationInput::from_json(&serde_json::to_vec(&changed)?).is_err());

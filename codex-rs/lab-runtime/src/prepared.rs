@@ -85,7 +85,11 @@ pub(crate) fn seal(
         plan_sha256: target.content_sha256,
         run_spec_sha256: target.run_spec_sha256,
         phase_threads,
-        verification_input_sha256: options.verification_input.as_ref().map(|input| input.bytes().map(|bytes| digest(&bytes))).transpose()?,
+        verification_input_sha256: options
+            .verification_input
+            .as_ref()
+            .map(|input| input.bytes().map(|bytes| digest(&bytes)))
+            .transpose()?,
         files: BTreeMap::new(),
     };
     let plan = authority.plan()?.context("prepared plan missing")?;
@@ -175,9 +179,17 @@ pub(crate) fn load(path: &Path, run_id: String) -> Result<LoadedPrepared> {
             instruction_root: descriptor.instruction_root,
             workflow,
             plan: Some(plan),
-            verification_input: descriptor.verification_input_sha256.as_ref().map(|_| {
-                crate::VerificationInput::from_json(&read_artifact(root, "evidence/verification-input.json", 8192)?)
-            }).transpose()?,
+            verification_input: descriptor
+                .verification_input_sha256
+                .as_ref()
+                .map(|_| {
+                    crate::VerificationInput::from_json(&read_artifact(
+                        root,
+                        "evidence/verification-input.json",
+                        8192,
+                    )?)
+                })
+                .transpose()?,
         },
         settings,
         lineage: serde_json::json!({"schema_version":1,"prepared":path,"prepared_sha256":digest(&bytes),
@@ -217,7 +229,10 @@ fn required_files(descriptor: &Descriptor, renderer: Renderer) -> Result<Vec<Str
     names.push(format!("plans/{}/plan.json", descriptor.revision));
     names.push(format!("plans/{}/{view}", descriptor.revision));
     if descriptor.verification_input_sha256.is_some() {
-        ensure!(descriptor.phase_threads == 0, "verifier-only preparation cannot contain model phases");
+        ensure!(
+            descriptor.phase_threads == 0,
+            "verifier-only preparation cannot contain model phases"
+        );
         names.push("evidence/verification-input.json".into());
     }
     for index in 1..=descriptor.phase_threads {
@@ -282,12 +297,24 @@ fn validate_files(
     );
     let manifest: Value = serde_json::from_slice(&artifacts["manifest.json"])?;
     let spec: Value = serde_json::from_slice(&artifacts["config/run-spec.json"])?;
-    ensure!(spec["verification_input_sha256"].as_str() == descriptor.verification_input_sha256.as_deref(), "verification input binding differs");
+    ensure!(
+        spec["verification_input_sha256"].as_str()
+            == descriptor.verification_input_sha256.as_deref(),
+        "verification input binding differs"
+    );
     if let Some(expected) = &descriptor.verification_input_sha256 {
         let bytes = &artifacts["evidence/verification-input.json"];
         let input = crate::VerificationInput::from_json(bytes)?;
-        ensure!(input.bytes()? == *bytes && digest(bytes) == *expected, "verification input changed");
-        input.validate(plan, spec["repository"]["commit"].as_str().context("missing candidate commit")?)?;
+        ensure!(
+            input.bytes()? == *bytes && digest(bytes) == *expected,
+            "verification input changed"
+        );
+        input.validate(
+            plan,
+            spec["repository"]["commit"]
+                .as_str()
+                .context("missing candidate commit")?,
+        )?;
     }
     ensure!(
         manifest["run_id"] == descriptor.source_run_id

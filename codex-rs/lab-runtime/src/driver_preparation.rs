@@ -71,7 +71,13 @@ pub(crate) async fn initialize(
         Some(model),
     )?;
     if let Some(input) = &options.verification_input {
-        input.validate(options.plan.as_ref().context("verifier-only trials require an imported plan")?, &options.repository_commit)?;
+        input.validate(
+            options
+                .plan
+                .as_ref()
+                .context("verifier-only trials require an imported plan")?,
+            &options.repository_commit,
+        )?;
         spec = spec.with_verification_input(&input.bytes()?);
     }
     if let Some((expected_settings, expected_spec)) = expected {

@@ -28,27 +28,50 @@ impl VerificationInput {
     pub fn from_json(bytes: &[u8]) -> Result<Self> {
         ensure!(bytes.len() <= 8192, "verification input exceeds 8 KiB");
         let input: Self = serde_json::from_slice(bytes)?;
-        ensure!(input.schema_version == 1, "unsupported verification input schema");
         ensure!(
-            !input.source_run.is_empty() && input.source_run.len() <= 64
-                && input.source_run.bytes().all(|b| b.is_ascii_alphanumeric() || matches!(b, b'-' | b'_')),
+            input.schema_version == 1,
+            "unsupported verification input schema"
+        );
+        ensure!(
+            !input.source_run.is_empty()
+                && input.source_run.len() <= 64
+                && input
+                    .source_run
+                    .bytes()
+                    .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'-' | b'_')),
             "invalid verification source run"
         );
         for hash in [&input.plan_sha256, &input.source_phase_sha256] {
-            ensure!(hash.len() == 64 && hash.bytes().all(|b| b.is_ascii_hexdigit()), "invalid verification input digest");
+            ensure!(
+                hash.len() == 64 && hash.bytes().all(|b| b.is_ascii_hexdigit()),
+                "invalid verification input digest"
+            );
         }
         ensure!(
             matches!(input.candidate_commit.len(), 40 | 64)
-                && input.candidate_commit.bytes().all(|b| b.is_ascii_hexdigit()),
+                && input
+                    .candidate_commit
+                    .bytes()
+                    .all(|b| b.is_ascii_hexdigit()),
             "invalid verification candidate commit"
         );
         Ok(input)
     }
 
     pub(crate) fn validate(&self, plan: &PlanRevision, commit: &str) -> Result<()> {
-        ensure!(self.candidate_commit == commit, "verification candidate commit changed");
-        ensure!(self.plan_sha256 == digest(&plan.canonical_json()?), "verification plan changed");
-        let completed = self.implementation_report.completed_steps.iter().collect::<BTreeSet<_>>();
+        ensure!(
+            self.candidate_commit == commit,
+            "verification candidate commit changed"
+        );
+        ensure!(
+            self.plan_sha256 == digest(&plan.canonical_json()?),
+            "verification plan changed"
+        );
+        let completed = self
+            .implementation_report
+            .completed_steps
+            .iter()
+            .collect::<BTreeSet<_>>();
         ensure!(
             completed.len() == plan.steps.len()
                 && completed.len() == self.implementation_report.completed_steps.len()

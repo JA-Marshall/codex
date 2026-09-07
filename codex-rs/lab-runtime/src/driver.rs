@@ -254,7 +254,10 @@ impl Driver {
                         .update(|run| run.approve(target, "local human input"))?;
                 }
                 HumanDecision::Reject(reason) => {
-                    ensure!(options.verification_input.is_none(), "verifier-only review rejected; prepare a new trial: {reason}");
+                    ensure!(
+                        options.verification_input.is_none(),
+                        "verifier-only review rejected; prepare a new trial: {reason}"
+                    );
                     self.first_approval.get_or_insert(false);
                     self.authority
                         .update(|run| run.reject(target, "local human input", &reason))?;
@@ -263,7 +266,10 @@ impl Driver {
                     continue;
                 }
                 HumanDecision::Edit(plan) => {
-                    ensure!(options.verification_input.is_none(), "verifier-only plan edit requires a new preparation");
+                    ensure!(
+                        options.verification_input.is_none(),
+                        "verifier-only plan edit requires a new preparation"
+                    );
                     self.first_approval.get_or_insert(false);
                     self.human_edits += 1;
                     self.authority.update(|run| {
@@ -273,29 +279,39 @@ impl Driver {
                 }
                 HumanDecision::Abort => bail!("human review ended without approval"),
             }
-            let (report, implementation_artifact) = if let Some(input) = &options.verification_input {
+            let (report, implementation_artifact) = if let Some(input) = &options.verification_input
+            {
                 input.validate(&plan, &options.repository_commit)?;
-                (input.report(), "evidence/verification-input.json#implementation_report".to_owned())
-            } else {
-            let Some(index) = self
-                .phase(
-                    Phase::Implementation,
-                    implementation_prompt,
-                    Some(reports::implementation_schema()),
+                (
+                    input.report(),
+                    "evidence/verification-input.json#implementation_report".to_owned(),
                 )
-                .await?
-            else {
-                let feedback = self
-                    .amendment_feedback
-                    .take()
-                    .context("missing amendment reason")?;
-                self.generate_plan(&options.task, &research, &feedback)
-                    .await?;
-                continue;
-            };
-            let report: reports::ImplementationReport =
-                serde_json::from_str(&self.outputs[index].1.text)?;
-            (report, format!("evidence/phase-{:02}.json#implementation-report", self.phase_count))
+            } else {
+                let Some(index) = self
+                    .phase(
+                        Phase::Implementation,
+                        implementation_prompt,
+                        Some(reports::implementation_schema()),
+                    )
+                    .await?
+                else {
+                    let feedback = self
+                        .amendment_feedback
+                        .take()
+                        .context("missing amendment reason")?;
+                    self.generate_plan(&options.task, &research, &feedback)
+                        .await?;
+                    continue;
+                };
+                let report: reports::ImplementationReport =
+                    serde_json::from_str(&self.outputs[index].1.text)?;
+                (
+                    report,
+                    format!(
+                        "evidence/phase-{:02}.json#implementation-report",
+                        self.phase_count
+                    ),
+                )
             };
             let completed = report.completed_steps.iter().collect::<BTreeSet<_>>();
             ensure!(
@@ -339,7 +355,10 @@ impl Driver {
                     .amendment_feedback
                     .take()
                     .context("missing amendment reason")?;
-                ensure!(options.verification_input.is_none(), "verifier-only amendment requires a new preparation: {feedback}");
+                ensure!(
+                    options.verification_input.is_none(),
+                    "verifier-only amendment requires a new preparation: {feedback}"
+                );
                 self.generate_plan(&options.task, &research, &feedback)
                     .await?;
                 continue;
