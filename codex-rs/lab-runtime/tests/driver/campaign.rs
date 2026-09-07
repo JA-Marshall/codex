@@ -69,9 +69,12 @@ fn delegated_events(artifacts: &std::path::Path) -> Result<Vec<Value>> {
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn campaign_cli_generates_plan_and_records_delegation_with_stdin_closed() -> Result<()> {
+async fn campaign_cli_generates_and_repairs_with_long_receipts_and_stdin_closed() -> Result<()> {
     let server = MockServer::start().await;
-    let fixture = support::Fixture::new(&server.uri()).await?;
+    let mut fixture = support::Fixture::new(&server.uri()).await?;
+    fixture.workflow_catalog = fixture
+        .workflow_catalog
+        .replace("[workflows.base]", "[workflows.base]\nmax_repairs = 1");
     let options = campaign_options(&fixture, "campaign-generated");
     let policy_path = write_policy(&fixture, &options, 0)?;
     let mut sequence = vec![
@@ -84,7 +87,25 @@ async fn campaign_cli_generates_plan_and_records_delegation_with_stdin_closed() 
             responses::ev_assistant_message("plan", &serde_json::to_string(&support::plan(1)?)?),
         ),
     ];
-    sequence.extend(implementation_and_verification("campaign"));
+    let mut initial = implementation_and_verification("campaign");
+    initial[0] = initial[0].replace("+hello", "+wrong");
+    sequence.extend(initial);
+    let mut repair = implementation_and_verification("repair");
+    repair[0] = response(
+        "repair-patch",
+        responses::ev_custom_tool_call(
+            "repair-patch",
+            "apply_patch",
+            "*** Begin Patch\n*** Update File: greeting.txt\n@@\n-wrong\n+hello\n*** End Patch",
+        ),
+    );
+    sequence.extend(repair);
+    for event in &mut sequence {
+        *event = event.replace(
+            "&& test ! -e forbidden.txt",
+            &format!("&& test ! -e forbidden.txt # {}", "x".repeat(16384)),
+        );
+    }
     let mock = responses::mount_sse_sequence(&server, sequence).await;
     let task = fixture.home.join("task.txt");
     let catalog = fixture.home.join("workflows.toml");
@@ -136,7 +157,7 @@ async fn campaign_cli_generates_plan_and_records_delegation_with_stdin_closed() 
             result["phase_threads"].clone(),
             mock.requests().len()
         ),
-        (json!("completed"), json!(4), 7)
+        (json!("completed"), json!(6), 12)
     );
     let artifacts = PathBuf::from(
         result["artifacts"]
@@ -163,6 +184,36 @@ async fn campaign_cli_generates_plan_and_records_delegation_with_stdin_closed() 
         ),
         (Value::Null, json!(1))
     );
+    assert_eq!(metrics["repair_attempts"], 1);
+    for prefix in ["campaign", "repair"] {
+        let output = mock
+            .requests()
+            .iter()
+            .find_map(|request| request.function_call_output_text(&format!("{prefix}-receipt")))
+            .context("missing long-command receipt")?;
+        let receipt: Value = serde_json::from_str(&output)?;
+        assert_eq!(receipt["receipt"]["call_id"], format!("{prefix}-verify"));
+        assert_eq!(receipt["receipt"]["preview_truncated"], true);
+    }
+    let journal = std::fs::read_to_string(artifacts.join("events.jsonl"))?;
+    assert!(journal.lines().any(|line| {
+        serde_json::from_str::<Value>(line).is_ok_and(|event| {
+            event["change"]["type"] == "verification_recorded"
+                && event["change"]["evidence"]["passed"] == false
+        })
+    }));
+    for phase in 1..=6 {
+        let evidence: Value = serde_json::from_slice(&std::fs::read(
+            artifacts.join(format!("evidence/phase-{phase:02}.json")),
+        )?)?;
+        assert!(
+            evidence["events"]
+                .as_array()
+                .context("phase events")?
+                .iter()
+                .any(|event| event["msg"]["type"] == "shutdown_complete")
+        );
+    }
     assert_eq!(
         std::fs::read(fixture.repository.join("greeting.txt"))?,
         b"hello\n"

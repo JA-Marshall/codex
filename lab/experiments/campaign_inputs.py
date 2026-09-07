@@ -11,6 +11,7 @@ import tomllib
 import uuid
 
 from fixture_registry import FIXTURES
+from campaign_service import freeze_service
 
 MAX_RUNS = 1000
 FIXTURE_NAMES = (*FIXTURES, "durable-queue-v1")
@@ -86,6 +87,9 @@ def freeze(args):
     )
     config_file = home / "config.toml"
     config = tomllib.loads(config_file.read_text(encoding="utf-8"))
+    service, service_pins = freeze_service(
+        getattr(args, "provider_service", None), config
+    )
     source = Path(__file__).resolve().parents[1]
     output = args.output.resolve()
     protected = (source, home, instruction_root, binary, sandbox, catalog)
@@ -149,6 +153,7 @@ def freeze(args):
         "catalog": str(frozen_catalog),
         "python": str(Path(sys.executable).resolve()),
         "requested_model": config.get("model"),
+        "provider_service": service,
         "jobs": args.jobs,
         "max_amendments": args.max_amendments,
         "trials": trials,
@@ -157,7 +162,10 @@ def freeze(args):
         "hard_spend_limit": None,
         "approval": "campaign_delegated",
         "resume_supported": False,
-        "pins": {str(path): digest(path) for path in sorted(set(pins))},
+        "pins": {
+            **{str(path): digest(path) for path in sorted(set(pins))},
+            **service_pins,
+        },
         "original_catalog_sha256": digest(catalog),
     }
     write_json(output / "campaign.json", manifest)

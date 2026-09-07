@@ -25,8 +25,12 @@ calls. The launcher loads the existing provider credential privately, selects th
 versioned unattended binary, and creates a new timestamped output directory.
 It runs in the current terminal; keep that terminal and WSL running until it ends.
 
+The integrated release uses the shared Muse request limiter and the separate
+`muse-contributor-unattended-v2` provider home. Its model instructions describe
+delegated host authorization; other model and provider settings follow the limited
+profile. Historical profiles and frozen batches retain their original settings.
 The installed bundle is
-`/home/james/.cache/codex-lab-binaries/unattended-v1-20260907`.
+`/home/james/.cache/codex-lab-binaries/unattended-v2-20260907`.
 This local convenience wrapper is separate from the portable Python entry point.
 
 The queue holds up to 1,000 trials with 1–32 active trial workers. A slot covers
@@ -42,6 +46,14 @@ dedicated provider home and credentials follow [RUNNING.md](RUNNING.md).
 
 The entry point is `lab/experiments/run_campaign.py`. Its `--help` lists the binary,
 provider home, catalog, instruction root, evaluator sandbox and output arguments.
+Muse campaigns also require `--provider-service` pointing to the existing shared
+proxy's `service.json`. The freezer checks the selected provider URL and pins the
+service receipt and both service source files. It does not make a health or model
+request. Execution checks local health and the configured request allowance before
+admitting workers and before each model host starts. An unavailable service stops
+execution without a direct-provider fallback. Other provider models may omit this
+Muse-specific argument. The service receipt records setup identity; a health check
+does not attest the code running inside the service process.
 Repeat `--fixture` and `--workflow` to select combinations; `--repetitions 200` on
 one fixture and one workflow queues 200 trials. `--jobs 16` runs at most 16 at once.
 
@@ -92,6 +104,9 @@ Unattended campaigns alter approval procedure and scheduling. Label that change
 when comparing them with earlier human-reviewed or shared-plan results.
 
 ## Validation
+
+The integrated release's validation is recorded separately in
+[unattended-integration-2026-09-07.json](unattended-integration-2026-09-07.json).
 
 The [validation receipt](unattended-validation-2026-09-07.json) records 32 focused
 Rust tests and 16 Python tests, including a real mock-provider CLI run with stdin

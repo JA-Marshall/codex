@@ -21,6 +21,7 @@ from campaign_inputs import (
     validate_pins,
     write_json,
 )
+from campaign_service import check_service
 
 
 def run_logged(command, prefix):
@@ -185,6 +186,7 @@ def run_trial(manifest, entry):
         )
         host, evaluate = trial_commands(manifest, entry, metadata, directory)
         validate_pins(manifest)
+        check_service(manifest)
         record["host_exit_code"] = run_logged(host, directory / "host")
         # The evaluator owns terminal/shutdown checks, including failed hosts.
         validate_pins(manifest)
@@ -226,6 +228,7 @@ def coordinate(manifest, cancelled=None):
     cancelled = cancelled or threading.Event()
     output = Path(manifest["output"])
     validate_pins(manifest)
+    check_service(manifest)
     # Exclusive creation deliberately refuses resume and any reuse of prior authority.
     with (output / "events.jsonl").open("x", encoding="utf-8") as journal:
         for name in ("trials", "runs"):
@@ -392,6 +395,9 @@ def main():
     parser.add_argument("--jobs", type=int, default=16)
     parser.add_argument("--max-amendments", type=int, default=0, choices=range(5))
     parser.add_argument("--prepare-only", action="store_true")
+    parser.add_argument(
+        "--provider-service", type=Path, help="Pinned shared Muse proxy service.json"
+    )
     args = parser.parse_args()
     if sys.platform != "linux" or sys.version_info[:2] != (3, 12):
         parser.error("campaign preparation and execution require Linux/Python 3.12")
@@ -406,6 +412,7 @@ def main():
         return 0
     if args.execute:
         manifest = load_campaign(args.execute, args.manifest_sha256)
+        check_service(manifest)
         frozen_runner = Path(manifest["archive"]) / "experiments/run_campaign.py"
         if Path(__file__).resolve() != frozen_runner.resolve():
             os.execv(
