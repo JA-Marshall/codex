@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "id": "py-route-planner",
+  "family": "bug_fix",
+  "language": "python",
+  "size": "large",
+  "split": "study",
+  "project_id": "py-route-planner",
+  "capabilities": [
+    "cli",
+    "graph",
+    "algorithm",
+    "batch-api",
+    "validation"
+  ],
+  "write_paths": [
+    "src",
+    "tests"
+  ],
+  "command": [
+    "{python}",
+    "{repository}/src/main.py"
+  ],
+  "build": [],
+  "public_command": [
+    "{python}",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests"
+  ],
+  "mutants": [
+    "early-destination",
+    "undirected-edges"
+  ],
+  "structural_checks": []
+}

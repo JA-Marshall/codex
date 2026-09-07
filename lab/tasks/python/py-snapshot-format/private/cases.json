@@ -1,0 +1,174 @@
+[
+  {
+    "id": "migrate-duplicates-and-falsy",
+    "files": {
+      "s.json": "[{\"key\": \"z\", \"value\": 1}, {\"key\": \"a\", \"value\": 0}, {\"key\": \"z\", \"value\": 4}, {\"key\": \"\", \"value\": null}]"
+    },
+    "steps": [
+      {
+        "argv": [
+          "compact",
+          "s.json"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "keys": 3
+          },
+          "files": {
+            "s.json": "{\"values\":{\"\":null,\"a\":0,\"z\":4},\"version\":2}\n"
+          }
+        }
+      },
+      {
+        "argv": [
+          "read",
+          "s.json"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "z": 4,
+            "a": 0,
+            "": null
+          }
+        }
+      },
+      {
+        "argv": [
+          "compact",
+          "s.json"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "keys": 3
+          },
+          "files": {
+            "s.json": "{\"values\":{\"\":null,\"a\":0,\"z\":4},\"version\":2}\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "unicode-nested",
+    "files": {
+      "s.json": "[{\"key\": \"caf\\u00e9\", \"value\": {\"z\": [false, \"\", null], \"a\": \"\\u00e9t\\u00e9\"}}]"
+    },
+    "steps": [
+      {
+        "argv": [
+          "compact",
+          "s.json"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "keys": 1
+          },
+          "files": {
+            "s.json": "{\"values\":{\"café\":{\"a\":\"été\",\"z\":[false,\"\",null]}},\"version\":2}\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "v2-read-does-not-rewrite",
+    "files": {
+      "s.json": "{ \"values\": {\"a\":false}, \"version\": 2 }"
+    },
+    "steps": [
+      {
+        "argv": [
+          "read",
+          "s.json"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "a": false
+          },
+          "files": {
+            "s.json": "{ \"values\": {\"a\":false}, \"version\": 2 }"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "empty-migration",
+    "files": {
+      "s.json": "[]"
+    },
+    "steps": [
+      {
+        "argv": [
+          "compact",
+          "s.json"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "keys": 0
+          },
+          "files": {
+            "s.json": "{\"values\":{},\"version\":2}\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "invalid-record-preserved",
+    "files": {
+      "s.json": "[{\"key\":3,\"value\":4}]"
+    },
+    "steps": [
+      {
+        "argv": [
+          "compact",
+          "s.json"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "invalid snapshot"
+          },
+          "files": {
+            "s.json": "[{\"key\":3,\"value\":4}]"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "unknown-version",
+    "files": {
+      "s.json": "{\"version\":3,\"values\":{}}"
+    },
+    "steps": [
+      {
+        "argv": [
+          "read",
+          "s.json"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "invalid snapshot"
+          }
+        }
+      }
+    ]
+  }
+]

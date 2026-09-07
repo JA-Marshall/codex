@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "id": "py-durable-queue",
+  "family": "maintenance",
+  "language": "python",
+  "size": "medium",
+  "split": "study",
+  "project_id": "py-durable-queue",
+  "capabilities": [
+    "cli",
+    "persistence",
+    "recovery",
+    "event-replay",
+    "backward-compatibility"
+  ],
+  "write_paths": [
+    "src",
+    "tests"
+  ],
+  "command": [
+    "{python}",
+    "{repository}/src/main.py"
+  ],
+  "build": [],
+  "public_command": [
+    "{python}",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests"
+  ],
+  "mutants": [
+    "parse-valid-tail",
+    "append-after-tail"
+  ],
+  "structural_checks": []
+}

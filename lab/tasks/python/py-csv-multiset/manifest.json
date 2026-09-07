@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "id": "py-csv-multiset",
+  "family": "bug_fix",
+  "language": "python",
+  "size": "medium",
+  "split": "study",
+  "project_id": "py-csv-multiset",
+  "capabilities": [
+    "cli",
+    "csv",
+    "data-reconciliation",
+    "multiset"
+  ],
+  "write_paths": [
+    "src",
+    "tests"
+  ],
+  "command": [
+    "{python}",
+    "{repository}/src/main.py"
+  ],
+  "build": [],
+  "public_command": [
+    "{python}",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests"
+  ],
+  "mutants": [
+    "set-semantics",
+    "positional-columns"
+  ],
+  "structural_checks": []
+}

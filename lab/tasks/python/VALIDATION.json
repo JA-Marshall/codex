@@ -1,0 +1,458 @@
+{
+  "runtime": "3.12.6 (tags/v3.12.6:a4a2d2b, Sep  6 2024, 20:11:23) [MSC v.1940 64 bit (AMD64)]",
+  "kind": "host-fixture-self-calibration",
+  "tasks": [
+    {
+      "id": "py-batch-checksums",
+      "private_cases": 6,
+      "variants": {
+        "baseline": {
+          "public_pass": true,
+          "private_pass": 4,
+          "rejected_case_ids": [
+            "isolate-and-preserve-order",
+            "unsafe-before-io"
+          ]
+        },
+        "solution": {
+          "public_pass": true,
+          "private_pass": 6,
+          "rejected_case_ids": []
+        },
+        "drop-failed-items": {
+          "public_pass": true,
+          "private_pass": 4,
+          "rejected_case_ids": [
+            "isolate-and-preserve-order",
+            "unsafe-before-io"
+          ]
+        },
+        "sort-by-id": {
+          "public_pass": true,
+          "private_pass": 3,
+          "rejected_case_ids": [
+            "isolate-and-preserve-order",
+            "unicode-and-crlf-duplicates",
+            "unsafe-before-io"
+          ]
+        }
+      }
+    },
+    {
+      "id": "py-csv-multiset",
+      "private_cases": 7,
+      "variants": {
+        "baseline": {
+          "public_pass": true,
+          "private_pass": 5,
+          "rejected_case_ids": [
+            "duplicate-deltas",
+            "quoted-and-empty"
+          ]
+        },
+        "solution": {
+          "public_pass": true,
+          "private_pass": 7,
+          "rejected_case_ids": []
+        },
+        "set-semantics": {
+          "public_pass": true,
+          "private_pass": 5,
+          "rejected_case_ids": [
+            "duplicate-deltas",
+            "quoted-and-empty"
+          ]
+        },
+        "positional-columns": {
+          "public_pass": true,
+          "private_pass": 5,
+          "rejected_case_ids": [
+            "quoted-and-empty",
+            "reordered-headers"
+          ]
+        }
+      }
+    },
+    {
+      "id": "py-csv-rollup",
+      "private_cases": 6,
+      "variants": {
+        "baseline": {
+          "public_pass": true,
+          "private_pass": 1,
+          "rejected_case_ids": [
+            "header-only",
+            "invalid-late",
+            "quoted-and-empty",
+            "repeated-signed-groups",
+            "unknown"
+          ]
+        },
+        "solution": {
+          "public_pass": true,
+          "private_pass": 6,
+          "rejected_case_ids": []
+        },
+        "overwrite-groups": {
+          "public_pass": true,
+          "private_pass": 4,
+          "rejected_case_ids": [
+            "quoted-and-empty",
+            "repeated-signed-groups"
+          ]
+        },
+        "drop-empty-groups": {
+          "public_pass": true,
+          "private_pass": 5,
+          "rejected_case_ids": [
+            "quoted-and-empty"
+          ]
+        }
+      }
+    },
+    {
+      "id": "py-dependency-waves",
+      "private_cases": 7,
+      "variants": {
+        "baseline": {
+          "public_pass": false,
+          "private_pass": 0,
+          "rejected_case_ids": [
+            "empty",
+            "isolated-cycle",
+            "non-string",
+            "parallel-and-dedup",
+            "self-cycle",
+            "unknown-first",
+            "wrong-type"
+          ]
+        },
+        "solution": {
+          "public_pass": true,
+          "private_pass": 7,
+          "rejected_case_ids": []
+        },
+        "reverse-edges": {
+          "public_pass": false,
+          "private_pass": 5,
+          "rejected_case_ids": [
+            "parallel-and-dedup",
+            "unknown-first"
+          ]
+        },
+        "one-task-per-wave": {
+          "public_pass": true,
+          "private_pass": 6,
+          "rejected_case_ids": [
+            "parallel-and-dedup"
+          ]
+        }
+      }
+    },
+    {
+      "id": "py-document-index",
+      "private_cases": 4,
+      "variants": {
+        "baseline": {
+          "public_pass": false,
+          "private_pass": 0,
+          "rejected_case_ids": [
+            "index-excluded",
+            "nested-all-terms",
+            "replace-stale",
+            "unicode-empty-ignored-case"
+          ]
+        },
+        "solution": {
+          "public_pass": true,
+          "private_pass": 4,
+          "rejected_case_ids": []
+        },
+        "any-term-query": {
+          "public_pass": true,
+          "private_pass": 3,
+          "rejected_case_ids": [
+            "nested-all-terms"
+          ]
+        },
+        "stale-rebuild": {
+          "public_pass": true,
+          "private_pass": 2,
+          "rejected_case_ids": [
+            "index-excluded",
+            "replace-stale"
+          ]
+        }
+      }
+    },
+    {
+      "id": "py-durable-queue",
+      "private_cases": 9,
+      "variants": {
+        "baseline": {
+          "public_pass": true,
+          "private_pass": 4,
+          "rejected_case_ids": [
+            "broken-tail-recovery",
+            "empty-uncommitted-tail",
+            "failed-write-keeps-tail",
+            "unicode-line-separator-in-value",
+            "valid-but-uncommitted-tail"
+          ]
+        },
+        "solution": {
+          "public_pass": true,
+          "private_pass": 9,
+          "rejected_case_ids": []
+        },
+        "parse-valid-tail": {
+          "public_pass": true,
+          "private_pass": 4,
+          "rejected_case_ids": [
+            "broken-tail-recovery",
+            "empty-uncommitted-tail",
+            "failed-write-keeps-tail",
+            "unicode-line-separator-in-value",
+            "valid-but-uncommitted-tail"
+          ]
+        },
+        "append-after-tail": {
+          "public_pass": true,
+          "private_pass": 6,
+          "rejected_case_ids": [
+            "broken-tail-recovery",
+            "empty-uncommitted-tail",
+            "valid-but-uncommitted-tail"
+          ]
+        }
+      }
+    },
+    {
+      "id": "py-ledger-batches",
+      "private_cases": 8,
+      "variants": {
+        "baseline": {
+          "public_pass": true,
+          "private_pass": 0,
+          "rejected_case_ids": [
+            "chained-transfer",
+            "empty-batch",
+            "id-conflict",
+            "invalid-bool",
+            "invalid-late-transfer",
+            "replay-snapshot",
+            "rollback-after-successful-prefix",
+            "zero-retained-and-exact-state"
+          ]
+        },
+        "solution": {
+          "public_pass": true,
+          "private_pass": 8,
+          "rejected_case_ids": []
+        },
+        "replay-current-balances": {
+          "public_pass": true,
+          "private_pass": 7,
+          "rejected_case_ids": [
+            "replay-snapshot"
+          ]
+        },
+        "partial-write": {
+          "public_pass": true,
+          "private_pass": 6,
+          "rejected_case_ids": [
+            "invalid-late-transfer",
+            "rollback-after-successful-prefix"
+          ]
+        }
+      }
+    },
+    {
+      "id": "py-log-tally",
+      "private_cases": 7,
+      "variants": {
+        "baseline": {
+          "public_pass": false,
+          "private_pass": 2,
+          "rejected_case_ids": [
+            "apostrophes-and-underscore",
+            "empty",
+            "ties-and-limit",
+            "unicode-casefold",
+            "zero-limit"
+          ]
+        },
+        "solution": {
+          "public_pass": true,
+          "private_pass": 7,
+          "rejected_case_ids": []
+        },
+        "ascii-only": {
+          "public_pass": true,
+          "private_pass": 6,
+          "rejected_case_ids": [
+            "unicode-casefold"
+          ]
+        },
+        "truncate-before-count": {
+          "public_pass": false,
+          "private_pass": 5,
+          "rejected_case_ids": [
+            "ties-and-limit",
+            "zero-limit"
+          ]
+        }
+      }
+    },
+    {
+      "id": "py-room-calendar",
+      "private_cases": 5,
+      "variants": {
+        "baseline": {
+          "public_pass": true,
+          "private_pass": 0,
+          "rejected_case_ids": [
+            "conflict-rollback",
+            "invalid-bool",
+            "move-room",
+            "same-and-adjacent",
+            "unknown-preserves"
+          ]
+        },
+        "solution": {
+          "public_pass": true,
+          "private_pass": 5,
+          "rejected_case_ids": []
+        },
+        "self-conflict": {
+          "public_pass": true,
+          "private_pass": 2,
+          "rejected_case_ids": [
+            "conflict-rollback",
+            "move-room",
+            "same-and-adjacent"
+          ]
+        },
+        "delete-before-validation": {
+          "public_pass": true,
+          "private_pass": 3,
+          "rejected_case_ids": [
+            "conflict-rollback",
+            "invalid-bool"
+          ]
+        }
+      }
+    },
+    {
+      "id": "py-route-planner",
+      "private_cases": 7,
+      "variants": {
+        "baseline": {
+          "public_pass": true,
+          "private_pass": 6,
+          "rejected_case_ids": [
+            "cheaper-indirect"
+          ]
+        },
+        "solution": {
+          "public_pass": true,
+          "private_pass": 7,
+          "rejected_case_ids": []
+        },
+        "early-destination": {
+          "public_pass": true,
+          "private_pass": 6,
+          "rejected_case_ids": [
+            "cheaper-indirect"
+          ]
+        },
+        "undirected-edges": {
+          "public_pass": true,
+          "private_pass": 5,
+          "rejected_case_ids": [
+            "directed-self-unreachable",
+            "parallel-and-cycle"
+          ]
+        }
+      }
+    },
+    {
+      "id": "py-semver-order",
+      "private_cases": 8,
+      "variants": {
+        "baseline": {
+          "public_pass": true,
+          "private_pass": 7,
+          "rejected_case_ids": [
+            "numeric-prerelease"
+          ]
+        },
+        "solution": {
+          "public_pass": true,
+          "private_pass": 8,
+          "rejected_case_ids": []
+        },
+        "lexical-numeric": {
+          "public_pass": true,
+          "private_pass": 7,
+          "rejected_case_ids": [
+            "numeric-prerelease"
+          ]
+        },
+        "build-tiebreaker": {
+          "public_pass": true,
+          "private_pass": 7,
+          "rejected_case_ids": [
+            "stable-build"
+          ]
+        }
+      }
+    },
+    {
+      "id": "py-snapshot-format",
+      "private_cases": 6,
+      "variants": {
+        "baseline": {
+          "public_pass": true,
+          "private_pass": 2,
+          "rejected_case_ids": [
+            "empty-migration",
+            "migrate-duplicates-and-falsy",
+            "unicode-nested",
+            "v2-read-does-not-rewrite"
+          ]
+        },
+        "solution": {
+          "public_pass": true,
+          "private_pass": 6,
+          "rejected_case_ids": []
+        },
+        "drop-falsy": {
+          "public_pass": true,
+          "private_pass": 5,
+          "rejected_case_ids": [
+            "migrate-duplicates-and-falsy"
+          ]
+        },
+        "first-duplicate-wins": {
+          "public_pass": false,
+          "private_pass": 5,
+          "rejected_case_ids": [
+            "migrate-duplicates-and-falsy"
+          ]
+        }
+      }
+    }
+  ],
+  "summary": {
+    "tasks": 12,
+    "solution_public_suites_passed": 12,
+    "solution_private_cases_passed": 80,
+    "baselines_rejected": 12,
+    "mutants_rejected": 24,
+    "non_greenfield_baseline_public_suites_passed": 9
+  },
+  "status": "initial-self-calibration-superseded-by-contract-review",
+  "current_private_case_total": 82,
+  "pending_shared_calibration": "Two repeated-ID invalid-amount regressions and reference validation were added after the recorded 80-case self-check. The shared evaluator will recalibrate the current assets."
+}

@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "id": "py-csv-rollup",
+  "family": "extension",
+  "language": "python",
+  "size": "small",
+  "split": "study",
+  "project_id": "py-csv-rollup",
+  "capabilities": [
+    "cli",
+    "csv",
+    "aggregation",
+    "backward-compatibility"
+  ],
+  "write_paths": [
+    "src",
+    "tests"
+  ],
+  "command": [
+    "{python}",
+    "{repository}/src/main.py"
+  ],
+  "build": [],
+  "public_command": [
+    "{python}",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests"
+  ],
+  "mutants": [
+    "overwrite-groups",
+    "drop-empty-groups"
+  ],
+  "structural_checks": []
+}

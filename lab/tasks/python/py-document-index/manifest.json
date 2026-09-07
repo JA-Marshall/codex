@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "id": "py-document-index",
+  "family": "greenfield",
+  "language": "python",
+  "size": "large",
+  "split": "study",
+  "project_id": "py-document-index",
+  "capabilities": [
+    "cli",
+    "filesystem",
+    "parsing",
+    "persistence",
+    "search"
+  ],
+  "write_paths": [
+    "src",
+    "tests"
+  ],
+  "command": [
+    "{python}",
+    "{repository}/src/main.py"
+  ],
+  "build": [],
+  "public_command": [
+    "{python}",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests"
+  ],
+  "mutants": [
+    "any-term-query",
+    "stale-rebuild"
+  ],
+  "structural_checks": []
+}

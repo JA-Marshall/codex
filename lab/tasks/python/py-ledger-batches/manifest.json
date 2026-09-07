@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "id": "py-ledger-batches",
+  "family": "extension",
+  "language": "python",
+  "size": "large",
+  "split": "study",
+  "project_id": "py-ledger-batches",
+  "capabilities": [
+    "cli",
+    "persistence",
+    "transactionality",
+    "idempotency",
+    "validation"
+  ],
+  "write_paths": [
+    "src",
+    "tests"
+  ],
+  "command": [
+    "{python}",
+    "{repository}/src/main.py"
+  ],
+  "build": [],
+  "public_command": [
+    "{python}",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests"
+  ],
+  "mutants": [
+    "replay-current-balances",
+    "partial-write"
+  ],
+  "structural_checks": []
+}

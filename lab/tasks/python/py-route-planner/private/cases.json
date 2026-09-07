@@ -1,0 +1,182 @@
+[
+  {
+    "id": "cheaper-indirect",
+    "files": {
+      "g.json": "{\"nodes\": [\"a\", \"b\", \"c\"], \"edges\": [{\"from\": \"a\", \"to\": \"c\", \"cost\": 9}, {\"from\": \"a\", \"to\": \"b\", \"cost\": 2}, {\"from\": \"b\", \"to\": \"c\", \"cost\": 2}]}"
+    },
+    "steps": [
+      {
+        "argv": [
+          "g.json"
+        ],
+        "stdin": "[[\"a\",\"c\"]]",
+        "expect": {
+          "exit": 0,
+          "stdout_json": [
+            {
+              "cost": 4,
+              "path": [
+                "a",
+                "b",
+                "c"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "directed-self-unreachable",
+    "files": {
+      "g.json": "{\"nodes\": [\"a\", \"b\", \"c\"], \"edges\": [{\"from\": \"a\", \"to\": \"b\", \"cost\": 1}]}"
+    },
+    "steps": [
+      {
+        "argv": [
+          "g.json"
+        ],
+        "stdin": "[[\"b\",\"a\"],[\"c\",\"c\"],[\"a\",\"c\"]]",
+        "expect": {
+          "exit": 0,
+          "stdout_json": [
+            {
+              "cost": null,
+              "path": []
+            },
+            {
+              "cost": 0,
+              "path": [
+                "c"
+              ]
+            },
+            {
+              "cost": null,
+              "path": []
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "full-path-tie",
+    "files": {
+      "g.json": "{\"nodes\": [\"s\", \"b\", \"c\", \"a\", \"z\", \"t\"], \"edges\": [{\"from\": \"s\", \"to\": \"b\", \"cost\": 1}, {\"from\": \"b\", \"to\": \"c\", \"cost\": 1}, {\"from\": \"c\", \"to\": \"t\", \"cost\": 1}, {\"from\": \"s\", \"to\": \"a\", \"cost\": 1}, {\"from\": \"a\", \"to\": \"z\", \"cost\": 1}, {\"from\": \"z\", \"to\": \"t\", \"cost\": 1}]}"
+    },
+    "steps": [
+      {
+        "argv": [
+          "g.json"
+        ],
+        "stdin": "[[\"s\",\"t\"]]",
+        "expect": {
+          "exit": 0,
+          "stdout_json": [
+            {
+              "cost": 3,
+              "path": [
+                "s",
+                "a",
+                "z",
+                "t"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "parallel-and-cycle",
+    "files": {
+      "g.json": "{\"nodes\": [\"c\", \"b\", \"a\"], \"edges\": [{\"from\": \"a\", \"to\": \"b\", \"cost\": 9}, {\"from\": \"a\", \"to\": \"b\", \"cost\": 1}, {\"from\": \"b\", \"to\": \"a\", \"cost\": 2}, {\"from\": \"b\", \"to\": \"b\", \"cost\": 1}, {\"from\": \"b\", \"to\": \"c\", \"cost\": 2}]}"
+    },
+    "steps": [
+      {
+        "argv": [
+          "g.json"
+        ],
+        "stdin": "[[\"a\",\"c\"],[\"b\",\"a\"]]",
+        "expect": {
+          "exit": 0,
+          "stdout_json": [
+            {
+              "cost": 3,
+              "path": [
+                "a",
+                "b",
+                "c"
+              ]
+            },
+            {
+              "cost": 2,
+              "path": [
+                "b",
+                "a"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "validate-all-queries",
+    "files": {
+      "g.json": "{\"nodes\": [\"a\", \"b\"], \"edges\": [{\"from\": \"a\", \"to\": \"b\", \"cost\": 1}]}"
+    },
+    "steps": [
+      {
+        "argv": [
+          "g.json"
+        ],
+        "stdin": "[[\"a\",\"b\"],[\"a\",\"missing\"]]",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "unknown node"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "invalid-cost",
+    "files": {
+      "g.json": "{\"nodes\": [\"a\", \"b\"], \"edges\": [{\"from\": \"a\", \"to\": \"b\", \"cost\": 0}]}"
+    },
+    "steps": [
+      {
+        "argv": [
+          "g.json"
+        ],
+        "stdin": "[]",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "invalid edge"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "empty-batch",
+    "files": {
+      "g.json": "{\"nodes\": [], \"edges\": []}"
+    },
+    "steps": [
+      {
+        "argv": [
+          "g.json"
+        ],
+        "stdin": "[]",
+        "expect": {
+          "exit": 0,
+          "stdout_json": []
+        }
+      }
+    ]
+  }
+]

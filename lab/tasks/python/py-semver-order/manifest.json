@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "id": "py-semver-order",
+  "family": "bug_fix",
+  "language": "python",
+  "size": "small",
+  "split": "study",
+  "project_id": "py-semver-order",
+  "capabilities": [
+    "cli",
+    "parsing",
+    "sorting",
+    "regression"
+  ],
+  "write_paths": [
+    "src",
+    "tests"
+  ],
+  "command": [
+    "{python}",
+    "{repository}/src/main.py"
+  ],
+  "build": [],
+  "public_command": [
+    "{python}",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests"
+  ],
+  "mutants": [
+    "lexical-numeric",
+    "build-tiebreaker"
+  ],
+  "structural_checks": []
+}

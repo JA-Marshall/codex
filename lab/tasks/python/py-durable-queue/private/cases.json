@@ -1,0 +1,308 @@
+[
+  {
+    "id": "broken-tail-recovery",
+    "files": {
+      "q.log": "{\"id\":\"a\",\"op\":\"push\",\"value\":1}\n{\"op\":\"pu"
+    },
+    "steps": [
+      {
+        "argv": [
+          "list",
+          "q.log"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": [
+            {
+              "id": "a",
+              "value": 1
+            }
+          ],
+          "files": {
+            "q.log": "{\"id\":\"a\",\"op\":\"push\",\"value\":1}\n{\"op\":\"pu"
+          }
+        }
+      },
+      {
+        "argv": [
+          "push",
+          "q.log"
+        ],
+        "stdin": "{\"id\":\"b\",\"value\":{\"x\":false}}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "ok": true
+          },
+          "files": {
+            "q.log": "{\"id\":\"a\",\"op\":\"push\",\"value\":1}\n{\"id\":\"b\",\"op\":\"push\",\"value\":{\"x\":false}}\n"
+          }
+        }
+      },
+      {
+        "argv": [
+          "pop",
+          "q.log"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "id": "a",
+            "value": 1
+          }
+        }
+      },
+      {
+        "argv": [
+          "list",
+          "q.log"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": [
+            {
+              "id": "b",
+              "value": {
+                "x": false
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "valid-but-uncommitted-tail",
+    "files": {
+      "q.log": "{\"id\":\"a\",\"op\":\"push\",\"value\":1}\n{\"id\":\"ghost\",\"op\":\"push\",\"value\":9}"
+    },
+    "steps": [
+      {
+        "argv": [
+          "list",
+          "q.log"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": [
+            {
+              "id": "a",
+              "value": 1
+            }
+          ]
+        }
+      },
+      {
+        "argv": [
+          "pop",
+          "q.log"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "id": "a",
+            "value": 1
+          },
+          "files": {
+            "q.log": "{\"id\":\"a\",\"op\":\"push\",\"value\":1}\n{\"id\":\"a\",\"op\":\"pop\"}\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "failed-write-keeps-tail",
+    "files": {
+      "q.log": "{\"id\":\"a\",\"op\":\"push\",\"value\":1}\nbad"
+    },
+    "steps": [
+      {
+        "argv": [
+          "push",
+          "q.log"
+        ],
+        "stdin": "{\"id\":\"a\",\"value\":2}",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "duplicate id"
+          },
+          "files": {
+            "q.log": "{\"id\":\"a\",\"op\":\"push\",\"value\":1}\nbad"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "complete-corruption",
+    "files": {
+      "q.log": "{\"id\":\"a\",\"op\":\"push\",\"value\":1}\nbad\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "push",
+          "q.log"
+        ],
+        "stdin": "{\"id\":\"b\",\"value\":2}",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "corrupt log"
+          },
+          "files": {
+            "q.log": "{\"id\":\"a\",\"op\":\"push\",\"value\":1}\nbad\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "empty-uncommitted-tail",
+    "files": {
+      "q.log": "{\"op\":"
+    },
+    "steps": [
+      {
+        "argv": [
+          "pop",
+          "q.log"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": null,
+          "files": {
+            "q.log": "{\"op\":"
+          }
+        }
+      },
+      {
+        "argv": [
+          "push",
+          "q.log"
+        ],
+        "stdin": "{\"id\":\"a\",\"value\":1}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "ok": true
+          },
+          "files": {
+            "q.log": "{\"id\":\"a\",\"op\":\"push\",\"value\":1}\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "historical-duplicate",
+    "files": {
+      "q.log": "{\"id\":\"a\",\"op\":\"push\",\"value\":1}\n{\"id\":\"a\",\"op\":\"pop\"}\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "push",
+          "q.log"
+        ],
+        "stdin": "{\"id\":\"a\",\"value\":3}",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "duplicate id"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "crlf-preserved",
+    "files": {
+      "q.log": "{\"id\":\"a\",\"op\":\"push\",\"value\":1}\r\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "push",
+          "q.log"
+        ],
+        "stdin": "{\"id\":\"b\",\"value\":{\"x\":false}}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "ok": true
+          },
+          "files": {
+            "q.log": "{\"id\":\"a\",\"op\":\"push\",\"value\":1}\r\n{\"id\":\"b\",\"op\":\"push\",\"value\":{\"x\":false}}\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "invalid-pop-event",
+    "files": {
+      "q.log": "{\"id\":\"a\",\"op\":\"push\",\"value\":1}\n{\"id\":\"other\",\"op\":\"pop\"}\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "list",
+          "q.log"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "corrupt log"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "unicode-line-separator-in-value",
+    "files": {
+      "q.log": "{\"id\":\"a\",\"op\":\"push\",\"value\":\"one two\"}\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "list",
+          "q.log"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": [
+            {
+              "id": "a",
+              "value": "one two"
+            }
+          ]
+        }
+      },
+      {
+        "argv": [
+          "pop",
+          "q.log"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "id": "a",
+            "value": "one two"
+          }
+        }
+      }
+    ]
+  }
+]

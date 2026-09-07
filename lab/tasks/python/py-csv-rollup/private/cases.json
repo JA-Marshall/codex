@@ -1,0 +1,162 @@
+[
+  {
+    "id": "repeated-signed-groups",
+    "files": {
+      "r.csv": "team,score\nb,10\na,0\nb,-5\nb,+2\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "rollup",
+          "r.csv",
+          "team",
+          "score"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": [
+            {
+              "group": "a",
+              "count": 1,
+              "sum": 0
+            },
+            {
+              "group": "b",
+              "count": 3,
+              "sum": 7
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "quoted-and-empty",
+    "files": {
+      "r.csv": "team,score\n,4\n\"a,b\",7\n\"x\ny\",9\n\"a,b\",-2\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "rollup",
+          "r.csv",
+          "team",
+          "score"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": [
+            {
+              "group": "",
+              "count": 1,
+              "sum": 4
+            },
+            {
+              "group": "a,b",
+              "count": 2,
+              "sum": 5
+            },
+            {
+              "group": "x\ny",
+              "count": 1,
+              "sum": 9
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "header-only",
+    "files": {
+      "r.csv": "team,score\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "rollup",
+          "r.csv",
+          "team",
+          "score"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": []
+        }
+      }
+    ]
+  },
+  {
+    "id": "unknown",
+    "files": {
+      "r.csv": "team,score\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "rollup",
+          "r.csv",
+          "team",
+          "no"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "unknown column"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "invalid-late",
+    "files": {
+      "r.csv": "team,score\na,1\nb,1.2\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "rollup",
+          "r.csv",
+          "team",
+          "score"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "invalid integer"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "existing-multiline",
+    "files": {
+      "r.csv": "team,score\n\"a,b\", 3 \n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "rows",
+          "r.csv"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": [
+            {
+              "team": "a,b",
+              "score": " 3 "
+            }
+          ]
+        }
+      }
+    ]
+  }
+]

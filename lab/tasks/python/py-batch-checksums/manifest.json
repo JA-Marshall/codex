@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "id": "py-batch-checksums",
+  "family": "maintenance",
+  "language": "python",
+  "size": "large",
+  "split": "study",
+  "project_id": "py-batch-checksums",
+  "capabilities": [
+    "cli",
+    "filesystem",
+    "concurrency",
+    "hashing",
+    "fault-isolation",
+    "backward-compatibility"
+  ],
+  "write_paths": [
+    "src",
+    "tests"
+  ],
+  "command": [
+    "{python}",
+    "{repository}/src/main.py"
+  ],
+  "build": [],
+  "public_command": [
+    "{python}",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests"
+  ],
+  "mutants": [
+    "drop-failed-items",
+    "sort-by-id"
+  ],
+  "structural_checks": []
+}

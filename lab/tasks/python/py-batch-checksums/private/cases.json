@@ -1,0 +1,186 @@
+[
+  {
+    "id": "isolate-and-preserve-order",
+    "files": {
+      "root/good.txt": "a",
+      "root/nested/file.txt": "x",
+      "root/other.txt": "b",
+      "manifest.json": "[{\"id\": \"z\", \"path\": \"good.txt\", \"sha256\": \"ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb\"}, {\"id\": \"a\", \"path\": \"missing\", \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}, {\"id\": \"q\", \"path\": \"nested\", \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}, {\"id\": \"b\", \"path\": \"other.txt\", \"sha256\": \"2f05d4b689d270cafb02285f35f44866f7dc8a2d368a3f9d1124373eeab31fb1\"}]"
+    },
+    "steps": [
+      {
+        "argv": [
+          "root",
+          "manifest.json",
+          "report.json"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "ok": 1,
+            "mismatch": 1,
+            "error": 2
+          },
+          "files": {
+            "report.json": "{\"results\":[{\"actual\":\"ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb\",\"id\":\"z\",\"status\":\"ok\"},{\"error\":\"not a file\",\"id\":\"a\",\"status\":\"error\"},{\"error\":\"not a file\",\"id\":\"q\",\"status\":\"error\"},{\"actual\":\"3e23e8160039594a33894f6564e1b1348bbd7a0088d42c4acb73eeaed59c009d\",\"id\":\"b\",\"status\":\"mismatch\"}],\"summary\":{\"error\":2,\"mismatch\":1,\"ok\":1}}\n",
+            "root/good.txt": "a",
+            "root/nested/file.txt": "x",
+            "root/other.txt": "b",
+            "manifest.json": "[{\"id\": \"z\", \"path\": \"good.txt\", \"sha256\": \"ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb\"}, {\"id\": \"a\", \"path\": \"missing\", \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}, {\"id\": \"q\", \"path\": \"nested\", \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}, {\"id\": \"b\", \"path\": \"other.txt\", \"sha256\": \"2f05d4b689d270cafb02285f35f44866f7dc8a2d368a3f9d1124373eeab31fb1\"}]"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "unsafe-before-io",
+    "files": {
+      "secret.txt": "secret",
+      "root/a": "a",
+      "manifest.json": "[{\"id\": \"traverse\", \"path\": \"../secret.txt\", \"sha256\": \"2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b\"}, {\"id\": \"slash\", \"path\": \"/tmp/file\", \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}, {\"id\": \"windows\", \"path\": \"C:/file\", \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}, {\"id\": \"backslash\", \"path\": \"a\\\\b\", \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}, {\"id\": \"empty-component\", \"path\": \"a//b\", \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}, {\"id\": \"dot\", \"path\": \"./a\", \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}]"
+    },
+    "steps": [
+      {
+        "argv": [
+          "root",
+          "manifest.json",
+          "report.json"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "ok": 0,
+            "mismatch": 0,
+            "error": 6
+          },
+          "files": {
+            "report.json": "{\"results\":[{\"error\":\"unsafe path\",\"id\":\"traverse\",\"status\":\"error\"},{\"error\":\"unsafe path\",\"id\":\"slash\",\"status\":\"error\"},{\"error\":\"unsafe path\",\"id\":\"windows\",\"status\":\"error\"},{\"error\":\"unsafe path\",\"id\":\"backslash\",\"status\":\"error\"},{\"error\":\"unsafe path\",\"id\":\"empty-component\",\"status\":\"error\"},{\"error\":\"unsafe path\",\"id\":\"dot\",\"status\":\"error\"}],\"summary\":{\"error\":6,\"mismatch\":0,\"ok\":0}}\n",
+            "secret.txt": "secret",
+            "root/a": "a",
+            "manifest.json": "[{\"id\": \"traverse\", \"path\": \"../secret.txt\", \"sha256\": \"2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b\"}, {\"id\": \"slash\", \"path\": \"/tmp/file\", \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}, {\"id\": \"windows\", \"path\": \"C:/file\", \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}, {\"id\": \"backslash\", \"path\": \"a\\\\b\", \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}, {\"id\": \"empty-component\", \"path\": \"a//b\", \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}, {\"id\": \"dot\", \"path\": \"./a\", \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}]"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "unicode-and-crlf-duplicates",
+    "files": {
+      "root/café.txt": "été\r\n",
+      "root/empty.txt": "",
+      "manifest.json": "[{\"id\": \"z\", \"path\": \"caf\\u00e9.txt\", \"sha256\": \"49166763932ea7e65a4321c8e3584436df846171814c6543dd875f919696887e\"}, {\"id\": \"a\", \"path\": \"caf\\u00e9.txt\", \"sha256\": \"49166763932ea7e65a4321c8e3584436df846171814c6543dd875f919696887e\"}, {\"id\": \"empty\", \"path\": \"empty.txt\", \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}]"
+    },
+    "steps": [
+      {
+        "argv": [
+          "root",
+          "manifest.json",
+          "report.json"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "ok": 3,
+            "mismatch": 0,
+            "error": 0
+          },
+          "files": {
+            "report.json": "{\"results\":[{\"actual\":\"49166763932ea7e65a4321c8e3584436df846171814c6543dd875f919696887e\",\"id\":\"z\",\"status\":\"ok\"},{\"actual\":\"49166763932ea7e65a4321c8e3584436df846171814c6543dd875f919696887e\",\"id\":\"a\",\"status\":\"ok\"},{\"actual\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"id\":\"empty\",\"status\":\"ok\"}],\"summary\":{\"error\":0,\"mismatch\":0,\"ok\":3}}\n",
+            "root/café.txt": "été\r\n",
+            "root/empty.txt": "",
+            "manifest.json": "[{\"id\": \"z\", \"path\": \"caf\\u00e9.txt\", \"sha256\": \"49166763932ea7e65a4321c8e3584436df846171814c6543dd875f919696887e\"}, {\"id\": \"a\", \"path\": \"caf\\u00e9.txt\", \"sha256\": \"49166763932ea7e65a4321c8e3584436df846171814c6543dd875f919696887e\"}, {\"id\": \"empty\", \"path\": \"empty.txt\", \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}]"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "empty",
+    "files": {
+      "root/marker": "",
+      "manifest.json": "[]"
+    },
+    "steps": [
+      {
+        "argv": [
+          "root",
+          "manifest.json",
+          "report.json"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "ok": 0,
+            "mismatch": 0,
+            "error": 0
+          },
+          "files": {
+            "report.json": "{\"results\":[],\"summary\":{\"error\":0,\"mismatch\":0,\"ok\":0}}\n",
+            "root/marker": "",
+            "manifest.json": "[]"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "duplicate-id-preserves-report",
+    "files": {
+      "root/a": "x",
+      "manifest.json": "[{\"id\": \"a\", \"path\": \"a\", \"sha256\": \"2d711642b726b04401627ca9fbac32f5c8530fb1903cc4db02258717921a4881\"}, {\"id\": \"a\", \"path\": \"a\", \"sha256\": \"2d711642b726b04401627ca9fbac32f5c8530fb1903cc4db02258717921a4881\"}]",
+      "report.json": "existing report\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "root",
+          "manifest.json",
+          "report.json"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "invalid manifest"
+          },
+          "files": {
+            "report.json": "existing report\n",
+            "root/a": "x",
+            "manifest.json": "[{\"id\": \"a\", \"path\": \"a\", \"sha256\": \"2d711642b726b04401627ca9fbac32f5c8530fb1903cc4db02258717921a4881\"}, {\"id\": \"a\", \"path\": \"a\", \"sha256\": \"2d711642b726b04401627ca9fbac32f5c8530fb1903cc4db02258717921a4881\"}]"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "invalid-hash-preserves-report",
+    "files": {
+      "manifest.json": "[{\"id\":\"a\",\"path\":\"a\",\"sha256\":\"XYZ\"}]",
+      "report.json": "keep"
+    },
+    "steps": [
+      {
+        "argv": [
+          "root",
+          "manifest.json",
+          "report.json"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "invalid manifest"
+          },
+          "files": {
+            "report.json": "keep",
+            "manifest.json": "[{\"id\":\"a\",\"path\":\"a\",\"sha256\":\"XYZ\"}]"
+          }
+        }
+      }
+    ]
+  }
+]

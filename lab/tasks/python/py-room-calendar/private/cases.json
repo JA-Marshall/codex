@@ -1,0 +1,204 @@
+[
+  {
+    "id": "same-and-adjacent",
+    "files": {
+      "c.json": "[{\"end\":20,\"id\":\"a\",\"room\":\"blue\",\"start\":10},{\"end\":30,\"id\":\"b\",\"room\":\"blue\",\"start\":20}]\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "reschedule",
+          "c.json"
+        ],
+        "stdin": "{\"id\": \"a\", \"room\": \"blue\", \"start\": 10, \"end\": 20}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "ok": true
+          }
+        }
+      },
+      {
+        "argv": [
+          "reschedule",
+          "c.json"
+        ],
+        "stdin": "{\"id\": \"a\", \"room\": \"blue\", \"start\": 0, \"end\": 20}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "ok": true
+          }
+        }
+      },
+      {
+        "argv": [
+          "list",
+          "c.json"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": [
+            {
+              "id": "a",
+              "room": "blue",
+              "start": 0,
+              "end": 20
+            },
+            {
+              "id": "b",
+              "room": "blue",
+              "start": 20,
+              "end": 30
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "conflict-rollback",
+    "files": {
+      "c.json": "[\n {\n  \"id\": \"b\",\n  \"room\": \"blue\",\n  \"start\": 20,\n  \"end\": 30\n },\n {\n  \"id\": \"a\",\n  \"room\": \"blue\",\n  \"start\": 10,\n  \"end\": 20\n }\n]"
+    },
+    "steps": [
+      {
+        "argv": [
+          "reschedule",
+          "c.json"
+        ],
+        "stdin": "{\"id\": \"a\", \"room\": \"blue\", \"start\": 19, \"end\": 21}",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "conflict"
+          },
+          "files": {
+            "c.json": "[\n {\n  \"id\": \"b\",\n  \"room\": \"blue\",\n  \"start\": 20,\n  \"end\": 30\n },\n {\n  \"id\": \"a\",\n  \"room\": \"blue\",\n  \"start\": 10,\n  \"end\": 20\n }\n]"
+          }
+        }
+      },
+      {
+        "argv": [
+          "list",
+          "c.json"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": [
+            {
+              "id": "a",
+              "room": "blue",
+              "start": 10,
+              "end": 20
+            },
+            {
+              "id": "b",
+              "room": "blue",
+              "start": 20,
+              "end": 30
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "move-room",
+    "files": {
+      "c.json": "[{\"end\":20,\"id\":\"a\",\"room\":\"blue\",\"start\":10},{\"end\":30,\"id\":\"b\",\"room\":\"blue\",\"start\":20}]\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "reschedule",
+          "c.json"
+        ],
+        "stdin": "{\"id\": \"a\", \"room\": \"green\", \"start\": 20, \"end\": 40}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "ok": true
+          },
+          "files": {
+            "c.json": "[{\"end\":40,\"id\":\"a\",\"room\":\"green\",\"start\":20},{\"end\":30,\"id\":\"b\",\"room\":\"blue\",\"start\":20}]\n"
+          }
+        }
+      },
+      {
+        "argv": [
+          "list",
+          "c.json"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": [
+            {
+              "id": "b",
+              "room": "blue",
+              "start": 20,
+              "end": 30
+            },
+            {
+              "id": "a",
+              "room": "green",
+              "start": 20,
+              "end": 40
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "unknown-preserves",
+    "files": {
+      "c.json": "[{\"end\":20,\"id\":\"a\",\"room\":\"blue\",\"start\":10}]\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "reschedule",
+          "c.json"
+        ],
+        "stdin": "{\"id\":\"missing\"}",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "unknown id"
+          },
+          "files": {
+            "c.json": "[{\"end\":20,\"id\":\"a\",\"room\":\"blue\",\"start\":10}]\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "invalid-bool",
+    "files": {
+      "c.json": "[{\"end\":20,\"id\":\"a\",\"room\":\"blue\",\"start\":10}]\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "reschedule",
+          "c.json"
+        ],
+        "stdin": "{\"id\":\"a\",\"room\":\"blue\",\"start\":true,\"end\":4}",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "invalid booking"
+          },
+          "files": {
+            "c.json": "[{\"end\":20,\"id\":\"a\",\"room\":\"blue\",\"start\":10}]\n"
+          }
+        }
+      }
+    ]
+  }
+]

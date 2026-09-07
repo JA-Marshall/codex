@@ -1,0 +1,128 @@
+[
+  {
+    "id": "parallel-and-dedup",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "{\"e\":[\"d\",\"c\"],\"d\":[\"b\"],\"c\":[\"a\",\"a\",\"b\"],\"b\":[],\"a\":[]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "waves": [
+              [
+                "a",
+                "b"
+              ],
+              [
+                "c",
+                "d"
+              ],
+              [
+                "e"
+              ]
+            ],
+            "tasks": 5
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "empty",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "{}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "waves": [],
+            "tasks": 0
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "unknown-first",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "{\"z\":[\"z\",\"missing\"],\"a\":[\"absent\"]}",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "unknown dependency: absent"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "self-cycle",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "{\"self\":[\"self\"]}",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "cycle"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "isolated-cycle",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "{\"a\":[],\"b\":[\"c\"],\"c\":[\"b\"]}",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "cycle"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "wrong-type",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "{\"a\":\"b\"}",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "invalid graph"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "non-string",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "{\"a\":[3]}",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "invalid graph"
+          }
+        }
+      }
+    ]
+  }
+]

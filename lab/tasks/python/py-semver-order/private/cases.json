@@ -1,0 +1,138 @@
+[
+  {
+    "id": "numeric-prerelease",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "[\"1.0.0-rc.10\",\"1.0.0\",\"1.0.0-rc.2\"]",
+        "expect": {
+          "exit": 0,
+          "stdout_json": [
+            "1.0.0-rc.2",
+            "1.0.0-rc.10",
+            "1.0.0"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "stable-build",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "[\"1.0.0+z\",\"1.0.0+a\",\"1.0.0\"]",
+        "expect": {
+          "exit": 0,
+          "stdout_json": [
+            "1.0.0+z",
+            "1.0.0+a",
+            "1.0.0"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "precedence-chain",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "[\"1.0.0\",\"1.0.0-beta\",\"1.0.0-alpha.beta\",\"1.0.0-alpha.1\",\"1.0.0-alpha\",\"1.0.0-1\"]",
+        "expect": {
+          "exit": 0,
+          "stdout_json": [
+            "1.0.0-1",
+            "1.0.0-alpha",
+            "1.0.0-alpha.1",
+            "1.0.0-alpha.beta",
+            "1.0.0-beta",
+            "1.0.0"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "core-numeric-and-build-zero",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "[\"1.10.0+001\",\"1.2.0\"]",
+        "expect": {
+          "exit": 0,
+          "stdout_json": [
+            "1.2.0",
+            "1.10.0+001"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "invalid-leading-zero",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "[\"1.0.0-01\"]",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "invalid version"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "invalid-empty-identifier",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "[\"1.0.0+foo..bar\"]",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "invalid version"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "invalid-core",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "[\"01.0.0\"]",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "invalid version"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "empty",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "[]",
+        "expect": {
+          "exit": 0,
+          "stdout_json": []
+        }
+      }
+    ]
+  }
+]

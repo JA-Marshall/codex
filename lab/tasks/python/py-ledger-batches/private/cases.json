@@ -1,0 +1,422 @@
+[
+  {
+    "id": "chained-transfer",
+    "files": {
+      "l.json": "{\"balances\":{\"a\":10},\"receipts\":{}}\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "batch",
+          "l.json"
+        ],
+        "stdin": "{\"id\": \"x\", \"transfers\": [{\"from\": \"a\", \"to\": \"b\", \"amount\": 4}, {\"from\": \"b\", \"to\": \"c\", \"amount\": 3}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "a": 6,
+            "b": 1,
+            "c": 3
+          }
+        }
+      },
+      {
+        "argv": [
+          "balances",
+          "l.json"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "a": 6,
+            "b": 1,
+            "c": 3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "replay-snapshot",
+    "files": {
+      "l.json": "{\"balances\":{\"a\":10},\"receipts\":{}}\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "batch",
+          "l.json"
+        ],
+        "stdin": "{\"id\": \"x\", \"transfers\": [{\"from\": \"a\", \"to\": \"b\", \"amount\": 4}, {\"from\": \"b\", \"to\": \"c\", \"amount\": 3}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "a": 6,
+            "b": 1,
+            "c": 3
+          }
+        }
+      },
+      {
+        "argv": [
+          "deposit",
+          "l.json"
+        ],
+        "stdin": "{\"account\":\"a\",\"amount\":5}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "a": 11,
+            "b": 1,
+            "c": 3
+          }
+        }
+      },
+      {
+        "argv": [
+          "batch",
+          "l.json"
+        ],
+        "stdin": "{\"id\": \"x\", \"transfers\": [{\"from\": \"a\", \"to\": \"b\", \"amount\": 4}, {\"from\": \"b\", \"to\": \"c\", \"amount\": 3}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "a": 6,
+            "b": 1,
+            "c": 3
+          }
+        }
+      },
+      {
+        "argv": [
+          "balances",
+          "l.json"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "a": 11,
+            "b": 1,
+            "c": 3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "rollback-after-successful-prefix",
+    "files": {
+      "l.json": "{\n \"balances\": {\n  \"a\": 10\n },\n \"receipts\": {}\n}"
+    },
+    "steps": [
+      {
+        "argv": [
+          "batch",
+          "l.json"
+        ],
+        "stdin": "{\"id\": \"bad\", \"transfers\": [{\"from\": \"a\", \"to\": \"b\", \"amount\": 4}, {\"from\": \"b\", \"to\": \"c\", \"amount\": 5}]}",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "insufficient funds"
+          },
+          "files": {
+            "l.json": "{\n \"balances\": {\n  \"a\": 10\n },\n \"receipts\": {}\n}"
+          }
+        }
+      },
+      {
+        "argv": [
+          "balances",
+          "l.json"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "a": 10
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "id-conflict",
+    "files": {
+      "l.json": "{\"balances\":{\"a\":10},\"receipts\":{}}\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "batch",
+          "l.json"
+        ],
+        "stdin": "{\"id\": \"x\", \"transfers\": [{\"from\": \"a\", \"to\": \"b\", \"amount\": 4}, {\"from\": \"b\", \"to\": \"c\", \"amount\": 3}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "a": 6,
+            "b": 1,
+            "c": 3
+          }
+        }
+      },
+      {
+        "argv": [
+          "batch",
+          "l.json"
+        ],
+        "stdin": "{\"id\": \"x\", \"transfers\": [{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}]}",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "id conflict"
+          }
+        }
+      },
+      {
+        "argv": [
+          "balances",
+          "l.json"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "a": 6,
+            "b": 1,
+            "c": 3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "invalid-bool",
+    "files": {
+      "l.json": "{\"balances\":{\"a\":10},\"receipts\":{}}\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "batch",
+          "l.json"
+        ],
+        "stdin": "{\"id\":\"b\",\"transfers\":[{\"from\":\"a\",\"to\":\"b\",\"amount\":true}]}",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "invalid transfer"
+          },
+          "files": {
+            "l.json": "{\"balances\":{\"a\":10},\"receipts\":{}}\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "empty-batch",
+    "files": {
+      "l.json": "{\"balances\":{\"a\":10},\"receipts\":{}}\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "batch",
+          "l.json"
+        ],
+        "stdin": "{\"id\":\"b\",\"transfers\":[]}",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "invalid batch"
+          },
+          "files": {
+            "l.json": "{\"balances\":{\"a\":10},\"receipts\":{}}\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "zero-retained-and-exact-state",
+    "files": {
+      "l.json": "{\"balances\":{\"a\":10},\"receipts\":{}}\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "batch",
+          "l.json"
+        ],
+        "stdin": "{\"id\":\"zero\",\"transfers\":[{\"from\":\"a\",\"to\":\"b\",\"amount\":10}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "a": 0,
+            "b": 10
+          },
+          "files": {
+            "l.json": "{\"balances\":{\"a\":0,\"b\":10},\"receipts\":{\"zero\":{\"balances\":{\"a\":0,\"b\":10},\"transfers\":[{\"amount\":10,\"from\":\"a\",\"to\":\"b\"}]}}}\n"
+          }
+        }
+      },
+      {
+        "argv": [
+          "batch",
+          "l.json"
+        ],
+        "stdin": "{\"id\":\"zero\",\"transfers\":[]}",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "invalid batch"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "invalid-late-transfer",
+    "files": {
+      "l.json": "{\"balances\":{\"a\":10},\"receipts\":{}}\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "batch",
+          "l.json"
+        ],
+        "stdin": "{\"id\":\"bad\",\"transfers\":[{\"from\":\"a\",\"to\":\"b\",\"amount\":2},{\"from\":\"b\",\"to\":\"b\",\"amount\":1}]}",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "invalid transfer"
+          },
+          "files": {
+            "l.json": "{\"balances\":{\"a\":10},\"receipts\":{}}\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "repeated-boolean-amount",
+    "files": {
+      "l.json": "{\"balances\":{\"a\":2},\"receipts\":{}}\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "batch",
+          "l.json"
+        ],
+        "stdin": "{\"id\": \"retry\", \"transfers\": [{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "a": 1,
+            "b": 1
+          },
+          "files": {
+            "l.json": "{\"balances\":{\"a\":1,\"b\":1},\"receipts\":{\"retry\":{\"balances\":{\"a\":1,\"b\":1},\"transfers\":[{\"amount\":1,\"from\":\"a\",\"to\":\"b\"}]}}}\n"
+          }
+        }
+      },
+      {
+        "argv": [
+          "batch",
+          "l.json"
+        ],
+        "stdin": "{\"id\": \"retry\", \"transfers\": [{\"from\": \"a\", \"to\": \"b\", \"amount\": true}]}",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "invalid transfer"
+          },
+          "files": {
+            "l.json": "{\"balances\":{\"a\":1,\"b\":1},\"receipts\":{\"retry\":{\"balances\":{\"a\":1,\"b\":1},\"transfers\":[{\"amount\":1,\"from\":\"a\",\"to\":\"b\"}]}}}\n"
+          }
+        }
+      },
+      {
+        "argv": [
+          "batch",
+          "l.json"
+        ],
+        "stdin": "{\"id\": \"retry\", \"transfers\": [{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "a": 1,
+            "b": 1
+          },
+          "files": {
+            "l.json": "{\"balances\":{\"a\":1,\"b\":1},\"receipts\":{\"retry\":{\"balances\":{\"a\":1,\"b\":1},\"transfers\":[{\"amount\":1,\"from\":\"a\",\"to\":\"b\"}]}}}\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "repeated-float-amount",
+    "files": {
+      "l.json": "{\"balances\":{\"a\":2},\"receipts\":{}}\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "batch",
+          "l.json"
+        ],
+        "stdin": "{\"id\": \"retry\", \"transfers\": [{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "a": 1,
+            "b": 1
+          },
+          "files": {
+            "l.json": "{\"balances\":{\"a\":1,\"b\":1},\"receipts\":{\"retry\":{\"balances\":{\"a\":1,\"b\":1},\"transfers\":[{\"amount\":1,\"from\":\"a\",\"to\":\"b\"}]}}}\n"
+          }
+        }
+      },
+      {
+        "argv": [
+          "batch",
+          "l.json"
+        ],
+        "stdin": "{\"id\": \"retry\", \"transfers\": [{\"from\": \"a\", \"to\": \"b\", \"amount\": 1.0}]}",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "invalid transfer"
+          },
+          "files": {
+            "l.json": "{\"balances\":{\"a\":1,\"b\":1},\"receipts\":{\"retry\":{\"balances\":{\"a\":1,\"b\":1},\"transfers\":[{\"amount\":1,\"from\":\"a\",\"to\":\"b\"}]}}}\n"
+          }
+        }
+      },
+      {
+        "argv": [
+          "batch",
+          "l.json"
+        ],
+        "stdin": "{\"id\": \"retry\", \"transfers\": [{\"from\": \"a\", \"to\": \"b\", \"amount\": 1}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "a": 1,
+            "b": 1
+          },
+          "files": {
+            "l.json": "{\"balances\":{\"a\":1,\"b\":1},\"receipts\":{\"retry\":{\"balances\":{\"a\":1,\"b\":1},\"transfers\":[{\"amount\":1,\"from\":\"a\",\"to\":\"b\"}]}}}\n"
+          }
+        }
+      }
+    ]
+  }
+]

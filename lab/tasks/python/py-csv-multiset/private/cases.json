@@ -1,0 +1,236 @@
+[
+  {
+    "id": "duplicate-deltas",
+    "files": {
+      "a.csv": "id,v\nx,1\nx,1\nx,1\ny,2\n",
+      "b.csv": "id,v\nx,1\ny,2\ny,2\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "a.csv",
+          "b.csv"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "columns": [
+              "id",
+              "v"
+            ],
+            "removed": [
+              {
+                "row": {
+                  "id": "x",
+                  "v": "1"
+                },
+                "count": 2
+              }
+            ],
+            "added": [
+              {
+                "row": {
+                  "id": "y",
+                  "v": "2"
+                },
+                "count": 1
+              }
+            ]
+          },
+          "files": {
+            "a.csv": "id,v\nx,1\nx,1\nx,1\ny,2\n",
+            "b.csv": "id,v\nx,1\ny,2\ny,2\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "reordered-headers",
+    "files": {
+      "a.csv": "id,v\na,first\na,second\n",
+      "b.csv": "v,id\nsecond,a\nfirst,a\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "a.csv",
+          "b.csv"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "columns": [
+              "id",
+              "v"
+            ],
+            "removed": [],
+            "added": []
+          },
+          "files": {
+            "a.csv": "id,v\na,first\na,second\n",
+            "b.csv": "v,id\nsecond,a\nfirst,a\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "quoted-and-empty",
+    "files": {
+      "a.csv": "id,v\n,\"a,b\"\n,\"a,b\"\n",
+      "b.csv": "v,id\n\"a,b\",\n\"line\nbreak\",z\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "a.csv",
+          "b.csv"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "columns": [
+              "id",
+              "v"
+            ],
+            "removed": [
+              {
+                "row": {
+                  "id": "",
+                  "v": "a,b"
+                },
+                "count": 1
+              }
+            ],
+            "added": [
+              {
+                "row": {
+                  "id": "z",
+                  "v": "line\nbreak"
+                },
+                "count": 1
+              }
+            ]
+          },
+          "files": {
+            "a.csv": "id,v\n,\"a,b\"\n,\"a,b\"\n",
+            "b.csv": "v,id\n\"a,b\",\n\"line\nbreak\",z\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "schema-mismatch",
+    "files": {
+      "a.csv": "a,b\n",
+      "b.csv": "a,c\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "a.csv",
+          "b.csv"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "schema mismatch"
+          },
+          "files": {
+            "a.csv": "a,b\n",
+            "b.csv": "a,c\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "duplicate-header",
+    "files": {
+      "a.csv": "a,a\n",
+      "b.csv": "a,b\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "a.csv",
+          "b.csv"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "invalid header"
+          },
+          "files": {
+            "a.csv": "a,a\n",
+            "b.csv": "a,b\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "wrong-width",
+    "files": {
+      "a.csv": "a,b\n1\n",
+      "b.csv": "a,b\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "a.csv",
+          "b.csv"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "invalid row"
+          },
+          "files": {
+            "a.csv": "a,b\n1\n",
+            "b.csv": "a,b\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "empty-tables",
+    "files": {
+      "a.csv": "z,a\n",
+      "b.csv": "a,z\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "a.csv",
+          "b.csv"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "columns": [
+              "a",
+              "z"
+            ],
+            "removed": [],
+            "added": []
+          },
+          "files": {
+            "a.csv": "z,a\n",
+            "b.csv": "a,z\n"
+          }
+        }
+      }
+    ]
+  }
+]

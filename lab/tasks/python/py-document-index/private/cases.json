@@ -1,0 +1,202 @@
+[
+  {
+    "id": "nested-all-terms",
+    "files": {
+      "docs/a.txt": "Blue blue sky",
+      "docs/sub/b.txt": "blue sky sky",
+      "docs/c.txt": "blue sea",
+      "docs/skip.md": "secret secret"
+    },
+    "steps": [
+      {
+        "argv": [
+          "build",
+          "docs",
+          "out/index.json"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "documents": 3,
+            "terms": 3
+          },
+          "files": {
+            "out/index.json": "{\"documents\":{\"a.txt\":{\"blue\":2,\"sky\":1},\"c.txt\":{\"blue\":1,\"sea\":1},\"sub/b.txt\":{\"blue\":1,\"sky\":2}},\"version\":1}\n"
+          }
+        }
+      },
+      {
+        "argv": [
+          "query",
+          "out/index.json",
+          "SKY",
+          "blue blue"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": [
+            {
+              "path": "a.txt",
+              "score": 3
+            },
+            {
+              "path": "sub/b.txt",
+              "score": 3
+            }
+          ]
+        }
+      },
+      {
+        "argv": [
+          "query",
+          "out/index.json",
+          "--"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": []
+        }
+      }
+    ]
+  },
+  {
+    "id": "unicode-empty-ignored-case",
+    "files": {
+      "docs/café.txt": "Straße STRASSE café",
+      "docs/empty.txt": "",
+      "docs/ignored.TXT": "No"
+    },
+    "steps": [
+      {
+        "argv": [
+          "build",
+          "docs",
+          "i.json"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "documents": 2,
+            "terms": 2
+          }
+        }
+      },
+      {
+        "argv": [
+          "query",
+          "i.json",
+          "strasse"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": [
+            {
+              "path": "café.txt",
+              "score": 2
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "replace-stale",
+    "files": {
+      "new/new.txt": "new",
+      "i.json": "{\"documents\":{\"old.txt\":{\"old\":9}},\"version\":1}\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "build",
+          "new",
+          "i.json"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "documents": 1,
+            "terms": 1
+          },
+          "files": {
+            "i.json": "{\"documents\":{\"new.txt\":{\"new\":1}},\"version\":1}\n"
+          }
+        }
+      },
+      {
+        "argv": [
+          "query",
+          "i.json",
+          "old"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": []
+        }
+      }
+    ]
+  },
+  {
+    "id": "index-excluded",
+    "files": {
+      "docs/a.txt": "one",
+      "docs/index.txt": "{\"documents\":{\"ghost.txt\":{\"ghost\":1}},\"version\":1}\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "build",
+          "docs",
+          "docs/index.txt"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "documents": 1,
+            "terms": 1
+          }
+        }
+      },
+      {
+        "argv": [
+          "build",
+          "docs",
+          "docs/index.txt"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "documents": 1,
+            "terms": 1
+          }
+        }
+      },
+      {
+        "argv": [
+          "query",
+          "docs/index.txt",
+          "one"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout_json": [
+            {
+              "path": "a.txt",
+              "score": 1
+            }
+          ]
+        }
+      }
+    ]
+  }
+]

@@ -1,0 +1,189 @@
+[
+  {
+    "id": "unicode-casefold",
+    "files": {},
+    "steps": [
+      {
+        "argv": [
+          "8"
+        ],
+        "stdin": "Straße STRASSE café CAFÉ 42",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "total": 5,
+            "unique": 3,
+            "top": [
+              {
+                "word": "café",
+                "count": 2
+              },
+              {
+                "word": "strasse",
+                "count": 2
+              },
+              {
+                "word": "42",
+                "count": 1
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "apostrophes-and-underscore",
+    "files": {},
+    "steps": [
+      {
+        "argv": [
+          "20"
+        ],
+        "stdin": "can't CAN'T x_y a''b 'start end'",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "total": 8,
+            "unique": 7,
+            "top": [
+              {
+                "word": "can't",
+                "count": 2
+              },
+              {
+                "word": "a",
+                "count": 1
+              },
+              {
+                "word": "b",
+                "count": 1
+              },
+              {
+                "word": "end",
+                "count": 1
+              },
+              {
+                "word": "start",
+                "count": 1
+              },
+              {
+                "word": "x",
+                "count": 1
+              },
+              {
+                "word": "y",
+                "count": 1
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "zero-limit",
+    "files": {},
+    "steps": [
+      {
+        "argv": [
+          "0"
+        ],
+        "stdin": "q p q",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "total": 3,
+            "unique": 2,
+            "top": []
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "ties-and-limit",
+    "files": {},
+    "steps": [
+      {
+        "argv": [
+          "2"
+        ],
+        "stdin": "z z a a b c",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "total": 6,
+            "unique": 4,
+            "top": [
+              {
+                "word": "a",
+                "count": 2
+              },
+              {
+                "word": "z",
+                "count": 2
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "empty",
+    "files": {},
+    "steps": [
+      {
+        "argv": [
+          "3"
+        ],
+        "stdin": " _ -- ",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "total": 0,
+            "unique": 0,
+            "top": []
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "invalid",
+    "files": {},
+    "steps": [
+      {
+        "argv": [
+          "-1"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "usage: LIMIT"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "nondecimal-digit",
+    "files": {},
+    "steps": [
+      {
+        "argv": [
+          "²"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 2,
+          "stdout_json": {
+            "error": "usage: LIMIT"
+          }
+        }
+      }
+    ]
+  }
+]
