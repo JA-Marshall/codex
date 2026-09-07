@@ -4,6 +4,9 @@ mod support;
 #[path = "workflow/repair.rs"]
 mod repair;
 
+#[path = "workflow/delegation.rs"]
+mod delegation;
+
 use std::panic::AssertUnwindSafe;
 
 use codex_lab::ActionKind;
