@@ -17,6 +17,10 @@ pub fn run_spec(base: &Path) -> Result<RunSpec> {
 }
 
 pub fn run_spec_with_renderer(base: &Path, renderer: Renderer) -> Result<RunSpec> {
+    run_spec_with_repairs(base, renderer, /*max_repairs*/ 0)
+}
+
+pub fn run_spec_with_repairs(base: &Path, renderer: Renderer, max_repairs: u8) -> Result<RunSpec> {
     let content = b"---\nname: lab-test-role\ndescription: Exercise the offline lab API.\n---\nFollow the approved canonical plan.\n";
     fs::create_dir_all(base.join("skill"))?;
     fs::write(base.join("skill/SKILL.md"), content)?;
@@ -31,6 +35,7 @@ pub fn run_spec_with_renderer(base: &Path, renderer: Renderer) -> Result<RunSpec
 path = "skill"
 sha256 = "{sha256}"
 [workflows.test]
+max_repairs = {max_repairs}
 approval = "human_required"
 plan.renderer = "{renderer}"
 roles.planner = "test"

@@ -220,6 +220,12 @@ impl Driver {
             ));
         }
         crate::validate_phase_context(self.roles.executor.content(), &implementation_prompt)?;
+        if self.max_repairs > 0 {
+            crate::validate_phase_context(
+                self.roles.executor.content(),
+                &crate::repair::prompt(&implementation_prompt, self.max_repairs, &"x".repeat(512)),
+            )?;
+        }
         crate::validate_phase_context(self.roles.verifier.content(), &verification_prompt)?;
         Ok((rendered, implementation_prompt, verification_prompt))
     }
@@ -230,7 +236,7 @@ impl Driver {
         reviewer: &mut impl HumanReviewer,
     ) -> Result<()> {
         let research = self.prepare_plan(options).await?;
-        loop {
+        'review: loop {
             let plan = self.authority.plan()?.context("canonical plan missing")?;
             let target = self
                 .authority
@@ -279,19 +285,78 @@ impl Driver {
                 }
                 HumanDecision::Abort => bail!("human review ended without approval"),
             }
-            let (report, implementation_artifact) = if let Some(input) = &options.verification_input
-            {
-                input.validate(&plan, &options.repository_commit)?;
-                (
-                    input.report(),
-                    "evidence/verification-input.json#implementation_report".to_owned(),
-                )
-            } else {
+            let initial_implementation_prompt = implementation_prompt;
+            let mut implementation_prompt = initial_implementation_prompt.clone();
+            loop {
+                let (report, implementation_artifact) =
+                    if let Some(input) = &options.verification_input {
+                        input.validate(&plan, &options.repository_commit)?;
+                        (
+                            input.report(),
+                            "evidence/verification-input.json#implementation_report".to_owned(),
+                        )
+                    } else {
+                        let Some(index) = self
+                            .phase(
+                                Phase::Implementation,
+                                implementation_prompt.clone(),
+                                Some(reports::implementation_schema()),
+                            )
+                            .await?
+                        else {
+                            let feedback = self
+                                .amendment_feedback
+                                .take()
+                                .context("missing amendment reason")?;
+                            self.generate_plan(&options.task, &research, &feedback)
+                                .await?;
+                            continue 'review;
+                        };
+                        let report: reports::ImplementationReport =
+                            serde_json::from_str(&self.outputs[index].1.text)?;
+                        (
+                            report,
+                            format!(
+                                "evidence/phase-{:02}.json#implementation-report",
+                                self.phase_count
+                            ),
+                        )
+                    };
+                let completed = report.completed_steps.iter().collect::<BTreeSet<_>>();
+                ensure!(
+                    completed.len() == plan.steps.len()
+                        && report.completed_steps.len() == completed.len()
+                        && plan.steps.iter().all(|s| completed.contains(&s.id)),
+                    "implementation report must cover exactly the approved steps"
+                );
+                let mut pending = plan.steps.clone();
+                while !pending.is_empty() {
+                    let snapshot = self.authority.snapshot()?;
+                    let position = pending
+                        .iter()
+                        .position(|step| {
+                            step.depends_on
+                                .iter()
+                                .all(|id| snapshot.progress[id].status == StepStatus::Completed)
+                        })
+                        .context("step dependencies cannot progress")?;
+                    let step = pending.remove(position);
+                    self.authority.update(|run| {
+                        run.record_step(
+                            &step.id,
+                            StepProgress {
+                                status: StepStatus::Completed,
+                                evidence: Some(implementation_artifact.clone()),
+                            },
+                        )
+                    })?;
+                }
+                self.authority.update(LabRun::begin_verification)?;
                 let Some(index) = self
                     .phase(
-                        Phase::Implementation,
-                        implementation_prompt,
-                        Some(reports::implementation_schema()),
+                        Phase::Verification,
+                        verification_prompt.clone(),
+                        Some(reports::verification_schema()),
                     )
                     .await?
                 else {
@@ -299,79 +364,59 @@ impl Driver {
                         .amendment_feedback
                         .take()
                         .context("missing amendment reason")?;
+                    ensure!(
+                        options.verification_input.is_none(),
+                        "verifier-only amendment requires a new preparation: {feedback}"
+                    );
                     self.generate_plan(&options.task, &research, &feedback)
                         .await?;
-                    continue;
+                    continue 'review;
                 };
-                let report: reports::ImplementationReport =
-                    serde_json::from_str(&self.outputs[index].1.text)?;
-                (
-                    report,
-                    format!(
-                        "evidence/phase-{:02}.json#implementation-report",
-                        self.phase_count
-                    ),
-                )
-            };
-            let completed = report.completed_steps.iter().collect::<BTreeSet<_>>();
-            ensure!(
-                completed.len() == plan.steps.len()
-                    && report.completed_steps.len() == completed.len()
-                    && plan.steps.iter().all(|s| completed.contains(&s.id)),
-                "implementation report must cover exactly the approved steps"
-            );
-            let mut pending = plan.steps.clone();
-            while !pending.is_empty() {
-                let snapshot = self.authority.snapshot()?;
-                let position = pending
+                let artifact = format!("evidence/phase-{:02}.json", self.phase_count);
+                let checks =
+                    reports::verification_evidence(&plan, &self.outputs[index].1, &artifact)?;
+                if self.max_repairs > 0 {
+                    let checkpoint =
+                        crate::capture_git_diff(&options.repository, &options.repository_commit)
+                            .await?;
+                    self.evidence.write_bytes(
+                        &format!("verification-{:02}.diff", self.phase_count),
+                        &checkpoint.diff,
+                    )?;
+                    self.evidence.write_json(&format!("verification-{:02}.json", self.phase_count),
+                    &serde_json::json!({"repairs_used":self.repairs,"checks":checks,"phase_artifact":artifact}))?;
+                }
+                let failed = checks
                     .iter()
-                    .position(|step| {
-                        step.depends_on
-                            .iter()
-                            .all(|id| snapshot.progress[id].status == StepStatus::Completed)
-                    })
-                    .context("step dependencies cannot progress")?;
-                let step = pending.remove(position);
-                self.authority.update(|run| {
-                    run.record_step(
-                        &step.id,
-                        StepProgress {
-                            status: StepStatus::Completed,
-                            evidence: Some(implementation_artifact.clone()),
-                        },
-                    )
-                })?;
+                    .filter(|(_, evidence)| !evidence.passed)
+                    .map(|(id, _)| id.as_str())
+                    .collect::<Vec<_>>();
+                for (id, evidence) in &checks {
+                    self.authority
+                        .update(|run| run.record_verification(id, evidence.clone()))?;
+                }
+                if !failed.is_empty() {
+                    self.authority.update(LabRun::begin_repair)?;
+                    self.repairs += 1;
+                    self.evidence.write_json(
+                        &format!("repair-{:02}.json", self.repairs),
+                        &serde_json::json!({"attempt":self.repairs,"verification_artifact":artifact,
+                        "checks":checks,"target":self.authority.snapshot()?.approved}),
+                    )?;
+                    let failures: String = failed.join(", ").chars().take(128).collect();
+                    implementation_prompt = crate::repair::prompt(
+                        &initial_implementation_prompt,
+                        self.repairs,
+                        &failures,
+                    );
+                    crate::validate_phase_context(
+                        self.roles.executor.content(),
+                        &implementation_prompt,
+                    )?;
+                    continue;
+                }
+                return Ok(());
             }
-            self.authority.update(LabRun::begin_verification)?;
-            let Some(index) = self
-                .phase(
-                    Phase::Verification,
-                    verification_prompt,
-                    Some(reports::verification_schema()),
-                )
-                .await?
-            else {
-                let feedback = self
-                    .amendment_feedback
-                    .take()
-                    .context("missing amendment reason")?;
-                ensure!(
-                    options.verification_input.is_none(),
-                    "verifier-only amendment requires a new preparation: {feedback}"
-                );
-                self.generate_plan(&options.task, &research, &feedback)
-                    .await?;
-                continue;
-            };
-            let artifact = format!("evidence/phase-{:02}.json", self.phase_count);
-            for (id, evidence) in
-                reports::verification_evidence(&plan, &self.outputs[index].1, &artifact)?
-            {
-                ensure!(evidence.passed, "verification {id} failed");
-                self.authority
-                    .update(|run| run.record_verification(&id, evidence))?;
-            }
-            return Ok(());
         }
     }
 }

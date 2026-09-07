@@ -310,6 +310,14 @@ impl LabRun {
         self.transition(Command::BeginVerification)
     }
 
+    /// Retry implementation under the same approved plan after failed verification.
+    /// The frozen run policy bounds repairs across all plan revisions.
+    pub fn begin_repair(&mut self) -> Result<()> {
+        self.transition(Command::BeginRepair {
+            limit: self.spec.workflow.max_repairs,
+        })
+    }
+
     pub fn record_verification(&mut self, id: &str, evidence: VerificationEvidence) -> Result<()> {
         self.transition(Command::RecordVerification {
             id: id.into(),
@@ -402,7 +410,8 @@ impl LabRun {
                 | Change::Completed
                 | Change::Failed { .. }
                 | Change::ActionAdmitted { .. }
-                | Change::ActionFinished { .. } => {}
+                | Change::ActionFinished { .. }
+                | Change::RepairStarted { .. } => {}
             }
             if matches!(
                 change,

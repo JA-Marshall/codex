@@ -43,6 +43,9 @@ pub struct RoleSelection {
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub struct ResolvedWorkflow {
+    /// Maximum verify/repair cycles for this run; zero preserves one-pass behavior.
+    #[serde(default, skip_serializing_if = "is_zero")]
+    pub max_repairs: u8,
     pub approval: ApprovalPolicy,
     pub plan: PlanConfig,
     pub roles: RoleSelection,
@@ -65,6 +68,7 @@ struct RolePatch {
 #[derive(Clone, Debug, Default, Deserialize)]
 #[serde(default, deny_unknown_fields)]
 struct WorkflowPatch {
+    max_repairs: Option<u8>,
     extends: Option<String>,
     approval: Option<ApprovalPolicy>,
     plan: PlanPatch,
@@ -149,6 +153,7 @@ impl WorkflowCatalog {
         let mut merged = WorkflowPatch::default();
         for ancestor in self.inheritance_chain(name)? {
             let local = &self.workflows[&ancestor];
+            merged.max_repairs = local.max_repairs.or(merged.max_repairs);
             merged.approval = local.approval.or(merged.approval);
             merged.plan.renderer = local.plan.renderer.or(merged.plan.renderer);
             merged.roles.planner = local.roles.planner.clone().or(merged.roles.planner);
@@ -157,6 +162,7 @@ impl WorkflowCatalog {
         }
         let missing = || LabError::Invalid(format!("workflow {name} is missing required settings"));
         let resolved = ResolvedWorkflow {
+            max_repairs: merged.max_repairs.unwrap_or(0),
             approval: merged.approval.ok_or_else(missing)?,
             plan: PlanConfig {
                 renderer: merged.plan.renderer.ok_or_else(missing)?,
@@ -167,6 +173,11 @@ impl WorkflowCatalog {
                 verifier: merged.roles.verifier.ok_or_else(missing)?,
             },
         };
+        if resolved.max_repairs > 4 {
+            return Err(LabError::Invalid(
+                "max_repairs must be between 0 and 4".into(),
+            ));
+        }
         for selector in [
             &resolved.roles.planner,
             &resolved.roles.executor,
@@ -200,4 +211,12 @@ impl WorkflowCatalog {
             verifier: snapshot(&workflow.roles.verifier)?,
         })
     }
+}
+
+#[expect(
+    clippy::trivially_copy_pass_by_ref,
+    reason = "serde skip predicates receive a reference"
+)]
+fn is_zero(value: &u8) -> bool {
+    *value == 0
 }
