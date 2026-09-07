@@ -74,6 +74,32 @@ def make_run(path, state="failed"):
 
 
 class TerminalTests(unittest.TestCase):
+    def test_delegated_approval_is_not_reported_as_human_review(self):
+        with tempfile.TemporaryDirectory() as directory:
+            run = Path(directory) / "run"
+            make_run(run)
+            write_journal(
+                run / "events.jsonl",
+                [
+                    {
+                        "state": "implementing",
+                        "change": {
+                            "type": "delegated_approved",
+                            "policy_sha256": "a" * 64,
+                        },
+                    },
+                    {"state": "failed", "change": {"type": "failed"}},
+                ],
+            )
+            _, _, observation = observe_terminal(run)
+            self.assertEqual(
+                (
+                    observation["first_plan_human_approval"],
+                    observation["delegated_plan_approvals"],
+                ),
+                (None, 1),
+            )
+
     def test_evaluation_respects_repository_launch_lock(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
