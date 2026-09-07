@@ -285,3 +285,8 @@ The approved foundation and restricted live host are complete with the recorded 
 - Inspected prepared_lock.rs and prepared_launch.rs: launch locking is scoped to each checkout's Git metadata. setup_suite.py already creates independent condition repositories; distinct approved run-prepared processes do not need a global serial barrier. This inspection is not a claim of a completed live concurrency test.
 - Added an explicit experiment-concurrency policy to AGENTS.md: bounded concurrent independent hosts, separate decision channels/checkouts/artifacts, no unrelated-run blocking, and recorded scheduling/resource metadata. A reusable batch scheduler remains missing. Prior pilot inputs/results and the historical local launcher remain unchanged; no old approval was reused and no extra paid model run was launched.
 - This correction changes instructions and the ledger only. Validation: inspected actual lock/launch/setup code and reviewed the documentation diff; no Rust or full-workspace tests needed.
+
+## Parallel batch runner — approved implementation 2026-09-07
+
+- User requested Implement after the parallel-runner correction. Concrete scope and architecture critique: PARALLEL_PLAN.md. Starting from 1072f070fb on lab/parallel-batch-v1. Existing driver stops model phases before HumanReviewer requests input; prepared_lock is per checkout, and existing run-prepared owns input revalidation and approval admission.
+- Implement in two reviewable stages: structured lab reviewer channel, then isolated Python batch scheduler/tests/docs. Active jobs and waiting-review hosts are distinct bounds. Approval remains live, exact-target and request-specific; no previous experimental target is being reused. No paid model run is part of validation.
