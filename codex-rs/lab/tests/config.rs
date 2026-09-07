@@ -66,10 +66,23 @@ fn repair_policy_is_inherited_bounded_and_omitted_when_disabled() {
     let catalog = WorkflowCatalog::parse(&source).unwrap();
     assert_eq!(catalog.resolve("json").unwrap().max_repairs, 2);
     let disabled = source.replace("[workflows.json]", "[workflows.json]\nmax_repairs = 0");
-    let workflow = WorkflowCatalog::parse(&disabled).unwrap().resolve("json").unwrap();
-    assert!(serde_json::to_value(workflow).unwrap().get("max_repairs").is_none());
+    let workflow = WorkflowCatalog::parse(&disabled)
+        .unwrap()
+        .resolve("json")
+        .unwrap();
+    assert!(
+        serde_json::to_value(workflow)
+            .unwrap()
+            .get("max_repairs")
+            .is_none()
+    );
     let invalid = source.replace("max_repairs = 2", "max_repairs = 5");
-    assert!(WorkflowCatalog::parse(&invalid).unwrap().resolve("json").is_err());
+    assert!(
+        WorkflowCatalog::parse(&invalid)
+            .unwrap()
+            .resolve("json")
+            .is_err()
+    );
 }
 
 #[test]

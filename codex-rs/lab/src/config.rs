@@ -174,7 +174,9 @@ impl WorkflowCatalog {
             },
         };
         if resolved.max_repairs > 4 {
-            return Err(LabError::Invalid("max_repairs must be between 0 and 4".into()));
+            return Err(LabError::Invalid(
+                "max_repairs must be between 0 and 4".into(),
+            ));
         }
         for selector in [
             &resolved.roles.planner,
@@ -211,6 +213,10 @@ impl WorkflowCatalog {
     }
 }
 
+#[expect(
+    clippy::trivially_copy_pass_by_ref,
+    reason = "serde skip predicates receive a reference"
+)]
 fn is_zero(value: &u8) -> bool {
     *value == 0
 }

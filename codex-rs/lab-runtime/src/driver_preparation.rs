@@ -33,8 +33,10 @@ pub(crate) async fn initialize(
 ) -> Result<Driver> {
     let catalog = WorkflowCatalog::parse(&options.workflow_catalog)?;
     let workflow = catalog.resolve(&options.workflow)?;
-    ensure!(options.verification_input.is_none() || workflow.max_repairs == 0,
-        "verifier-only trials cannot enable executor repairs");
+    ensure!(
+        options.verification_input.is_none() || workflow.max_repairs == 0,
+        "verifier-only trials cannot enable executor repairs"
+    );
     verify_git_baseline(&options.repository, &options.repository_commit).await?;
     let runtime = Arc::new(
         PreparedRuntime::load(
