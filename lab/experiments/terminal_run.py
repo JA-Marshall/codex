@@ -167,7 +167,8 @@ def observe_terminal(run: Path):
     decisions = [
         e["change"]["type"]
         for e in events
-        if e["change"]["type"] in ("human_approved", "human_rejected", "plan_edited")
+        if e["change"]["type"]
+        in ("human_approved", "delegated_approved", "human_rejected", "plan_edited")
     ]
     observation = {
         "schema_version": 1,
@@ -177,7 +178,7 @@ def observe_terminal(run: Path):
         "all_started_phases_shutdown": True,
         "repository": next(iter(repositories)),
         "first_plan_human_approval": decisions[0] == "human_approved"
-        if decisions
+        if decisions and decisions[0] != "delegated_approved"
         else None,
         "phase_turns": len(phases),
         "planner_phases": sum(p["phase"] == "planning" for p in phases),
@@ -185,6 +186,9 @@ def observe_terminal(run: Path):
         "usage": totals,
         "workflow_terminal_elapsed_ms": events[-1].get("elapsed_ms"),
         "human_plan_edits": sum(e["change"]["type"] == "plan_edited" for e in events),
+        "delegated_plan_approvals": sum(
+            e["change"]["type"] == "delegated_approved" for e in events
+        ),
         "plan_amendments": sum(
             e["change"]["type"] == "amendment_requested" for e in events
         ),
