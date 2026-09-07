@@ -20,6 +20,7 @@ def observe(sandbox, repository, scratch, mode, request):
         sandbox.resolve(),
         sandbox.resolve().parent / "codex-resources",
         WORKER,
+        WORKER.with_name("queue_cli_format.py"),
         repository,
     ]
     entries = [
