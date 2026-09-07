@@ -29,7 +29,9 @@ def summarize(text: str) -> dict[str, int]:
     if state == "quoted":
         raise ValueError("unterminated quote")
     try:
-        rows = (row for row in csv.reader(io.StringIO(text, newline=""), strict=True) if row)
+        rows = (
+            row for row in csv.reader(io.StringIO(text, newline=""), strict=True) if row
+        )
         header = next(rows, None)
         if header is None:
             return {}
@@ -37,7 +39,11 @@ def summarize(text: str) -> dict[str, int]:
             raise ValueError("expected category,count header")
         totals = {}
         for row in rows:
-            if len(row) != 2 or not row[1] or not all("0" <= char <= "9" for char in row[1]):
+            if (
+                len(row) != 2
+                or not row[1]
+                or not all("0" <= char <= "9" for char in row[1])
+            ):
                 raise ValueError("invalid count record")
             category, count = row
             totals[category] = totals.get(category, 0) + int(count)

@@ -24,35 +24,78 @@ use tokio::time::timeout;
 use wiremock::MockServer;
 
 fn child(fixture: &support::Fixture) -> Result<Command> {
-    let mut command = Command::new(fixture.paths.codex_self_exe.as_ref().context("CLI binary missing")?);
-    command.env("CODEX_HOME", &fixture.home).current_dir(&fixture.repository)
-        .stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::piped()).kill_on_drop(true);
+    let mut command = Command::new(
+        fixture
+            .paths
+            .codex_self_exe
+            .as_ref()
+            .context("CLI binary missing")?,
+    );
+    command
+        .env("CODEX_HOME", &fixture.home)
+        .current_dir(&fixture.repository)
+        .stdin(Stdio::null())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .kill_on_drop(true);
     Ok(command)
 }
 
-async fn prepare(fixture: &support::Fixture, id: &str, workflow: &str) -> Result<std::path::PathBuf> {
+async fn prepare(
+    fixture: &support::Fixture,
+    id: &str,
+    workflow: &str,
+) -> Result<std::path::PathBuf> {
     let task = fixture.home.join("task.txt");
     let catalog = fixture.home.join("workflows.toml");
     let plan = fixture.home.join("plan.json");
     fs::write(&task, fixture.options("unused", "md", None).task)?;
     fs::write(&catalog, &fixture.workflow_catalog)?;
     fs::write(&plan, support::plan(1)?.canonical_json()?)?;
-    let result = timeout(Duration::from_secs(45), child(fixture)?.arg("prepare")
-        .arg("--repository").arg(&fixture.repository).arg("--commit").arg(&fixture.commit)
-        .arg("--codex-home").arg(&fixture.home).arg("--runs-directory").arg(&fixture.runs)
-        .args(["--run-id", id, "--workflow", workflow])
-        .arg("--task-file").arg(task).arg("--workflow-catalog").arg(catalog)
-        .arg("--instruction-root").arg(&fixture.instruction_root).arg("--plan-file").arg(plan)
-        .output()).await??;
-    ensure!(result.status.success(), "prepare failed: {}", String::from_utf8_lossy(&result.stderr));
+    let result = timeout(
+        Duration::from_secs(45),
+        child(fixture)?
+            .arg("prepare")
+            .arg("--repository")
+            .arg(&fixture.repository)
+            .arg("--commit")
+            .arg(&fixture.commit)
+            .arg("--codex-home")
+            .arg(&fixture.home)
+            .arg("--runs-directory")
+            .arg(&fixture.runs)
+            .args(["--run-id", id, "--workflow", workflow])
+            .arg("--task-file")
+            .arg(task)
+            .arg("--workflow-catalog")
+            .arg(catalog)
+            .arg("--instruction-root")
+            .arg(&fixture.instruction_root)
+            .arg("--plan-file")
+            .arg(plan)
+            .output(),
+    )
+    .await??;
+    ensure!(
+        result.status.success(),
+        "prepare failed: {}",
+        String::from_utf8_lossy(&result.stderr)
+    );
     let result: Value = serde_json::from_slice(&result.stdout)?;
     assert_eq!(result["state"], "awaiting_plan_approval");
-    Ok(result["prepared"].as_str().context("missing checkpoint")?.into())
+    Ok(result["prepared"]
+        .as_str()
+        .context("missing checkpoint")?
+        .into())
 }
 
 fn execution(fixture: &support::Fixture, prepared: &Path, id: &str) -> Result<Command> {
     let mut command = child(fixture)?;
-    command.arg("run-prepared").arg("--prepared").arg(prepared).args(["--run-id", id]);
+    command
+        .arg("run-prepared")
+        .arg("--prepared")
+        .arg(prepared)
+        .args(["--run-id", id]);
     Ok(command)
 }
 
@@ -70,55 +113,105 @@ fn successful_responses() -> Vec<String> {
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn prepared_survives_process_exit_eof_cannot_approve_and_lock_excludes_competitors() -> Result<()> {
+async fn prepared_survives_process_exit_eof_cannot_approve_and_lock_excludes_competitors()
+-> Result<()> {
     let server = MockServer::start().await;
     let fixture = support::Fixture::new(&server.uri()).await?;
     let prepared = prepare(&fixture, "prepared", "md").await?; // This CLI process has exited.
     let source_events = fs::read(fixture.runs.join("prepared/events.jsonl"))?;
-    let eof = timeout(Duration::from_secs(45), execution(&fixture, &prepared, "eof")?.output()).await??;
+    let eof = timeout(
+        Duration::from_secs(45),
+        execution(&fixture, &prepared, "eof")?.output(),
+    )
+    .await??;
     ensure!(!eof.status.success());
-    ensure!(String::from_utf8_lossy(&eof.stdout).contains("Approval target:"), "{}", String::from_utf8_lossy(&eof.stderr));
+    ensure!(
+        String::from_utf8_lossy(&eof.stdout).contains("Approval target:"),
+        "{}",
+        String::from_utf8_lossy(&eof.stderr)
+    );
     assert!(server.received_requests().await.unwrap().is_empty());
-    let mut host = execution(&fixture, &prepared, "approved")?.stdin(Stdio::piped()).spawn()?;
+    let mut host = execution(&fixture, &prepared, "approved")?
+        .stdin(Stdio::piped())
+        .spawn()?;
     let mut stdout = BufReader::new(host.stdout.take().context("stdout missing")?.take(524288));
     let mut transcript = String::new();
     timeout(Duration::from_secs(45), async {
         loop {
             let mut line = String::new();
-            ensure!(stdout.read_line(&mut line).await? > 0, "execution ended before review");
+            ensure!(
+                stdout.read_line(&mut line).await? > 0,
+                "execution ended before review"
+            );
             let waiting = line.starts_with("Enter approve ");
             transcript.push_str(&line);
-            if waiting { break; }
+            if waiting {
+                break;
+            }
         }
         anyhow::Ok(())
-    }).await??;
+    })
+    .await??;
     assert!(transcript.contains("\"run_id\":\"approved\""));
     assert!(!fixture.repository.join("greeting.txt").exists());
     assert!(server.received_requests().await.unwrap().is_empty());
-    let competitor = timeout(Duration::from_secs(15), execution(&fixture, &prepared, "competitor")?.output()).await??;
+    let competitor = timeout(
+        Duration::from_secs(15),
+        execution(&fixture, &prepared, "competitor")?.output(),
+    )
+    .await??;
     assert!(!competitor.status.success());
-    assert!(String::from_utf8_lossy(&competitor.stderr).contains("another lab host owns this repository"));
+    assert!(
+        String::from_utf8_lossy(&competitor.stderr)
+            .contains("another lab host owns this repository")
+    );
     assert!(!fixture.runs.join("competitor").exists());
     let mock = responses::mount_sse_sequence(&server, successful_responses()).await;
-    host.stdin.take().context("stdin missing")?.write_all(format!("approve {}\n", support::plan(1)?.digest()?).as_bytes()).await?;
+    host.stdin
+        .take()
+        .context("stdin missing")?
+        .write_all(format!("approve {}\n", support::plan(1)?.digest()?).as_bytes())
+        .await?;
     let (status, _) = timeout(Duration::from_secs(60), async {
         tokio::try_join!(host.wait(), stdout.read_to_string(&mut transcript))
-    }).await??;
+    })
+    .await??;
     let mut diagnostic = String::new();
-    host.stderr.take().context("stderr missing")?.take(65536).read_to_string(&mut diagnostic).await?;
+    host.stderr
+        .take()
+        .context("stderr missing")?
+        .take(65536)
+        .read_to_string(&mut diagnostic)
+        .await?;
     ensure!(status.success(), "execution failed: {diagnostic}");
     assert!(transcript.contains("\"state\": \"completed\""));
     assert_eq!(mock.requests().len(), 5);
-    assert_eq!(fs::read(fixture.repository.join("greeting.txt"))?, b"hello\n");
-    assert_eq!(fs::read(fixture.runs.join("prepared/events.jsonl"))?, source_events);
+    assert_eq!(
+        fs::read(fixture.repository.join("greeting.txt"))?,
+        b"hello\n"
+    );
+    assert_eq!(
+        fs::read(fixture.runs.join("prepared/events.jsonl"))?,
+        source_events
+    );
     Ok(())
 }
 
 async fn approve_fixture(fixture: &support::Fixture, prepared: &Path, id: &str) -> Result<()> {
-    let mut host = execution(fixture, prepared, id)?.stdin(Stdio::piped()).spawn()?;
-    host.stdin.take().context("stdin missing")?.write_all(format!("approve {}\n", support::plan(1)?.digest()?).as_bytes()).await?;
+    let mut host = execution(fixture, prepared, id)?
+        .stdin(Stdio::piped())
+        .spawn()?;
+    host.stdin
+        .take()
+        .context("stdin missing")?
+        .write_all(format!("approve {}\n", support::plan(1)?.digest()?).as_bytes())
+        .await?;
     let output = timeout(Duration::from_secs(45), host.wait_with_output()).await??;
-    ensure!(output.status.success(), "{}", String::from_utf8_lossy(&output.stderr));
+    ensure!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
     Ok(())
 }
 
@@ -141,18 +234,36 @@ async fn prepared_completed_cli_pair_compares_only_renderer() -> Result<()> {
         use sha2::Digest;
         let run = fixture.runs.join(id);
         let spec: Value = serde_json::from_slice(&fs::read(run.join("config/run-spec.json"))?)?;
-        let task_sha256 = format!("{:x}", sha2::Sha256::digest(spec["task"].as_str().unwrap().as_bytes()));
+        let task_sha256 = format!(
+            "{:x}",
+            sha2::Sha256::digest(spec["task"].as_str().unwrap().as_bytes())
+        );
         fs::create_dir(run.join("evaluation"))?;
-        fs::write(run.join("evaluation/evaluation.json"), serde_json::to_vec(&json!({
-            "schema_version":1,"run":run,"fixture":"mock-greeting","fixture_commit":fixture.commit,
-            "task_sha256":task_sha256,"python":{"version":"test-only"},"evaluator_sha256":"test-only",
-            "sandbox_sha256":"test-only","task_success":true,"hidden_test_success":true,"public_test_success":true
-        }))?)?;
+        fs::write(
+            run.join("evaluation/evaluation.json"),
+            serde_json::to_vec(&json!({
+                "schema_version":1,"run":run,"fixture":"mock-greeting","fixture_commit":fixture.commit,
+                "task_sha256":task_sha256,"python":{"version":"test-only"},"evaluator_sha256":"test-only",
+                "sandbox_sha256":"test-only","task_success":true,"hidden_test_success":true,"public_test_success":true
+            }))?,
+        )?;
     }
-    let report_path = codex_lab_runtime::compare_runs(&fixture.runs.join("approved"), &fixture.runs.join("approved-json"),
-        "plan.renderer", &fixture.runs.join("comparison"))?;
+    let report_path = codex_lab_runtime::compare_runs(
+        &fixture.runs.join("approved"),
+        &fixture.runs.join("approved-json"),
+        "plan.renderer",
+        &fixture.runs.join("comparison"),
+    )?;
     let report: Value = serde_json::from_slice(&fs::read(report_path)?)?;
-    assert_eq!(report["classification"], "controlled_recorded_pair", "{}", serde_json::to_string_pretty(&report)?);
-    assert_eq!(report["control_differences"], json!([{"path":"plan.renderer","left":"markdown","right":"json"}]));
+    assert_eq!(
+        report["classification"],
+        "controlled_recorded_pair",
+        "{}",
+        serde_json::to_string_pretty(&report)?
+    );
+    assert_eq!(
+        report["control_differences"],
+        json!([{"path":"plan.renderer","left":"markdown","right":"json"}])
+    );
     Ok(())
 }

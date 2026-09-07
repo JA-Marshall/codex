@@ -65,8 +65,10 @@ pub(crate) fn seal(
     phase_threads: usize,
 ) -> Result<PreparedRunResult> {
     let snapshot = authority.snapshot()?;
-    ensure!(snapshot.state == WorkflowState::AwaitingPlanApproval && snapshot.approved.is_none(),
-        "only an unapproved pending plan can be prepared");
+    ensure!(
+        snapshot.state == WorkflowState::AwaitingPlanApproval && snapshot.approved.is_none(),
+        "only an unapproved pending plan can be prepared"
+    );
     let target = snapshot.target.context("prepared target missing")?;
     let root = authority.artifacts()?;
     let mut descriptor = Descriptor {
@@ -85,9 +87,14 @@ pub(crate) fn seal(
     };
     let plan = authority.plan()?.context("prepared plan missing")?;
     let renderer = codex_lab::WorkflowCatalog::parse(&options.workflow_catalog)?
-        .resolve(&options.workflow)?.plan.renderer;
+        .resolve(&options.workflow)?
+        .plan
+        .renderer;
     for name in required_files(&descriptor, renderer)? {
-        descriptor.files.insert(name.clone(), digest(&read_artifact(&root, &name, MAX_ARTIFACT_BYTES)?));
+        descriptor.files.insert(
+            name.clone(),
+            digest(&read_artifact(&root, &name, MAX_ARTIFACT_BYTES)?),
+        );
     }
     // Validate the exact bytes before publishing the final descriptor. Its mere
     // existence is never enough: every later reader repeats these checks.
@@ -95,31 +102,68 @@ pub(crate) fn seal(
     let bytes = serde_json::to_vec_pretty(&descriptor)?;
     ensure!(bytes.len() <= 65536, "prepared descriptor exceeds limit");
     let prepared = evidence.write_bytes("prepared.json", &bytes)?;
-    Ok(PreparedRunResult { prepared, state: snapshot.state, phase_threads })
+    Ok(PreparedRunResult {
+        prepared,
+        state: snapshot.state,
+        phase_threads,
+    })
 }
 
 pub(crate) fn load(path: &Path, run_id: String) -> Result<LoadedPrepared> {
-    ensure!(!std::fs::symlink_metadata(path)?.file_type().is_symlink(), "checkpoint symlinks are unsupported");
+    ensure!(
+        !std::fs::symlink_metadata(path)?.file_type().is_symlink(),
+        "checkpoint symlinks are unsupported"
+    );
     let path = path.canonicalize()?;
-    let root = path.parent().and_then(Path::parent).context("checkpoint has no run root")?;
-    ensure!(path == root.join(DESCRIPTOR), "expected evidence/prepared.json");
+    let root = path
+        .parent()
+        .and_then(Path::parent)
+        .context("checkpoint has no run root")?;
+    ensure!(
+        path == root.join(DESCRIPTOR),
+        "expected evidence/prepared.json"
+    );
     let bytes = read_artifact(root, DESCRIPTOR, 65536)?;
     let descriptor: Descriptor = serde_json::from_slice(&bytes)?;
-    ensure!(descriptor.schema_version == 1, "unsupported prepared schema");
-    ensure!(root == descriptor.runs_directory.join(&descriptor.source_run_id), "checkpoint moved from original run");
-    let spec: Value = serde_json::from_slice(&read_artifact(root, "config/run-spec.json", 262144)?)?;
+    ensure!(
+        descriptor.schema_version == 1,
+        "unsupported prepared schema"
+    );
+    ensure!(
+        root == descriptor.runs_directory.join(&descriptor.source_run_id),
+        "checkpoint moved from original run"
+    );
+    let spec: Value =
+        serde_json::from_slice(&read_artifact(root, "config/run-spec.json", 262144)?)?;
     let catalog = String::from_utf8(read_artifact(root, "config/workflow.source.toml", 65536)?)?;
-    let workflow = spec["workflow_name"].as_str().context("missing workflow")?.to_owned();
-    let renderer = codex_lab::WorkflowCatalog::parse(&catalog)?.resolve(&workflow)?.plan.renderer;
-    let plan: PlanRevision = serde_json::from_slice(&read_artifact(root, &format!("plans/{}/plan.json", descriptor.revision), 65536)?)?;
+    let workflow = spec["workflow_name"]
+        .as_str()
+        .context("missing workflow")?
+        .to_owned();
+    let renderer = codex_lab::WorkflowCatalog::parse(&catalog)?
+        .resolve(&workflow)?
+        .plan
+        .renderer;
+    let plan: PlanRevision = serde_json::from_slice(&read_artifact(
+        root,
+        &format!("plans/{}/plan.json", descriptor.revision),
+        65536,
+    )?)?;
     validate_files(root, &descriptor, &plan, renderer)?;
     let task = spec["task"].as_str().context("missing task")?.to_owned();
     ensure!(task.len() <= 8192, "prepared task exceeds limit");
-    let settings = serde_json::from_slice(&read_artifact(root, "evidence/effective-settings.json", MAX_ARTIFACT_BYTES)?)?;
+    let settings = serde_json::from_slice(&read_artifact(
+        root,
+        "evidence/effective-settings.json",
+        MAX_ARTIFACT_BYTES,
+    )?)?;
     Ok(LoadedPrepared {
         options: RunOptions {
             repository: descriptor.repository,
-            repository_commit: spec["repository"]["commit"].as_str().context("missing commit")?.to_owned(),
+            repository_commit: spec["repository"]["commit"]
+                .as_str()
+                .context("missing commit")?
+                .to_owned(),
             codex_home: descriptor.codex_home,
             runs_directory: descriptor.runs_directory,
             run_id,
@@ -139,13 +183,31 @@ pub(crate) fn load(path: &Path, run_id: String) -> Result<LoadedPrepared> {
 }
 
 fn required_files(descriptor: &Descriptor, renderer: Renderer) -> Result<Vec<String>> {
-    ensure!(descriptor.phase_threads <= 2, "checkpoint contains unexpected phases");
-    let mut names: Vec<String> = ["manifest.json", "config/run-spec.json", "config/workflow.source.toml",
-        "config/workflow.effective.json", "instructions/planner.SKILL.md", "instructions/executor.SKILL.md",
-        "instructions/verifier.SKILL.md", "events.jsonl", "runtime-events.jsonl",
-        "evidence/effective-settings.json", "evidence/environment.json", "evidence/runtime-manifest.json"]
-        .into_iter().map(str::to_owned).collect();
-    let view = match renderer { Renderer::Markdown => "PLAN.md", Renderer::Json => "plan.view.json" };
+    ensure!(
+        descriptor.phase_threads <= 2,
+        "checkpoint contains unexpected phases"
+    );
+    let mut names: Vec<String> = [
+        "manifest.json",
+        "config/run-spec.json",
+        "config/workflow.source.toml",
+        "config/workflow.effective.json",
+        "instructions/planner.SKILL.md",
+        "instructions/executor.SKILL.md",
+        "instructions/verifier.SKILL.md",
+        "events.jsonl",
+        "runtime-events.jsonl",
+        "evidence/effective-settings.json",
+        "evidence/environment.json",
+        "evidence/runtime-manifest.json",
+    ]
+    .into_iter()
+    .map(str::to_owned)
+    .collect();
+    let view = match renderer {
+        Renderer::Markdown => "PLAN.md",
+        Renderer::Json => "plan.view.json",
+    };
     names.push(format!("plans/{}/plan.json", descriptor.revision));
     names.push(format!("plans/{}/{view}", descriptor.revision));
     for index in 1..=descriptor.phase_threads {
@@ -155,48 +217,103 @@ fn required_files(descriptor: &Descriptor, renderer: Renderer) -> Result<Vec<Str
     Ok(names)
 }
 
-fn validate_files(root: &Path, descriptor: &Descriptor, plan: &PlanRevision, renderer: Renderer) -> Result<()> {
+fn validate_files(
+    root: &Path,
+    descriptor: &Descriptor,
+    plan: &PlanRevision,
+    renderer: Renderer,
+) -> Result<()> {
     let expected = required_files(descriptor, renderer)?;
-    ensure!(descriptor.files.len() == expected.len(), "unexpected checkpoint file inventory");
+    ensure!(
+        descriptor.files.len() == expected.len(),
+        "unexpected checkpoint file inventory"
+    );
     let mut artifacts = BTreeMap::new();
     let mut total = 0;
     for name in expected {
-        let expected_hash = descriptor.files.get(&name).context("missing checkpoint artifact")?;
+        let expected_hash = descriptor
+            .files
+            .get(&name)
+            .context("missing checkpoint artifact")?;
         let bytes = read_artifact(root, &name, MAX_ARTIFACT_BYTES)?;
         total += bytes.len();
-        ensure!(total <= 32 * 1024 * 1024, "checkpoint exceeds total byte limit");
-        ensure!(digest(&bytes) == *expected_hash, "checkpoint artifact changed: {name}");
+        ensure!(
+            total <= 32 * 1024 * 1024,
+            "checkpoint exceeds total byte limit"
+        );
+        ensure!(
+            digest(&bytes) == *expected_hash,
+            "checkpoint artifact changed: {name}"
+        );
         artifacts.insert(name, bytes);
     }
     let canonical = plan.canonical_json()?;
-    ensure!(plan.plan_id == descriptor.plan_id && plan.revision == descriptor.revision
-        && digest(&canonical) == descriptor.plan_sha256, "checkpoint plan identity changed");
-    ensure!(artifacts[&format!("plans/{}/plan.json", descriptor.revision)] == canonical, "plan is not canonical JSON");
-    let rendered = match renderer { Renderer::Markdown => MarkdownRenderer.render(plan)?, Renderer::Json => JsonRenderer.render(plan)? };
-    let view = match renderer { Renderer::Markdown => "PLAN.md", Renderer::Json => "plan.view.json" };
-    ensure!(artifacts[&format!("plans/{}/{view}", descriptor.revision)] == rendered.content, "rendered plan differs from canonical plan");
+    ensure!(
+        plan.plan_id == descriptor.plan_id
+            && plan.revision == descriptor.revision
+            && digest(&canonical) == descriptor.plan_sha256,
+        "checkpoint plan identity changed"
+    );
+    ensure!(
+        artifacts[&format!("plans/{}/plan.json", descriptor.revision)] == canonical,
+        "plan is not canonical JSON"
+    );
+    let rendered = match renderer {
+        Renderer::Markdown => MarkdownRenderer.render(plan)?,
+        Renderer::Json => JsonRenderer.render(plan)?,
+    };
+    let view = match renderer {
+        Renderer::Markdown => "PLAN.md",
+        Renderer::Json => "plan.view.json",
+    };
+    ensure!(
+        artifacts[&format!("plans/{}/{view}", descriptor.revision)] == rendered.content,
+        "rendered plan differs from canonical plan"
+    );
     let manifest: Value = serde_json::from_slice(&artifacts["manifest.json"])?;
-    ensure!(manifest["run_id"] == descriptor.source_run_id && manifest["run_spec_sha256"] == descriptor.run_spec_sha256, "checkpoint manifest identity differs");
+    ensure!(
+        manifest["run_id"] == descriptor.source_run_id
+            && manifest["run_spec_sha256"] == descriptor.run_spec_sha256,
+        "checkpoint manifest identity differs"
+    );
     let journal = std::str::from_utf8(&artifacts["events.jsonl"])?;
     ensure!(journal.ends_with('\n'), "partial workflow journal");
     let mut last = Value::Null;
     for (index, line) in journal.lines().enumerate() {
         let event: Value = serde_json::from_str(line)?;
-        ensure!(event["sequence"] == index + 1 && event["approved"].is_null()
-            && matches!(event["state"].as_str(), Some("researching" | "planning" | "awaiting_plan_approval")), "checkpoint contains non-pending workflow history");
+        ensure!(
+            event["sequence"] == index + 1
+                && event["approved"].is_null()
+                && matches!(
+                    event["state"].as_str(),
+                    Some("researching" | "planning" | "awaiting_plan_approval")
+                ),
+            "checkpoint contains non-pending workflow history"
+        );
         last = event;
     }
-    ensure!(last["state"] == "awaiting_plan_approval" && last["change"]["type"] == "plan_submitted"
-        && last["change"]["target"]["content_sha256"] == descriptor.plan_sha256
-        && last["change"]["target"]["run_spec_sha256"] == descriptor.run_spec_sha256,
-        "checkpoint is not a submitted unapproved plan");
+    ensure!(
+        last["state"] == "awaiting_plan_approval"
+            && last["change"]["type"] == "plan_submitted"
+            && last["change"]["target"]["content_sha256"] == descriptor.plan_sha256
+            && last["change"]["target"]["run_spec_sha256"] == descriptor.run_spec_sha256,
+        "checkpoint is not a submitted unapproved plan"
+    );
     for index in 1..=descriptor.phase_threads {
-        let input: Value = serde_json::from_slice(&artifacts[&format!("evidence/input-{index:02}.json")])?;
-        let output: Value = serde_json::from_slice(&artifacts[&format!("evidence/phase-{index:02}.json")])?;
-        ensure!(matches!(input["phase"].as_str(), Some("research" | "planning")) && output["cancelled"] == false,
-            "checkpoint contains an incomplete or writable phase");
+        let input: Value =
+            serde_json::from_slice(&artifacts[&format!("evidence/input-{index:02}.json")])?;
+        let output: Value =
+            serde_json::from_slice(&artifacts[&format!("evidence/phase-{index:02}.json")])?;
+        ensure!(
+            matches!(input["phase"].as_str(), Some("research" | "planning"))
+                && output["cancelled"] == false,
+            "checkpoint contains an incomplete or writable phase"
+        );
     }
-    crate::prepared_journal::validate(&artifacts["runtime-events.jsonl"], descriptor.phase_threads)?;
+    crate::prepared_journal::validate(
+        &artifacts["runtime-events.jsonl"],
+        descriptor.phase_threads,
+    )?;
     Ok(())
 }
 

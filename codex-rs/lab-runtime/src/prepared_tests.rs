@@ -16,15 +16,24 @@ fn fixture() -> Result<(tempfile::TempDir, RunAuthority, EvidenceStore, RunOptio
     authority.update(|run| run.submit_plan(plan))?;
     let artifacts = authority.artifacts()?;
     let evidence = EvidenceStore::new(&artifacts)?;
-    for name in ["effective-settings.json", "environment.json", "runtime-manifest.json"] {
+    for name in [
+        "effective-settings.json",
+        "environment.json",
+        "runtime-manifest.json",
+    ] {
         evidence.write_json(name, &serde_json::json!({"schema_version":1}))?;
     }
     let options = RunOptions {
-        repository: root.path().to_owned(), repository_commit: "0".repeat(40),
-        codex_home: root.path().to_owned(), runs_directory: root.path().to_owned(),
-        run_id: "run".into(), task: "Test runtime admission".into(),
+        repository: root.path().to_owned(),
+        repository_commit: "0".repeat(40),
+        codex_home: root.path().to_owned(),
+        runs_directory: root.path().to_owned(),
+        run_id: "run".into(),
+        task: "Test runtime admission".into(),
         workflow_catalog: fs::read_to_string(artifacts.join("config/workflow.source.toml"))?,
-        instruction_root: root.path().to_owned(), workflow: "test".into(), plan: None,
+        instruction_root: root.path().to_owned(),
+        workflow: "test".into(),
+        plan: None,
     };
     Ok((root, authority, evidence, options))
 }
@@ -37,17 +46,30 @@ fn prepared_round_trip_leaves_source_pending_and_reuses_only_data() -> Result<()
     let loaded = load(&prepared.prepared, "child".into())?;
     assert_eq!(loaded.options.run_id, "child");
     assert_eq!(loaded.options.plan, Some(authority_support::plan(1)?));
-    assert_eq!(authority.snapshot()?.state, WorkflowState::AwaitingPlanApproval);
+    assert_eq!(
+        authority.snapshot()?.state,
+        WorkflowState::AwaitingPlanApproval
+    );
     assert_eq!(authority.snapshot()?.approved, None);
-    assert_eq!(fs::read(authority.artifacts()?.join("events.jsonl"))?, before);
+    assert_eq!(
+        fs::read(authority.artifacts()?.join("events.jsonl"))?,
+        before
+    );
     assert_eq!(loaded.lineage["approval_reused"], false);
     Ok(())
 }
 
 #[test]
 fn prepared_rejects_changed_partial_missing_and_oversized_artifacts() -> Result<()> {
-    for name in ["config/run-spec.json", "plans/1/plan.json", "plans/1/plan.view.json",
-        "instructions/executor.SKILL.md", "events.jsonl", "runtime-events.jsonl", "evidence/prepared.json"] {
+    for name in [
+        "config/run-spec.json",
+        "plans/1/plan.json",
+        "plans/1/plan.view.json",
+        "instructions/executor.SKILL.md",
+        "events.jsonl",
+        "runtime-events.jsonl",
+        "evidence/prepared.json",
+    ] {
         let (_root, authority, evidence, options) = fixture()?;
         let prepared = seal(&options, &authority, &evidence, 0)?;
         let path = authority.artifacts()?.join(name);
@@ -61,7 +83,10 @@ fn prepared_rejects_changed_partial_missing_and_oversized_artifacts() -> Result<
     }
     let (_root, authority, evidence, options) = fixture()?;
     let prepared = seal(&options, &authority, &evidence, 0)?;
-    fs::OpenOptions::new().write(true).open(&prepared.prepared)?.set_len(65537)?;
+    fs::OpenOptions::new()
+        .write(true)
+        .open(&prepared.prepared)?
+        .set_len(65537)?;
     assert!(load(&prepared.prepared, "child".into()).is_err());
     Ok(())
 }
@@ -86,7 +111,12 @@ fn prepared_rejects_escaping_and_symlink_references() -> Result<()> {
     let (_root, authority, evidence, options) = fixture()?;
     let prepared = seal(&options, &authority, &evidence, 0)?;
     let root = authority.artifacts()?;
-    for reference in ["../skill/SKILL.md", "/etc/passwd", "config/../manifest.json", "config\\run-spec.json"] {
+    for reference in [
+        "../skill/SKILL.md",
+        "/etc/passwd",
+        "config/../manifest.json",
+        "config\\run-spec.json",
+    ] {
         assert!(read_artifact(&root, reference, 65536).is_err());
     }
     let original = root.join("instructions/executor.SKILL.md");

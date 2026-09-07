@@ -35,7 +35,9 @@ if mode == "probe":
         raise RuntimeError("evaluator networking is available")
     print("isolated")
 elif mode == "api":
-    spec = importlib.util.spec_from_file_location("csv_summary", repository / "csv_summary.py")
+    spec = importlib.util.spec_from_file_location(
+        "csv_summary", repository / "csv_summary.py"
+    )
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     observations = []

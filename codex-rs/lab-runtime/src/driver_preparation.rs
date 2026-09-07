@@ -71,8 +71,14 @@ pub(crate) async fn initialize(
         Some(model),
     )?;
     if let Some((expected_settings, expected_spec)) = expected {
-        ensure!(&settings == expected_settings, "effective runtime settings changed; prepare again");
-        ensure!(spec.digest()? == expected_spec, "effective run specification changed; prepare again");
+        ensure!(
+            &settings == expected_settings,
+            "effective runtime settings changed; prepare again"
+        );
+        ensure!(
+            spec.digest()? == expected_spec,
+            "effective run specification changed; prepare again"
+        );
     }
     let roles = spec.instructions().clone();
     let run = LabRun::create(&options.runs_directory, &options.run_id, spec)?;

@@ -11,13 +11,16 @@ use codex_core_api::Arg0DispatchPaths;
 use codex_lab::PlanRevision;
 use codex_lab_runtime::RunOptions;
 use codex_lab_runtime::TerminalReviewer;
-use codex_lab_runtime::execute_run;
 use codex_lab_runtime::compare_runs;
+use codex_lab_runtime::execute_run;
 use codex_lab_runtime::prepare_run;
 use codex_lab_runtime::run_prepared;
 
 #[derive(Parser)]
-#[command(name = "codex-lab", about = "Prepare, review and execute controlled coding workflows")]
+#[command(
+    name = "codex-lab",
+    about = "Prepare, review and execute controlled coding workflows"
+)]
 struct Cli {
     #[command(subcommand)]
     command: Command,
@@ -90,10 +93,21 @@ pub async fn run(arg0_paths: Arg0DispatchPaths) -> Result<()> {
         Cli::parse_from(arguments).command
     };
     let result = match command {
-        Command::Compare { left, right, vary, output } => serde_json::to_value(compare_runs(&left, &right, &vary, &output)?)?,
-        Command::Run(args) => serde_json::to_value(execute_run(args.into_options()?, arg0_paths, &mut TerminalReviewer).await?)?,
-        Command::Prepare(args) => serde_json::to_value(prepare_run(args.into_options()?, arg0_paths).await?)?,
-        Command::RunPrepared { prepared, run_id } => serde_json::to_value(run_prepared(&prepared, run_id, arg0_paths, &mut TerminalReviewer).await?)?,
+        Command::Compare {
+            left,
+            right,
+            vary,
+            output,
+        } => serde_json::to_value(compare_runs(&left, &right, &vary, &output)?)?,
+        Command::Run(args) => serde_json::to_value(
+            execute_run(args.into_options()?, arg0_paths, &mut TerminalReviewer).await?,
+        )?,
+        Command::Prepare(args) => {
+            serde_json::to_value(prepare_run(args.into_options()?, arg0_paths).await?)?
+        }
+        Command::RunPrepared { prepared, run_id } => serde_json::to_value(
+            run_prepared(&prepared, run_id, arg0_paths, &mut TerminalReviewer).await?,
+        )?,
     };
     println!("{}", serde_json::to_string_pretty(&result)?);
     Ok(())
@@ -101,16 +115,16 @@ pub async fn run(arg0_paths: Arg0DispatchPaths) -> Result<()> {
 
 impl Arguments {
     fn into_options(self) -> Result<RunOptions> {
-    let plan = self
-        .plan_file
-        .as_ref()
-        .map(|path| -> Result<PlanRevision> {
-            let plan: PlanRevision = serde_json::from_str(&read_bounded(path, 65536)?)?;
-            plan.validate()?;
-            Ok(plan)
-        })
-        .transpose()?;
-    Ok(RunOptions {
+        let plan = self
+            .plan_file
+            .as_ref()
+            .map(|path| -> Result<PlanRevision> {
+                let plan: PlanRevision = serde_json::from_str(&read_bounded(path, 65536)?)?;
+                plan.validate()?;
+                Ok(plan)
+            })
+            .transpose()?;
+        Ok(RunOptions {
             repository: self.repository,
             repository_commit: self.commit,
             codex_home: self.codex_home,

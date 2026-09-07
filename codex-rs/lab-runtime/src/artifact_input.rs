@@ -22,7 +22,9 @@ pub(crate) fn read_artifact(root: &Path, relative: &str, limit: usize) -> Result
             !component.is_empty()
                 && component != "."
                 && component != ".."
-                && component.bytes().all(|b| b.is_ascii_alphanumeric() || b"-_.".contains(&b)),
+                && component
+                    .bytes()
+                    .all(|b| b.is_ascii_alphanumeric() || b"-_.".contains(&b)),
             "artifact reference must be a safe relative path"
         );
         path.push(component);
@@ -31,10 +33,16 @@ pub(crate) fn read_artifact(root: &Path, relative: &str, limit: usize) -> Result
             "artifact symlinks are unsupported"
         );
     }
-    ensure!(path.canonicalize()?.starts_with(root), "artifact escapes run");
+    ensure!(
+        path.canonicalize()?.starts_with(root),
+        "artifact escapes run"
+    );
     let file = File::open(path)?;
     let metadata = file.metadata()?;
-    ensure!(metadata.is_file() && metadata.len() <= limit as u64, "artifact exceeds file limit");
+    ensure!(
+        metadata.is_file() && metadata.len() <= limit as u64,
+        "artifact exceeds file limit"
+    );
     let mut bytes = Vec::new();
     file.take(limit as u64 + 1).read_to_end(&mut bytes)?;
     ensure!(bytes.len() <= limit, "artifact grew beyond file limit");

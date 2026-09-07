@@ -54,7 +54,9 @@ pub async fn verify_git_baseline(root: &Path, pinned_commit: &str) -> anyhow::Re
 
 pub(crate) async fn repository_git_directory(root: &Path) -> anyhow::Result<PathBuf> {
     let mut capture = Capture::new(root).await?;
-    let directory = capture.run(&["rev-parse", "--absolute-git-dir"], ExitPolicy::Success).await?;
+    let directory = capture
+        .run(&["rev-parse", "--absolute-git-dir"], ExitPolicy::Success)
+        .await?;
     Ok(PathBuf::from(std::str::from_utf8(&directory)?.trim_end_matches('\n')).canonicalize()?)
 }
 
