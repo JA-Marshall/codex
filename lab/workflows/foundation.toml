@@ -26,3 +26,11 @@ extends = "plan-base"
 [workflows.plan-json-v1]
 extends = "plan-base"
 plan.renderer = "json"
+
+[skills."verifier/tests-only-single-observation-v2"]
+path = "instructions/verifier/tests-only-single-observation-v2"
+sha256 = "3a10deca2adacfd18a855bfabb0c2c0fe86f5c02828cbc4d823c1966732e242b"
+
+[workflows.plan-md-single-observation-v2]
+extends = "plan-md-v1"
+roles.verifier = "verifier/tests-only-single-observation-v2"
