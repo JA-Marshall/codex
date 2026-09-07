@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "approved_at_utc": "2026-09-07T13:58:57.3863589Z",
+  "source": "User Yes in response to the four-target review approval question",
+  "suite_root": "/home/james/.cache/codex-lab-varied-pilot/20260907T134224Z",
+  "execution_order": [
+    "dependency-order-v1-json-execution",
+    "dependency-order-v1-md-execution",
+    "config-merge-v1-md-execution",
+    "config-merge-v1-json-execution"
+  ],
+  "targets": [
+    {
+      "run_id": "dependency-order-v1-json-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "0eadb6d14529a2989108b40ffbbb8e44bbca0b0be88e776b8424730c74449a53",
+      "run_spec_sha256": "3e020acf3392512db0678112a233e863d69d09848c00bdc1a6a038bee2e0e59a"
+    },
+    {
+      "run_id": "dependency-order-v1-md-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "0eadb6d14529a2989108b40ffbbb8e44bbca0b0be88e776b8424730c74449a53",
+      "run_spec_sha256": "962f680837d9e87097eb5a2c6fe62b0ff7a62fc80f7831e7035871da9aa915a6"
+    },
+    {
+      "run_id": "config-merge-v1-md-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "0435406d6f40cc74eb0a175cf5415d58c68c0f13b573842d0346f85bbba471bd",
+      "run_spec_sha256": "5efe7f000ae71c0e87751aa1157249eb9898d397c577ef3ae884b02f86107a63"
+    },
+    {
+      "run_id": "config-merge-v1-json-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "0435406d6f40cc74eb0a175cf5415d58c68c0f13b573842d0346f85bbba471bd",
+      "run_spec_sha256": "95d46048347504153625fd7d3775009386baa8c3332394eb8b21c3ef401d2be1"
+    }
+  ],
+  "attempts_per_condition": 1,
+  "future_amendments_approved": false,
+  "new_csv_targets_approved": false,
+  "note": "Records the human decision; runtime must freshly validate and display each exact target before the decision is transmitted."
+}
