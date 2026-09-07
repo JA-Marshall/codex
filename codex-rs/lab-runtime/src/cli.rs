@@ -6,11 +6,36 @@ use anyhow::Context;
 use anyhow::Result;
 use anyhow::ensure;
 use clap::Parser;
+use clap::Subcommand;
 use codex_core_api::Arg0DispatchPaths;
 use codex_lab::PlanRevision;
 use codex_lab_runtime::RunOptions;
 use codex_lab_runtime::TerminalReviewer;
 use codex_lab_runtime::execute_run;
+use codex_lab_runtime::prepare_run;
+use codex_lab_runtime::run_prepared;
+
+#[derive(Parser)]
+#[command(name = "codex-lab", about = "Prepare, review and execute controlled coding workflows")]
+struct Cli {
+    #[command(subcommand)]
+    command: Command,
+}
+
+#[derive(Subcommand)]
+enum Command {
+    /// Research, plan and ask for human approval in this process.
+    Run(Arguments),
+    /// Save an unapproved plan and exit after clean phase shutdown.
+    Prepare(Arguments),
+    /// Validate a saved plan and request a fresh exact human decision.
+    RunPrepared {
+        #[arg(long)]
+        prepared: PathBuf,
+        #[arg(long)]
+        run_id: String,
+    },
+}
 
 #[derive(Parser)]
 #[command(
@@ -45,8 +70,27 @@ struct Arguments {
 }
 
 pub async fn run(arg0_paths: Arg0DispatchPaths) -> Result<()> {
-    let args = Arguments::parse();
-    let plan = args
+    let arguments: Vec<_> = std::env::args_os().collect();
+    let command = if arguments.get(1).is_some_and(|argument| {
+        let text = argument.to_string_lossy();
+        text.starts_with('-') && text != "--help" && text != "-h"
+    }) {
+        Command::Run(Arguments::parse_from(arguments))
+    } else {
+        Cli::parse_from(arguments).command
+    };
+    let result = match command {
+        Command::Run(args) => serde_json::to_value(execute_run(args.into_options()?, arg0_paths, &mut TerminalReviewer).await?)?,
+        Command::Prepare(args) => serde_json::to_value(prepare_run(args.into_options()?, arg0_paths).await?)?,
+        Command::RunPrepared { prepared, run_id } => serde_json::to_value(run_prepared(&prepared, run_id, arg0_paths, &mut TerminalReviewer).await?)?,
+    };
+    println!("{}", serde_json::to_string_pretty(&result)?);
+    Ok(())
+}
+
+impl Arguments {
+    fn into_options(self) -> Result<RunOptions> {
+    let plan = self
         .plan_file
         .as_ref()
         .map(|path| -> Result<PlanRevision> {
@@ -55,25 +99,19 @@ pub async fn run(arg0_paths: Arg0DispatchPaths) -> Result<()> {
             Ok(plan)
         })
         .transpose()?;
-    let result = execute_run(
-        RunOptions {
-            repository: args.repository,
-            repository_commit: args.commit,
-            codex_home: args.codex_home,
-            runs_directory: args.runs_directory,
-            run_id: args.run_id,
-            task: read_bounded(&args.task_file, 8192)?,
-            workflow_catalog: read_bounded(&args.workflow_catalog, 65536)?,
-            instruction_root: args.instruction_root,
-            workflow: args.workflow,
+    Ok(RunOptions {
+            repository: self.repository,
+            repository_commit: self.commit,
+            codex_home: self.codex_home,
+            runs_directory: self.runs_directory,
+            run_id: self.run_id,
+            task: read_bounded(&self.task_file, 8192)?,
+            workflow_catalog: read_bounded(&self.workflow_catalog, 65536)?,
+            instruction_root: self.instruction_root,
+            workflow: self.workflow,
             plan,
-        },
-        arg0_paths,
-        &mut TerminalReviewer,
-    )
-    .await?;
-    println!("{}", serde_json::to_string_pretty(&result)?);
-    Ok(())
+        })
+    }
 }
 
 fn read_bounded(path: &Path, limit: usize) -> Result<String> {
