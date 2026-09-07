@@ -1,0 +1,12 @@
+{
+  "root": "/home/james/.cache/codex-lab-queue-matrix/20260907T181937Z-repair-v1",
+  "source_commit": "dc83f4578b88c2a0c122e376f717fb286e46ff9a",
+  "model_calls": 0,
+  "tokens": 0,
+  "prepared": 32,
+  "concurrency": 16,
+  "plan_count": 4,
+  "batch_sha256": "1a09781fc9a867360279a9defe77cc8af1348a7d9c26af71ec1e45976e3508d9",
+  "matrix_sha256": "0649d9c50faad023866210427f5b3b1dfade89630a051afb600a9a6e61a7a8bb",
+  "evaluator_version": "durable-queue-v2"
+}

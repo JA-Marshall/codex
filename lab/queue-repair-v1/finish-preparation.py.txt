@@ -1,0 +1,104 @@
+"""Freeze thirty-two fresh imported-plan trials. No credentials, model calls or decisions."""
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timezone
+import copy
+import json
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+import tomllib
+
+source = Path('/home/james/.cache/codex-lab-verify')
+public = Path('/mnt/c/Users/james/Desktop/Code/trees/codex-lab/lab/queue-repair-v1')
+prior = Path('/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z')
+sys.path.insert(0, str(source/'lab/experiments'))
+from setup_fixture import git, sha256
+from setup_suite import validate_pins
+from queue_fixture import setup, evaluator_fingerprint, EVALUATOR_VERSION
+from batch_inputs import load_batch
+
+def read(path):
+    return json.loads(path.read_text())
+
+def write(path, value):
+    path.write_text(json.dumps(value, indent=2)+'\n')
+
+root = Path('/home/james/.cache/codex-lab-queue-matrix/20260907T181937Z-repair-v1')
+manifest = read(root/'matrix.json')
+validate_pins(manifest)
+archive = Path(manifest['archive'])
+entries, plans = manifest['conditions'], manifest['plans']
+def prepare(entry):
+    command = [manifest['binary'],'prepare','--repository',entry['repository'],'--commit',entry['commit'],
+        '--codex-home',manifest['codex_home'],'--runs-directory',str(root/'runs'),'--run-id',entry['preparation_id'],
+        '--task-file',str(archive/'fixtures/durable-queue-v1/task.txt'),'--workflow-catalog',str(archive/'workflows/queue-repair.toml'),
+        '--instruction-root',str(archive),'--workflow',entry['workflow'],'--plan-file',entry['plan_file']]
+    existing = root/'runs'/entry['preparation_id']
+    if not (existing/'evidence/prepared.json').exists():
+        assert not existing.exists(), 'partial preparation must be inspected'
+        with (root/'preparation'/(entry['id']+'.stdout')).open('xb') as stdout, (root/'preparation'/(entry['id']+'.stderr')).open('xb') as stderr:
+            result = subprocess.run(command, stdin=subprocess.DEVNULL, stdout=stdout, stderr=stderr, cwd=root, check=False)
+        assert result.returncode == 0, entry['id']
+    run = root/'runs'/entry['preparation_id']
+    path = run/'evidence/prepared.json'
+    descriptor = read(path)
+    assert descriptor['phase_threads'] == 0
+    assert not list((run/'evidence').glob('phase-*.json'))
+    assert not (run/'runtime-events.jsonl').read_text().strip()
+    events = [json.loads(line) for line in (run/'events.jsonl').read_text().splitlines()]
+    assert events[-1]['state'] == 'awaiting_plan_approval'
+    assert all(e['approved'] is None for e in events)
+    assert not git(Path(entry['repository']),'status','--porcelain')
+    assert descriptor['plan_sha256'] == plans[entry['plan_parent']]['canonical_sha256']
+    assert (run/'plans/1/plan.json').read_bytes() == Path(entry['plan_file']).read_bytes()
+    for name,digest in descriptor['files'].items():
+        assert sha256(run/name) == digest
+    previous = read(Path(entry['prior_prepared']).parents[1]/'config/run-spec.json')
+    current = read(run/'config/run-spec.json')
+    old_settings = read(Path(entry['prior_prepared']).parents[1]/'evidence/effective-settings.json')
+    new_settings = read(run/'evidence/effective-settings.json')
+    old_binaries = old_settings.pop('runtime_binaries')
+    new_binaries = new_settings.pop('runtime_binaries')
+    assert old_settings == new_settings
+    for binary in new_binaries.values():
+        assert binary['path'] == manifest['binary']
+        assert binary['sha256'] == manifest['pins'][manifest['binary']]
+    a,b = copy.deepcopy(previous),copy.deepcopy(current)
+    a['model'].pop('effective_config_sha256')
+    b['model'].pop('effective_config_sha256')
+    # Repository identity excludes its path in current RunSpec. Only verifier
+    # selection/bytes and profile identity may differ from the corresponding v1.
+    for value in (a,b):
+        value.pop('workflow_name')
+        value.pop('inheritance_chain')
+        value['workflow']['roles'].pop('verifier')
+        value['workflow'].pop('max_repairs',None)
+        value['instructions'].pop('verifier')
+        for instruction in value['instructions'].values():
+            instruction.pop('path')
+    assert current['workflow']['max_repairs'] == 2
+    assert a == b, (entry['id'], a, b)
+    target = dict(run_id=entry['execution_id'], plan_id=descriptor['plan_id'], revision=descriptor['revision'],
+        content_sha256=descriptor['plan_sha256'],run_spec_sha256=descriptor['run_spec_sha256'])
+    return dict(entry, status='awaiting_plan_approval', prepared=str(path), prepared_sha256=sha256(path),
+        target=target, run_spec=current, artifact_inventory=descriptor['files'])
+
+shutil.copyfile(__file__,root/'finish-preparation.py')
+shutil.copyfile(__file__,public/'finish-preparation.py.txt')
+with ThreadPoolExecutor(max_workers=16) as pool:
+    records = list(pool.map(prepare, entries))
+batch = dict(schema_version=1,binary=manifest['binary'],binary_sha256=manifest['pins'][manifest['binary']],
+    runs=[dict(run_id=r['execution_id'],prepared=r['prepared'],prepared_sha256=r['prepared_sha256']) for r in records])
+write(root/'batch-input.json',batch)
+preflight=load_batch(root/'batch-input.json',root/'batch',16)
+assert len(preflight['runs']) == 32
+validate_pins(manifest)
+for name,value in [('matrix.json',manifest),('conditions.json',records),('batch-input.json',batch),
+    ('preflight.json',preflight),('review-targets.json',dict(status='unapproved',targets=[r['target'] for r in records]))]:
+    write(public/name,value)
+write(root/'review.json',dict(status='awaiting human approval',conditions=records))
+write(public/'preparation.json',dict(root=str(root),source_commit=manifest['source_commit'],model_calls=0,tokens=0,
+    prepared=32,concurrency=16,plan_count=4,batch_sha256=sha256(root/'batch-input.json'),
+    matrix_sha256=sha256(root/'matrix.json'),evaluator_version=EVALUATOR_VERSION))
+print(json.dumps(dict(root=str(root),prepared=32,model_calls=0,batch_sha256=sha256(root/'batch-input.json'))))
