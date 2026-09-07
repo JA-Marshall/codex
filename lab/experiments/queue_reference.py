@@ -1,4 +1,5 @@
 """Private evaluation reference. Never copy this into model task checkouts."""
+
 import copy
 import json
 import sqlite3
@@ -20,11 +21,14 @@ def normalize(job):
     allowed = {"id", "payload", "priority", "dependencies", "max_attempts", "ready_at"}
     if not isinstance(job, dict) or set(job) - allowed or "id" not in job:
         raise ValueError("invalid job")
-    result = dict(id=identifier(job["id"]), payload=job.get("payload", {}),
-                  priority=integer(job.get("priority", 0)),
-                  dependencies=job.get("dependencies", []),
-                  max_attempts=integer(job.get("max_attempts", 3), 1),
-                  ready_at=integer(job.get("ready_at", 0), 0))
+    result = dict(
+        id=identifier(job["id"]),
+        payload=job.get("payload", {}),
+        priority=integer(job.get("priority", 0)),
+        dependencies=job.get("dependencies", []),
+        max_attempts=integer(job.get("max_attempts", 3), 1),
+        ready_at=integer(job.get("ready_at", 0), 0),
+    )
     if result["max_attempts"] > 100 or not isinstance(result["payload"], dict):
         raise ValueError("invalid attempts/payload")
     if not isinstance(result["dependencies"], list):
@@ -41,7 +45,9 @@ class Queue:
         self.db_path = db_path
         connection = sqlite3.connect(db_path, timeout=5)
         try:
-            connection.execute("CREATE TABLE IF NOT EXISTS reference_jobs (id TEXT PRIMARY KEY, original TEXT NOT NULL, current TEXT NOT NULL)")
+            connection.execute(
+                "CREATE TABLE IF NOT EXISTS reference_jobs (id TEXT PRIMARY KEY, original TEXT NOT NULL, current TEXT NOT NULL)"
+            )
             connection.commit()
         finally:
             connection.close()
@@ -50,11 +56,21 @@ class Queue:
         connection = sqlite3.connect(self.db_path, timeout=5)
         try:
             connection.execute("BEGIN IMMEDIATE")
-            rows = {key: (json.loads(original), json.loads(current)) for key, original, current in connection.execute("SELECT * FROM reference_jobs")}
+            rows = {
+                key: (json.loads(original), json.loads(current))
+                for key, original, current in connection.execute(
+                    "SELECT * FROM reference_jobs"
+                )
+            }
             result = operation(rows)
             connection.execute("DELETE FROM reference_jobs")
-            connection.executemany("INSERT INTO reference_jobs VALUES (?, ?, ?)",
-                                   [(key, json.dumps(original), json.dumps(current)) for key, (original, current) in rows.items()])
+            connection.executemany(
+                "INSERT INTO reference_jobs VALUES (?, ?, ?)",
+                [
+                    (key, json.dumps(original), json.dumps(current))
+                    for key, (original, current) in rows.items()
+                ],
+            )
             connection.commit()
             return copy.deepcopy(result)
         except BaseException:
@@ -74,10 +90,18 @@ class Queue:
             for original in normalized:
                 key = original["id"]
                 if key in rows:
-                    if json.dumps(rows[key][0], sort_keys=True) != json.dumps(original, sort_keys=True):
+                    if json.dumps(rows[key][0], sort_keys=True) != json.dumps(
+                        original, sort_keys=True
+                    ):
                         raise ValueError("conflicting job")
                 else:
-                    current = dict(original, state="pending", attempts=0, worker=None, lease_until=None)
+                    current = dict(
+                        original,
+                        state="pending",
+                        attempts=0,
+                        worker=None,
+                        lease_until=None,
+                    )
                     rows[key] = (original, current)
             visiting, visited = set(), set()
 
@@ -130,13 +154,25 @@ class Queue:
 
         def action(rows):
             self.recover_rows(rows, now)
-            eligible = [view for _, view in rows.values() if view["state"] == "pending"
-                        and view["ready_at"] <= now and view["attempts"] < view["max_attempts"]
-                        and all(rows[dep][1]["state"] == "succeeded" for dep in view["dependencies"])]
+            eligible = [
+                view
+                for _, view in rows.values()
+                if view["state"] == "pending"
+                and view["ready_at"] <= now
+                and view["attempts"] < view["max_attempts"]
+                and all(
+                    rows[dep][1]["state"] == "succeeded" for dep in view["dependencies"]
+                )
+            ]
             if not eligible:
                 return None
             view = min(eligible, key=lambda item: (-item["priority"], item["id"]))
-            view.update(state="running", attempts=view["attempts"] + 1, worker=worker, lease_until=now + lease_seconds)
+            view.update(
+                state="running",
+                attempts=view["attempts"] + 1,
+                worker=worker,
+                lease_until=now + lease_seconds,
+            )
             return view
 
         return self.transaction(action)
@@ -152,8 +188,12 @@ class Queue:
             if id not in rows:
                 raise ValueError("unknown job")
             view = rows[id][1]
-            if (view["state"] != "running" or view["worker"] != worker
-                    or view["attempts"] != attempt or now >= view["lease_until"]):
+            if (
+                view["state"] != "running"
+                or view["worker"] != worker
+                or view["attempts"] != attempt
+                or now >= view["lease_until"]
+            ):
                 raise ValueError("stale lease")
             if outcome == "succeeded":
                 view["state"] = "succeeded"

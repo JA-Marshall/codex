@@ -1,4 +1,5 @@
 """Sandboxed observation worker: inputs and candidate only, no expected answers."""
+
 from copy import deepcopy
 import json
 import multiprocessing
@@ -11,6 +12,7 @@ import sys
 def race_child(repository, database, worker, barrier, output):
     sys.path.insert(0, str(repository))
     from durable_queue import Queue
+
     try:
         queue = Queue(database)
         barrier.wait(timeout=5)
@@ -22,12 +24,18 @@ def race_child(repository, database, worker, barrier, output):
 
 def race(repository, scratch, count):
     from durable_queue import Queue
+
     database = scratch / "race.db"
     queue = Queue(database)
     queue.submit([{"id": chr(97 + i)} for i in range(count)])
     context = multiprocessing.get_context("fork")
     barrier, output = context.Barrier(3), context.Queue()
-    children = [context.Process(target=race_child, args=(repository, database, f"w{i}", barrier, output)) for i in range(2)]
+    children = [
+        context.Process(
+            target=race_child, args=(repository, database, f"w{i}", barrier, output)
+        )
+        for i in range(2)
+    ]
     try:
         for child in children:
             child.start()
@@ -36,11 +44,14 @@ def race(repository, scratch, count):
         for child in children:
             child.join(timeout=5)
         claims = [v["claim"]["id"] for v in values if v.get("claim")]
-        return {"claims": sorted(claims), "unique": len(set(claims)) == len(claims),
-                "processes": len({v["pid"] for v in values}),
-                "errors": [v["error"] for v in values if "error" in v],
-                "exits": [c.exitcode for c in children],
-                "attempts": {r["id"]: r["attempts"] for r in queue.list()}}
+        return {
+            "claims": sorted(claims),
+            "unique": len(set(claims)) == len(claims),
+            "processes": len({v["pid"] for v in values}),
+            "errors": [v["error"] for v in values if "error" in v],
+            "exits": [c.exitcode for c in children],
+            "attempts": {r["id"]: r["attempts"] for r in queue.list()},
+        }
     finally:
         for child in children:
             if child.is_alive():
@@ -53,9 +64,19 @@ def race(repository, scratch, count):
 def cli(repository, scratch, request_bytes, variant=None):
     request_path = scratch / "request.json"
     request_path.write_bytes(request_bytes)
-    command = [sys.executable, "-B", "-m", "durable_queue", "--db", str(scratch if variant == "database" else scratch / "queue.db")]
+    command = [
+        sys.executable,
+        "-B",
+        "-m",
+        "durable_queue",
+        "--db",
+        str(scratch if variant == "database" else scratch / "queue.db"),
+    ]
     if variant != "usage":
-        command += ["--request", str(scratch / "absent.json" if variant == "missing_file" else request_path)]
+        command += [
+            "--request",
+            str(scratch / "absent.json" if variant == "missing_file" else request_path),
+        ]
     if variant == "extra":
         command += ["unexpected"]
     result = subprocess.run(command, cwd=repository, capture_output=True, timeout=5)
@@ -78,10 +99,16 @@ def main():
     request = json.load(sys.stdin)
     if mode == "probe":
         import socket
+
         assert "MODEL_API_KEY" not in os.environ
-        for path, operation in [(Path(request["private"]), "read"), (repository / "forbidden-write", "write")]:
+        for path, operation in [
+            (Path(request["private"]), "read"),
+            (repository / "forbidden-write", "write"),
+        ]:
             try:
-                path.read_bytes() if operation == "read" else path.write_text("forbidden")
+                path.read_bytes() if operation == "read" else path.write_text(
+                    "forbidden"
+                )
             except OSError:
                 pass
             else:
@@ -99,18 +126,33 @@ def main():
         return
     if mode == "cli_invalid":
         from durable_queue import Queue
+
         database = scratch / "queue.db"
         Queue(database).submit([{"id": "keep"}])
-        result = cli(repository, scratch, bytes(request["bytes"]), request.get("variant"))
-        print(json.dumps({"result": result, "preserved": Queue(database).get("keep")}, sort_keys=True))
+        result = cli(
+            repository, scratch, bytes(request["bytes"]), request.get("variant")
+        )
+        print(
+            json.dumps(
+                {"result": result, "preserved": Queue(database).get("keep")},
+                sort_keys=True,
+            )
+        )
         return
     from durable_queue import Queue
+
     results = []
     for step in request["steps"]:
         args = deepcopy(step["args"])
         before = json.dumps(args, sort_keys=True)
         if mode == "cli":
-            results.append(cli(repository, scratch, json.dumps(dict(op=step["op"], **args)).encode()))
+            results.append(
+                cli(
+                    repository,
+                    scratch,
+                    json.dumps(dict(op=step["op"], **args)).encode(),
+                )
+            )
             continue
         try:
             # Reopen for every step: durable state must survive object lifetime.
