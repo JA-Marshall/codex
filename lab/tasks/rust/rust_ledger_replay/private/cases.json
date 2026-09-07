@@ -1,0 +1,147 @@
+[
+  {
+    "id": "nonadjacent_retry",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "e1\tcash\t5\ne2\tcash\t-2\ne1\tcash\t5\n",
+        "expect": {
+          "exit": 0,
+          "stdout": "cash\t3\nTOTAL\t3\n"
+        }
+      }
+    ]
+  },
+  {
+    "id": "cross_account_conflict",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "id\talpha\t2\nother\tbeta\t1\nid\tbeta\t2\n",
+        "expect": {
+          "exit": 2,
+          "stdout": "",
+          "stderr_contains_all": ["conflict", "id"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "changed_delta",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "id\ta\t2\nid\ta\t3\n",
+        "expect": {
+          "exit": 2,
+          "stdout": "",
+          "stderr_contains_all": ["conflict", "id"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "numeric_equality",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "id\ta\t01\nx\tz\t-1\nid\ta\t1\n",
+        "expect": {
+          "exit": 0,
+          "stdout": "a\t1\nz\t-1\nTOTAL\t0\n"
+        }
+      }
+    ]
+  },
+  {
+    "id": "zero_balances",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "a\tB\t2\nb\tB\t-2\nc\ta\t3\n",
+        "expect": {
+          "exit": 0,
+          "stdout": "B\t0\na\t3\nTOTAL\t3\n"
+        }
+      }
+    ]
+  },
+  {
+    "id": "duplicate_overflow_prevented",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "id\ta\t9223372036854775807\nx\tb\t0\nid\ta\t9223372036854775807\n",
+        "expect": {
+          "exit": 0,
+          "stdout": "a\t9223372036854775807\nb\t0\nTOTAL\t9223372036854775807\n"
+        }
+      }
+    ]
+  },
+  {
+    "id": "balance_overflow",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "id\ta\t9223372036854775807\nx\ta\t1\n",
+        "expect": {
+          "exit": 2,
+          "stdout": "",
+          "stderr_contains": "overflow"
+        }
+      }
+    ]
+  },
+  {
+    "id": "total_overflow",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "id\ta\t9223372036854775807\nx\tb\t1\n",
+        "expect": {
+          "exit": 2,
+          "stdout": "",
+          "stderr_contains": "overflow"
+        }
+      }
+    ]
+  },
+  {
+    "id": "late_bad_duplicate",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "id\ta\t1\nid\ta\tnot-number\n",
+        "expect": {
+          "exit": 2,
+          "stdout": "",
+          "stderr_contains": "line 2"
+        }
+      }
+    ]
+  },
+  {
+    "id": "empty",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout": "TOTAL\t0\n"
+        }
+      }
+    ]
+  }
+]

@@ -1,0 +1,120 @@
+[
+  {
+    "id": "signed_duplicate",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": " bolts \t4\nnuts\t-2\nbolts\t-4\n",
+        "expect": {
+          "exit": 0,
+          "stdout": "bolts\t0\nnuts\t-2\n"
+        }
+      }
+    ]
+  },
+  {
+    "id": "case_and_order",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "z\t1\nA\t2\na\t3\n# ignored\n\n",
+        "expect": {
+          "exit": 0,
+          "stdout": "A\t2\na\t3\nz\t1\n"
+        }
+      }
+    ]
+  },
+  {
+    "id": "empty",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": " \n # ignored\n",
+        "expect": {
+          "exit": 0,
+          "stdout": ""
+        }
+      }
+    ]
+  },
+  {
+    "id": "wide_values",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "x\t4000000000\nx\t-1\n",
+        "expect": {
+          "exit": 0,
+          "stdout": "x\t3999999999\n"
+        }
+      }
+    ]
+  },
+  {
+    "id": "overflow",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "x\t9223372036854775807\nx\t1\n",
+        "expect": {
+          "exit": 2,
+          "stdout": "",
+          "stderr_contains": "overflow"
+        }
+      }
+    ]
+  },
+  {
+    "id": "negative_overflow",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "x\t-9223372036854775808\nx\t-1\n",
+        "expect": {
+          "exit": 2,
+          "stdout": "",
+          "stderr_contains": "overflow"
+        }
+      }
+    ]
+  },
+  {
+    "id": "late_invalid",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "good\t3\n# comment\nbad\n",
+        "expect": {
+          "exit": 2,
+          "stdout": "",
+          "stderr_contains": "line 3"
+        }
+      }
+    ]
+  },
+  {
+    "id": "arguments",
+    "files": {},
+    "steps": [
+      {
+        "argv": [
+          "extra"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 2,
+          "stdout": "",
+          "stderr_contains": "usage"
+        }
+      }
+    ]
+  }
+]

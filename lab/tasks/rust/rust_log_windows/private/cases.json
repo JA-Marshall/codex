@@ -1,0 +1,155 @@
+[
+  {
+    "id": "half_open",
+    "files": {},
+    "steps": [
+      {
+        "argv": [
+          "window",
+          "INFO",
+          "10",
+          "20"
+        ],
+        "stdin": "10\tINFO\ta\n20\tINFO\tb\n15\tWARN\tc\n19\tINFO\td\n",
+        "expect": {
+          "exit": 0,
+          "stdout": "2\n"
+        }
+      }
+    ]
+  },
+  {
+    "id": "empty_window",
+    "files": {},
+    "steps": [
+      {
+        "argv": [
+          "window",
+          "X",
+          "7",
+          "7"
+        ],
+        "stdin": "7\tX\ta\n",
+        "expect": {
+          "exit": 0,
+          "stdout": "0\n"
+        }
+      }
+    ]
+  },
+  {
+    "id": "unordered_wide",
+    "files": {},
+    "steps": [
+      {
+        "argv": [
+          "window",
+          "X",
+          "8",
+          "18446744073709551615"
+        ],
+        "stdin": "18446744073709551614\tX\ta\n4\tX\tb\n8\tX\t\tmessage\n",
+        "expect": {
+          "exit": 0,
+          "stdout": "2\n"
+        }
+      }
+    ]
+  },
+  {
+    "id": "legacy_count",
+    "files": {},
+    "steps": [
+      {
+        "argv": [
+          "count",
+          "INFO"
+        ],
+        "stdin": "2\tINFO\tx\n9\tinfo\tx\n\n1\tINFO\t\n",
+        "expect": {
+          "exit": 0,
+          "stdout": "2\n"
+        }
+      }
+    ]
+  },
+  {
+    "id": "excluded_invalid",
+    "files": {},
+    "steps": [
+      {
+        "argv": [
+          "window",
+          "INFO",
+          "0",
+          "3"
+        ],
+        "stdin": "1\tINFO\tok\nwrong\tWARN\thidden\n",
+        "expect": {
+          "exit": 2,
+          "stdout": "",
+          "stderr_contains": "line 2"
+        }
+      }
+    ]
+  },
+  {
+    "id": "reversed",
+    "files": {},
+    "steps": [
+      {
+        "argv": [
+          "window",
+          "INFO",
+          "3",
+          "2"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 2,
+          "stdout": "",
+          "stderr_contains": "range"
+        }
+      }
+    ]
+  },
+  {
+    "id": "overflow_bound",
+    "files": {},
+    "steps": [
+      {
+        "argv": [
+          "window",
+          "X",
+          "0",
+          "18446744073709551616"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 2,
+          "stdout": "",
+          "stderr_contains": "range"
+        }
+      }
+    ]
+  },
+  {
+    "id": "bad_arity",
+    "files": {},
+    "steps": [
+      {
+        "argv": [
+          "window",
+          "X",
+          "0"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 2,
+          "stdout": "",
+          "stderr_contains": "usage"
+        }
+      }
+    ]
+  }
+]

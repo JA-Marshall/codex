@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "id": "rust_log_windows",
+  "family": "extension",
+  "language": "rust",
+  "size": "small",
+  "split": "study",
+  "project_id": "rust_log_windows",
+  "capabilities": [
+    "cli_extension",
+    "boundary_conditions",
+    "validation"
+  ],
+  "write_paths": [
+    "src",
+    "tests"
+  ],
+  "build": [
+    "{cargo}",
+    "build",
+    "--offline",
+    "--locked",
+    "--manifest-path",
+    "{repository}/Cargo.toml",
+    "--target-dir",
+    "{scratch}/target"
+  ],
+  "command": [
+    "{scratch}/target/debug/rust-log-windows"
+  ],
+  "public_command": [
+    "{cargo}",
+    "test",
+    "--offline",
+    "--locked",
+    "--manifest-path",
+    "{repository}/Cargo.toml",
+    "--target-dir",
+    "{scratch}/target"
+  ],
+  "mutants": [
+    "inclusive_end",
+    "filter_before_validate"
+  ],
+  "structural_checks": []
+}

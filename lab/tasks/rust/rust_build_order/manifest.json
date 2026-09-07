@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "id": "rust_build_order",
+  "family": "greenfield",
+  "language": "rust",
+  "size": "medium",
+  "split": "study",
+  "project_id": "rust_build_order",
+  "capabilities": [
+    "dependency_graphs",
+    "deterministic_ordering",
+    "cycle_detection"
+  ],
+  "write_paths": [
+    "src",
+    "tests"
+  ],
+  "build": [
+    "{cargo}",
+    "build",
+    "--offline",
+    "--locked",
+    "--manifest-path",
+    "{repository}/Cargo.toml",
+    "--target-dir",
+    "{scratch}/target"
+  ],
+  "command": [
+    "{scratch}/target/debug/rust-build-order"
+  ],
+  "public_command": [
+    "{cargo}",
+    "test",
+    "--offline",
+    "--locked",
+    "--manifest-path",
+    "{repository}/Cargo.toml",
+    "--target-dir",
+    "{scratch}/target"
+  ],
+  "mutants": [
+    "batched_ready",
+    "first_dependency"
+  ],
+  "structural_checks": []
+}

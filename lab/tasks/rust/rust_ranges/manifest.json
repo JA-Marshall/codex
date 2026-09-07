@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "id": "rust_ranges",
+  "family": "bug_fix",
+  "language": "rust",
+  "size": "small",
+  "split": "study",
+  "project_id": "rust_ranges",
+  "capabilities": [
+    "interval_algorithms",
+    "regression_repair",
+    "numeric_ordering"
+  ],
+  "write_paths": [
+    "src",
+    "tests"
+  ],
+  "build": [
+    "{cargo}",
+    "build",
+    "--offline",
+    "--locked",
+    "--manifest-path",
+    "{repository}/Cargo.toml",
+    "--target-dir",
+    "{scratch}/target"
+  ],
+  "command": [
+    "{scratch}/target/debug/rust-ranges"
+  ],
+  "public_command": [
+    "{cargo}",
+    "test",
+    "--offline",
+    "--locked",
+    "--manifest-path",
+    "{repository}/Cargo.toml",
+    "--target-dir",
+    "{scratch}/target"
+  ],
+  "mutants": [
+    "strict_overlap",
+    "lexical_sort"
+  ],
+  "structural_checks": []
+}

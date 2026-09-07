@@ -1,0 +1,101 @@
+[
+  {
+    "id": "nested_bridge",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "0,10\n2,4\n8,12\n",
+        "expect": {
+          "exit": 0,
+          "stdout": "0,12\n"
+        }
+      }
+    ]
+  },
+  {
+    "id": "touching",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "4,6\n0,2\n2,4\n",
+        "expect": {
+          "exit": 0,
+          "stdout": "0,6\n"
+        }
+      }
+    ]
+  },
+  {
+    "id": "numeric_sort",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "10,12\n2,3\n-2,-1\n-10,-9\n",
+        "expect": {
+          "exit": 0,
+          "stdout": "-10,-9\n-2,-1\n2,3\n10,12\n"
+        }
+      }
+    ]
+  },
+  {
+    "id": "empty_and_duplicate",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "1,1\n3,5\n3,5\n4,4\n",
+        "expect": {
+          "exit": 0,
+          "stdout": "3,5\n"
+        }
+      }
+    ]
+  },
+  {
+    "id": "extremes",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "-9223372036854775808,0\n0,9223372036854775807\n",
+        "expect": {
+          "exit": 0,
+          "stdout": "-9223372036854775808,9223372036854775807\n"
+        }
+      }
+    ]
+  },
+  {
+    "id": "invalid_late",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "0,2\n5,1\n",
+        "expect": {
+          "exit": 2,
+          "stdout": "",
+          "stderr_contains": "line 2"
+        }
+      }
+    ]
+  },
+  {
+    "id": "empty",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "\n  \n2,2\n",
+        "expect": {
+          "exit": 0,
+          "stdout": ""
+        }
+      }
+    ]
+  }
+]

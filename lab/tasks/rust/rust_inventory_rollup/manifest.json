@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "id": "rust_inventory_rollup",
+  "family": "greenfield",
+  "language": "rust",
+  "size": "small",
+  "split": "study",
+  "project_id": "rust_inventory_rollup",
+  "capabilities": [
+    "text_parsing",
+    "aggregation",
+    "checked_arithmetic"
+  ],
+  "write_paths": [
+    "src",
+    "tests"
+  ],
+  "build": [
+    "{cargo}",
+    "build",
+    "--offline",
+    "--locked",
+    "--manifest-path",
+    "{repository}/Cargo.toml",
+    "--target-dir",
+    "{scratch}/target"
+  ],
+  "command": [
+    "{scratch}/target/debug/rust-inventory-rollup"
+  ],
+  "public_command": [
+    "{cargo}",
+    "test",
+    "--offline",
+    "--locked",
+    "--manifest-path",
+    "{repository}/Cargo.toml",
+    "--target-dir",
+    "{scratch}/target"
+  ],
+  "mutants": [
+    "drops_zero",
+    "case_fold"
+  ],
+  "structural_checks": []
+}

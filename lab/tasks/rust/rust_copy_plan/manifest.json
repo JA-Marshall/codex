@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "id": "rust_copy_plan",
+  "family": "extension",
+  "language": "rust",
+  "size": "medium",
+  "split": "study",
+  "project_id": "rust_copy_plan",
+  "capabilities": [
+    "manifest_comparison",
+    "filesystem_input",
+    "cli_compatibility"
+  ],
+  "write_paths": [
+    "src",
+    "tests"
+  ],
+  "build": [
+    "{cargo}",
+    "build",
+    "--offline",
+    "--locked",
+    "--manifest-path",
+    "{repository}/Cargo.toml",
+    "--target-dir",
+    "{scratch}/target"
+  ],
+  "command": [
+    "{scratch}/target/debug/rust-copy-plan"
+  ],
+  "public_command": [
+    "{cargo}",
+    "test",
+    "--offline",
+    "--locked",
+    "--manifest-path",
+    "{repository}/Cargo.toml",
+    "--target-dir",
+    "{scratch}/target"
+  ],
+  "mutants": [
+    "digest_only",
+    "always_delete"
+  ],
+  "structural_checks": []
+}

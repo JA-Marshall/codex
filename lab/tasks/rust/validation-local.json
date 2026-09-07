@@ -1,0 +1,319 @@
+{
+  "rust": "1.95.0",
+  "model_calls": 0,
+  "records": [
+    {
+      "id": "rust_atomic_export",
+      "variant": "baseline",
+      "public_pass": true,
+      "private_pass": 3,
+      "private_fail": [
+        "invalid_preserves_existing",
+        "invalid_keeps_absent",
+        "temporary_collision",
+        "rename_failure_cleanup",
+        "extra_tab"
+      ]
+    },
+    {
+      "id": "rust_atomic_export",
+      "variant": "solution",
+      "public_pass": true,
+      "private_pass": 8,
+      "private_fail": []
+    },
+    {
+      "id": "rust_atomic_export",
+      "variant": "direct_write",
+      "public_pass": true,
+      "private_pass": 6,
+      "private_fail": [
+        "temporary_collision",
+        "rename_failure_cleanup"
+      ]
+    },
+    {
+      "id": "rust_atomic_export",
+      "variant": "clobber_temporary",
+      "public_pass": true,
+      "private_pass": 7,
+      "private_fail": [
+        "temporary_collision"
+      ]
+    },
+    {
+      "id": "rust_checked_totals",
+      "variant": "baseline",
+      "public_pass": true,
+      "private_pass": 5,
+      "private_fail": [
+        "row_overflow",
+        "label_overflow",
+        "grand_overflow"
+      ]
+    },
+    {
+      "id": "rust_checked_totals",
+      "variant": "solution",
+      "public_pass": true,
+      "private_pass": 8,
+      "private_fail": []
+    },
+    {
+      "id": "rust_checked_totals",
+      "variant": "product_only",
+      "public_pass": true,
+      "private_pass": 6,
+      "private_fail": [
+        "label_overflow",
+        "grand_overflow"
+      ]
+    },
+    {
+      "id": "rust_checked_totals",
+      "variant": "missing_grand_check",
+      "public_pass": true,
+      "private_pass": 7,
+      "private_fail": [
+        "grand_overflow"
+      ]
+    },
+    {
+      "id": "rust_copy_plan",
+      "variant": "baseline",
+      "public_pass": true,
+      "private_pass": 1,
+      "private_fail": [
+        "mixed_plan",
+        "same_digest_changed_size",
+        "keep_extras",
+        "empty",
+        "duplicate_target",
+        "bad_path",
+        "overflow",
+        "missing_target"
+      ]
+    },
+    {
+      "id": "rust_copy_plan",
+      "variant": "solution",
+      "public_pass": true,
+      "private_pass": 9,
+      "private_fail": []
+    },
+    {
+      "id": "rust_copy_plan",
+      "variant": "digest_only",
+      "public_pass": true,
+      "private_pass": 8,
+      "private_fail": [
+        "same_digest_changed_size"
+      ]
+    },
+    {
+      "id": "rust_copy_plan",
+      "variant": "always_delete",
+      "public_pass": true,
+      "private_pass": 8,
+      "private_fail": [
+        "keep_extras"
+      ]
+    },
+    {
+      "id": "rust_inventory_rollup",
+      "variant": "baseline",
+      "public_pass": true,
+      "private_pass": 2,
+      "private_fail": [
+        "signed_duplicate",
+        "case_and_order",
+        "empty",
+        "wide_values",
+        "overflow",
+        "negative_overflow"
+      ]
+    },
+    {
+      "id": "rust_inventory_rollup",
+      "variant": "solution",
+      "public_pass": true,
+      "private_pass": 8,
+      "private_fail": []
+    },
+    {
+      "id": "rust_inventory_rollup",
+      "variant": "drops_zero",
+      "public_pass": true,
+      "private_pass": 7,
+      "private_fail": [
+        "signed_duplicate"
+      ]
+    },
+    {
+      "id": "rust_inventory_rollup",
+      "variant": "case_fold",
+      "public_pass": true,
+      "private_pass": 7,
+      "private_fail": [
+        "case_and_order"
+      ]
+    },
+    {
+      "id": "rust_ledger_replay",
+      "variant": "baseline",
+      "public_pass": true,
+      "private_pass": 5,
+      "private_fail": [
+        "nonadjacent_retry",
+        "cross_account_conflict",
+        "changed_delta",
+        "numeric_equality",
+        "duplicate_overflow_prevented"
+      ]
+    },
+    {
+      "id": "rust_ledger_replay",
+      "variant": "solution",
+      "public_pass": true,
+      "private_pass": 10,
+      "private_fail": []
+    },
+    {
+      "id": "rust_ledger_replay",
+      "variant": "account_scoped_ids",
+      "public_pass": true,
+      "private_pass": 9,
+      "private_fail": [
+        "cross_account_conflict"
+      ]
+    },
+    {
+      "id": "rust_ledger_replay",
+      "variant": "silently_skip_conflicts",
+      "public_pass": true,
+      "private_pass": 8,
+      "private_fail": [
+        "cross_account_conflict",
+        "changed_delta"
+      ]
+    },
+    {
+      "id": "rust_ranges",
+      "variant": "baseline",
+      "public_pass": true,
+      "private_pass": 6,
+      "private_fail": [
+        "nested_bridge"
+      ]
+    },
+    {
+      "id": "rust_ranges",
+      "variant": "solution",
+      "public_pass": true,
+      "private_pass": 7,
+      "private_fail": []
+    },
+    {
+      "id": "rust_ranges",
+      "variant": "strict_overlap",
+      "public_pass": true,
+      "private_pass": 5,
+      "private_fail": [
+        "touching",
+        "extremes"
+      ]
+    },
+    {
+      "id": "rust_ranges",
+      "variant": "lexical_sort",
+      "public_pass": true,
+      "private_pass": 6,
+      "private_fail": [
+        "numeric_sort"
+      ]
+    },
+    {
+      "id": "rust_build_order",
+      "variant": "baseline",
+      "public_pass": true,
+      "private_pass": 1,
+      "private_fail": [
+        "newly_ready_priority",
+        "repeated_union",
+        "diamond",
+        "implicit_dedup",
+        "disconnected",
+        "cycle_after_ready",
+        "self_cycle",
+        "empty"
+      ]
+    },
+    {
+      "id": "rust_build_order",
+      "variant": "solution",
+      "public_pass": true,
+      "private_pass": 9,
+      "private_fail": []
+    },
+    {
+      "id": "rust_build_order",
+      "variant": "batched_ready",
+      "public_pass": true,
+      "private_pass": 8,
+      "private_fail": [
+        "newly_ready_priority"
+      ]
+    },
+    {
+      "id": "rust_build_order",
+      "variant": "first_dependency",
+      "public_pass": true,
+      "private_pass": 6,
+      "private_fail": [
+        "repeated_union",
+        "diamond",
+        "implicit_dedup"
+      ]
+    },
+    {
+      "id": "rust_log_windows",
+      "variant": "baseline",
+      "public_pass": true,
+      "private_pass": 2,
+      "private_fail": [
+        "half_open",
+        "empty_window",
+        "unordered_wide",
+        "excluded_invalid",
+        "reversed",
+        "overflow_bound"
+      ]
+    },
+    {
+      "id": "rust_log_windows",
+      "variant": "solution",
+      "public_pass": true,
+      "private_pass": 8,
+      "private_fail": []
+    },
+    {
+      "id": "rust_log_windows",
+      "variant": "inclusive_end",
+      "public_pass": true,
+      "private_pass": 6,
+      "private_fail": [
+        "half_open",
+        "empty_window"
+      ]
+    },
+    {
+      "id": "rust_log_windows",
+      "variant": "filter_before_validate",
+      "public_pass": true,
+      "private_pass": 7,
+      "private_fail": [
+        "excluded_invalid"
+      ]
+    }
+  ]
+}

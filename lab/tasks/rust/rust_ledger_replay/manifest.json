@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "id": "rust_ledger_replay",
+  "family": "bug_fix",
+  "language": "rust",
+  "size": "medium",
+  "split": "study",
+  "project_id": "rust_ledger_replay",
+  "capabilities": [
+    "idempotency",
+    "state_replay",
+    "conflict_validation"
+  ],
+  "write_paths": [
+    "src",
+    "tests"
+  ],
+  "build": [
+    "{cargo}",
+    "build",
+    "--offline",
+    "--locked",
+    "--manifest-path",
+    "{repository}/Cargo.toml",
+    "--target-dir",
+    "{scratch}/target"
+  ],
+  "command": [
+    "{scratch}/target/debug/rust-ledger-replay"
+  ],
+  "public_command": [
+    "{cargo}",
+    "test",
+    "--offline",
+    "--locked",
+    "--manifest-path",
+    "{repository}/Cargo.toml",
+    "--target-dir",
+    "{scratch}/target"
+  ],
+  "mutants": [
+    "account_scoped_ids",
+    "silently_skip_conflicts"
+  ],
+  "structural_checks": []
+}

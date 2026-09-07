@@ -1,0 +1,176 @@
+[
+  {
+    "id": "mixed_plan",
+    "files": {
+      "target.tsv": "a\t4\tsame\nb\t7\told\ngone\t9\tx\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "diff",
+          "target.tsv"
+        ],
+        "stdin": "b\t7\tnew\na\t4\tsame\nnew/file\t0\td\n",
+        "expect": {
+          "exit": 0,
+          "stdout": "COPY\tb\t7\nDELETE\tgone\nCOPY\tnew/file\t0\nTOTAL\t2\t1\t7\n"
+        }
+      }
+    ]
+  },
+  {
+    "id": "same_digest_changed_size",
+    "files": {
+      "target.tsv": "a\t8\td\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "diff",
+          "target.tsv"
+        ],
+        "stdin": "a\t9\td\n",
+        "expect": {
+          "exit": 0,
+          "stdout": "COPY\ta\t9\nTOTAL\t1\t0\t9\n"
+        }
+      }
+    ]
+  },
+  {
+    "id": "keep_extras",
+    "files": {
+      "target.tsv": "extra\t2\tz\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "diff",
+          "target.tsv",
+          "--keep-extra"
+        ],
+        "stdin": "x\t3\ty\n",
+        "expect": {
+          "exit": 0,
+          "stdout": "COPY\tx\t3\nTOTAL\t1\t0\t3\n",
+          "files": {
+            "target.tsv": "extra\t2\tz\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "empty",
+    "files": {
+      "target.tsv": ""
+    },
+    "steps": [
+      {
+        "argv": [
+          "diff",
+          "target.tsv"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout": "TOTAL\t0\t0\t0\n"
+        }
+      }
+    ]
+  },
+  {
+    "id": "legacy_list",
+    "files": {},
+    "steps": [
+      {
+        "argv": [
+          "list"
+        ],
+        "stdin": "z\t2\tz\na\t1\ta\n",
+        "expect": {
+          "exit": 0,
+          "stdout": "a\t1\ta\nz\t2\tz\n"
+        }
+      }
+    ]
+  },
+  {
+    "id": "duplicate_target",
+    "files": {
+      "target.tsv": "a\t1\tx\na\t1\tx\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "diff",
+          "target.tsv"
+        ],
+        "stdin": "a\t1\tx\n",
+        "expect": {
+          "exit": 2,
+          "stdout": "",
+          "stderr_contains_all": ["target", "line 2"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "bad_path",
+    "files": {
+      "target.tsv": ""
+    },
+    "steps": [
+      {
+        "argv": [
+          "diff",
+          "target.tsv"
+        ],
+        "stdin": "a/../b\t1\tx\n",
+        "expect": {
+          "exit": 2,
+          "stdout": "",
+          "stderr_contains": "line 1"
+        }
+      }
+    ]
+  },
+  {
+    "id": "overflow",
+    "files": {
+      "target.tsv": ""
+    },
+    "steps": [
+      {
+        "argv": [
+          "diff",
+          "target.tsv"
+        ],
+        "stdin": "a\t18446744073709551615\tx\nb\t1\ty\n",
+        "expect": {
+          "exit": 2,
+          "stdout": "",
+          "stderr_contains": "overflow"
+        }
+      }
+    ]
+  },
+  {
+    "id": "missing_target",
+    "files": {},
+    "steps": [
+      {
+        "argv": [
+          "diff",
+          "missing.tsv"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 2,
+          "stdout": "",
+          "stderr_contains": "target"
+        }
+      }
+    ]
+  }
+]

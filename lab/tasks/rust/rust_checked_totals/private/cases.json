@@ -1,0 +1,118 @@
+[
+  {
+    "id": "normal_compatibility",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "service\t2\t7\nparts\t3\t5\nservice\t1\t1\nzero\t0\t999\n",
+        "expect": {
+          "exit": 0,
+          "stdout": "parts\t15\nservice\t15\nzero\t0\nGRAND\t30\n"
+        }
+      }
+    ]
+  },
+  {
+    "id": "maximum_valid",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "x\t18446744073709551615\t1\n",
+        "expect": {
+          "exit": 0,
+          "stdout": "x\t18446744073709551615\nGRAND\t18446744073709551615\n"
+        }
+      }
+    ]
+  },
+  {
+    "id": "row_overflow",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "x\t9223372036854775808\t2\n",
+        "expect": {
+          "exit": 2,
+          "stdout": "",
+          "stderr_contains": "overflow"
+        }
+      }
+    ]
+  },
+  {
+    "id": "label_overflow",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "x\t18446744073709551615\t1\nx\t1\t1\n",
+        "expect": {
+          "exit": 2,
+          "stdout": "",
+          "stderr_contains": "overflow"
+        }
+      }
+    ]
+  },
+  {
+    "id": "grand_overflow",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "a\t18446744073709551615\t1\nb\t1\t1\n",
+        "expect": {
+          "exit": 2,
+          "stdout": "",
+          "stderr_contains": "overflow"
+        }
+      }
+    ]
+  },
+  {
+    "id": "zero_product",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "x\t18446744073709551615\t0\n",
+        "expect": {
+          "exit": 0,
+          "stdout": "x\t0\nGRAND\t0\n"
+        }
+      }
+    ]
+  },
+  {
+    "id": "late_parse_error",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "a\t1\t2\n\nb\t-1\t3\n",
+        "expect": {
+          "exit": 2,
+          "stdout": "",
+          "stderr_contains": "line 3"
+        }
+      }
+    ]
+  },
+  {
+    "id": "empty",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout": "GRAND\t0\n"
+        }
+      }
+    ]
+  }
+]

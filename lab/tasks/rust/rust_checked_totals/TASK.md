@@ -1,0 +1,9 @@
+# Harden invoice totals without changing normal reports
+
+Maintain `rust-checked-totals` (no arguments), an existing small invoice summarizer. Replace its wrapping arithmetic with checked arithmetic throughout while preserving byte-for-byte reports for all nonoverflowing inputs. The measurable objective is that no row product, label subtotal, or grand total can silently wrap, saturate, truncate, or panic.
+
+Read each nonempty physical stdin line as exactly `nonempty-label<TAB>u64-quantity<TAB>u64-unit-price`. Fields are not trimmed. Labels are case sensitive. Multiply quantity by price, aggregate products by label, and print `label<TAB>subtotal` in Rust string order, retaining zero totals. Finish with `GRAND<TAB>sum-of-subtotals`; every record ends in newline. Empty input prints `GRAND<TAB>0` plus newline. All arithmetic is unsigned 64-bit; the maximum u64 value is valid when no operation exceeds it.
+
+Any row product, label addition, or final grand-total addition exceeding u64 must exit 2, print no stdout, and emit `error:` stderr containing `overflow`. Parse errors similarly exit 2 with physical `line N`; incorrect arguments contain `usage`. Validate the full input before returning a report. Keep the existing parser/summarizer separation and public API. Do not introduce monetary rounding, signed values, new output formats, big-integer packages, or external dependencies.
+
+Work only in `src/` and `tests/`. Keep the CLI contract and existing public behavior. Use Rust 1.95 and the standard library; do not add dependencies or modify Cargo metadata. The project is deliberately detached from the parent workspace. Run `just test` in the project (with an isolated `CARGO_TARGET_DIR`) to execute its public tests. No network, services, clock, or environment configuration is needed. Input sizes are modest; do not add unrelated features.

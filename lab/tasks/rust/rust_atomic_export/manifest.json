@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "id": "rust_atomic_export",
+  "family": "maintenance",
+  "language": "rust",
+  "size": "medium",
+  "split": "study",
+  "project_id": "rust_atomic_export",
+  "capabilities": [
+    "atomic_file_update",
+    "failure_recovery",
+    "filesystem_state"
+  ],
+  "write_paths": [
+    "src",
+    "tests"
+  ],
+  "build": [
+    "{cargo}",
+    "build",
+    "--offline",
+    "--locked",
+    "--manifest-path",
+    "{repository}/Cargo.toml",
+    "--target-dir",
+    "{scratch}/target"
+  ],
+  "command": [
+    "{scratch}/target/debug/rust-atomic-export"
+  ],
+  "public_command": [
+    "{cargo}",
+    "test",
+    "--offline",
+    "--locked",
+    "--manifest-path",
+    "{repository}/Cargo.toml",
+    "--target-dir",
+    "{scratch}/target"
+  ],
+  "mutants": [
+    "direct_write",
+    "clobber_temporary"
+  ],
+  "structural_checks": []
+}

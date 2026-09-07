@@ -1,0 +1,9 @@
+# Repair replay deduplication across an event stream
+
+`rust-ledger-replay` (no arguments) rebuilds account balances from stdin. Current deduplication remembers only the immediately previous event, so replaying `e1<TAB>cash<TAB>5`, `e2<TAB>cash<TAB>-2`, `e1<TAB>cash<TAB>5` yields cash 8 instead of cash 3. Repair the event replay logic.
+
+Each nonempty physical line is exactly `nonempty-id<TAB>nonempty-account<TAB>signed-i64-delta`. Fields are not trimmed; IDs and accounts are case sensitive. An event ID is globally unique across accounts. Its first occurrence contributes the delta. Any later record with the same ID and exactly the same account and numeric delta is ignored, however far apart. Reusing an ID with a different account or delta is a conflict: exit 2, empty stdout, and stderr containing `conflict` and that ID. Validate the complete stream, including duplicate records; malformed rows report physical `line N`.
+
+On success, print each encountered account and its balance as `account<TAB>balance` in Rust string order, retaining zero balances, then `TOTAL<TAB>total`. Each record has a newline; empty input prints `TOTAL<TAB>0` plus newline. Balances use checked i64 addition in first-occurrence input order; the final total uses checked i64 addition in sorted account order. Overflow exits 2 with empty stdout and `overflow` stderr. Unexpected arguments report `usage` and exit 2. Do not add persistence, transfer semantics, or dependencies.
+
+Work only in `src/` and `tests/`. Keep the CLI contract and existing public behavior. Use Rust 1.95 and the standard library; do not add dependencies or modify Cargo metadata. The project is deliberately detached from the parent workspace. Run `just test` in the project (with an isolated `CARGO_TARGET_DIR`) to execute its public tests. No network, services, clock, or environment configuration is needed. Input sizes are modest; do not add unrelated features.

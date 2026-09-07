@@ -1,0 +1,191 @@
+[
+  {
+    "id": "replace_sorted_last_wins",
+    "files": {
+      "config.tsv": "previous\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "export",
+          "config.tsv"
+        ],
+        "stdin": "z\told\na\t first \nz\tnew\nempty\t\n",
+        "expect": {
+          "exit": 0,
+          "stdout": "EXPORTED\t3\n",
+          "files": {
+            "config.tsv": "a\t first \nempty\t\nz\tnew\n",
+            "config.tsv.tmp": null
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "invalid_preserves_existing",
+    "files": {
+      "config.tsv": "unchanged bytes\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "export",
+          "config.tsv"
+        ],
+        "stdin": "good\tx\ninvalid key\ty\n",
+        "expect": {
+          "exit": 2,
+          "stdout": "",
+          "stderr_contains": "line 2",
+          "files": {
+            "config.tsv": "unchanged bytes\n",
+            "config.tsv.tmp": null
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "invalid_keeps_absent",
+    "files": {},
+    "steps": [
+      {
+        "argv": [
+          "export",
+          "new.tsv"
+        ],
+        "stdin": "bad\n",
+        "expect": {
+          "exit": 2,
+          "stdout": "",
+          "stderr_contains": "line 1",
+          "files": {
+            "new.tsv": null,
+            "new.tsv.tmp": null
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "temporary_collision",
+    "files": {
+      "config.tsv": "old\n",
+      "config.tsv.tmp": "owned elsewhere\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "export",
+          "config.tsv"
+        ],
+        "stdin": "a\tnew\n",
+        "expect": {
+          "exit": 2,
+          "stdout": "",
+          "stderr_contains": "temporary",
+          "files": {
+            "config.tsv": "old\n",
+            "config.tsv.tmp": "owned elsewhere\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "empty_replaces",
+    "files": {
+      "config.tsv": "old\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "export",
+          "config.tsv"
+        ],
+        "stdin": "",
+        "expect": {
+          "exit": 0,
+          "stdout": "EXPORTED\t0\n",
+          "files": {
+            "config.tsv": "",
+            "config.tsv.tmp": null
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "nested_destination",
+    "files": {
+      "nested/keep.txt": "keep\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "export",
+          "nested/config.tsv"
+        ],
+        "stdin": "b\t2\na\t1\n",
+        "expect": {
+          "exit": 0,
+          "stdout": "EXPORTED\t2\n",
+          "files": {
+            "nested/config.tsv": "a\t1\nb\t2\n",
+            "nested/config.tsv.tmp": null,
+            "nested/keep.txt": "keep\n"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "rename_failure_cleanup",
+    "files": {
+      "occupied/child.txt": "kept\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "export",
+          "occupied"
+        ],
+        "stdin": "a\t1\n",
+        "expect": {
+          "exit": 2,
+          "stdout": "",
+          "stderr_contains": "commit",
+          "files": {
+            "occupied/child.txt": "kept\n",
+            "occupied.tmp": null
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "extra_tab",
+    "files": {
+      "config.tsv": "old\n"
+    },
+    "steps": [
+      {
+        "argv": [
+          "export",
+          "config.tsv"
+        ],
+        "stdin": "good\tx\nbad\ty\tz\n",
+        "expect": {
+          "exit": 2,
+          "stdout": "",
+          "stderr_contains": "line 2",
+          "files": {
+            "config.tsv": "old\n",
+            "config.tsv.tmp": null
+          }
+        }
+      }
+    ]
+  }
+]

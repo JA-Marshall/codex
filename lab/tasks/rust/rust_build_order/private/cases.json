@@ -1,0 +1,131 @@
+[
+  {
+    "id": "newly_ready_priority",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "b: a\nz:\na:\n",
+        "expect": {
+          "exit": 0,
+          "stdout": "a\nb\nz\n"
+        }
+      }
+    ]
+  },
+  {
+    "id": "repeated_union",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "app: z\napp: b\n",
+        "expect": {
+          "exit": 0,
+          "stdout": "b\nz\napp\n"
+        }
+      }
+    ]
+  },
+  {
+    "id": "diamond",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "app: core\napp: util\nutil: base\ncore: base\n",
+        "expect": {
+          "exit": 0,
+          "stdout": "base\ncore\nutil\napp\n"
+        }
+      }
+    ]
+  },
+  {
+    "id": "implicit_dedup",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "ship: build,build,test\ntest:build\n",
+        "expect": {
+          "exit": 0,
+          "stdout": "build\ntest\nship\n"
+        }
+      }
+    ]
+  },
+  {
+    "id": "disconnected",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "Z:\na:\nB: a\n",
+        "expect": {
+          "exit": 0,
+          "stdout": "Z\na\nB\n"
+        }
+      }
+    ]
+  },
+  {
+    "id": "cycle_after_ready",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "ready:\na:b\nb:a\n",
+        "expect": {
+          "exit": 2,
+          "stdout": "",
+          "stderr_contains": "cycle"
+        }
+      }
+    ]
+  },
+  {
+    "id": "self_cycle",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "self:self\n",
+        "expect": {
+          "exit": 2,
+          "stdout": "",
+          "stderr_contains": "cycle"
+        }
+      }
+    ]
+  },
+  {
+    "id": "empty",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "# only comment\n",
+        "expect": {
+          "exit": 0,
+          "stdout": ""
+        }
+      }
+    ]
+  },
+  {
+    "id": "bad_dependency",
+    "files": {},
+    "steps": [
+      {
+        "argv": [],
+        "stdin": "ok:\nwrong: ok,\n",
+        "expect": {
+          "exit": 2,
+          "stdout": "",
+          "stderr_contains": "line 2"
+        }
+      }
+    ]
+  }
+]
