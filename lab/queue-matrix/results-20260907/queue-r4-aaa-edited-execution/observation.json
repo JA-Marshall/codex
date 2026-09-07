@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "run": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r4-aaa-edited-execution",
+  "workflow_state": "completed",
+  "terminal_change": {
+    "type": "completed"
+  },
+  "all_started_phases_shutdown": true,
+  "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r4-aaa/repository",
+  "first_plan_human_approval": true,
+  "phase_turns": 2,
+  "planner_phases": 0,
+  "tool_admissions": 69,
+  "usage": {
+    "input_tokens": 1346872,
+    "output_tokens": 55771,
+    "cached_input_tokens": 1230309
+  },
+  "workflow_terminal_elapsed_ms": 1883894,
+  "human_plan_edits": 0,
+  "plan_amendments": 0,
+  "plan_deviations": null,
+  "source_artifact_sha256": {
+    "events.jsonl": "1c7c285a1950aa2e2ef18d1f499c54a4e26e35e1b6c826b793443ffa1f6cd2d1",
+    "runtime-events.jsonl": "88b8607472396a57cf3b590ed9a81c5ad923fba1e2cafed1d25813de4bc7daca",
+    "evidence/input-01.json": "01ceff5183964942d2a23d3612157604698bf82af34edce789f9df4399e34e7b",
+    "evidence/phase-01.json": "01cc094b502c6388ad8d2d9ccb03e9b4c5a87a73e67fc681678243f9922fecc2",
+    "evidence/input-02.json": "0097af9bd4a886826ec2ea7e54f6980e8b8ce896d1e201fed54cf5a19b29ea6a",
+    "evidence/phase-02.json": "ee39c0bd3093320344a8c37943470d9c6a54ace4e9a9115a0dcf182e44fcb5cd",
+    "config/run-spec.json": "2682d945e565039dfc2054dc6bea31c07b3ec290bac8f09148811eddf688ddae"
+  },
+  "authority_restored": false,
+  "git": {
+    "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "files_changed": 19,
+    "changed_files": [
+      "_api_check.py",
+      "_cli_check.py",
+      "durable_queue/__main__.py",
+      "durable_queue/queue.py",
+      "durable_queue/storage.py",
+      "tests/test_regression.py",
+      "tmp0yta5kd_/q.db",
+      "tmp21vkv52b/q.db",
+      "tmp3qpy2eh9/q.db",
+      "tmp4uiad2rl/q.db",
+      "tmp8rvgwl0z/q.db",
+      "tmpff4_xrqg/q.db",
+      "tmpfowmu73d/q.db",
+      "tmplub0naxt/q.db",
+      "tmpm7syz0l_/q.db",
+      "tmpm7syz0l_/r.json",
+      "tmpn0jowe6r/q.db",
+      "tmpo89vrwil/q.db",
+      "tmpw76y0tzm/q.db"
+    ],
+    "diff_bytes": 65186,
+    "diff_sha256": "2e46bde07db4c960e94b0e45a30fedf6042ff0c0f383c8ca869f5f49164f292f"
+  }
+}

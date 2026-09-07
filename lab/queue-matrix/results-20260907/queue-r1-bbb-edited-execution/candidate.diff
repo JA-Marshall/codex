@@ -1,0 +1,846 @@
+diff --git a/durable_queue/__main__.py b/durable_queue/__main__.py
+index 65c8720..8e77be7 100644
+--- a/durable_queue/__main__.py
++++ b/durable_queue/__main__.py
+@@ -1,20 +1,94 @@
+ import argparse
+ import json
++import sqlite3
++import sys
+ 
+ from .queue import Queue
+ 
++OPS = {"submit", "get", "list", "claim", "recover", "complete", "fail"}
++ALLOWED = {
++    "submit": {"jobs"},
++    "get": {"id"},
++    "list": set(),
++    "claim": {"worker", "now", "lease_seconds"},
++    "recover": {"now"},
++    "complete": {"id", "worker", "attempt", "now"},
++    "fail": {"id", "worker", "attempt", "now", "retry_delay"},
++}
++REQUIRED = {
++    "submit": {"jobs"},
++    "get": {"id"},
++    "list": set(),
++    "claim": {"worker", "now", "lease_seconds"},
++    "recover": {"now"},
++    "complete": {"id", "worker", "attempt", "now"},
++    "fail": {"id", "worker", "attempt", "now"},
++}
+ 
+-def main():
++
++def _fail():
++    return 2
++
++
++def main(argv=None):
+     parser = argparse.ArgumentParser()
+     parser.add_argument("--db", required=True)
+     parser.add_argument("--request", required=True)
+-    args = parser.parse_args()
+-    with open(args.request, encoding="utf-8") as stream:
+-        request = json.load(stream)
+-    operation = request.pop("op")
+-    value = getattr(Queue(args.db), operation)(**request)
+-    print(json.dumps(value, sort_keys=True))
+-    return 0
++    try:
++        args = parser.parse_args(argv)
++    except SystemExit as exc:
++        # argparse exits 2 on invalid usage; ensure stdout empty
++        raise
++    # read request file strict UTF-8
++    try:
++        with open(args.request, encoding="utf-8", errors="strict") as stream:
++            request = json.load(stream)
++    except Exception as exc:
++        print(f"error: bad request file: {exc}", file=sys.stderr)
++        return 2
++    try:
++        if not isinstance(request, dict):
++            raise ValueError("request must be object")
++        if "op" not in request:
++            raise ValueError("missing op")
++        op = request["op"]
++        if not isinstance(op, str) or op not in OPS:
++            raise ValueError("unknown op")
++        allowed = ALLOWED[op]
++        required = REQUIRED[op]
++        keys = set(request.keys()) - {"op"}
++        if not required.issubset(keys):
++            raise ValueError("missing fields")
++        if not keys.issubset(allowed):
++            raise ValueError("unknown fields")
++        kwargs = {k: request[k] for k in keys}
++        try:
++            queue = Queue(args.db)
++        except Exception as exc:
++            print(f"error: unavailable db: {exc}", file=sys.stderr)
++            return 2
++        try:
++            method = getattr(queue, op)
++            value = method(**kwargs)
++        except (ValueError, TypeError) as exc:
++            print(f"error: {exc}", file=sys.stderr)
++            return 2
++        except sqlite3.Error as exc:
++            print(f"error: db: {exc}", file=sys.stderr)
++            return 2
++        except Exception as exc:
++            print(f"error: {exc}", file=sys.stderr)
++            return 2
++        try:
++            text = json.dumps(value, sort_keys=True, allow_nan=False)
++        except Exception as exc:
++            print(f"error: encode: {exc}", file=sys.stderr)
++            return 2
++        sys.stdout.write(text + "\n")
++        return 0
++    except ValueError as exc:
++        print(f"error: {exc}", file=sys.stderr)
++        return 2
+ 
+ 
+ if __name__ == "__main__":
+diff --git a/durable_queue/queue.py b/durable_queue/queue.py
+index 048c736..23e7250 100644
+--- a/durable_queue/queue.py
++++ b/durable_queue/queue.py
+@@ -1,61 +1,402 @@
+-"""Initial durable storage; scheduling and lease behavior are unfinished."""
+-
++"""Durable queue: submit/views (s2) with minimal claim stub."""
++import copy
+ import json
+ 
+-from .storage import connect
++from .storage import connect, transaction, check_payload, validate_now, validate_lease_seconds, validate_retry_delay
++
++ALLOWED_FIELDS = {"id", "payload", "priority", "dependencies", "max_attempts", "ready_at"}
++VIEW_KEYS = {"id", "payload", "priority", "dependencies", "max_attempts", "ready_at", "state", "attempts", "worker", "lease_until"}
++
++def _validate_id(value):
++    if not isinstance(value, str) or value == "":
++        raise ValueError("invalid id")
++
++def _norm_spec(job):
++    if not isinstance(job, dict):
++        raise ValueError("invalid job")
++    keys = set(job.keys())
++    unknown = keys - ALLOWED_FIELDS
++    if unknown:
++        raise ValueError("unknown fields")
++    if "id" not in job:
++        raise ValueError("missing id")
++    jid = job["id"]
++    _validate_id(jid)
++    payload = job["payload"] if "payload" in job else {}
++    # payload must be dict with finite JSON
++    check_payload(payload)
++    payload_copy = copy.deepcopy(payload)
++    if "priority" in job:
++        prio = job["priority"]
++        if type(prio) is not int:
++            raise ValueError("invalid priority")
++    else:
++        prio = 0
++    if "dependencies" in job:
++        deps = job["dependencies"]
++        if not isinstance(deps, list):
++            raise ValueError("invalid dependencies")
++        for d in deps:
++            if not isinstance(d, str) or d == "":
++                raise ValueError("invalid dependency")
++    else:
++        deps = []
++    deps_norm = sorted(set(deps))
++    if "max_attempts" in job:
++        ma = job["max_attempts"]
++        if type(ma) is not int or not (1 <= ma <= 100):
++            raise ValueError("invalid max_attempts")
++    else:
++        ma = 3
++    if "ready_at" in job:
++        ra = job["ready_at"]
++        if type(ra) is not int or ra < 0:
++            raise ValueError("invalid ready_at")
++    else:
++        ra = 0
++    return {"id": jid, "payload": payload_copy, "priority": prio, "dependencies": deps_norm, "max_attempts": ma, "ready_at": ra}
+ 
++def _has_cycle(graph):
++    # graph: dict id -> list deps
++    WHITE, GRAY, BLACK = 0, 1, 2
++    color = {k: WHITE for k in graph}
++    def dfs(u, stack):
++        color[u] = GRAY
++        for v in graph.get(u, []):
++            if v not in graph:
++                continue
++            if color[v] == GRAY:
++                return True
++            if color[v] == WHITE and dfs(v, stack):
++                return True
++        color[u] = BLACK
++        return False
++    for node in graph:
++        if color[node] == WHITE:
++            if dfs(node, []):
++                return True
++    return False
++
++def _row_to_view(data_text):
++    view = json.loads(data_text)
++    return copy.deepcopy(view)
+ 
+ class Queue:
+     def __init__(self, db_path):
+         self.db_path = db_path
+-        with connect(db_path):
++        conn = connect(db_path)
++        try:
++            conn.commit()
++        except Exception:
+             pass
++        finally:
++            try:
++                conn.close()
++            except Exception:
++                pass
+ 
+     def submit(self, jobs):
+-        views = []
+-        with connect(self.db_path) as connection:
+-            for job in jobs:
+-                view = dict(
+-                    id=job["id"],
+-                    payload=job.get("payload", {}),
+-                    priority=job.get("priority", 0),
+-                    dependencies=job.get("dependencies", []),
+-                    max_attempts=job.get("max_attempts", 3),
+-                    ready_at=job.get("ready_at", 0),
+-                    state="pending",
+-                    attempts=0,
+-                    worker=None,
+-                    lease_until=None,
+-                )
+-                connection.execute(
+-                    "INSERT OR REPLACE INTO jobs VALUES (?, ?)",
+-                    (view["id"], json.dumps(view)),
+-                )
+-                views.append(view)
+-        return views
++        if not isinstance(jobs, list):
++            raise ValueError("jobs must be list")
++        # no input mutation: deep copy inputs for validation
++        specs = []
++        for job in jobs:
++            if not isinstance(job, dict):
++                raise ValueError("invalid job")
++            # copy to avoid mutation; _norm_spec also deep copies payload
++            job_copy = copy.deepcopy(job)
++            specs.append(_norm_spec(job_copy))
++        # dup within batch
++        ids = [s["id"] for s in specs]
++        if len(ids) != len(set(ids)):
++            raise ValueError("duplicate ids")
++        conn = connect(self.db_path)
++        try:
++            with transaction(conn):
++                # load existing
++                rows = conn.execute("SELECT id, spec, data FROM jobs").fetchall()
++                existing_spec = {}
++                existing_data = {}
++                for jid, spec_text, data_text in rows:
++                    existing_data[jid] = data_text
++                    if spec_text is not None:
++                        try:
++                            existing_spec[jid] = json.loads(spec_text)
++                        except Exception:
++                            existing_spec[jid] = None
++                    else:
++                        try:
++                            v = json.loads(data_text)
++                            existing_spec[jid] = {"id": v.get("id"), "payload": v.get("payload", {}), "priority": v.get("priority", 0), "dependencies": sorted(set(v.get("dependencies", []))), "max_attempts": v.get("max_attempts", 3), "ready_at": v.get("ready_at", 0)}
++                        except Exception:
++                            existing_spec[jid] = None
++                batch_ids = set(ids)
++                existing_ids = set(existing_spec.keys())
++                # idempotent check + unknown/self checks
++                new_specs = []
++                for spec in specs:
++                    jid = spec["id"]
++                    if jid in existing_spec:
++                        stored = existing_spec[jid]
++                        try:
++                            same = json.dumps(stored, sort_keys=True) == json.dumps(spec, sort_keys=True)
++                        except Exception:
++                            same = (stored == spec)
++                        if not same:
++                            raise ValueError("conflicting resubmit")
++                        # idempotent: no new insert
++                    else:
++                        new_specs.append(spec)
++                # dependency checks for new jobs
++                for spec in new_specs:
++                    jid = spec["id"]
++                    for dep in spec["dependencies"]:
++                        if dep == jid:
++                            raise ValueError("self dependency")
++                        if dep not in existing_ids and dep not in batch_ids:
++                            raise ValueError("unknown dependency")
++                # cycle check over combined graph
++                graph = {}
++                for jid, s in existing_spec.items():
++                    if s is not None and isinstance(s.get("dependencies"), list):
++                        graph[jid] = list(s["dependencies"])
++                    else:
++                        try:
++                            v = json.loads(existing_data[jid])
++                            graph[jid] = list(v.get("dependencies", []))
++                        except Exception:
++                            graph[jid] = []
++                for spec in new_specs:
++                    graph[spec["id"]] = list(spec["dependencies"])
++                # also need deps of idempotent batch members already in graph (same)
++                if _has_cycle(graph):
++                    raise ValueError("cycle")
++                # insert new jobs
++                for spec in new_specs:
++                    view = {"id": spec["id"], "payload": copy.deepcopy(spec["payload"]), "priority": spec["priority"], "dependencies": list(spec["dependencies"]), "max_attempts": spec["max_attempts"], "ready_at": spec["ready_at"], "state": "pending", "attempts": 0, "worker": None, "lease_until": None}
++                    conn.execute("INSERT INTO jobs (id, spec, data) VALUES (?, ?, ?)", (spec["id"], json.dumps(spec, sort_keys=True), json.dumps(view, sort_keys=True)))
++                # collect return views in input order (current views)
++                result = []
++                for spec in specs:
++                    jid = spec["id"]
++                    row = conn.execute("SELECT data FROM jobs WHERE id=?", (jid,)).fetchone()
++                    if row is None:
++                        raise ValueError("missing after submit")
++                    result.append(copy.deepcopy(json.loads(row[0])))
++                return result
++        finally:
++            try:
++                conn.close()
++            except Exception:
++                pass
+ 
+     def get(self, id):
+-        with connect(self.db_path) as connection:
+-            row = connection.execute(
+-                "SELECT data FROM jobs WHERE id=?", (id,)
+-            ).fetchone()
+-        return json.loads(row[0]) if row else None
++        _validate_id(id)
++        conn = connect(self.db_path)
++        try:
++            row = conn.execute("SELECT data FROM jobs WHERE id=?", (id,)).fetchone()
++            try:
++                conn.commit()
++            except Exception:
++                pass
++            if row is None:
++                return None
++            return copy.deepcopy(json.loads(row[0]))
++        finally:
++            try:
++                conn.close()
++            except Exception:
++                pass
+ 
+     def list(self):
+-        with connect(self.db_path) as connection:
+-            return [
+-                json.loads(row[0])
+-                for row in connection.execute("SELECT data FROM jobs ORDER BY id")
+-            ]
++        conn = connect(self.db_path)
++        try:
++            rows = conn.execute("SELECT data FROM jobs ORDER BY id").fetchall()
++            try:
++                conn.commit()
++            except Exception:
++                pass
++            return [copy.deepcopy(json.loads(r[0])) for r in rows]
++        finally:
++            try:
++                conn.close()
++            except Exception:
++                pass
+ 
+-    def claim(self, worker, now, lease_seconds):
+-        raise NotImplementedError("claim scheduling and atomic ownership")
++    def _apply_recovery(self, conn, now):
++        rows = conn.execute("SELECT id, data FROM jobs").fetchall()
++        recovered = []
++        for jid, data_text in rows:
++            view = json.loads(data_text)
++            if view.get("state") != "running":
++                continue
++            lease = view.get("lease_until")
++            if lease is None:
++                continue
++            if not (type(lease) is int and lease <= now):
++                continue
++            # expired
++            attempts = view.get("attempts", 0)
++            max_a = view.get("max_attempts", 3)
++            view["worker"] = None
++            view["lease_until"] = None
++            if attempts < max_a:
++                view["state"] = "pending"
++                view["ready_at"] = lease
++            else:
++                view["state"] = "failed"
++                # ready_at unchanged
++            conn.execute("UPDATE jobs SET data=? WHERE id=?", (json.dumps(view, sort_keys=True), jid))
++            recovered.append(jid)
++        recovered.sort()
++        return recovered
+ 
++    def claim(self, worker, now, lease_seconds):
++        if not isinstance(worker, str) or worker == "":
++            raise ValueError("invalid worker")
++        validate_now(now)
++        validate_lease_seconds(lease_seconds)
++        conn = connect(self.db_path)
++        try:
++            with transaction(conn):
++                self._apply_recovery(conn, now)
++                rows = conn.execute("SELECT id, data FROM jobs").fetchall()
++                states = {}
++                for jid, data_text in rows:
++                    # re-read after recovery
++                    r = conn.execute("SELECT data FROM jobs WHERE id=?", (jid,)).fetchone()
++                    states[jid] = json.loads(r[0]) if r else json.loads(data_text)
++                candidates = []
++                for jid, view in states.items():
++                    if view.get("state") != "pending":
++                        continue
++                    if view.get("ready_at", 0) > now:
++                        continue
++                    if view.get("attempts", 0) >= view.get("max_attempts", 3):
++                        continue
++                    deps = view.get("dependencies", [])
++                    ok = True
++                    for d in deps:
++                        dv = states.get(d)
++                        if dv is None or dv.get("state") != "succeeded":
++                            ok = False
++                            break
++                    if not ok:
++                        continue
++                    candidates.append(view)
++                if not candidates:
++                    return None
++                candidates.sort(key=lambda v: (-v["priority"], v["id"]))
++                chosen = candidates[0]
++                jid = chosen["id"]
++                # conditional update to preserve cross-process exclusivity: only if still pending
++                # re-read current row to ensure still eligible (guards against TOCTOU within TX is already exclusive, but extra check)
++                cur = conn.execute("SELECT data FROM jobs WHERE id=?", (jid,)).fetchone()
++                cur_view = json.loads(cur[0])
++                if cur_view.get("state") != "pending":
++                    return None
++                new_attempts = cur_view["attempts"] + 1
++                if new_attempts > cur_view["max_attempts"]:
++                    return None
++                cur_view["state"] = "running"
++                cur_view["attempts"] = new_attempts
++                cur_view["worker"] = worker
++                cur_view["lease_until"] = now + lease_seconds
++                conn.execute("UPDATE jobs SET data=? WHERE id=?", (json.dumps(cur_view, sort_keys=True), jid))
++                # re-read to return exact stored view
++                final = conn.execute("SELECT data FROM jobs WHERE id=?", (jid,)).fetchone()
++                result = copy.deepcopy(json.loads(final[0]))
++                return result
++        finally:
++            try:
++                conn.close()
++            except Exception:
++                pass
+     def recover(self, now):
+-        raise NotImplementedError("expired lease recovery")
++        validate_now(now)
++        conn = connect(self.db_path)
++        try:
++            with transaction(conn):
++                return self._apply_recovery(conn, now)
++        finally:
++            try:
++                conn.close()
++            except Exception:
++                pass
++
+ 
+     def complete(self, id, worker, attempt, now):
+-        raise NotImplementedError("completion validation")
++        _validate_id(id)
++        if not isinstance(worker, str) or worker == "":
++            raise ValueError("invalid worker")
++        if type(attempt) is not int or attempt < 1:
++            raise ValueError("invalid attempt")
++        validate_now(now)
++        conn = connect(self.db_path)
++        try:
++            with transaction(conn):
++                row = conn.execute("SELECT data FROM jobs WHERE id=?", (id,)).fetchone()
++                if row is None:
++                    raise ValueError("unknown job")
++                view = json.loads(row[0])
++                if view.get("state") != "running":
++                    raise ValueError("not running")
++                if view.get("worker") != worker:
++                    raise ValueError("wrong owner")
++                if view.get("attempts") != attempt:
++                    raise ValueError("stale attempt")
++                lease = view.get("lease_until")
++                if type(lease) is not int or not (now < lease):
++                    raise ValueError("expired lease")
++                view["state"] = "succeeded"
++                view["worker"] = None
++                view["lease_until"] = None
++                # ready_at unchanged
++                conn.execute("UPDATE jobs SET data=? WHERE id=?", (json.dumps(view, sort_keys=True), id))
++                return copy.deepcopy(view)
++        finally:
++            try:
++                conn.close()
++            except Exception:
++                pass
+ 
+     def fail(self, id, worker, attempt, now, retry_delay=0):
+-        raise NotImplementedError("retry state transition")
++        _validate_id(id)
++        if not isinstance(worker, str) or worker == "":
++            raise ValueError("invalid worker")
++        if type(attempt) is not int or attempt < 1:
++            raise ValueError("invalid attempt")
++        if type(now) is not int or now < 0:
++            raise ValueError("invalid now")
++        validate_retry_delay(retry_delay)
++        conn = connect(self.db_path)
++        try:
++            with transaction(conn):
++                row = conn.execute("SELECT data FROM jobs WHERE id=?", (id,)).fetchone()
++                if row is None:
++                    raise ValueError("unknown job")
++                view = json.loads(row[0])
++                if view.get("state") != "running":
++                    raise ValueError("not running")
++                if view.get("worker") != worker:
++                    raise ValueError("wrong owner")
++                if view.get("attempts") != attempt:
++                    raise ValueError("stale attempt")
++                lease = view.get("lease_until")
++                if type(lease) is not int or not (now < lease):
++                    raise ValueError("expired lease")
++                view["worker"] = None
++                view["lease_until"] = None
++                if view.get("attempts", 0) < view.get("max_attempts", 3):
++                    view["state"] = "pending"
++                    view["ready_at"] = now + retry_delay
++                else:
++                    view["state"] = "failed"
++                    # ready_at unchanged
++                conn.execute("UPDATE jobs SET data=? WHERE id=?", (json.dumps(view, sort_keys=True), id))
++                return copy.deepcopy(view)
++        finally:
++            try:
++                conn.close()
++            except Exception:
++                pass
+diff --git a/durable_queue/storage.py b/durable_queue/storage.py
+index 0eb7fa5..7afa773 100644
+--- a/durable_queue/storage.py
++++ b/durable_queue/storage.py
+@@ -1,9 +1,141 @@
++"""Storage helpers: WAL, busy timeout, transactions, strict validators."""
++import contextlib
++import json
++import math
+ import sqlite3
+ 
+ 
++def strict_int(value):
++    """True only for exact int (bool excluded)."""
++    return type(value) is int
++
++
++def validate_now(now):
++    if type(now) is not int or now < 0:
++        raise ValueError("invalid now")
++    return now
++
++
++def validate_lease_seconds(lease_seconds):
++    if type(lease_seconds) is not int or lease_seconds <= 0:
++        raise ValueError("invalid lease_seconds")
++    return lease_seconds
++
++
++def validate_retry_delay(retry_delay):
++    if type(retry_delay) is not int or retry_delay < 0:
++        raise ValueError("invalid retry_delay")
++    return retry_delay
++
++
++def _check_json_value(value):
++    if value is None or value is True or value is False:
++        return
++    if type(value) is int:
++        return
++    if type(value) is float:
++        if not math.isfinite(value):
++            raise ValueError("non-finite JSON number")
++        return
++    if type(value) is str:
++        return
++    if type(value) is list:
++        for item in value:
++            _check_json_value(item)
++        return
++    if type(value) is dict:
++        for k, v in value.items():
++            if type(k) is not str:
++                raise ValueError("invalid JSON object key")
++            _check_json_value(v)
++        return
++    raise ValueError("non-JSON value")
++
++
++def check_finite_json(value):
++    _check_json_value(value)
++
++
++def check_payload(payload):
++    if not isinstance(payload, dict):
++        raise ValueError("invalid payload")
++    check_finite_json(payload)
++
++
++@contextlib.contextmanager
++def transaction(connection):
++    connection.execute("BEGIN IMMEDIATE")
++    try:
++        yield connection
++        connection.commit()
++    except Exception:
++        try:
++            connection.rollback()
++        except Exception:
++            pass
++        raise
++
++
++def _derive_spec_from_view(view):
++    payload = view.get("payload", {})
++    priority = view.get("priority", 0)
++    deps = view.get("dependencies", [])
++    max_attempts = view.get("max_attempts", 3)
++    ready_at = view.get("ready_at", 0)
++    jid = view.get("id")
++    try:
++        deps_norm = sorted(set(deps)) if isinstance(deps, list) else []
++    except Exception:
++        deps_norm = []
++    spec = {
++        "id": jid,
++        "payload": payload,
++        "priority": priority,
++        "dependencies": deps_norm,
++        "max_attempts": max_attempts,
++        "ready_at": ready_at,
++    }
++    return spec
++
++
+ def connect(path):
+-    connection = sqlite3.connect(path, timeout=5)
++    connection = sqlite3.connect(str(path), timeout=30.0, isolation_level=None, check_same_thread=False)
++    try:
++        connection.execute("PRAGMA journal_mode=WAL")
++    except Exception:
++        pass
++    try:
++        connection.execute("PRAGMA busy_timeout=5000")
++    except Exception:
++        pass
++    try:
++        connection.execute("PRAGMA synchronous=NORMAL")
++    except Exception:
++        pass
+     connection.execute(
+         "CREATE TABLE IF NOT EXISTS jobs (id TEXT PRIMARY KEY, data TEXT NOT NULL)"
+     )
++    cols = [row[1] for row in connection.execute("PRAGMA table_info(jobs)").fetchall()]
++    if "spec" not in cols:
++        connection.execute("ALTER TABLE jobs ADD COLUMN spec TEXT")
++        rows = connection.execute("SELECT id, data FROM jobs WHERE spec IS NULL").fetchall()
++        for jid, data in rows:
++            try:
++                view = json.loads(data)
++            except Exception:
++                continue
++            try:
++                spec = _derive_spec_from_view(view)
++                # ensure dependencies normalized if possible
++                if isinstance(spec.get("dependencies"), list):
++                    try:
++                        spec["dependencies"] = sorted(set(spec["dependencies"]))
++                    except Exception:
++                        pass
++                connection.execute(
++                    "UPDATE jobs SET spec=? WHERE id=?",
++                    (json.dumps(spec, sort_keys=True), jid),
++                )
++            except Exception:
++                continue
+     return connection
+diff --git a/tests/test_regress.py b/tests/test_regress.py
+new file mode 100644
+index 0000000..e75e557
+--- /dev/null
++++ b/tests/test_regress.py
+@@ -0,0 +1,139 @@
++"""Focused regression tests: separate-process exclusivity and durability."""
++import json
++import subprocess
++import sys
++import tempfile
++import unittest
++from pathlib import Path
++
++from durable_queue import Queue
++
++
++def run_cli(db, obj):
++    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False, encoding="utf-8", dir=str(Path(db).parent)) as f:
++        json.dump(obj, f)
++        req = f.name
++    try:
++        p = subprocess.run([sys.executable, "-m", "durable_queue", "--db", str(db), "--request", req], capture_output=True, text=True, timeout=20)
++        return p
++    finally:
++        try:
++            Path(req).unlink()
++        except Exception:
++            pass
++
++
++class RegressTests(unittest.TestCase):
++    def test_separate_process_claim_exclusivity(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            db = str(Path(tmp) / "q.db")
++            Queue(db).submit([{"id": "only"}])
++            # two processes compete concurrently for the single job
++            req1 = Path(tmp) / "r1.json"
++            req2 = Path(tmp) / "r2.json"
++            req1.write_text(json.dumps({"op": "claim", "worker": "w1", "now": 0, "lease_seconds": 30}), encoding="utf-8")
++            req2.write_text(json.dumps({"op": "claim", "worker": "w2", "now": 0, "lease_seconds": 30}), encoding="utf-8")
++            p1 = subprocess.Popen([sys.executable, "-m", "durable_queue", "--db", db, "--request", str(req1)], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
++            p2 = subprocess.Popen([sys.executable, "-m", "durable_queue", "--db", db, "--request", str(req2)], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
++            o1, e1 = p1.communicate(timeout=20)
++            o2, e2 = p2.communicate(timeout=20)
++            self.assertEqual(p1.returncode, 0, e1)
++            self.assertEqual(p2.returncode, 0, e2)
++            v1 = json.loads(o1)
++            v2 = json.loads(o2)
++            got = [v for v in (v1, v2) if v is not None]
++            nulls = [v for v in (v1, v2) if v is None]
++            self.assertEqual(len(got), 1, (v1, v2))
++            self.assertEqual(len(nulls), 1, (v1, v2))
++            self.assertEqual(got[0]["id"], "only")
++            self.assertIsNotNone(got[0]["lease_until"])
++
++    def test_durability_kill_restart(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            db = str(Path(tmp) / "q.db")
++            q = Queue(db)
++            q.submit([{"id": "a", "payload": {"n": 1}}, {"id": "b", "dependencies": ["a"]}])
++            c = q.claim("w", 0, 10)
++            self.assertEqual(c["id"], "a")
++            # simulate restart: fresh Queue in new process via CLI list
++            p = run_cli(db, {"op": "list"})
++            self.assertEqual(p.returncode, 0, p.stderr)
++            views = json.loads(p.stdout)
++            self.assertEqual(sorted(v["id"] for v in views), ["a", "b"])
++            # committed work survives: a still running with same lease
++            va = [v for v in views if v["id"] == "a"][0]
++            self.assertEqual(va["state"], "running")
++            self.assertEqual(va["lease_until"], 10)
++            # reopen in-process also sees same
++            q2 = Queue(db)
++            self.assertEqual(q2.get("a")["state"], "running")
++
++    def test_atomic_batch_rollback_no_recovery(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(str(Path(tmp) / "q.db"))
++            q.submit([{"id": "a"}])
++            c = q.claim("w", 0, 5)
++            self.assertEqual(c["id"], "a")
++            # invalid batch must not write and must not recover running lease
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "b"}, {"id": ""}])
++            self.assertIsNone(q.get("b"))
++            # a still running, not recovered
++            self.assertEqual(q.get("a")["state"], "running")
++            # expired check: recover at 5 would recover, but submit failure must not have recovered early
++            # now recover explicitly
++            self.assertEqual(q.recover(5), ["a"])
++
++    def test_stale_complete_rejected(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(str(Path(tmp) / "q.db"))
++            q.submit([{"id": "a"}])
++            c1 = q.claim("w", 0, 5)
++            q.recover(5)
++            c2 = q.claim("w", 5, 10)
++            self.assertEqual(c2["attempts"], 2)
++            with self.assertRaises(ValueError):
++                q.complete("a", "w", 1, 6)
++            # correct attempt succeeds
++            v = q.complete("a", "w", 2, 6)
++            self.assertEqual(v["state"], "succeeded")
++
++    def test_cli_matrix(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            db = str(Path(tmp) / "q.db")
++            Queue(db).submit([{"id": "a"}])
++            # unknown field
++            p = run_cli(db, {"op": "get", "id": "a", "extra": 1})
++            self.assertEqual(p.returncode, 2)
++            self.assertEqual(p.stdout, "")
++            # malformed JSON
++            bad = Path(tmp) / "bad.json"
++            bad.write_text("{not json", encoding="utf-8")
++            p = subprocess.run([sys.executable, "-m", "durable_queue", "--db", db, "--request", str(bad)], capture_output=True, text=True)
++            self.assertEqual(p.returncode, 2)
++            self.assertEqual(p.stdout, "")
++            # invalid UTF-8
++            badb = Path(tmp) / "badb.json"
++            badb.write_bytes(b"\xff\xfe not utf8")
++            p = subprocess.run([sys.executable, "-m", "durable_queue", "--db", db, "--request", str(badb)], capture_output=True, text=True)
++            self.assertEqual(p.returncode, 2)
++            self.assertEqual(p.stdout, "")
++            # missing file
++            p = subprocess.run([sys.executable, "-m", "durable_queue", "--db", db, "--request", str(Path(tmp) / "nope.json")], capture_output=True, text=True)
++            self.assertEqual(p.returncode, 2)
++            self.assertEqual(p.stdout, "")
++            # unavailable db (directory)
++            p = run_cli(str(Path(tmp)), {"op": "list"})
++            self.assertEqual(p.returncode, 2)
++            self.assertEqual(p.stdout, "")
++            # success shape sorted keys + newline
++            p = run_cli(db, {"op": "get", "id": "a"})
++            self.assertEqual(p.returncode, 0)
++            self.assertTrue(p.stdout.endswith("\n"))
++            self.assertEqual(p.stdout.count("\n"), 1)
++            obj = json.loads(p.stdout)
++            self.assertEqual(list(sorted(obj.keys())), list(obj.keys()))
++
++
++if __name__ == "__main__":
++    unittest.main()

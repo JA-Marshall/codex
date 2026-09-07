@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "run": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r2-bab-edited-execution",
+  "workflow_state": "failed",
+  "terminal_change": {
+    "type": "failed",
+    "reason": "verification did not reference a completed host command"
+  },
+  "all_started_phases_shutdown": true,
+  "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r2-bab/repository",
+  "first_plan_human_approval": true,
+  "phase_turns": 2,
+  "planner_phases": 0,
+  "tool_admissions": 68,
+  "usage": {
+    "input_tokens": 1429822,
+    "output_tokens": 52527,
+    "cached_input_tokens": 1347896
+  },
+  "workflow_terminal_elapsed_ms": 1118227,
+  "human_plan_edits": 0,
+  "plan_amendments": 0,
+  "plan_deviations": null,
+  "source_artifact_sha256": {
+    "events.jsonl": "45525a5314f697af40f9d4f96c37eb784ac3827860eddd5f87059a6d1ad7a98f",
+    "runtime-events.jsonl": "174a062aba6908ce3c7a863f7fb7d4565907aefca122db2403aab02eafc2c85f",
+    "evidence/input-01.json": "5c1afbdfa55a0503ae1a1e1c3eaafb08399a15bae96e507eae17e9bedd1047d3",
+    "evidence/phase-01.json": "989420dc306efe00455e220ca0ba25a8a00f70c4d591880838f27e2601413736",
+    "evidence/input-02.json": "7f41449522a5190e368c4e51bd3a5a57cafb8f0557d8597442bd4e3d20701a2d",
+    "evidence/phase-02.json": "c1a0c9311d19c083ce184eaea04e583f766418bea96faa600ab7da0debd32d25",
+    "config/run-spec.json": "51830002955ce57b7d258f4251b5a7a08bf6b7e21a9678020374cad90f48a7df"
+  },
+  "authority_restored": false,
+  "git": {
+    "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "files_changed": 5,
+    "changed_files": [
+      "durable_queue/__main__.py",
+      "durable_queue/queue.py",
+      "durable_queue/storage.py",
+      "tests/test_processes.py",
+      "tests/test_regression.py"
+    ],
+    "diff_bytes": 49309,
+    "diff_sha256": "eb2be6f83ca95a9c24d4fbba4c49881f4963c78a5c1053f1cee40d3e752649be"
+  }
+}

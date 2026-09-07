@@ -1,0 +1,1503 @@
+diff --git a/durable_queue/__main__.py b/durable_queue/__main__.py
+index 65c8720..8a683a4 100644
+--- a/durable_queue/__main__.py
++++ b/durable_queue/__main__.py
+@@ -1,20 +1,88 @@
+ import argparse
+ import json
++import sys
+ 
+ from .queue import Queue
+ 
++_OPS = {"submit", "get", "list", "claim", "recover", "complete", "fail"}
++_ALLOWED_FIELDS = {
++    "submit": {"jobs"},
++    "get": {"id"},
++    "list": set(),
++    "claim": {"worker", "now", "lease_seconds"},
++    "recover": {"now"},
++    "complete": {"id", "worker", "attempt", "now"},
++    "fail": {"id", "worker", "attempt", "now", "retry_delay"},
++}
+ 
+-def main():
++
++def _fail(msg=None):
++    if msg is not None:
++        try:
++            sys.stderr.write(str(msg) + "\n")
++        except Exception:
++            pass
++    raise SystemExit(2)
++
++
++def main(argv=None):
+     parser = argparse.ArgumentParser()
+     parser.add_argument("--db", required=True)
+     parser.add_argument("--request", required=True)
+-    args = parser.parse_args()
+-    with open(args.request, encoding="utf-8") as stream:
+-        request = json.load(stream)
+-    operation = request.pop("op")
+-    value = getattr(Queue(args.db), operation)(**request)
+-    print(json.dumps(value, sort_keys=True))
+-    return 0
++    try:
++        args = parser.parse_args(argv)
++    except SystemExit as e:
++        # argparse exits 2 on usage error; ensure stdout empty (it uses stderr).
++        raise
++    try:
++        with open(args.request, "rb") as stream:
++            raw = stream.read()
++        try:
++            text = raw.decode("utf-8")
++        except UnicodeDecodeError as exc:
++            _fail("invalid utf-8")
++        try:
++            request = json.loads(text)
++        except Exception:
++            _fail("malformed json")
++        if not isinstance(request, dict):
++            _fail("request must be object")
++        if "op" not in request:
++            _fail("missing op")
++        op = request["op"]
++        if not isinstance(op, str) or op not in _OPS:
++            _fail("unknown op")
++        allowed = _ALLOWED_FIELDS[op]
++        keys = set(request.keys()) - {"op"}
++        if not keys <= allowed:
++            _fail("unknown field")
++        kwargs = {k: request[k] for k in keys}
++        try:
++            queue = Queue(args.db)
++        except Exception as exc:
++            _fail("unavailable db")
++        try:
++            method = getattr(queue, op)
++        except Exception:
++            _fail("unknown op")
++        try:
++            value = method(**kwargs)
++        except TypeError as exc:
++            _fail("invalid args")
++        except ValueError as exc:
++            _fail("invalid request")
++        except Exception as exc:
++            _fail("operation failed")
++        try:
++            out = json.dumps(value, sort_keys=True, allow_nan=False)
++        except Exception:
++            _fail("encode failed")
++        sys.stdout.write(out + "\n")
++        return 0
++    except SystemExit:
++        raise
++    except Exception as exc:
++        _fail("failed")
+ 
+ 
+ if __name__ == "__main__":
+diff --git a/durable_queue/queue.py b/durable_queue/queue.py
+index 048c736..44ccc04 100644
+--- a/durable_queue/queue.py
++++ b/durable_queue/queue.py
+@@ -1,61 +1,620 @@
+-"""Initial durable storage; scheduling and lease behavior are unfinished."""
+-
++"""Durable queue with atomic submit, claim, recover, complete and fail."""
++import copy
+ import json
++import math
+ 
+ from .storage import connect
+ 
++VIEW_KEYS = (
++    "id",
++    "payload",
++    "priority",
++    "dependencies",
++    "max_attempts",
++    "ready_at",
++    "state",
++    "attempts",
++    "worker",
++    "lease_until",
++)
++VIEW_KEYS_SET = set(VIEW_KEYS)
++SPEC_KEYS = ("id", "payload", "priority", "dependencies", "max_attempts", "ready_at")
++ALLOWED_JOB_FIELDS = set(SPEC_KEYS)
++TERMINAL_STATES = ("succeeded", "failed")
++
++
++def _is_plain_int(v):
++    return type(v) is int
++
++
++def _validate_now(now):
++    if type(now) is not int or now < 0:
++        raise ValueError("invalid now")
++
++
++def _validate_worker(worker):
++    if not isinstance(worker, str) or worker == "":
++        raise ValueError("invalid worker")
++
++
++def _validate_job_id(job_id):
++    if not isinstance(job_id, str) or job_id == "":
++        raise ValueError("invalid id")
++
++
++def _validate_lease_seconds(v):
++    if type(v) is not int or v <= 0:
++        raise ValueError("invalid lease_seconds")
++
++
++def _validate_attempt(v):
++    if type(v) is not int or v <= 0:
++        raise ValueError("invalid attempt")
++
++
++def _validate_retry_delay(v):
++    if type(v) is not int or v < 0:
++        raise ValueError("invalid retry_delay")
++
++
++def _check_finite_json_value(v):
++    # Iterative stack validation for finite JSON values.
++    # Allowed: None, bool, plain int, finite float, str, list, dict with str keys.
++    if v is None or isinstance(v, bool) or isinstance(v, str):
++        if isinstance(v, str):
++            pass
++        return
++    if type(v) is int:
++        return
++    if isinstance(v, float):
++        if not math.isfinite(v):
++            raise ValueError("non-finite number in payload")
++        return
++    if isinstance(v, list):
++        for item in v:
++            _check_finite_json_value(item)
++        return
++    if isinstance(v, dict):
++        for k, item in v.items():
++            if not isinstance(k, str):
++                raise ValueError("invalid payload key")
++            _check_finite_json_value(item)
++        return
++    raise ValueError("invalid payload value")
++
++
++def _validate_payload(payload):
++    if not isinstance(payload, dict):
++        raise ValueError("invalid payload")
++    _check_finite_json_value(payload)
++    # Ensure JSON round-trips without NaN (manual check already covers).
++    json.dumps(payload, allow_nan=False, sort_keys=True)
++
++
++def _normalize_spec(job):
++    if not isinstance(job, dict):
++        raise ValueError("invalid job")
++    keys = set(job.keys())
++    if not keys <= ALLOWED_JOB_FIELDS:
++        raise ValueError("unknown job field")
++    if "id" not in job:
++        raise ValueError("missing id")
++    job_id = job["id"]
++    if not isinstance(job_id, str) or job_id == "":
++        raise ValueError("invalid id")
++    if "payload" in job:
++        payload = job["payload"]
++        _validate_payload(payload)
++        payload_copy = copy.deepcopy(payload)
++    else:
++        payload_copy = {}
++    if "priority" in job:
++        priority = job["priority"]
++        if type(priority) is not int:
++            raise ValueError("invalid priority")
++    else:
++        priority = 0
++    if "dependencies" in job:
++        deps = job["dependencies"]
++        if not isinstance(deps, list):
++            raise ValueError("invalid dependencies")
++        for d in deps:
++            if not isinstance(d, str) or d == "":
++                raise ValueError("invalid dependency")
++        normalized_deps = sorted(set(deps))
++    else:
++        normalized_deps = []
++    if "max_attempts" in job:
++        max_attempts = job["max_attempts"]
++        if type(max_attempts) is not int or not (1 <= max_attempts <= 100):
++            raise ValueError("invalid max_attempts")
++    else:
++        max_attempts = 3
++    if "ready_at" in job:
++        ready_at = job["ready_at"]
++        if type(ready_at) is not int or ready_at < 0:
++            raise ValueError("invalid ready_at")
++    else:
++        ready_at = 0
++    return {
++        "id": job_id,
++        "payload": payload_copy,
++        "priority": priority,
++        "dependencies": normalized_deps,
++        "max_attempts": max_attempts,
++        "ready_at": ready_at,
++    }
++
++
++def _view_to_stored(view):
++    return json.dumps(view, sort_keys=True, allow_nan=False)
++
++
++def _has_cycle(nodes, edges):
++    # nodes: set of ids, edges: dict id -> list of deps (within nodes)
++    WHITE, GRAY, BLACK = 0, 1, 2
++    color = {n: WHITE for n in nodes}
++
++    def visit(start):
++        stack = [(start, 0)]
++        while stack:
++            node, idx = stack[-1]
++            if color[node] == WHITE:
++                color[node] = GRAY
++            deps = edges.get(node, [])
++            advanced = False
++            for i in range(idx, len(deps)):
++                dep = deps[i]
++                if dep not in nodes:
++                    continue
++                if color.get(dep) == GRAY:
++                    return True
++                if color.get(dep) == WHITE:
++                    stack[-1] = (node, i + 1)
++                    stack.append((dep, 0))
++                    advanced = True
++                    break
++            if not advanced:
++                color[node] = BLACK
++                stack.pop()
++        return False
++
++    for n in nodes:
++        if color[n] == WHITE:
++            if visit(n):
++                return True
++    return False
++
++
++def _decode_view(data):
++    return json.loads(data)
++
+ 
+ class Queue:
+     def __init__(self, db_path):
+         self.db_path = db_path
+-        with connect(db_path):
++        conn = connect(db_path)
++        try:
+             pass
++        finally:
++            try:
++                conn.close()
++            except Exception:
++                pass
+ 
+     def submit(self, jobs):
+-        views = []
+-        with connect(self.db_path) as connection:
+-            for job in jobs:
+-                view = dict(
+-                    id=job["id"],
+-                    payload=job.get("payload", {}),
+-                    priority=job.get("priority", 0),
+-                    dependencies=job.get("dependencies", []),
+-                    max_attempts=job.get("max_attempts", 3),
+-                    ready_at=job.get("ready_at", 0),
+-                    state="pending",
+-                    attempts=0,
+-                    worker=None,
+-                    lease_until=None,
+-                )
+-                connection.execute(
+-                    "INSERT OR REPLACE INTO jobs VALUES (?, ?)",
+-                    (view["id"], json.dumps(view)),
++        if not isinstance(jobs, list):
++            raise ValueError("jobs must be a list")
++        if len(jobs) == 0:
++            return []
++        specs = []
++        for job in jobs:
++            specs.append(_normalize_spec(job))
++        ids = [s["id"] for s in specs]
++        if len(set(ids)) != len(ids):
++            raise ValueError("duplicate ids in batch")
++        conn = connect(self.db_path)
++        try:
++            conn.execute("BEGIN IMMEDIATE")
++            try:
++                rows = conn.execute("SELECT id, data, orig FROM jobs").fetchall()
++            except Exception as exc:
++                raise ValueError("storage error") from exc
++            existing_views = {}
++            existing_origs = {}
++            for r_id, r_data, r_orig in rows:
++                try:
++                    existing_views[r_id] = json.loads(r_data)
++                except Exception as exc:
++                    raise ValueError("corrupt job") from exc
++                try:
++                    existing_origs[r_id] = json.loads(r_orig) if r_orig is not None else None
++                except Exception as exc:
++                    raise ValueError("corrupt orig") from exc
++            existing_ids = set(existing_views.keys())
++            batch_ids = set(ids)
++            # Idempotency / conflict check.
++            new_specs = []
++            for spec in specs:
++                jid = spec["id"]
++                if jid in existing_ids:
++                    stored_orig = existing_origs.get(jid)
++                    if stored_orig is None or stored_orig != spec:
++                        raise ValueError("conflicting id")
++                    # idempotent: no write; deps same so no new edges
++                else:
++                    new_specs.append(spec)
++            # Dependency checks for new jobs.
++            allowed = existing_ids | batch_ids
++            for spec in new_specs:
++                for dep in spec["dependencies"]:
++                    if dep == spec["id"]:
++                        raise ValueError("self dependency")
++                    if dep not in allowed:
++                        raise ValueError("unknown dependency")
++            # Cycle detection over full graph.
++            all_ids = existing_ids | set(s["id"] for s in new_specs)
++            edges = {}
++            for eid, view in existing_views.items():
++                deps = view.get("dependencies", [])
++                # For ids that are also in batch idempotently, deps unchanged.
++                edges[eid] = list(deps)
++            for spec in new_specs:
++                edges[spec["id"]] = list(spec["dependencies"])
++            if _has_cycle(all_ids, edges):
++                raise ValueError("dependency cycle")
++            # Insert new jobs.
++            for spec in new_specs:
++                view = {
++                    "id": spec["id"],
++                    "payload": copy.deepcopy(spec["payload"]),
++                    "priority": spec["priority"],
++                    "dependencies": list(spec["dependencies"]),
++                    "max_attempts": spec["max_attempts"],
++                    "ready_at": spec["ready_at"],
++                    "state": "pending",
++                    "attempts": 0,
++                    "worker": None,
++                    "lease_until": None,
++                }
++                orig_text = json.dumps(spec, sort_keys=True, allow_nan=False)
++                data_text = json.dumps(view, sort_keys=True, allow_nan=False)
++                conn.execute(
++                    "INSERT INTO jobs (id, data, orig) VALUES (?, ?, ?)",
++                    (spec["id"], data_text, orig_text),
+                 )
+-                views.append(view)
+-        return views
++            conn.execute("COMMIT")
++        except ValueError:
++            try:
++                conn.execute("ROLLBACK")
++            except Exception:
++                pass
++            raise
++        except Exception as exc:
++            try:
++                conn.execute("ROLLBACK")
++            except Exception:
++                pass
++            if isinstance(exc, ValueError):
++                raise
++            raise ValueError(str(exc)) from exc
++        finally:
++            try:
++                conn.close()
++            except Exception:
++                pass
++        # Return current views in input order (fresh read for durability).
++        conn2 = connect(self.db_path)
++        try:
++            result = []
++            for spec in specs:
++                row = conn2.execute(
++                    "SELECT data FROM jobs WHERE id=?", (spec["id"],)
++                ).fetchone()
++                if row is None:
++                    raise ValueError("missing job after submit")
++                result.append(json.loads(row[0]))
++            return result
++        finally:
++            try:
++                conn2.close()
++            except Exception:
++                pass
+ 
+     def get(self, id):
+-        with connect(self.db_path) as connection:
+-            row = connection.execute(
++        _validate_job_id(id)
++        conn = connect(self.db_path)
++        try:
++            row = conn.execute(
+                 "SELECT data FROM jobs WHERE id=?", (id,)
+             ).fetchone()
+-        return json.loads(row[0]) if row else None
++        finally:
++            try:
++                conn.close()
++            except Exception:
++                pass
++        if row is None:
++            return None
++        return json.loads(row[0])
+ 
+     def list(self):
+-        with connect(self.db_path) as connection:
+-            return [
+-                json.loads(row[0])
+-                for row in connection.execute("SELECT data FROM jobs ORDER BY id")
+-            ]
++        conn = connect(self.db_path)
++        try:
++            rows = conn.execute("SELECT id, data FROM jobs").fetchall()
++        finally:
++            try:
++                conn.close()
++            except Exception:
++                pass
++        views = []
++        for _jid, data in rows:
++            views.append(json.loads(data))
++        views.sort(key=lambda v: v["id"])
++        return views
++
++    def _apply_recovery(self, conn, views_by_id, now):
++        # views_by_id: dict id -> view (mutable copies); updates DB rows.
++        recovered = []
++        for jid, view in list(views_by_id.items()):
++            if view.get("state") == "running":
++                lease_until = view.get("lease_until")
++                if isinstance(lease_until, int) and not isinstance(lease_until, bool):
++                    pass
++                else:
++                    # Running jobs must have int lease; if corrupt, skip.
++                    continue
++                if lease_until <= now:
++                    expired = lease_until
++                    view["worker"] = None
++                    view["lease_until"] = None
++                    if view.get("attempts", 0) < view.get("max_attempts", 0):
++                        view["state"] = "pending"
++                        view["ready_at"] = expired
++                    else:
++                        view["state"] = "failed"
++                    conn.execute(
++                        "UPDATE jobs SET data=? WHERE id=?",
++                        (json.dumps(view, sort_keys=True, allow_nan=False), jid),
++                    )
++                    recovered.append(jid)
++        return recovered
+ 
+     def claim(self, worker, now, lease_seconds):
+-        raise NotImplementedError("claim scheduling and atomic ownership")
++        _validate_worker(worker)
++        _validate_now(now)
++        _validate_lease_seconds(lease_seconds)
++        conn = connect(self.db_path)
++        try:
++            conn.execute("BEGIN IMMEDIATE")
++            try:
++                rows = conn.execute("SELECT id, data FROM jobs").fetchall()
++                views_by_id = {}
++                for r_id, r_data in rows:
++                    views_by_id[r_id] = json.loads(r_data)
++                # Recover expired.
++                self._apply_recovery(conn, views_by_id, now)
++                # Find eligible.
++                candidates = []
++                for jid, view in views_by_id.items():
++                    if view.get("state") != "pending":
++                        continue
++                    ready_at = view.get("ready_at")
++                    if type(ready_at) is not int or ready_at > now:
++                        continue
++                    attempts = view.get("attempts")
++                    max_attempts = view.get("max_attempts")
++                    if type(attempts) is not int or type(max_attempts) is not int:
++                        continue
++                    if not (attempts < max_attempts):
++                        continue
++                    deps = view.get("dependencies", [])
++                    ok = True
++                    for dep in deps:
++                        dep_view = views_by_id.get(dep)
++                        if dep_view is None or dep_view.get("state") != "succeeded":
++                            ok = False
++                            break
++                    if not ok:
++                        continue
++                    candidates.append(view)
++                if not candidates:
++                    conn.execute("COMMIT")
++                    return None
++                candidates.sort(key=lambda v: (-v["priority"], v["id"]))
++                chosen = candidates[0]
++                # Re-check predicated state to guard cross-process race:
++                # verify stored row still pending.
++                cur = conn.execute(
++                    "SELECT data FROM jobs WHERE id=?", (chosen["id"],)
++                ).fetchone()
++                if cur is None:
++                    conn.execute("ROLLBACK")
++                    raise ValueError("job vanished")
++                cur_view = json.loads(cur[0])
++                if cur_view.get("state") != "pending":
++                    # Another process claimed concurrently; re-evaluate once.
++                    # Simplest: rollback and retry once via fresh transaction.
++                    conn.execute("ROLLBACK")
++                    return self.claim(worker, now, lease_seconds)
++                # Apply claim to the authoritative copy.
++                # Note: use cur_view merged with recovery-updated values (chosen).
++                # chosen already reflects recovery; cur_view should equal chosen
++                # for the chosen id unless concurrent write. Use chosen.
++                chosen["state"] = "running"
++                chosen["attempts"] = chosen["attempts"] + 1
++                chosen["worker"] = worker
++                chosen["lease_until"] = now + lease_seconds
++                # Single predicated UPDATE: only if still pending.
++                # We emulate with data comparison via state check above;
++                # do unconditional update while holding IMMEDIATE lock.
++                conn.execute(
++                    "UPDATE jobs SET data=? WHERE id=?",
++                    (
++                        json.dumps(chosen, sort_keys=True, allow_nan=False),
++                        chosen["id"],
++                    ),
++                )
++                conn.execute("COMMIT")
++                return copy.deepcopy(chosen)
++            except ValueError:
++                try:
++                    conn.execute("ROLLBACK")
++                except Exception:
++                    pass
++                raise
++            except Exception as exc:
++                try:
++                    conn.execute("ROLLBACK")
++                except Exception:
++                    pass
++                if isinstance(exc, ValueError):
++                    raise
++                raise
++        finally:
++            try:
++                conn.close()
++            except Exception:
++                pass
+ 
+     def recover(self, now):
+-        raise NotImplementedError("expired lease recovery")
++        _validate_now(now)
++        conn = connect(self.db_path)
++        try:
++            conn.execute("BEGIN IMMEDIATE")
++            try:
++                rows = conn.execute("SELECT id, data FROM jobs").fetchall()
++                views_by_id = {r_id: json.loads(r_data) for r_id, r_data in rows}
++                recovered = self._apply_recovery(conn, views_by_id, now)
++                conn.execute("COMMIT")
++                recovered.sort()
++                return recovered
++            except ValueError:
++                try:
++                    conn.execute("ROLLBACK")
++                except Exception:
++                    pass
++                raise
++            except Exception as exc:
++                try:
++                    conn.execute("ROLLBACK")
++                except Exception:
++                    pass
++                if isinstance(exc, ValueError):
++                    raise
++                raise
++        finally:
++            try:
++                conn.close()
++            except Exception:
++                pass
++
++    def _load_for_transition(self, conn, job_id):
++        row = conn.execute("SELECT data FROM jobs WHERE id=?", (job_id,)).fetchone()
++        if row is None:
++            return None
++        return json.loads(row[0])
+ 
+     def complete(self, id, worker, attempt, now):
+-        raise NotImplementedError("completion validation")
++        _validate_job_id(id)
++        _validate_worker(worker)
++        _validate_attempt(attempt)
++        _validate_now(now)
++        conn = connect(self.db_path)
++        try:
++            conn.execute("BEGIN IMMEDIATE")
++            try:
++                view = self._load_for_transition(conn, id)
++                if view is None:
++                    raise ValueError("unknown job")
++                if view.get("state") != "running":
++                    raise ValueError("not running")
++                if view.get("worker") != worker:
++                    raise ValueError("wrong owner")
++                if view.get("attempts") != attempt:
++                    raise ValueError("stale attempt")
++                lease_until = view.get("lease_until")
++                if type(lease_until) is not int or not (now < lease_until):
++                    raise ValueError("expired lease")
++                view["state"] = "succeeded"
++                view["worker"] = None
++                view["lease_until"] = None
++                conn.execute(
++                    "UPDATE jobs SET data=? WHERE id=?",
++                    (json.dumps(view, sort_keys=True, allow_nan=False), id),
++                )
++                conn.execute("COMMIT")
++                return copy.deepcopy(view)
++            except ValueError:
++                try:
++                    conn.execute("ROLLBACK")
++                except Exception:
++                    pass
++                raise
++            except Exception as exc:
++                try:
++                    conn.execute("ROLLBACK")
++                except Exception:
++                    pass
++                if isinstance(exc, ValueError):
++                    raise
++                raise ValueError(str(exc)) from exc
++        finally:
++            try:
++                conn.close()
++            except Exception:
++                pass
+ 
+     def fail(self, id, worker, attempt, now, retry_delay=0):
+-        raise NotImplementedError("retry state transition")
++        _validate_job_id(id)
++        _validate_worker(worker)
++        _validate_attempt(attempt)
++        _validate_now(now)
++        _validate_retry_delay(retry_delay)
++        conn = connect(self.db_path)
++        try:
++            conn.execute("BEGIN IMMEDIATE")
++            try:
++                view = self._load_for_transition(conn, id)
++                if view is None:
++                    raise ValueError("unknown job")
++                if view.get("state") != "running":
++                    raise ValueError("not running")
++                if view.get("worker") != worker:
++                    raise ValueError("wrong owner")
++                if view.get("attempts") != attempt:
++                    raise ValueError("stale attempt")
++                lease_until = view.get("lease_until")
++                if type(lease_until) is not int or not (now < lease_until):
++                    raise ValueError("expired lease")
++                view["worker"] = None
++                view["lease_until"] = None
++                if view.get("attempts", 0) < view.get("max_attempts", 0):
++                    view["state"] = "pending"
++                    view["ready_at"] = now + retry_delay
++                else:
++                    view["state"] = "failed"
++                conn.execute(
++                    "UPDATE jobs SET data=? WHERE id=?",
++                    (json.dumps(view, sort_keys=True, allow_nan=False), id),
++                )
++                conn.execute("COMMIT")
++                return copy.deepcopy(view)
++            except ValueError:
++                try:
++                    conn.execute("ROLLBACK")
++                except Exception:
++                    pass
++                raise
++            except Exception as exc:
++                try:
++                    conn.execute("ROLLBACK")
++                except Exception:
++                    pass
++                if isinstance(exc, ValueError):
++                    raise
++                raise ValueError(str(exc)) from exc
++        finally:
++            try:
++                conn.close()
++            except Exception:
++                pass
+diff --git a/durable_queue/storage.py b/durable_queue/storage.py
+index 0eb7fa5..153c773 100644
+--- a/durable_queue/storage.py
++++ b/durable_queue/storage.py
+@@ -1,9 +1,47 @@
++"""Durable SQLite storage with WAL and explicit transactions."""
++import json
+ import sqlite3
+ 
+ 
+ def connect(path):
+-    connection = sqlite3.connect(path, timeout=5)
++    connection = sqlite3.connect(str(path), timeout=5.0, isolation_level=None)
++    # Durability / concurrency settings.
++    try:
++        connection.execute("PRAGMA journal_mode=WAL;")
++    except Exception:
++        pass
++    try:
++        connection.execute("PRAGMA busy_timeout=5000;")
++    except Exception:
++        pass
++    try:
++        connection.execute("PRAGMA synchronous=NORMAL;")
++    except Exception:
++        pass
+     connection.execute(
+-        "CREATE TABLE IF NOT EXISTS jobs (id TEXT PRIMARY KEY, data TEXT NOT NULL)"
++        "CREATE TABLE IF NOT EXISTS jobs (id TEXT PRIMARY KEY, data TEXT NOT NULL, orig TEXT)"
+     )
++    # Migrate legacy table without orig column.
++    cols = [row[1] for row in connection.execute("PRAGMA table_info(jobs)").fetchall()]
++    if "orig" not in cols:
++        connection.execute("ALTER TABLE jobs ADD COLUMN orig TEXT")
++    # Backfill missing orig from stored views (legacy pending jobs).
++    rows = connection.execute("SELECT id, data FROM jobs WHERE orig IS NULL").fetchall()
++    for job_id, data in rows:
++        try:
++            view = json.loads(data)
++        except Exception:
++            continue
++        spec = {
++            "id": view.get("id", job_id),
++            "payload": view.get("payload", {}),
++            "priority": view.get("priority", 0),
++            "dependencies": sorted(set(view.get("dependencies", []))),
++            "max_attempts": view.get("max_attempts", 3),
++            "ready_at": view.get("ready_at", 0),
++        }
++        connection.execute(
++            "UPDATE jobs SET orig=? WHERE id=?",
++            (json.dumps(spec, sort_keys=True, allow_nan=False), job_id),
++        )
+     return connection
+diff --git a/tests/test_regression.py b/tests/test_regression.py
+new file mode 100644
+index 0000000..368cbe6
+--- /dev/null
++++ b/tests/test_regression.py
+@@ -0,0 +1,439 @@
++import copy
++import json
++import subprocess
++import sys
++import tempfile
++import unittest
++from pathlib import Path
++
++from durable_queue import Queue
++
++
++def tmp_queue(tmpdir=None):
++    d = tempfile.TemporaryDirectory()
++    p = Path(d.name) / "q.db"
++    q = Queue(str(p))
++    return d, p, q
++
++
++class ValidationTests(unittest.TestCase):
++    def test_bool_rejected_for_int_fields(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "a", "priority": True}])
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "a", "max_attempts": True}])
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "a", "ready_at": False}])
++            with self.assertRaises(ValueError):
++                q.claim("w", True, 10)
++            with self.assertRaises(ValueError):
++                q.claim("w", 0, True)
++            with self.assertRaises(ValueError):
++                q.recover(True)
++            q.submit([{"id": "a"}])
++            c = q.claim("w", 0, 10)
++            with self.assertRaises(ValueError):
++                q.complete("a", "w", True, 1)
++            with self.assertRaises(ValueError):
++                q.complete("a", "w", c["attempts"], True)
++            with self.assertRaises(ValueError):
++                q.fail("a", "w", c["attempts"], 1, retry_delay=True)
++            self.assertEqual(len(q.list()), 1)
++
++    def test_unknown_fields_and_types(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "a", "bogus": 1}])
++            with self.assertRaises(ValueError):
++                q.submit([{"id": ""}])
++            with self.assertRaises(ValueError):
++                q.submit([{"id": 123}])
++            with self.assertRaises(ValueError):
++                q.submit([{"payload": {}}])
++            with self.assertRaises(ValueError):
++                q.submit("notalist")
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "a", "payload": []}])
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "a", "payload": {"x": float("nan")}}])
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "a", "payload": {"x": float("inf")}}])
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "a", "dependencies": "x"}])
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "a", "dependencies": [""]}])
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "a", "max_attempts": 0}])
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "a", "max_attempts": 101}])
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "a", "ready_at": -1}])
++            with self.assertRaises(ValueError):
++                q.get("")
++            with self.assertRaises(ValueError):
++                q.get(123)
++            with self.assertRaises(ValueError):
++                q.claim("", 0, 10)
++            with self.assertRaises(ValueError):
++                q.claim("w", -1, 10)
++            with self.assertRaises(ValueError):
++                q.claim("w", 0, 0)
++            self.assertEqual(q.list(), [])
++
++    def test_does_not_mutate_input(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            jobs = [{"id": "a", "payload": {"x": [1]}, "dependencies": ["b", "b"]}, {"id": "b"}]
++            snapshot = copy.deepcopy(jobs)
++            q.submit(jobs)
++            self.assertEqual(jobs, snapshot)
++
++    def test_view_keys_exact_and_detached(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "a", "payload": {"x": 1}}])
++            v = q.get("a")
++            self.assertEqual(set(v.keys()), {"id","payload","priority","dependencies","max_attempts","ready_at","state","attempts","worker","lease_until"})
++            v["payload"]["x"] = 999
++            v["dependencies"].append("zzz")
++            v2 = q.get("a")
++            self.assertEqual(v2["payload"], {"x": 1})
++            self.assertEqual(v2["dependencies"], [])
++
++    def test_dependencies_normalized(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "b"}, {"id": "a", "dependencies": ["b", "b"]}])
++            self.assertEqual(q.get("a")["dependencies"], ["b"])
++
++
++class SubmitAtomicityTests(unittest.TestCase):
++    def test_rollback_on_invalid_batch(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "keep"}])
++            before = q.list()
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "n1"}, {"id": "n2", "dependencies": ["missing"]}])
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "dup"}, {"id": "dup"}])
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "self", "dependencies": ["self"]}])
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "x", "dependencies": ["y"]}, {"id": "y", "dependencies": ["x"]}])
++            self.assertEqual(q.list(), before)
++
++    def test_unknown_dep_and_cycle_with_existing(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "a"}, {"id": "b", "dependencies": ["a"]}])
++            # new job depending on unknown
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "c", "dependencies": ["nope"]}])
++            # cycle involving batch: c->d, d->c
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "c", "dependencies": ["d"]}, {"id": "d", "dependencies": ["c"]}])
++            self.assertEqual(sorted(j["id"] for j in q.list()), ["a", "b"])
++
++    def test_idempotent_same_spec(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            p = Path(tmp) / "q.db"
++            q = Queue(p)
++            q.submit([{"id": "a", "priority": 5, "dependencies": []}])
++            c = q.claim("w", 0, 10)
++            # resubmit same original spec after state change -> idempotent
++            views = q.submit([{"id": "a", "priority": 5}])
++            self.assertEqual(views[0]["state"], "running")
++            self.assertEqual(views[0]["attempts"], 1)
++            q.complete("a", "w", c["attempts"], 1)
++            views2 = q.submit([{"id": "a", "priority": 5}])
++            self.assertEqual(views2[0]["state"], "succeeded")
++
++    def test_conflict_rejects_batch(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "a", "priority": 1}])
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "a", "priority": 2}])
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "b"}, {"id": "a", "priority": 9}])
++            # b must not have been created (atomic)
++            self.assertIsNone(q.get("b"))
++            self.assertEqual(q.get("a")["priority"], 1)
++
++    def test_submit_no_recovery_side_effect(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "a"}])
++            c = q.claim("w", 0, 5)
++            # invalid submit must not recover expired lease
++            with self.assertRaises(ValueError):
++                q.submit([{"id": "bad", "dependencies": ["missing"]}])
++            v = q.get("a")
++            self.assertEqual(v["state"], "running")
++            self.assertEqual(v["worker"], "w")
++
++
++class OrderingLeaseTests(unittest.TestCase):
++    def test_claim_ordering(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "b", "priority": 1}, {"id": "a", "priority": 1}, {"id": "c", "priority": 9}])
++            first = q.claim("w", 0, 10)
++            self.assertEqual(first["id"], "c")
++            q.complete("c", "w", first["attempts"], 1)
++            second = q.claim("w", 1, 10)
++            self.assertEqual(second["id"], "a")
++
++    def test_claim_respects_deps_and_ready(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "a", "ready_at": 10}, {"id": "b", "dependencies": ["a"]}])
++            self.assertIsNone(q.claim("w", 0, 10))
++            c = q.claim("w", 10, 10)
++            self.assertEqual(c["id"], "a")
++            # b not eligible until a succeeded
++            q.complete("a", "w", c["attempts"], 11)
++            # need new claim at later now
++            c2 = q.claim("w", 11, 10)
++            self.assertEqual(c2["id"], "b")
++
++    def test_failed_dep_stays_ineligible(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "a", "max_attempts": 1}, {"id": "b", "dependencies": ["a"]}])
++            c = q.claim("w", 0, 5)
++            self.assertEqual(c["id"], "a")
++            q.fail("a", "w", c["attempts"], 1)
++            self.assertEqual(q.get("a")["state"], "failed")
++            self.assertIsNone(q.claim("w", 1, 10))
++            self.assertEqual(q.get("b")["state"], "pending")
++
++    def test_recover_semantics(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "a"}])
++            c = q.claim("w", 0, 5)
++            self.assertEqual(c["attempts"], 1)
++            # not expired yet
++            self.assertEqual(q.recover(4), [])
++            # expired
++            rec = q.recover(5)
++            self.assertEqual(rec, ["a"])
++            v = q.get("a")
++            self.assertEqual(v["state"], "pending")
++            self.assertEqual(v["ready_at"], 5)
++            self.assertIsNone(v["worker"])
++            self.assertIsNone(v["lease_until"])
++            # repeated no-op
++            self.assertEqual(q.recover(5), [])
++            # claim again increments
++            c2 = q.claim("w2", 5, 5)
++            self.assertEqual(c2["attempts"], 2)
++
++    def test_recover_failed_when_attempts_exhausted(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "a", "max_attempts": 1}])
++            c = q.claim("w", 0, 5)
++            self.assertEqual(c["attempts"], 1)
++            rec = q.recover(5)
++            self.assertEqual(rec, ["a"])
++            v = q.get("a")
++            self.assertEqual(v["state"], "failed")
++            self.assertEqual(v["ready_at"], 0)
++
++    def test_claim_recovers_implicitly(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "a"}])
++            q.claim("w", 0, 5)
++            c2 = q.claim("w2", 5, 10)
++            self.assertEqual(c2["id"], "a")
++            self.assertEqual(c2["attempts"], 2)
++            self.assertEqual(c2["worker"], "w2")
++
++    def test_get_list_do_not_recover(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "a"}])
++            q.claim("w", 0, 5)
++            # after expiry, get still shows running
++            v = q.get("a")
++            self.assertEqual(v["state"], "running")
++            q.list()
++            self.assertEqual(q.get("a")["state"], "running")
++
++    def test_complete_fail_validation_no_write(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "a"}])
++            c = q.claim("w", 0, 10)
++            before = q.get("a")
++            with self.assertRaises(ValueError):
++                q.complete("a", "other", c["attempts"], 1)
++            with self.assertRaises(ValueError):
++                q.complete("a", "w", c["attempts"] + 1, 1)
++            with self.assertRaises(ValueError):
++                q.complete("missing", "w", 1, 1)
++            with self.assertRaises(ValueError):
++                q.complete("a", "w", c["attempts"], 10)
++            # expired exactly at lease_until: now < lease_until required
++            with self.assertRaises(ValueError):
++                q.complete("a", "w", c["attempts"], 10)
++            self.assertEqual(q.get("a"), before)
++            # fail wrong owner also no write
++            with self.assertRaises(ValueError):
++                q.fail("a", "other", c["attempts"], 1)
++            self.assertEqual(q.get("a"), before)
++
++    def test_stale_attempt_rejected_after_reclaim(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "a"}])
++            c1 = q.claim("w", 0, 5)
++            q.recover(5)
++            c2 = q.claim("w", 5, 10)
++            self.assertEqual(c2["attempts"], 2)
++            with self.assertRaises(ValueError):
++                q.complete("a", "w", c1["attempts"], 6)
++            # correct attempt works
++            q.complete("a", "w", c2["attempts"], 6)
++            self.assertEqual(q.get("a")["state"], "succeeded")
++
++    def test_bounded_retry(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "a", "max_attempts": 2}])
++            c1 = q.claim("w", 0, 10)
++            f1 = q.fail("a", "w", c1["attempts"], 1, retry_delay=5)
++            self.assertEqual(f1["state"], "pending")
++            self.assertEqual(f1["ready_at"], 6)
++            c2 = q.claim("w", 6, 10)
++            self.assertEqual(c2["id"], "a")
++            f2 = q.fail("a", "w", c2["attempts"], 7)
++            self.assertEqual(f2["state"], "failed")
++            # terminal cannot be claimed/completed/failed
++            self.assertIsNone(q.claim("w", 7, 10))
++            with self.assertRaises(ValueError):
++                q.complete("a", "w", f2["attempts"], 7)
++            with self.assertRaises(ValueError):
++                q.fail("a", "w", f2["attempts"], 7)
++
++    def test_terminal_cannot_transition(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            q = Queue(Path(tmp) / "q.db")
++            q.submit([{"id": "a"}])
++            c = q.claim("w", 0, 10)
++            q.complete("a", "w", c["attempts"], 1)
++            with self.assertRaises(ValueError):
++                q.complete("a", "w", c["attempts"], 2)
++            with self.assertRaises(ValueError):
++                q.fail("a", "w", c["attempts"], 2)
++            self.assertIsNone(q.claim("w", 2, 10))
++
++
++class SubprocessTests(unittest.TestCase):
++    def test_claim_exclusivity_across_processes(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            db = str(Path(tmp) / "q.db")
++            Queue(db).submit([{"id": "only"}])
++            script = (
++                "from durable_queue import Queue;"
++                "import sys;"
++                f"q=Queue({db!r});"
++                "v=q.claim('w'+sys.argv[1], 0, 100);"
++                "print(v['id'] if v else 'NONE')"
++            )
++            procs = [
++                subprocess.Popen([sys.executable, "-c", script, str(i)],
++                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
++                for i in range(4)
++            ]
++            outs = []
++            for p in procs:
++                out, _ = p.communicate(timeout=30)
++                outs.append(out.strip())
++            self.assertEqual(outs.count("only"), 1)
++            self.assertEqual(outs.count("NONE"), 3)
++
++    def test_durability_across_processes(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            db = str(Path(tmp) / "q.db")
++            Queue(db).submit([{"id": "a", "payload": {"n": 1}}])
++            # separate process claims and completes
++            r1 = subprocess.run([sys.executable, "-c",
++                                 f"from durable_queue import Queue;q=Queue({db!r});v=q.claim('w',0,10);print(v['id']+':'+str(v['attempts']))"],
++                                capture_output=True, text=True, timeout=30)
++            self.assertEqual(r1.returncode, 0)
++            self.assertIn("a:1", r1.stdout)
++            r2 = subprocess.run([sys.executable, "-c",
++                                 f"from durable_queue import Queue;q=Queue({db!r});v=q.complete('a','w',1,1);print(v['state'])"],
++                                capture_output=True, text=True, timeout=30)
++            self.assertEqual(r2.returncode, 0)
++            self.assertIn("succeeded", r2.stdout)
++            self.assertEqual(Queue(db).get("a")["state"], "succeeded")
++
++    def test_cli_durability_and_errors(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            db = str(Path(tmp) / "q.db")
++            req = Path(tmp) / "req.json"
++            def cli(obj=None, raw=None):
++                if raw is not None:
++                    req.write_bytes(raw)
++                else:
++                    req.write_text(json.dumps(obj), encoding="utf-8")
++                return subprocess.run([sys.executable, "-m", "durable_queue", "--db", db, "--request", str(req)],
++                                      capture_output=True, timeout=30)
++            # submit success: sorted keys + newline
++            r = cli({"op": "submit", "jobs": [{"id": "a"}]})
++            self.assertEqual(r.returncode, 0)
++            self.assertTrue(r.stdout.endswith(b"\n"))
++            self.assertEqual(r.stdout.count(b"\n"), 1)
++            val = json.loads(r.stdout.decode())
++            self.assertEqual(val[0]["id"], "a")
++            # raw stdout keys sorted: check first object keys order by loading raw?
++            # get success persists
++            r2 = cli({"op": "get", "id": "a"})
++            self.assertEqual(r2.returncode, 0)
++            self.assertEqual(json.loads(r2.stdout.decode())["id"], "a")
++            # unknown op -> exit 2 empty stdout
++            r3 = cli({"op": "nope"})
++            self.assertEqual(r3.returncode, 2)
++            self.assertEqual(r3.stdout, b"")
++            # unknown field -> exit 2
++            r4 = cli({"op": "get", "id": "a", "extra": 1})
++            self.assertEqual(r4.returncode, 2)
++            self.assertEqual(r4.stdout, b"")
++            # malformed json
++            req.write_text("{bad", encoding="utf-8")
++            r5 = subprocess.run([sys.executable, "-m", "durable_queue", "--db", db, "--request", str(req)],
++                                capture_output=True, timeout=30)
++            self.assertEqual(r5.returncode, 2)
++            self.assertEqual(r5.stdout, b"")
++            # invalid utf-8
++            req.write_bytes(b"\xff\xfe")
++            r6 = subprocess.run([sys.executable, "-m", "durable_queue", "--db", db, "--request", str(req)],
++                                capture_output=True, timeout=30)
++            self.assertEqual(r6.returncode, 2)
++            self.assertEqual(r6.stdout, b"")
++            # non-object
++            r7 = cli([1, 2])
++            self.assertEqual(r7.returncode, 2)
++            self.assertEqual(r7.stdout, b"")
++            # unavailable db (directory as db? use nested missing dir file is creatable, so use directory path)
++            badreq = Path(tmp) / "good.json"
++            badreq.write_text(json.dumps({"op": "list"}), encoding="utf-8")
++            r8 = subprocess.run([sys.executable, "-m", "durable_queue", "--db", tmp, "--request", str(badreq)],
++                                capture_output=True, timeout=30)
++            self.assertEqual(r8.returncode, 2)
++            self.assertEqual(r8.stdout, b"")
++            # prior committed work survives failures
++            self.assertEqual(Queue(db).get("a")["id"], "a")
++
++
++if __name__ == "__main__":
++    unittest.main()
+diff --git a/tmp2jwl3ny2/q.db b/tmp2jwl3ny2/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..2244f27718cb997dd334f40ebff7c306af054814
+GIT binary patch
+literal 12288
+zcmeI#ze~eF6bJB2TKt6?mr~r0EGiUH+;p)@25GHYBUnVjX-+v!lbBqwrF3Zj2mdH1
+z{}wmF#dlQ~mkw^_d)y`WUUGNglj)tG)s>d~F3H+L^BuOrY@6+K&KR?46lnZ5izdb2
+zfbJ%q)NHo-^19@FFx$zPlR0mb7T`GqAOHafKmY;|fB*y_009U<U^)b@tl4s@WDQrf
+zxQXOLa+8~3A2z+J?{U9+Q1`gW@O2e(-@EkrY4hl~+HCQf*Q)SPXz`tHocO$PQLk5c
+zlBxS~Zez`!Desjmrs7a`^QVYv`#^MbGL8eYZLn>wrmmkeo=Y^W<#$FM4FV8=00bZa
+z0SG_<0uX=z1RyXq0;AEQHRFt0!<y*3LTlMhb?)x+?Fx58nM$gg<69+7>gt+uDx{e!
+zT$)Bw<TB{QT1AwLJ5fZ*w&(_bwn;@VN`zV0AJ7|Vrl>yGJ&Ly|%%li=wB#quwa}90
+z?wwGP49z*uN%kl+%9$eu{YjtouP+!Z(4V!OPevUL0uX=z1Rwwb2tWV=5P$##AOL~s
+K6DSs(dGQ5Lb&P-j
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpcksw_0f1/q.db b/tmpcksw_0f1/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..e38a5f604cf91b49b0e1490cb682615687a990f4
+GIT binary patch
+literal 12288
+zcmeI#L2J}N6bJB0Qd=!u$IDW@4Y{bWNSB_}i)+b2cCEUmU|A$glCeay$(l@PmnDbY
+z@8E~>Qon-VKre#e#WyPjYiXCdr^<g|GV@-T<nhboFt1+r60OAByckL?w%ILa+w8Fr
+zj4_+KL;a*#G+8+bXf*MnX0!VrKQ;IdX7hsaf`4AL0QVsP0SG_<0uX=z1Rwwb2tWV=
+z|A)Z9TH9<kt?6wo!&JS?!_stnr|)%qPxzfDJx`d7xSPbn_g?$rMgQruPJdr?z5SMm
+zrIx?byU%^GyVvWrL|!BZ^W42V_Uh)Nrp1yhR!8NBl+N~ntaLt)1M}FRZLa2Af8BUC
+zs5=|S&dqO)FB``ug9ZTzKmY;|fB*y_009U<;3^2rxU<S<!L%DqT&cAhj&$ih6z!I9
+zV>MEAD9WNlnbhD7<&v0YZsgK5RkBn;mFXm<TvnwiC5Q4T_~S9#lp4u#noF~8Qk$?y
+z=<ub-6hEM_P%<9V5(>8{EVa~%=5AR<ky5dW&8rUc;=L*;ZQfE(7FD)X5%p}{CXu~q
+zS6)Iyo)u{u!%LN77M$l%R9Ti}2d6aLL-#_Ac~MJMP>Zd4*09K9Fztq?Jj~ZRe}{x;
+zJ^p2fTqI&P=ied=_s6`h<w(})w|4kf#=rBQG@wBM0uX=z1Rwwb2tWV=5P$##AaL~s
+Rt~uO_9CMZSio<V&zW_VhI;;Qy
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpda_sustf/q.db b/tmpda_sustf/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..2c9a59bf2fde31a9c6f5a4b4ebdd2fe1b0829fd6
+GIT binary patch
+literal 12288
+zcmeI#PfNov7zXgPllcc`y$taddQoAB;!Q73=|QYhX9Z<Q$!wI^uAOa$j<JLL4t^+4
+zeie^`7vD?;Z##G!PiWe_Pf1dKJ>~q&S6cGhEbj=-x7iZ2ZMMfbW6Y*rqW;?~8qE9_
+z^fdLPX0wf#*NXGOY$s<<?z~N!fcFr900bZa0SG_<0uX=z1Rwx`=@4jHv&+@0^}M1*
+zJCXNUyD;58XnOU)<3WAj_qa*;nu>VfT?YKLd3aoJUhyOEs>UOs#dq8|33%he_iH@M
+z)!jH-U$x82yH$&+G?GunLqcc!Q1o;*u0ykIxMl9<Tt8<#E7YyUcSaW)1Rwwb2tWV=
+z5P$##AOHafKwxSFMir~<j9Sk}@xT>Y%T8Ap?hfCqaW|4(Nyp~&MoAO3t|?OyjojF!
+zVIoB#!(OUYLRs2N5(+!wDg3j{Hbq_0PcmWV4Th%76&=rYpK7y7E=AO*DL-YQg_bmS
+z&DJWtGaEf-c`S1Z%^t(Sr0@FICkz+p&sxqWqYDiJ5P$##AOHafKmY;|fB*y_0D<Wf
+Jm?=5)@fRsxjH&<t
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpf5ocfxwa/q.db b/tmpf5ocfxwa/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..edcd781093604641906f8bea9e22489ece889395
+GIT binary patch
+literal 12288
+zcmeI#O-sWt7zgmQim%Li8R9MUqQVf}@S+!|^dQc+Sy2%wnT-<d+L>nP7(2M{;D_?$
+zckv{6@rg3<wu86v4@sNnUy_zzPdPoQDI@u9rkld>3Y%xH%eFaZjJY(%XbhS|lkq`8
+zcUuo@E?a$lD|nyG^)&Oe_daX^o<jfv5P$##AOHafKmY;|fB*zWL*UApTqqWumqjBQ
+ziM-DmxgG9qJ*b8O534)1fZK#GtC)wuMaYlqdk59}CEpJ&OFR}v{KkhzAwN8;)k-|m
+z>h337S#l>9wu%l@X)K@f$Ar%Ik!YLjr;hBl(Yn3bbN!U{EYNV~J{Wa02tWV=5P$##
+zAOHafKmY;|fWXKI^b7r2XTs~BzwC>yFN~4RmdX81UM_JzmMuvK=k!KN8(m#fred1;
+z!l!8>MJ}UuYE(km`UXW!@f`ixq(V_kbdpTiRo$K~wW8y>=}^5!rIsS@&=M-``rHU3
+zY3}QGnyU29zUC>@4^rFksqFW<!@lZ2pRm@Op+D<*UyM2$1Rwwb2tWV=5P$##AOHaf
+OKmY=xCon$dO^a_~#ETCA
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpgmm50y4z/q.db b/tmpgmm50y4z/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..ac12cfb15cc95bf2a091fd4127f76320cc5f4e7c
+GIT binary patch
+literal 12288
+zcmeI#PfNov7zXgPj_HJ1FJpKMy{Irm5ifdiN)O_kIx9FtO0-d;T|3hZ9b*Ug9sE$9
+z{4yQ{FTU{)c-z6-ctX<VeM-{u>nSJ44P_+1&U8l@zRu>E>#}Xm8DlPuDH^}cp-JJl
+zpu4TdHJ7bCzm&aq=6afW+It<h0M8)+0SG_<0uX=z1Rwwb2tWV=lOb^KOjj!v=V`%+
+z%S7I0m$@D8ZY!vV0T1gtjey&PFR7S^!CA<UT6+ieR-5k!?HZ4T5#Mq1FyzhCMx(|v
+zt!}=u<wdtx-KscDrLla>?-M%PN1|u4uR5~ZMr-zJ&-F9bvrNO8dt=nmAOHafKmY;|
+zfB*y_009U<00I*uFe*F6QOPNKqm!q7G4O>kvePxWzsc8X+>d2f($P7+Qqo4}7nG@(
+zX1?%gnn;n$sFxa*P_{uyM?6M<_E@K=EBZ+$?4rTYmRiyI-1MnlrBX`~_i4#bnHymw
+z&3)ZVQ<dJ>w>)I}PHG!I_`|`tZ~E643}@-jI^GAPjs^h;KmY;|fB*y_009U<00Izz
+Mz~l)Oro58)1lyj9s{jB1
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpgmv97zma/q.db b/tmpgmv97zma/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..92ce97a78fc93777cc588120d41e51db6a2d82de
+GIT binary patch
+literal 12288
+zcmeI#L2DC17zW_kNv*XIM<}6q8}?#_AWCm~X<GImO{+~;umoAYb;mNg*-dvR*bs6^
+z{zHFMPu~3%UIf95-_#bxON3suyaO{k-@DAt@UWLTJm^|y^t-Yekkgyuo{&;(X)T11
+z+#B4lTELT~tAd}tUeu&`baviU--J|^P?h?$XaU|s00Izz00bZa0SG_<0uX=z1a5{v
+zKe)Z#Y6Y|Vj?&z`FVot0xzmd}airtUb~n;K(Hl0?ar8RYFMH4TI=v&k8y&TEMvi{Q
+z`!8a>|Ek+<>$0-P7umxHa(Vq(D-gEG%xQg+^W8q7kt;9i#D6w<;zxh4U-6zz?y~t=
+z-2K7>8U!E!0SG_<0uX=z1Rwwb2>gcv^EJ7w<}^D<Cm}g!218eePxa%r4l^?}d_gSU
+zTH~XBNZ}ifZN^2IhCIy;)g~Dg&gPsIqdezuK&Q!XU)tnoNaMUDziu-1Wo7v;>c(9A
+zeJVrQn3r6ZwIgSE9{SyFaqKtxSXLiQ#i8G0I{AyEUF#Inc{5;@{%n^Ps{A6Me~RRf
+xb6wA4mH%w1z6$l72Q&yk00Izz00bZa0SG_<0uX=z1a6MNt%eFxxztd1=m+89<u(8S
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpif3xcg4n/q.db b/tmpif3xcg4n/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..2d608315fb97270adb68e292bf4bac869322d99e
+GIT binary patch
+literal 12288
+zcmeI#&ui2`6bJChY^^_V9YL1jZOBE1MJ&DP#Z_{UuGOv)T#AGjGcBXpWKCwV%aX(H
+z|KK0x$$S3_FM{C3H`Su<rK_GS-+`CRdtqiCA99&zyM617-Y=^WIlU#W3Ms{Xt%VSh
+zqs4JD0-mg$B>eXIX+w(J??1HF7a>(8RHZ(iwgBHD009U<00Izz00bZa0SG_<0%t>D
+zFF3!^=>+rZj?&z`F4NkFd^m`DairtkgMOraMc=fUj-wZ`emZ#cxHlN;?P%E589Dl1
+z-gy%1o#*|2SC^GNIIi8gA=fwVbpm0F%pBHlbH3XrG;!r|p7?E(P5<=w`U~E(%^}-I
+z!Ie+#BcEeH00Izz00bZa0SG_<0uX?}|0b}wCfC)1=DX=EB<IX%?CS8YzSGrVX2ymu
+zh{Y>wd}%MF@FkaR#z~llJk1T&CYcn@=3FZ#dCtWV9VWl*w8f<{P4klcx>@7X%JN;*
+zO*!}HREDxCFZq$yj-26n=ufxBfj{V7S-mk87yTK{Y=zeTsf%WDIbfCHe4Bn#+2mH1
+zReqAtsw94!za!Zvo11JEk)^hlIR31Irn$twwN#&l`pORs2tWV=5P$##AOHafKmY;|
+TfB*!}j=;H=3R1b&QWxnPSb60x
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpk535_kn4/q.db b/tmpk535_kn4/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..a9d35a863ee0c5607c71cde2ad7c200acc740ac8
+GIT binary patch
+literal 12288
+zcmeI#yGsKx90%~+ReXV-OA)tl4k{E;yXj(;8^rpmCn!>m)Qcs0kD5!-A|2}g;2-7W
+z?q4Ff_=^v4>*At(!{sjdhCKM(l;fkiGLm2BIu(Xj*$i`Cw#hkT%%xhQ`du7qjC^<K
+zYx~2B%a$LXro30?dYXCKdmc6c;}C!V1Rwwb2tWV=5P$##AOL~?A#m=D&6dl~V9tnE
+zBCqmRVXM2{2x?)#!`fCo;5OllD&}Eu8uG)&&R(r?#&?6W3Xg>mpYi@d$oEg`^$O3m
+zYJX%)3-0LbM%iI1i{)K$lhEBh5?zyj^dq}$v})h>UO#R<r>Hv9FN_`(2tWV=5P$##
+zAOHafKmY;|fWRLVc$jxay@#8DNbh}Nj7&SG@YnfDh5NDWNV*_r7fRabyh)jgspY3W
+zH4`Zc8Fe$G63Vh}l2Dk6yXeO<Rf;;Im*m3EqaExzs};W1?AsBo=uU2W6x#i?6mgGc
+ze{~BZjHI@2Poc85-Salr*HTkxx9i^zJK}Ghrawu4*74pLJtz=>00bZa0SG_<0uX=z
+R1Rwwb2>d^Rk&-u&z61Lyk(2-c
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpoenneoob/q.db b/tmpoenneoob/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..af4baeeb1f966abb56a7f32d0674b5371cfe422a
+GIT binary patch
+literal 12288
+zcmeI%L2DC16bJCxNo}n(ZYzY++prfEf;9G~7o+S!npPWEumo9Vvt!x1*^Rriv?1)F
+z`40U?y?FBKXYeivUVPJ1HAx}T;wAhSW;5@F*?IZp5g77juN7$}KBQSsYO%#u8RzVo
+z5R5TSqeA2IvS_k!8PKbVXI-2<I{jR=e=u%m%+BmDvlife2tWV=5P$##AOHafKmY;|
+zfWUkRbgZTITFpAy&@zbCVH)IS@E2{j>AAvdK5x0gWW<9g6rTIe6R+DZcbe^evF+~H
+zMJTnrNbkP##O~Wxt1i+kIylcgyw4ZcpVllEC80XbKgD#m_hq5e^Vm0!^&94H&h@vA
+zXSMp3@s+d6%Gup-^Wlq60Rad=00Izz00bZa0SL^qz-Y}{v`6w}M-CmSwd(bC?mQ8V
+zx^P0(S9BCgx{)%e&U?y5A<Z1=&@@&uSALP`D5hLe#4#m%^4S0DF<X@C%R!t<vu;?L
+zFpKEOr3VymQkW?j4rmF54HM^DYDIyQ7u~K>p$g4jM``v^Wt2ACl*3u2-K>g|{+_*O
+zO!k5?6I0%#2~qrE3H}Sqn2PyEqU7LTOr}e_KFes8Q<romMXu_S>21dw<*`|G{Yoyn
+z=69E5MUqT<I7iMEEizr#jfyB6o8=w)Vc_<6X8)ucE(kyX0uX=z1Rwwb2tWV=5P$##
+Q=11UG#kK;zP_dWgFQ9)qnE(I)
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpqqatzdn4/q.db b/tmpqqatzdn4/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..0b3e99e16f1a34b3fb5e14eee532c7b0b0ef5da7
+GIT binary patch
+literal 12288
+zcmeI#&5IK;6aetdhxN0@OIZ|z5DzMp#j<$Oi&c7%t*h1%T#A%TC%a5Lo$1b`+FE*O
+z_iyn3@#@Kc!K){|2!a>iYc2JngIk1EUm)qrEBX3mD4i#d>!HzNFG+jKh%I)3**3c)
+z1Y^vG>Ofr<3j%l9flut`6`O6oep}>Un9WnhQ~oY*0DVsaBtQZrKmsH{0wh2JBtQZr
+zKmz}UK+`(8Q7T!}i$?j8?j(MO)xOuLRlS<<s(0%(ff;cv41`yE=7~p*`wyy(U9nx;
+zEsH=IwMg$g^u*57dc7=?G~A!(u3xna8@Edq3*$f!vx5lU?OSSKl6k*{)3z$u;(Prm
+z^ejSk&t78ZKNa7fdjkO#5+DH*AOR8}0TLhq68J9#4zIWcet0lbov~EL=w9Ds@|L(!
+z7BbL%4S%rXcBnDcd=9xVfJk;EgppR6ZVh4+Mv#jKQ3T1J8n%9zW(!h%HHs32<Hpj5
+z)}#Xs=|!T8)4h-rNbEsa*}Mr6&eyEqaxv!M6W5nRT=f-1xE7A+ry;x(m=UCKzo}Ni
+z2v+~z&5SY{$Kff$cppc<Owz7Sms5=Mj(A*7Gnrj>3Vha`Hru(kBo!Xim#f=qAMv*S
+z4DnC)_iO5$txRS`8+@A6ZI$b@a+yON;VI794Ct@-=*{=Fu7|bo@PEU@KUUAl>YnEN
+zTF>JQ{I<LN1LL3hSN;(KDkMMxBtQZrKmsH{0wh2JBtQZrKmvcSzzK(29T(fSgRQb%
+IhoAPp0hIN)LjV8(
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpuclb8134/q.db b/tmpuclb8134/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..2ea4e6bd54b18f935892c18de9a20671efa225db
+GIT binary patch
+literal 12288
+zcmeI#Jx{_w7zglcA^4JDT?lczbWsyxeA#pnO$P&_VofB(G>1LSX`$F25keT?JNTiT
+z{3?znE<T50aba*H|I1x_&(q#r^Xv3nUsaWs{2@--Lh}Q*&TN|<bIusEX=G^3nnjcB
+zETFrI=QW${yuIh0FJ?Ola}wuc-U2*_00bZa0SG_<0uX=z1Rwwb2rPy`(^@JP3f6c-
+zi&i9`;#O*geOmX*zQ_IYN!8;f!?#q(eec%im-Vyra=pPTUZccAp~Y{ycH#5dO|@F$
+zaiSilx$R9mS3D|MOm#xpPhTRc?E}%%@iY$1w!xmcn!0}3c;;zXYoCld8U!E!0SG_<
+z0uX=z1Rwwb2tZ&_1SXTbm2)P|aYYPWp|xyxb?P4S{StRW*_Bi_ckY!mspcK!R7f*d
+zxHOHVNM+FLXcbYe(~BZXwnabqvrShFqF9)9!x6pFO%#>qdO-0mg^3j5fR<3WXW~=~
+zEh%sxgo<Qn4tkA~XPHpWoG}{C`>y|d!tQ95{;cJEGwNs%fB*y_009U<00Izz00bZa
+N0SGLfKsMv7h#$%MjI{s&
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpuf64psul/q.db b/tmpuf64psul/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..dae06f950fc012623353bb531c78ac56b806ac9d
+GIT binary patch
+literal 12288
+zcmeI%L5tHs6bJChbX{H9I9|%)ZOBE1BD*dk=*22INb9OK3ob>%#Ei>mn$%><ZYe#q
+z-@y;%$>V+muU-Vfi*LFtED9Elr}`h5WZo;2dHFE}hQ4^-HCD?vMLAGb?y{?lbM`<=
+z#u%sGpnldo8myfKba(Nx#@Ve8AARwSaZxf+iciZX;CBc>00Izz00bZa0SG_<0uX?}
+zY6$ebi(Ad6H@jw4lIgcaQn}6_^}==(%BcOY8%mdvH%uy{@MR>Q^&UTI_YPzyJZQ;O
+zS#_G;dm72T{cg7<i_#n}ayPH@^{x9&kC{Bx$JP6c&i1hy*<umL?y>QXySj7zCFkk;
+zpBdjgVVfsczO05X-U0#;fB*y_009U<00I#B&jjYaw=U-WSw~F*Wvw0zZ57;;J1rTc
+zdZ_7il)pCGrTVWZXHpskDxhJeRi)!mZcRqHe3WIB9H`^?++%hrHB{rQP;TC2>cY~{
+zDa?*3-lnkBDjm}l3hz)@S!Fei1Gluv58XmXMfpyblyqxMC(G)pQ^NL?{;k~*^Zi*T
+z`2&ySSC6|?c&$p#W0a#j{~04Vx*hx$V^P%KmoWGF>BguD@eekJv#hr<YFf}%onEF7
+r0~cSJ_)Zrz2tWV=5P$##AOHafKmY;|fB*zmN8mz3cnM!?hz<1vlOHx9
+
+literal 0
+HcmV?d00001
+
+diff --git a/tmpy_tm4jza/q.db b/tmpy_tm4jza/q.db
+new file mode 100644
+index 0000000000000000000000000000000000000000..af711363de1c6d136d3ab417b7cc107871befd68
+GIT binary patch
+literal 12288
+zcmeI#KTE?v7zXf5TIwIDaVf>^$f80Ki@4}wl?>8awMMWM3D@S7Xxh}|iYcW-`yKpH
+zPJR<-!NvC~1-A}v<vDW6y-&E@@ym2K*R?=N{t(4oq4)vYWTweZIA@HR)HBrQ&7eVc
+zUeHt5i<-&y-rn=p7c;GxS+Vu8Xae3t00Izz00bZa0SG_<0uX=z1eQafWvmnn1!J<M
+zL_3sEQ9IGyJZm@=*WqsEwB~S~@SVWtu5;(|tH$|7rP1V7r&;2@P~tbPU%I@0TdS3L
+z6bFy9Y<Jtt6^{!B3wpjxlb4Xr_MRB1XjXgrvtC)>^|^jkd*-Pd8=s6WGzdTd0uX=z
+z1Rwwb2tWV=5P-mv2uv*_XHC6HH67VPDcS9-#6IHX61RQXmvm_EbpolQ);(o`Pa`|E
+zX&6e8NN><nK}cC|5QY?XMe6<e%mGDxF$^Q2=Z(g?i~~BHt0C2gRK`;HLz+V6K9z|Q
+zO48U)2Az(SzV!7{uTlIgV~X`E<I$p>{c98Bb^5c0_08x)g8&2|009U<00Izz00bZa
+P0SG`~`2?~VYc2f&3U7_8
+
+literal 0
+HcmV?d00001
+

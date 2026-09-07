@@ -1,0 +1,4199 @@
+[
+  {
+    "id": "queue-r1-aaa",
+    "block": 1,
+    "planner": "a",
+    "executor": "a",
+    "verifier": "a",
+    "workflow": "queue-aaa-v1",
+    "parent": null,
+    "preparation_id": "queue-r1-aaa-prepared",
+    "execution_id": "queue-r1-aaa-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r1-aaa/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r1-aaa/fixture.json",
+    "run_id": "queue-r1-aaa-execution",
+    "target": {
+      "run_id": "queue-r1-aaa-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "4952a928f43056dcd6feb45d7a4f02891c16cfff60d8a1d5716a0ae871ce74b8",
+      "run_spec_sha256": "db9dc96570f921507ed6448da398bd672d563fe7a2c8d57825ab1de0752b3663"
+    },
+    "parent_plan": "queue-r1-aaa",
+    "original_plan_approved_without_edit": true,
+    "accepted_plan_text_changes": 0,
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "audited_task_success": true,
+    "cli_format_audit_changed_check": true,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 1214853,
+      "output_tokens": 43730,
+      "cached_input_tokens": 1146175
+    },
+    "tool_calls": 54,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "plan_deviations": null,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 72,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "durable_views",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 37,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_processes.py",
+        "tests/test_regression.py",
+        "tmp4ia_0scc/q.db",
+        "tmp4ia_0scc/req_0.json",
+        "tmp4ia_0scc/req_1.json",
+        "tmp4ia_0scc/req_2.json",
+        "tmp4ia_0scc/req_3.json",
+        "tmp4ia_0scc/req_4.json",
+        "tmp4ia_0scc/req_5.json",
+        "tmpjjm9jg7g/q.db",
+        "tmpjjm9jg7g/req_1.json",
+        "tmpjjm9jg7g/req_10.json",
+        "tmpjjm9jg7g/req_11.json",
+        "tmpjjm9jg7g/req_12.json",
+        "tmpjjm9jg7g/req_13.json",
+        "tmpjjm9jg7g/req_14.json",
+        "tmpjjm9jg7g/req_15.json",
+        "tmpjjm9jg7g/req_16.json",
+        "tmpjjm9jg7g/req_17.json",
+        "tmpjjm9jg7g/req_18.json",
+        "tmpjjm9jg7g/req_19.json",
+        "tmpjjm9jg7g/req_2.json",
+        "tmpjjm9jg7g/req_20.json",
+        "tmpjjm9jg7g/req_22.json",
+        "tmpjjm9jg7g/req_23.json",
+        "tmpjjm9jg7g/req_24.json",
+        "tmpjjm9jg7g/req_25.json",
+        "tmpjjm9jg7g/req_3.json",
+        "tmpjjm9jg7g/req_4.json",
+        "tmpjjm9jg7g/req_5.json",
+        "tmpjjm9jg7g/req_6.json",
+        "tmpjjm9jg7g/req_7.json",
+        "tmpjjm9jg7g/req_8.json",
+        "tmpjjm9jg7g/req_9.json"
+      ],
+      "diff_bytes": 64573,
+      "diff_sha256": "ef18ddd7f64c8b3a8fcd294fb19fc27c76240d241ec34f776afab12b0b85f785"
+    },
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 10,
+      "exec_command": 34,
+      "lab_command_receipt": 4
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07cca-94d5-7480-a6f4-6dd8d2a6676f",
+        "started_ms": 1788800046253,
+        "ended_ms": 1788800407322,
+        "usage": {
+          "input_tokens": 1103005,
+          "cached_input_tokens": 1048066,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 36006,
+          "reasoning_output_tokens": 17660,
+          "total_tokens": 1139011
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07cd0-1791-7ee3-a6f1-f21e5e9dc247",
+        "started_ms": 1788800407416,
+        "ended_ms": 1788800490676,
+        "usage": {
+          "input_tokens": 111848,
+          "cached_input_tokens": 98109,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 7724,
+          "reasoning_output_tokens": 4018,
+          "total_tokens": 119572
+        },
+        "report_counts": {
+          "V1": 1,
+          "V2": 1,
+          "V3": 1
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "AC1",
+                "AC2",
+                "AC3",
+                "AC4",
+                "AC5"
+              ],
+              "call_id": "call_01a07cd06db07ac199177b3be1347e53",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "AC2",
+                "AC3",
+                "AC5"
+              ],
+              "call_id": "call_01a07cd099627bd3862b2ab330047956",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "AC5"
+              ],
+              "call_id": "call_01a07cd121317710a14a8efa784663cf",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 444698
+  },
+  {
+    "id": "queue-r1-aab",
+    "block": 1,
+    "planner": "a",
+    "executor": "a",
+    "verifier": "b",
+    "workflow": "queue-aab-v1",
+    "parent": "queue-r1-aaa",
+    "preparation_id": "queue-r1-aab-prepared",
+    "execution_id": "queue-r1-aab-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r1-aab/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r1-aab/fixture.json",
+    "run_id": "queue-r1-aab-execution",
+    "target": {
+      "run_id": "queue-r1-aab-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "4952a928f43056dcd6feb45d7a4f02891c16cfff60d8a1d5716a0ae871ce74b8",
+      "run_spec_sha256": "25fe7a58326ad61044afb4542c77b09c4d47fba1d5300751fbbb956c045ed2e3"
+    },
+    "parent_plan": "queue-r1-aaa",
+    "original_plan_approved_without_edit": true,
+    "accepted_plan_text_changes": 0,
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "audited_task_success": false,
+    "cli_format_audit_changed_check": false,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 1656721,
+      "output_tokens": 50685,
+      "cached_input_tokens": 1572679
+    },
+    "tool_calls": 62,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "plan_deviations": null,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 18,
+      "changed_files": [
+        ".tmp-cli/tmp.8N1tX0nRry/err.txt",
+        ".tmp-cli/tmp.8N1tX0nRry/out.txt",
+        ".tmp-cli/tmp.8N1tX0nRry/q.db",
+        ".tmp-cli/tmp.8N1tX0nRry/req.json",
+        ".tmp-cli/tmp.tvKEe16J13/err.txt",
+        ".tmp-cli/tmp.tvKEe16J13/out.txt",
+        ".tmp-cli/tmp.tvKEe16J13/q.db",
+        ".tmp-cli/tmp.tvKEe16J13/req.json",
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_processes.py",
+        "tests/test_regression.py",
+        "tmp0ct646v1/q.db",
+        "tmp3ot8vn9v/q.db",
+        "tmp45rxofav/q.db",
+        "tmpnm1rrk5s/q.db",
+        "tmpuj1u203e/q.db"
+      ],
+      "diff_bytes": 62074,
+      "diff_sha256": "5afef21dcbd382d39ad952c3c2896fea05ea57d53a39d10d2d98ff349abd5e54"
+    },
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 4,
+      "lab_repo_read": 10,
+      "exec_command": 43,
+      "lab_command_receipt": 5
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07cca-94d5-75a0-9fd4-85361909aab6",
+        "started_ms": 1788800046261,
+        "ended_ms": 1788800423797,
+        "usage": {
+          "input_tokens": 1456629,
+          "cached_input_tokens": 1394630,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 39987,
+          "reasoning_output_tokens": 17070,
+          "total_tokens": 1496616
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07cd0-57d5-7140-9c2e-132f0732f0ef",
+        "started_ms": 1788800423876,
+        "ended_ms": 1788800520549,
+        "usage": {
+          "input_tokens": 200092,
+          "cached_input_tokens": 178049,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 10698,
+          "reasoning_output_tokens": 2783,
+          "total_tokens": 210790
+        },
+        "report_counts": {
+          "V1": 1,
+          "V2": 1,
+          "V3": 1
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "AC1",
+                "AC2",
+                "AC3",
+                "AC4",
+                "AC5"
+              ],
+              "call_id": "call_01a07cd06a287473848d58b908fbc993",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "AC2",
+                "AC3",
+                "AC5"
+              ],
+              "call_id": "call_01a07cd094ad71c3bc3ed2a5388b0ece",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "AC5"
+              ],
+              "call_id": "call_01a07cd1881e7a63b46283691f18ae9f",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 474485
+  },
+  {
+    "id": "queue-r1-aba",
+    "block": 1,
+    "planner": "a",
+    "executor": "b",
+    "verifier": "a",
+    "workflow": "queue-aba-v1",
+    "parent": "queue-r1-aaa",
+    "preparation_id": "queue-r1-aba-prepared",
+    "execution_id": "queue-r1-aba-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r1-aba/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r1-aba/fixture.json",
+    "run_id": "queue-r1-aba-execution",
+    "target": {
+      "run_id": "queue-r1-aba-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "4952a928f43056dcd6feb45d7a4f02891c16cfff60d8a1d5716a0ae871ce74b8",
+      "run_spec_sha256": "51063a92e06c69f9ba4d4aa88250100c116df8ab53e68c2c3df986e826d9f2da"
+    },
+    "parent_plan": "queue-r1-aaa",
+    "original_plan_approved_without_edit": true,
+    "accepted_plan_text_changes": 0,
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "audited_task_success": false,
+    "cli_format_audit_changed_check": true,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 1159848,
+      "output_tokens": 38284,
+      "cached_input_tokens": 1093251
+    },
+    "tool_calls": 62,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "plan_deviations": null,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 70,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "durable_views",
+        "mode": "cli"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 16,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_processes.py",
+        "tests/test_regression.py",
+        "tmpyexw2y42/q.db",
+        "tmpyexw2y42/req/r0.json",
+        "tmpyexw2y42/req/r1.json",
+        "tmpyexw2y42/req/r2.json",
+        "tmpyexw2y42/req/r3.json",
+        "tmpyexw2y42/req/r4.json",
+        "tmpyexw2y42/req/r5.json",
+        "tmpyexw2y42/req/r6.json",
+        "tmpyexw2y42/req/r7.json",
+        "tmpyexw2y42/req/r8.json",
+        "tmpyexw2y42/req/r9.json"
+      ],
+      "diff_bytes": 53593,
+      "diff_sha256": "35f30c43ddfc4048abacca177d67aed8ab02511037e221cbc2e0eb0235bdf01e"
+    },
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 11,
+      "exec_command": 42,
+      "lab_command_receipt": 3
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07cca-94d5-74c1-9a99-9ea10b092289",
+        "started_ms": 1788800046261,
+        "ended_ms": 1788800347457,
+        "usage": {
+          "input_tokens": 1040925,
+          "cached_input_tokens": 988727,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 31117,
+          "reasoning_output_tokens": 14192,
+          "total_tokens": 1072042
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07ccf-2dc5-7111-a218-fd2abb35b7d9",
+        "started_ms": 1788800347550,
+        "ended_ms": 1788800430813,
+        "usage": {
+          "input_tokens": 118923,
+          "cached_input_tokens": 104524,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 7167,
+          "reasoning_output_tokens": 3556,
+          "total_tokens": 126090
+        },
+        "report_counts": {
+          "V1": 1,
+          "V2": 1,
+          "V3": 1
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "AC1",
+                "AC2",
+                "AC3",
+                "AC4",
+                "AC5"
+              ],
+              "call_id": "call_01a07ccf667f76f398b67c60be856567",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "AC2",
+                "AC3",
+                "AC5"
+              ],
+              "call_id": "call_01a07ccf822773328464d385687f0401",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "AC5"
+              ],
+              "call_id": "call_01a07cd01d93773398e22b0e8b2673a3",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 384842
+  },
+  {
+    "id": "queue-r1-abb",
+    "block": 1,
+    "planner": "a",
+    "executor": "b",
+    "verifier": "b",
+    "workflow": "queue-abb-v1",
+    "parent": "queue-r1-aaa",
+    "preparation_id": "queue-r1-abb-prepared",
+    "execution_id": "queue-r1-abb-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r1-abb/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r1-abb/fixture.json",
+    "run_id": "queue-r1-abb-execution",
+    "target": {
+      "run_id": "queue-r1-abb-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "4952a928f43056dcd6feb45d7a4f02891c16cfff60d8a1d5716a0ae871ce74b8",
+      "run_spec_sha256": "bf8af6c28143e9971dcdc02f7745c56a4d94e7d589e7bba4e576faa37f58dd44"
+    },
+    "parent_plan": "queue-r1-aaa",
+    "original_plan_approved_without_edit": true,
+    "accepted_plan_text_changes": 0,
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "audited_task_success": true,
+    "cli_format_audit_changed_check": true,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 2124757,
+      "output_tokens": 56111,
+      "cached_input_tokens": 2025875
+    },
+    "tool_calls": 83,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "plan_deviations": null,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 72,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "durable_views",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 5,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_processes.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 48961,
+      "diff_sha256": "2cb3f68e0d585f0f8ce5c43ad296b70a83a58c630eff35cb437bd2dc8d231caa"
+    },
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 17,
+      "exec_command": 50,
+      "lab_command_receipt": 10
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07cca-94d5-7172-bf63-419268901b73",
+        "started_ms": 1788800046261,
+        "ended_ms": 1788800464976,
+        "usage": {
+          "input_tokens": 1653734,
+          "cached_input_tokens": 1590124,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 40344,
+          "reasoning_output_tokens": 22464,
+          "total_tokens": 1694078
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07cd0-f8ba-73c0-ba4a-659596e9ba8b",
+        "started_ms": 1788800465063,
+        "ended_ms": 1788800633208,
+        "usage": {
+          "input_tokens": 471023,
+          "cached_input_tokens": 435751,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 15767,
+          "reasoning_output_tokens": 5743,
+          "total_tokens": 486790
+        },
+        "report_counts": {
+          "V1": 1,
+          "V2": 1,
+          "V3": 1
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "AC1",
+                "AC2",
+                "AC3",
+                "AC4",
+                "AC5"
+              ],
+              "call_id": "call_01a07cd28f657751b30d82967cc7d46d",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "AC2",
+                "AC3",
+                "AC5"
+              ],
+              "call_id": "call_01a07cd2f0377f13af8f61e0f0a345d3",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "AC5"
+              ],
+              "call_id": "call_01a07cd311a77131a6e869dc5414f4a3",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 587122
+  },
+  {
+    "id": "queue-r1-baa",
+    "block": 1,
+    "planner": "b",
+    "executor": "a",
+    "verifier": "a",
+    "workflow": "queue-baa-v1",
+    "parent": null,
+    "preparation_id": "queue-r1-baa-prepared",
+    "execution_id": "queue-r1-baa-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r1-baa/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r1-baa/fixture.json",
+    "run_id": "queue-r1-baa-edited-execution",
+    "target": {
+      "run_id": "queue-r1-baa-edited-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "41d966bb3d0558662c963ffb3587d041b62bdedc36542790757a262bc13b37dc",
+      "run_spec_sha256": "95f1c68f73bb25c511cfec15fdeeec9da6f8075aaa88c7347d09e80f4a12be65"
+    },
+    "parent_plan": "queue-r1-baa",
+    "original_plan_approved_without_edit": false,
+    "accepted_plan_text_changes": 5,
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "audited_task_success": true,
+    "cli_format_audit_changed_check": false,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 597265,
+      "output_tokens": 36051,
+      "cached_input_tokens": 535200
+    },
+    "tool_calls": 47,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "plan_deviations": null,
+    "all_phases_shutdown": true,
+    "task_success": true,
+    "public_test_success": true,
+    "hidden_test_success": true,
+    "private_passed": 73,
+    "private_total": 73,
+    "failed_checks": [],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 24,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regress.py",
+        "tmpdlzo8zdi/a.json",
+        "tmpdlzo8zdi/arr.json",
+        "tmpdlzo8zdi/badop.json",
+        "tmpdlzo8zdi/c.json",
+        "tmpdlzo8zdi/cb.json",
+        "tmpdlzo8zdi/done.json",
+        "tmpdlzo8zdi/extra.json",
+        "tmpdlzo8zdi/fb.json",
+        "tmpdlzo8zdi/g.json",
+        "tmpdlzo8zdi/l.json",
+        "tmpdlzo8zdi/mal.json",
+        "tmpdlzo8zdi/miss.json",
+        "tmpdlzo8zdi/q.db",
+        "tmpdlzo8zdi/rec.json",
+        "tmpdlzo8zdi/sb.json",
+        "tmpdlzo8zdi/utf8.json",
+        "tmpdlzo8zdi/val.json",
+        "tmpe0b0ifnv/q.db",
+        "tmpe0b0ifnv/req.json",
+        "tmpy1issa8c/a.json"
+      ],
+      "diff_bytes": 49804,
+      "diff_sha256": "e1e85f4ce0c83f0f2484de40a8644dee13f8f49d9222f46c1f0167123f053621"
+    },
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 16,
+      "exec_command": 18,
+      "lab_command_receipt": 7
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07cca-94d5-7e40-8e20-0e4d9bd667a0",
+        "started_ms": 1788800046261,
+        "ended_ms": 1788800298161,
+        "usage": {
+          "input_tokens": 354195,
+          "cached_input_tokens": 313134,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 26012,
+          "reasoning_output_tokens": 12732,
+          "total_tokens": 380207
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07cce-6d09-7d00-9e8d-20d9d6d8861a",
+        "started_ms": 1788800298232,
+        "ended_ms": 1788800405667,
+        "usage": {
+          "input_tokens": 243070,
+          "cached_input_tokens": 222066,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 10039,
+          "reasoning_output_tokens": 4796,
+          "total_tokens": 253109
+        },
+        "report_counts": {
+          "v1": 1,
+          "v2": 1,
+          "v3": 1
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "ac-submit",
+                "ac-views",
+                "ac-claim",
+                "ac-recover",
+                "ac-transitions"
+              ],
+              "call_id": "call_01a07ccef24770418b8a222d3fb30390",
+              "verification_id": "v1"
+            },
+            {
+              "acceptance_criteria": [
+                "ac-claim",
+                "ac-regress"
+              ],
+              "call_id": "call_01a07ccf082875129326070f2f33a098",
+              "verification_id": "v2"
+            },
+            {
+              "acceptance_criteria": [
+                "ac-cli"
+              ],
+              "call_id": "call_01a07ccfcc217942a7428ab620a2727e",
+              "verification_id": "v3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 359636
+  },
+  {
+    "id": "queue-r1-bab",
+    "block": 1,
+    "planner": "b",
+    "executor": "a",
+    "verifier": "b",
+    "workflow": "queue-bab-v1",
+    "parent": "queue-r1-baa",
+    "preparation_id": "queue-r1-bab-prepared",
+    "execution_id": "queue-r1-bab-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r1-bab/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r1-bab/fixture.json",
+    "run_id": "queue-r1-bab-edited-execution",
+    "target": {
+      "run_id": "queue-r1-bab-edited-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "41d966bb3d0558662c963ffb3587d041b62bdedc36542790757a262bc13b37dc",
+      "run_spec_sha256": "687bf801cb4d7052cac69d5fb97f870b901547924532c45d5f674905a6f46bfa"
+    },
+    "parent_plan": "queue-r1-baa",
+    "original_plan_approved_without_edit": false,
+    "accepted_plan_text_changes": 5,
+    "exit_code": 1,
+    "evaluation_exit_code": 0,
+    "audited_task_success": true,
+    "cli_format_audit_changed_check": false,
+    "workflow_state": "failed",
+    "terminal_change": {
+      "type": "failed",
+      "reason": "verification did not reference a completed host command"
+    },
+    "usage": {
+      "input_tokens": 2112674,
+      "output_tokens": 64431,
+      "cached_input_tokens": 2000516
+    },
+    "tool_calls": 80,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "plan_deviations": null,
+    "all_phases_shutdown": true,
+    "task_success": true,
+    "public_test_success": true,
+    "hidden_test_success": true,
+    "private_passed": 73,
+    "private_total": 73,
+    "failed_checks": [],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 4,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regress.py"
+      ],
+      "diff_bytes": 46801,
+      "diff_sha256": "7cbc3fdd9eaa6efc619b5e2788841069f2a6ef455cb9e0c27adbd129f89889cf"
+    },
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 16,
+      "exec_command": 49,
+      "lab_command_receipt": 9
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07cca-94d5-7e01-9227-d20faa8c93f9",
+        "started_ms": 1788800046261,
+        "ended_ms": 1788800445621,
+        "usage": {
+          "input_tokens": 1227604,
+          "cached_input_tokens": 1158176,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 41360,
+          "reasoning_output_tokens": 21395,
+          "total_tokens": 1268964
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07cd0-ad14-7f53-a46b-22b305982991",
+        "started_ms": 1788800445699,
+        "ended_ms": 1788800728243,
+        "usage": {
+          "input_tokens": 885070,
+          "cached_input_tokens": 842340,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 23071,
+          "reasoning_output_tokens": 13635,
+          "total_tokens": 908141
+        },
+        "report_counts": {
+          "v1": 1,
+          "v2": 1,
+          "v3": 1
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "ac-submit",
+                "ac-views",
+                "ac-claim",
+                "ac-recover",
+                "ac-transitions"
+              ],
+              "call_id": "e15d1e",
+              "verification_id": "v1"
+            },
+            {
+              "acceptance_criteria": [
+                "ac-claim",
+                "ac-recover",
+                "ac-regress"
+              ],
+              "call_id": "6f1b8c",
+              "verification_id": "v2"
+            },
+            {
+              "acceptance_criteria": [
+                "ac-cli",
+                "ac-regress"
+              ],
+              "call_id": "faa660",
+              "verification_id": "v3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 682114
+  },
+  {
+    "id": "queue-r1-bba",
+    "block": 1,
+    "planner": "b",
+    "executor": "b",
+    "verifier": "a",
+    "workflow": "queue-bba-v1",
+    "parent": "queue-r1-baa",
+    "preparation_id": "queue-r1-bba-prepared",
+    "execution_id": "queue-r1-bba-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r1-bba/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r1-bba/fixture.json",
+    "run_id": "queue-r1-bba-edited-execution",
+    "target": {
+      "run_id": "queue-r1-bba-edited-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "41d966bb3d0558662c963ffb3587d041b62bdedc36542790757a262bc13b37dc",
+      "run_spec_sha256": "e57a1db1ed5ceb2341642c57dd6a3f1825bf5742bb05c2fe7edd7cf5e5dd695b"
+    },
+    "parent_plan": "queue-r1-baa",
+    "original_plan_approved_without_edit": false,
+    "accepted_plan_text_changes": 5,
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "audited_task_success": false,
+    "cli_format_audit_changed_check": false,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 1562093,
+      "output_tokens": 40002,
+      "cached_input_tokens": 1490917
+    },
+    "tool_calls": 64,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "plan_deviations": null,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 25,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regress.py",
+        "tmplt0j2q8u/q.sqlite",
+        "tmplt0j2q8u/req-0cb8a9d8d8c94157869eea4e70058300.json",
+        "tmplt0j2q8u/req-1520cb8736e94b2c82fbde9f9fe42446.json",
+        "tmplt0j2q8u/req-3d8149f587434a2b83857f8939f00eb6.json",
+        "tmplt0j2q8u/req-3d94570e8a9e4d2fa652af4f7ed8981c.json",
+        "tmplt0j2q8u/req-49e8e15d39e341bfbadc7812f868094b.json",
+        "tmplt0j2q8u/req-49fdb668325c413db1b2117de9d34e8b.json",
+        "tmplt0j2q8u/req-656f9680835c4f8d85624e7ba85c5db1.json",
+        "tmplt0j2q8u/req-87fe9c8173c4493eb88213a4280267d3.json",
+        "tmplt0j2q8u/req-94f29d3b6c624320bd1fcc8464c65e75.json",
+        "tmplt0j2q8u/req-9d0f7e6af10743feb5b5feede7bc64f4.json",
+        "tmplt0j2q8u/req-9e65d744fc56421f8c06ffcfcbee8f36.json",
+        "tmplt0j2q8u/req-ace5c2b7014b4328ae0d1573f346c03c.json",
+        "tmplt0j2q8u/req-bccc0d424b2d485bb8a0f484dd72af49.json",
+        "tmplt0j2q8u/req-d3f0152c4a744624afadadc323c2123a.json",
+        "tmplt0j2q8u/req-d7ca4ded40b3454697d2fba8432e3ec3.json",
+        "tmplt0j2q8u/req-da2331bd9eff41e399d5fd8119d98500.json",
+        "tmplt0j2q8u/req-ddd64fc328b24727a60cc5624c941e09.json",
+        "tmplt0j2q8u/req-e57202ddbe27487fbca2e16642a5236a.json",
+        "tmplt0j2q8u/req-e8c2203b344e4ed3bd4d8d2b95950dfe.json",
+        "tmplt0j2q8u/req-f17f1dc981484bfa889fda8f519c50d1.json"
+      ],
+      "diff_bytes": 50268,
+      "diff_sha256": "5f4bb0bdccca4424e359f5caaaf6d8f9d03d7790855fbe4647a936b1a9ad2bf6"
+    },
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 12,
+      "exec_command": 43,
+      "lab_command_receipt": 3
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07cca-94d5-7c03-8a39-6ac744dbfe93",
+        "started_ms": 1788800046261,
+        "ended_ms": 1788800396290,
+        "usage": {
+          "input_tokens": 1479121,
+          "cached_input_tokens": 1421179,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 34307,
+          "reasoning_output_tokens": 15083,
+          "total_tokens": 1513428
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07ccf-ec98-7862-9090-c583c3a99081",
+        "started_ms": 1788800396402,
+        "ended_ms": 1788800470835,
+        "usage": {
+          "input_tokens": 82972,
+          "cached_input_tokens": 69738,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 5695,
+          "reasoning_output_tokens": 3239,
+          "total_tokens": 88667
+        },
+        "report_counts": {
+          "v1": 1,
+          "v2": 1,
+          "v3": 1
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "ac-submit",
+                "ac-views",
+                "ac-claim",
+                "ac-recover",
+                "ac-transitions",
+                "ac-cli",
+                "ac-regress"
+              ],
+              "call_id": "call_01a07cd027297f60af3670ce756a7df3",
+              "verification_id": "v1"
+            },
+            {
+              "acceptance_criteria": [
+                "ac-claim",
+                "ac-recover",
+                "ac-regress"
+              ],
+              "call_id": "call_01a07cd03ad2799290a00daf2bbb095e",
+              "verification_id": "v2"
+            },
+            {
+              "acceptance_criteria": [
+                "ac-cli",
+                "ac-transitions",
+                "ac-regress"
+              ],
+              "call_id": "call_01a07cd0a7b9768384917a1a633ef18b",
+              "verification_id": "v3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 424763
+  },
+  {
+    "id": "queue-r1-bbb",
+    "block": 1,
+    "planner": "b",
+    "executor": "b",
+    "verifier": "b",
+    "workflow": "queue-bbb-v1",
+    "parent": "queue-r1-baa",
+    "preparation_id": "queue-r1-bbb-prepared",
+    "execution_id": "queue-r1-bbb-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r1-bbb/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r1-bbb/fixture.json",
+    "run_id": "queue-r1-bbb-edited-execution",
+    "target": {
+      "run_id": "queue-r1-bbb-edited-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "41d966bb3d0558662c963ffb3587d041b62bdedc36542790757a262bc13b37dc",
+      "run_spec_sha256": "f31625af3c9ef9af69ee59f63fbc6c854bd9d561cc89f82c3c0b5a70ea8ea6e0"
+    },
+    "parent_plan": "queue-r1-baa",
+    "original_plan_approved_without_edit": false,
+    "accepted_plan_text_changes": 5,
+    "exit_code": 1,
+    "evaluation_exit_code": 0,
+    "audited_task_success": true,
+    "cli_format_audit_changed_check": false,
+    "workflow_state": "failed",
+    "terminal_change": {
+      "type": "failed",
+      "reason": "verification did not reference a completed host command"
+    },
+    "usage": {
+      "input_tokens": 1876890,
+      "output_tokens": 52641,
+      "cached_input_tokens": 1790732
+    },
+    "tool_calls": 84,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "plan_deviations": null,
+    "all_phases_shutdown": true,
+    "task_success": true,
+    "public_test_success": true,
+    "hidden_test_success": true,
+    "private_passed": 73,
+    "private_total": 73,
+    "failed_checks": [],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 4,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regress.py"
+      ],
+      "diff_bytes": 33548,
+      "diff_sha256": "2602f61a7c24288c876f3fa2f936e2038bf1bedabe79d933cbad16e507700398"
+    },
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 5,
+      "lab_repo_read": 11,
+      "exec_command": 62,
+      "lab_command_receipt": 6
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07cca-94d5-7fb2-8eb1-4d5dfa1bc890",
+        "started_ms": 1788800046261,
+        "ended_ms": 1788800401520,
+        "usage": {
+          "input_tokens": 1416072,
+          "cached_input_tokens": 1364468,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 33561,
+          "reasoning_output_tokens": 15451,
+          "total_tokens": 1449633
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07cd0-00e2-7ac1-8d90-9155e7465d83",
+        "started_ms": 1788800401598,
+        "ended_ms": 1788800622957,
+        "usage": {
+          "input_tokens": 460818,
+          "cached_input_tokens": 426264,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 19080,
+          "reasoning_output_tokens": 10546,
+          "total_tokens": 479898
+        },
+        "report_counts": {
+          "v1": 1,
+          "v2": 1,
+          "v3": 1
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "ac-submit",
+                "ac-views",
+                "ac-claim",
+                "ac-recover",
+                "ac-transitions"
+              ],
+              "call_id": "65f656",
+              "verification_id": "v1"
+            },
+            {
+              "acceptance_criteria": [
+                "ac-claim",
+                "ac-recover",
+                "ac-regress"
+              ],
+              "call_id": "50edde",
+              "verification_id": "v2"
+            },
+            {
+              "acceptance_criteria": [
+                "ac-cli"
+              ],
+              "call_id": "c67d8c",
+              "verification_id": "v3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 576809
+  },
+  {
+    "id": "queue-r2-aab",
+    "block": 2,
+    "planner": "a",
+    "executor": "a",
+    "verifier": "b",
+    "workflow": "queue-aab-v1",
+    "parent": "queue-r2-aaa",
+    "preparation_id": "queue-r2-aab-prepared",
+    "execution_id": "queue-r2-aab-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r2-aab/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r2-aab/fixture.json",
+    "run_id": "queue-r2-aab-execution",
+    "target": {
+      "run_id": "queue-r2-aab-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "2f4cc33c069cb7df820a8cfb17c079c618f82a3468a4638096b88db3e09e000c",
+      "run_spec_sha256": "25fe7a58326ad61044afb4542c77b09c4d47fba1d5300751fbbb956c045ed2e3"
+    },
+    "parent_plan": "queue-r2-aaa",
+    "original_plan_approved_without_edit": true,
+    "accepted_plan_text_changes": 0,
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "audited_task_success": true,
+    "cli_format_audit_changed_check": false,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 1323072,
+      "output_tokens": 47028,
+      "cached_input_tokens": 1242552
+    },
+    "tool_calls": 72,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "plan_deviations": null,
+    "all_phases_shutdown": true,
+    "task_success": true,
+    "public_test_success": true,
+    "hidden_test_success": true,
+    "private_passed": 73,
+    "private_total": 73,
+    "failed_checks": [],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 5,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_processes.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 53461,
+      "diff_sha256": "a8577797d8265d699420ff4ab097561a8383757152e91469e0af47253b84cd47"
+    },
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 14,
+      "exec_command": 34,
+      "lab_command_receipt": 18
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07cd0-119c-7402-afdb-87dafb55675b",
+        "started_ms": 1788800405884,
+        "ended_ms": 1788800653065,
+        "usage": {
+          "input_tokens": 348854,
+          "cached_input_tokens": 307246,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 27776,
+          "reasoning_output_tokens": 13070,
+          "total_tokens": 376630
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07cd3-d776-7400-b92c-b79235ba2775",
+        "started_ms": 1788800653138,
+        "ended_ms": 1788800888203,
+        "usage": {
+          "input_tokens": 974218,
+          "cached_input_tokens": 935306,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 19252,
+          "reasoning_output_tokens": 11094,
+          "total_tokens": 993470
+        },
+        "report_counts": {
+          "V1": 1,
+          "V2": 1,
+          "V3": 1
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "A1",
+                "A2",
+                "A3"
+              ],
+              "call_id": "call_01a07cd49cbc750195271d728b0ba5b2",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "A1"
+              ],
+              "call_id": "call_01a07cd49cbc750195271d728b0ba5b2",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "A2",
+                "A3"
+              ],
+              "call_id": "call_01a07cd49cbc750195271d728b0ba5b2",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 482481
+  },
+  {
+    "id": "queue-r2-aba",
+    "block": 2,
+    "planner": "a",
+    "executor": "b",
+    "verifier": "a",
+    "workflow": "queue-aba-v1",
+    "parent": "queue-r2-aaa",
+    "preparation_id": "queue-r2-aba-prepared",
+    "execution_id": "queue-r2-aba-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r2-aba/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r2-aba/fixture.json",
+    "run_id": "queue-r2-aba-execution",
+    "target": {
+      "run_id": "queue-r2-aba-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "2f4cc33c069cb7df820a8cfb17c079c618f82a3468a4638096b88db3e09e000c",
+      "run_spec_sha256": "51063a92e06c69f9ba4d4aa88250100c116df8ab53e68c2c3df986e826d9f2da"
+    },
+    "parent_plan": "queue-r2-aaa",
+    "original_plan_approved_without_edit": true,
+    "accepted_plan_text_changes": 0,
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "audited_task_success": true,
+    "cli_format_audit_changed_check": false,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 670775,
+      "output_tokens": 37426,
+      "cached_input_tokens": 608785
+    },
+    "tool_calls": 49,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "plan_deviations": null,
+    "all_phases_shutdown": true,
+    "task_success": true,
+    "public_test_success": true,
+    "hidden_test_success": true,
+    "private_passed": 73,
+    "private_total": 73,
+    "failed_checks": [],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 5,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_processes.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 38765,
+      "diff_sha256": "e6e83a7f1ed48a83d77d01fe80008607fa4d15f44dfa5bc06b40674908f752e8"
+    },
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 17,
+      "exec_command": 22,
+      "lab_command_receipt": 4
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07cd0-742b-7952-bcc6-eb2bb21cb033",
+        "started_ms": 1788800431107,
+        "ended_ms": 1788800699262,
+        "usage": {
+          "input_tokens": 498206,
+          "cached_input_tokens": 458309,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 27237,
+          "reasoning_output_tokens": 13315,
+          "total_tokens": 525443
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07cd4-8be9-73c2-9629-3ad2f405588a",
+        "started_ms": 1788800699338,
+        "ended_ms": 1788800813232,
+        "usage": {
+          "input_tokens": 172569,
+          "cached_input_tokens": 150476,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 10189,
+          "reasoning_output_tokens": 3253,
+          "total_tokens": 182758
+        },
+        "report_counts": {
+          "V1": 1,
+          "V2": 1,
+          "V3": 1
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "A1",
+                "A2",
+                "A3"
+              ],
+              "call_id": "call_01a07cd5219d78d0910d517acbaa3ea5",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "A1"
+              ],
+              "call_id": "call_01a07cd5b83c7be1b972d6b8908c2a77",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "A2",
+                "A3"
+              ],
+              "call_id": "call_01a07cd60fdf7ab2b53c2797310f2736",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 382376
+  },
+  {
+    "id": "queue-r2-abb",
+    "block": 2,
+    "planner": "a",
+    "executor": "b",
+    "verifier": "b",
+    "workflow": "queue-abb-v1",
+    "parent": "queue-r2-aaa",
+    "preparation_id": "queue-r2-abb-prepared",
+    "execution_id": "queue-r2-abb-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r2-abb/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r2-abb/fixture.json",
+    "run_id": "queue-r2-abb-execution",
+    "target": {
+      "run_id": "queue-r2-abb-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "2f4cc33c069cb7df820a8cfb17c079c618f82a3468a4638096b88db3e09e000c",
+      "run_spec_sha256": "bf8af6c28143e9971dcdc02f7745c56a4d94e7d589e7bba4e576faa37f58dd44"
+    },
+    "parent_plan": "queue-r2-aaa",
+    "original_plan_approved_without_edit": true,
+    "accepted_plan_text_changes": 0,
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "audited_task_success": false,
+    "cli_format_audit_changed_check": false,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 1692524,
+      "output_tokens": 51346,
+      "cached_input_tokens": 1607232
+    },
+    "tool_calls": 77,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "plan_deviations": null,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 5,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_processes.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 46645,
+      "diff_sha256": "9eddb4619355966928dc2601f984887328351910c514a3cdf6e9ba6f97e2ba33"
+    },
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 13,
+      "exec_command": 46,
+      "lab_command_receipt": 12
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07cd1-0ff7-7762-8a28-5655b116dee1",
+        "started_ms": 1788800471012,
+        "ended_ms": 1788800724764,
+        "usage": {
+          "input_tokens": 437563,
+          "cached_input_tokens": 395905,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 28671,
+          "reasoning_output_tokens": 14453,
+          "total_tokens": 466234
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07cd4-ef79-7131-8cfc-807c06aaebab",
+        "started_ms": 1788800724839,
+        "ended_ms": 1788801025259,
+        "usage": {
+          "input_tokens": 1254961,
+          "cached_input_tokens": 1211327,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 22675,
+          "reasoning_output_tokens": 11693,
+          "total_tokens": 1277636
+        },
+        "report_counts": {
+          "V1": 1,
+          "V2": 1,
+          "V3": 1
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "A1",
+                "A2",
+                "A3"
+              ],
+              "call_id": "call_01a07cd5ec4573a3ab818b13f7026966",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "A1"
+              ],
+              "call_id": "call_01a07cd5ec4573a3ab818b13f7026966",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "A2",
+                "A3"
+              ],
+              "call_id": "call_01a07cd5ec4573a3ab818b13f7026966",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 554507
+  },
+  {
+    "id": "queue-r2-baa",
+    "block": 2,
+    "planner": "b",
+    "executor": "a",
+    "verifier": "a",
+    "workflow": "queue-baa-v1",
+    "parent": null,
+    "preparation_id": "queue-r2-baa-prepared",
+    "execution_id": "queue-r2-baa-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r2-baa/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r2-baa/fixture.json",
+    "run_id": "queue-r2-baa-edited-execution",
+    "target": {
+      "run_id": "queue-r2-baa-edited-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "2a03422cc7cf39a67ff732aac55bcdd6d159389e4c631494cbf6b2700e0274a4",
+      "run_spec_sha256": "95f1c68f73bb25c511cfec15fdeeec9da6f8075aaa88c7347d09e80f4a12be65"
+    },
+    "parent_plan": "queue-r2-baa",
+    "original_plan_approved_without_edit": false,
+    "accepted_plan_text_changes": 1,
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "audited_task_success": false,
+    "cli_format_audit_changed_check": false,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 488122,
+      "output_tokens": 32594,
+      "cached_input_tokens": 394234
+    },
+    "tool_calls": 37,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "plan_deviations": null,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 11,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_processes.py",
+        "tests/test_regression.py",
+        "tmp031d_kql/q.db",
+        "tmp031d_kql/req.json",
+        "tmp031d_kql/req2.json",
+        "tmp031d_kql/req3.json",
+        "tmp_v3check/q.db",
+        "tmp_v3check/req.json"
+      ],
+      "diff_bytes": 54449,
+      "diff_sha256": "d9cc9e943c7e7aed130d1b6efb225bdc40452e1c3dcfeaf4c312541ff661e059"
+    },
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 5,
+      "lab_repo_read": 10,
+      "exec_command": 17,
+      "lab_command_receipt": 5
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07cd1-5dec-71f3-b779-c7bb7dc515fc",
+        "started_ms": 1788800490950,
+        "ended_ms": 1788800741598,
+        "usage": {
+          "input_tokens": 372935,
+          "cached_input_tokens": 293678,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 25896,
+          "reasoning_output_tokens": 11507,
+          "total_tokens": 398831
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07cd5-313c-7a10-9aa3-307af28d5906",
+        "started_ms": 1788800741675,
+        "ended_ms": 1788800822491,
+        "usage": {
+          "input_tokens": 115187,
+          "cached_input_tokens": 100556,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 6698,
+          "reasoning_output_tokens": 3188,
+          "total_tokens": 121885
+        },
+        "report_counts": {
+          "V1": 1,
+          "V2": 1,
+          "V3": 1
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "AC1",
+                "AC2",
+                "AC3",
+                "AC4",
+                "AC5",
+                "AC6"
+              ],
+              "call_id": "call_01a07cd5543f7ca3bca6a6c6769454a4",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "AC3",
+                "AC6"
+              ],
+              "call_id": "call_01a07cd580b77602b896f5e6ded38f21",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "AC6"
+              ],
+              "call_id": "call_01a07cd641e27cf3b7ef259143b3e4b4",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 331700
+  },
+  {
+    "id": "queue-r2-bab",
+    "block": 2,
+    "planner": "b",
+    "executor": "a",
+    "verifier": "b",
+    "workflow": "queue-bab-v1",
+    "parent": "queue-r2-baa",
+    "preparation_id": "queue-r2-bab-prepared",
+    "execution_id": "queue-r2-bab-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r2-bab/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r2-bab/fixture.json",
+    "run_id": "queue-r2-bab-edited-execution",
+    "target": {
+      "run_id": "queue-r2-bab-edited-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "2a03422cc7cf39a67ff732aac55bcdd6d159389e4c631494cbf6b2700e0274a4",
+      "run_spec_sha256": "687bf801cb4d7052cac69d5fb97f870b901547924532c45d5f674905a6f46bfa"
+    },
+    "parent_plan": "queue-r2-baa",
+    "original_plan_approved_without_edit": false,
+    "accepted_plan_text_changes": 1,
+    "exit_code": 1,
+    "evaluation_exit_code": 0,
+    "audited_task_success": false,
+    "cli_format_audit_changed_check": false,
+    "workflow_state": "failed",
+    "terminal_change": {
+      "type": "failed",
+      "reason": "verification did not reference a completed host command"
+    },
+    "usage": {
+      "input_tokens": 1429822,
+      "output_tokens": 52527,
+      "cached_input_tokens": 1347896
+    },
+    "tool_calls": 68,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "plan_deviations": null,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 5,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_processes.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 49309,
+      "diff_sha256": "eb2be6f83ca95a9c24d4fbba4c49881f4963c78a5c1053f1cee40d3e752649be"
+    },
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 13,
+      "exec_command": 41,
+      "lab_command_receipt": 8
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07cd1-d22d-7a73-be4b-437d4664540f",
+        "started_ms": 1788800520730,
+        "ended_ms": 1788800790741,
+        "usage": {
+          "input_tokens": 442253,
+          "cached_input_tokens": 402659,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 27612,
+          "reasoning_output_tokens": 13156,
+          "total_tokens": 469865
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07cd5-f14f-72d2-9d74-3b6467f6bed6",
+        "started_ms": 1788800790826,
+        "ended_ms": 1788801144611,
+        "usage": {
+          "input_tokens": 987569,
+          "cached_input_tokens": 945237,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 24915,
+          "reasoning_output_tokens": 13375,
+          "total_tokens": 1012484
+        },
+        "report_counts": {
+          "V1": 1,
+          "V2": 1,
+          "V3": 1
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "AC1",
+                "AC2",
+                "AC3",
+                "AC4",
+                "AC5",
+                "AC6"
+              ],
+              "call_id": "9ea73e",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "AC3",
+                "AC4",
+                "AC5",
+                "AC6"
+              ],
+              "call_id": "cf1e5d",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "AC6"
+              ],
+              "call_id": "744b95",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 623978
+  },
+  {
+    "id": "queue-r2-bba",
+    "block": 2,
+    "planner": "b",
+    "executor": "b",
+    "verifier": "a",
+    "workflow": "queue-bba-v1",
+    "parent": "queue-r2-baa",
+    "preparation_id": "queue-r2-bba-prepared",
+    "execution_id": "queue-r2-bba-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r2-bba/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r2-bba/fixture.json",
+    "run_id": "queue-r2-bba-edited-execution",
+    "target": {
+      "run_id": "queue-r2-bba-edited-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "2a03422cc7cf39a67ff732aac55bcdd6d159389e4c631494cbf6b2700e0274a4",
+      "run_spec_sha256": "e57a1db1ed5ceb2341642c57dd6a3f1825bf5742bb05c2fe7edd7cf5e5dd695b"
+    },
+    "parent_plan": "queue-r2-baa",
+    "original_plan_approved_without_edit": false,
+    "accepted_plan_text_changes": 1,
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "audited_task_success": false,
+    "cli_format_audit_changed_check": true,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 725036,
+      "output_tokens": 40128,
+      "cached_input_tokens": 664480
+    },
+    "tool_calls": 42,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "plan_deviations": null,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 70,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "durable_views",
+        "mode": "cli"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 7,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_processes.py",
+        "tests/test_regression.py",
+        "tmph6tgqv_7/q.db",
+        "tmph6tgqv_7/req.json"
+      ],
+      "diff_bytes": 48729,
+      "diff_sha256": "a76c0a6bd5d3ee2271c1ae24c2512f57cb8792d53adcced0b78aeab455e9fcf3"
+    },
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 9,
+      "exec_command": 23,
+      "lab_command_receipt": 4
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07cd3-61e7-7d02-859d-92c21945a4ab",
+        "started_ms": 1788800623061,
+        "ended_ms": 1788800916518,
+        "usage": {
+          "input_tokens": 634109,
+          "cached_input_tokens": 586934,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 34101,
+          "reasoning_output_tokens": 18492,
+          "total_tokens": 668210
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07cd7-dc7e-70e2-818a-2b725652628d",
+        "started_ms": 1788800916589,
+        "ended_ms": 1788800979046,
+        "usage": {
+          "input_tokens": 90927,
+          "cached_input_tokens": 77546,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 6027,
+          "reasoning_output_tokens": 3068,
+          "total_tokens": 96954
+        },
+        "report_counts": {
+          "V1": 1,
+          "V2": 1,
+          "V3": 1
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "AC1",
+                "AC2",
+                "AC3",
+                "AC4",
+                "AC5",
+                "AC6"
+              ],
+              "call_id": "call_01a07cd805aa7560b599e9bc559dd137",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "AC3",
+                "AC6"
+              ],
+              "call_id": "call_01a07cd81fff780092c1d725de46e57e",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "AC6"
+              ],
+              "call_id": "call_01a07cd88f517212b030162336f4ef1c",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 356136
+  },
+  {
+    "id": "queue-r2-bbb",
+    "block": 2,
+    "planner": "b",
+    "executor": "b",
+    "verifier": "b",
+    "workflow": "queue-bbb-v1",
+    "parent": "queue-r2-baa",
+    "preparation_id": "queue-r2-bbb-prepared",
+    "execution_id": "queue-r2-bbb-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r2-bbb/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r2-bbb/fixture.json",
+    "run_id": "queue-r2-bbb-edited-execution",
+    "target": {
+      "run_id": "queue-r2-bbb-edited-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "2a03422cc7cf39a67ff732aac55bcdd6d159389e4c631494cbf6b2700e0274a4",
+      "run_spec_sha256": "f31625af3c9ef9af69ee59f63fbc6c854bd9d561cc89f82c3c0b5a70ea8ea6e0"
+    },
+    "parent_plan": "queue-r2-baa",
+    "original_plan_approved_without_edit": false,
+    "accepted_plan_text_changes": 1,
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "audited_task_success": false,
+    "cli_format_audit_changed_check": false,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 1377240,
+      "output_tokens": 43053,
+      "cached_input_tokens": 1293240
+    },
+    "tool_calls": 63,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "plan_deviations": null,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 5,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_processes.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 47781,
+      "diff_sha256": "99756557d4edb42e4ebab93e678885df7afb673c43fb6f6cc9f82437d8353db8"
+    },
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 9,
+      "exec_command": 39,
+      "lab_command_receipt": 9
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07cd3-8a39-79f2-9e04-4b3c45431c6e",
+        "started_ms": 1788800633383,
+        "ended_ms": 1788800943096,
+        "usage": {
+          "input_tokens": 834893,
+          "cached_input_tokens": 783851,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 31782,
+          "reasoning_output_tokens": 16688,
+          "total_tokens": 866675
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07cd8-444e-7d33-9f78-720d6f2e97fd",
+        "started_ms": 1788800943165,
+        "ended_ms": 1788801101599,
+        "usage": {
+          "input_tokens": 542347,
+          "cached_input_tokens": 509389,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 11271,
+          "reasoning_output_tokens": 4375,
+          "total_tokens": 553618
+        },
+        "report_counts": {
+          "V1": 1,
+          "V2": 1,
+          "V3": 1
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "AC1",
+                "AC2",
+                "AC3",
+                "AC4",
+                "AC5"
+              ],
+              "call_id": "call_01a07cd9d6a77f70938f6c58d08bab88",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "AC3",
+                "AC6"
+              ],
+              "call_id": "call_01a07cd9f744781389bcc79e8954a047",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "AC6"
+              ],
+              "call_id": "call_01a07cda8a1374d18db20669f72376f3",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 468383
+  },
+  {
+    "id": "queue-r2-aaa",
+    "block": 2,
+    "planner": "a",
+    "executor": "a",
+    "verifier": "a",
+    "workflow": "queue-aaa-v1",
+    "parent": null,
+    "preparation_id": "queue-r2-aaa-prepared",
+    "execution_id": "queue-r2-aaa-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r2-aaa/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r2-aaa/fixture.json",
+    "run_id": "queue-r2-aaa-execution",
+    "target": {
+      "run_id": "queue-r2-aaa-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "2f4cc33c069cb7df820a8cfb17c079c618f82a3468a4638096b88db3e09e000c",
+      "run_spec_sha256": "db9dc96570f921507ed6448da398bd672d563fe7a2c8d57825ab1de0752b3663"
+    },
+    "parent_plan": "queue-r2-aaa",
+    "original_plan_approved_without_edit": true,
+    "accepted_plan_text_changes": 0,
+    "exit_code": 1,
+    "evaluation_exit_code": 0,
+    "audited_task_success": false,
+    "cli_format_audit_changed_check": false,
+    "workflow_state": "failed",
+    "terminal_change": {
+      "type": "failed",
+      "reason": "unknown acceptance criterion"
+    },
+    "usage": {
+      "input_tokens": 784700,
+      "output_tokens": 42072,
+      "cached_input_tokens": 718007
+    },
+    "tool_calls": 51,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "plan_deviations": null,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 5,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_processes.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 45308,
+      "diff_sha256": "e9f0339068915cfe6fedba5918f64f2c23c00e83261c6e5c2bdc49be90ac4b5b"
+    },
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 12,
+      "exec_command": 24,
+      "lab_command_receipt": 9
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07cd4-fd65-7190-a595-e45024da2d7d",
+        "started_ms": 1788800728381,
+        "ended_ms": 1788801008376,
+        "usage": {
+          "input_tokens": 512871,
+          "cached_input_tokens": 466915,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 30573,
+          "reasoning_output_tokens": 14430,
+          "total_tokens": 543444
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07cd9-4353-7921-a5c8-717588bdebce",
+        "started_ms": 1788801008450,
+        "ended_ms": 1788801151843,
+        "usage": {
+          "input_tokens": 271829,
+          "cached_input_tokens": 251092,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 11499,
+          "reasoning_output_tokens": 6893,
+          "total_tokens": 283328
+        },
+        "report_counts": {
+          "V1": 1,
+          "V2": 1,
+          "V3": 1
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "A1",
+                "A2",
+                "A3"
+              ],
+              "call_id": "call_01a07cd9ab167252bf6a22731861e0e0",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "A1-distinct-V2-receipt-unavailable-host-ambiguous-shared-V1-receipt-covers-contract-matrix-21-tests-OK-exploratory-matrix-preview-had-test-expectation-bug-no-host-receipt"
+              ],
+              "call_id": "call_01a07cd9ab167252bf6a22731861e0e0",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "A2-distinct-V3-receipt-unavailable-host-ambiguous",
+                "A3-distinct-V3-receipt-unavailable-host-ambiguous-shared-V1-receipt-includes-4-process-tests-OK-per-preview"
+              ],
+              "call_id": "call_01a07cd9ab167252bf6a22731861e0e0",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 423558
+  },
+  {
+    "id": "queue-r3-baa",
+    "block": 3,
+    "planner": "b",
+    "executor": "a",
+    "verifier": "a",
+    "workflow": "queue-baa-v1",
+    "parent": null,
+    "preparation_id": "queue-r3-baa-prepared",
+    "execution_id": "queue-r3-baa-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r3-baa/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r3-baa/fixture.json",
+    "run_id": "queue-r3-baa-edited-execution",
+    "target": {
+      "run_id": "queue-r3-baa-edited-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "5c0857508221ba570cedb4da63dd74e3d5e322a7cded5394fec1136a9feff212",
+      "run_spec_sha256": "95f1c68f73bb25c511cfec15fdeeec9da6f8075aaa88c7347d09e80f4a12be65"
+    },
+    "parent_plan": "queue-r3-baa",
+    "original_plan_approved_without_edit": false,
+    "accepted_plan_text_changes": 2,
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "audited_task_success": true,
+    "cli_format_audit_changed_check": false,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 521632,
+      "output_tokens": 29842,
+      "cached_input_tokens": 466961
+    },
+    "tool_calls": 48,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "plan_deviations": null,
+    "all_phases_shutdown": true,
+    "task_success": true,
+    "public_test_success": true,
+    "hidden_test_success": true,
+    "private_passed": 73,
+    "private_total": 73,
+    "failed_checks": [],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 4,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 41350,
+      "diff_sha256": "f9b26b572cac649e71dbc5789cfe6734462e44a7fc8a7720d199a58bcb425bdb"
+    },
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 15,
+      "exec_command": 18,
+      "lab_command_receipt": 9
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07cd6-49d3-7780-9e56-f7be4f3c81f4",
+        "started_ms": 1788800813483,
+        "ended_ms": 1788800947385,
+        "usage": {
+          "input_tokens": 230535,
+          "cached_input_tokens": 198476,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 20268,
+          "reasoning_output_tokens": 8700,
+          "total_tokens": 250803
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07cd8-5514-7883-ba4e-4b61ef603bc0",
+        "started_ms": 1788800947452,
+        "ended_ms": 1788801065891,
+        "usage": {
+          "input_tokens": 291097,
+          "cached_input_tokens": 268485,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 9574,
+          "reasoning_output_tokens": 4936,
+          "total_tokens": 300671
+        },
+        "report_counts": {
+          "V1": 1,
+          "V2": 1,
+          "V3": 1
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "AC1",
+                "AC2",
+                "AC3",
+                "AC4"
+              ],
+              "call_id": "call_01a07cd9a4b576f28df7c699fb3bade9",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "AC1",
+                "AC2",
+                "AC3"
+              ],
+              "call_id": "call_01a07cd9bbca7890917b93dbab2f5ca8",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "AC2",
+                "AC3",
+                "AC4"
+              ],
+              "call_id": "call_01a07cd9e63f7f219a28e2b4211e8179",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 252662
+  },
+  {
+    "id": "queue-r3-bab",
+    "block": 3,
+    "planner": "b",
+    "executor": "a",
+    "verifier": "b",
+    "workflow": "queue-bab-v1",
+    "parent": "queue-r3-baa",
+    "preparation_id": "queue-r3-bab-prepared",
+    "execution_id": "queue-r3-bab-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r3-bab/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r3-bab/fixture.json",
+    "run_id": "queue-r3-bab-edited-execution",
+    "target": {
+      "run_id": "queue-r3-bab-edited-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "5c0857508221ba570cedb4da63dd74e3d5e322a7cded5394fec1136a9feff212",
+      "run_spec_sha256": "687bf801cb4d7052cac69d5fb97f870b901547924532c45d5f674905a6f46bfa"
+    },
+    "parent_plan": "queue-r3-baa",
+    "original_plan_approved_without_edit": false,
+    "accepted_plan_text_changes": 2,
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "audited_task_success": true,
+    "cli_format_audit_changed_check": false,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 1314694,
+      "output_tokens": 53128,
+      "cached_input_tokens": 1222516
+    },
+    "tool_calls": 70,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "plan_deviations": null,
+    "all_phases_shutdown": true,
+    "task_success": true,
+    "public_test_success": true,
+    "hidden_test_success": true,
+    "private_passed": 73,
+    "private_total": 73,
+    "failed_checks": [],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 4,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 53106,
+      "diff_sha256": "eadc1e14460c1cb35682180697e7a7733ff412562442747bb987c83ed26a26e2"
+    },
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 16,
+      "exec_command": 28,
+      "lab_command_receipt": 20
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07cd6-6d87-7740-88fe-8f7efde9ebf3",
+        "started_ms": 1788800822644,
+        "ended_ms": 1788801102720,
+        "usage": {
+          "input_tokens": 598433,
+          "cached_input_tokens": 542292,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 32098,
+          "reasoning_output_tokens": 12320,
+          "total_tokens": 630531
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07cda-b3e4-7a12-97b2-b1ceb47373b3",
+        "started_ms": 1788801102803,
+        "ended_ms": 1788801346635,
+        "usage": {
+          "input_tokens": 716261,
+          "cached_input_tokens": 680224,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 21030,
+          "reasoning_output_tokens": 13895,
+          "total_tokens": 737291
+        },
+        "report_counts": {
+          "V1": 1,
+          "V2": 1,
+          "V3": 1
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "AC1",
+                "AC2",
+                "AC3",
+                "AC4"
+              ],
+              "call_id": "call_01a07cdbe5647c61a493ad0afbcb32a0",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "AC1",
+                "AC2",
+                "AC3"
+              ],
+              "call_id": "call_01a07cdbe5647c61a493ad0afbcb32a0",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "AC3",
+                "AC4"
+              ],
+              "call_id": "call_01a07cdbe5647c61a493ad0afbcb32a0",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 524247
+  },
+  {
+    "id": "queue-r3-bba",
+    "block": 3,
+    "planner": "b",
+    "executor": "b",
+    "verifier": "a",
+    "workflow": "queue-bba-v1",
+    "parent": "queue-r3-baa",
+    "preparation_id": "queue-r3-bba-prepared",
+    "execution_id": "queue-r3-bba-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r3-bba/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r3-bba/fixture.json",
+    "run_id": "queue-r3-bba-edited-execution",
+    "target": {
+      "run_id": "queue-r3-bba-edited-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "5c0857508221ba570cedb4da63dd74e3d5e322a7cded5394fec1136a9feff212",
+      "run_spec_sha256": "e57a1db1ed5ceb2341642c57dd6a3f1825bf5742bb05c2fe7edd7cf5e5dd695b"
+    },
+    "parent_plan": "queue-r3-baa",
+    "original_plan_approved_without_edit": false,
+    "accepted_plan_text_changes": 2,
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "audited_task_success": false,
+    "cli_format_audit_changed_check": false,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 1160149,
+      "output_tokens": 50276,
+      "cached_input_tokens": 1082160
+    },
+    "tool_calls": 62,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "plan_deviations": null,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 4,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 48029,
+      "diff_sha256": "9e38cc7c4645e411293ebe077bb74431cbdd63b98166cd5a8e6f9d964210d8b4"
+    },
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 14,
+      "exec_command": 33,
+      "lab_command_receipt": 9
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07cd7-6e42-7aa3-b202-9185e2858562",
+        "started_ms": 1788800888368,
+        "ended_ms": 1788801220885,
+        "usage": {
+          "input_tokens": 882717,
+          "cached_input_tokens": 827115,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 40205,
+          "reasoning_output_tokens": 20238,
+          "total_tokens": 922922
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07cdc-8179-7c52-bff5-1b16a840f9dd",
+        "started_ms": 1788801220967,
+        "ended_ms": 1788801374781,
+        "usage": {
+          "input_tokens": 277432,
+          "cached_input_tokens": 255045,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 10071,
+          "reasoning_output_tokens": 5014,
+          "total_tokens": 287503
+        },
+        "report_counts": {
+          "V1": 1,
+          "V2": 1,
+          "V3": 1
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "AC1",
+                "AC2",
+                "AC3",
+                "AC4"
+              ],
+              "call_id": "call_01a07cde0d1d77f293923778eb4a4021",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "AC1",
+                "AC2",
+                "AC3"
+              ],
+              "call_id": "call_01a07cddce537d70af227a9f90395fa4",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "AC2",
+                "AC3",
+                "AC4"
+              ],
+              "call_id": "call_01a07cde23637a4382375675cc8c2d86",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 486569
+  },
+  {
+    "id": "queue-r3-bbb",
+    "block": 3,
+    "planner": "b",
+    "executor": "b",
+    "verifier": "b",
+    "workflow": "queue-bbb-v1",
+    "parent": "queue-r3-baa",
+    "preparation_id": "queue-r3-bbb-prepared",
+    "execution_id": "queue-r3-bbb-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r3-bbb/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r3-bbb/fixture.json",
+    "run_id": "queue-r3-bbb-edited-execution",
+    "target": {
+      "run_id": "queue-r3-bbb-edited-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "5c0857508221ba570cedb4da63dd74e3d5e322a7cded5394fec1136a9feff212",
+      "run_spec_sha256": "f31625af3c9ef9af69ee59f63fbc6c854bd9d561cc89f82c3c0b5a70ea8ea6e0"
+    },
+    "parent_plan": "queue-r3-baa",
+    "original_plan_approved_without_edit": false,
+    "accepted_plan_text_changes": 2,
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "audited_task_success": false,
+    "cli_format_audit_changed_check": false,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 1582362,
+      "output_tokens": 59204,
+      "cached_input_tokens": 1408869
+    },
+    "tool_calls": 69,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "plan_deviations": null,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 4,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 51254,
+      "diff_sha256": "7644ae77006d5762e1f7e6ade95935709f002bb695fdec0e6bfa3dc8f9c64ada"
+    },
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 15,
+      "exec_command": 37,
+      "lab_command_receipt": 11
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07cd8-d110-7ab3-a934-5b535adb4992",
+        "started_ms": 1788800979198,
+        "ended_ms": 1788801309797,
+        "usage": {
+          "input_tokens": 727870,
+          "cached_input_tokens": 640566,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 36856,
+          "reasoning_output_tokens": 19576,
+          "total_tokens": 764726
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07cdd-dcf3-7e12-8a91-1f33a2dd3732",
+        "started_ms": 1788801309906,
+        "ended_ms": 1788801592225,
+        "usage": {
+          "input_tokens": 854492,
+          "cached_input_tokens": 768303,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 22348,
+          "reasoning_output_tokens": 15694,
+          "total_tokens": 876840
+        },
+        "report_counts": {
+          "V1": 1,
+          "V2": 1,
+          "V3": 1
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "AC1",
+                "AC2",
+                "AC3",
+                "AC4"
+              ],
+              "call_id": "call_01a07cdf833374c19344a52a81517b39",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "AC1",
+                "AC2",
+                "AC3"
+              ],
+              "call_id": "call_01a07cdf833374c19344a52a81517b39",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "AC2",
+                "AC3",
+                "AC4"
+              ],
+              "call_id": "call_01a07cdf833374c19344a52a81517b39",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 613316
+  },
+  {
+    "id": "queue-r4-abb",
+    "block": 4,
+    "planner": "a",
+    "executor": "b",
+    "verifier": "b",
+    "workflow": "queue-abb-v1",
+    "parent": "queue-r4-aaa",
+    "preparation_id": "queue-r4-abb-prepared",
+    "execution_id": "queue-r4-abb-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r4-abb/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r4-abb/fixture.json",
+    "run_id": "queue-r4-abb-edited-execution",
+    "target": {
+      "run_id": "queue-r4-abb-edited-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "5b43b778679e693f6c6b18be2b1c1d9a6d7a1d923b36fff775e001117876ee8b",
+      "run_spec_sha256": "bf8af6c28143e9971dcdc02f7745c56a4d94e7d589e7bba4e576faa37f58dd44"
+    },
+    "parent_plan": "queue-r4-aaa",
+    "original_plan_approved_without_edit": false,
+    "accepted_plan_text_changes": 2,
+    "exit_code": 1,
+    "evaluation_exit_code": 0,
+    "audited_task_success": true,
+    "cli_format_audit_changed_check": false,
+    "workflow_state": "failed",
+    "terminal_change": {
+      "type": "failed",
+      "reason": "verification did not reference a completed host command"
+    },
+    "usage": {
+      "input_tokens": 1309315,
+      "output_tokens": 55006,
+      "cached_input_tokens": 1216131
+    },
+    "tool_calls": 66,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "plan_deviations": null,
+    "all_phases_shutdown": true,
+    "task_success": true,
+    "public_test_success": true,
+    "hidden_test_success": true,
+    "private_passed": 73,
+    "private_total": 73,
+    "failed_checks": [],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 4,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 46213,
+      "diff_sha256": "61111abe671a83c3c20410d00f3be6d7108b1b733b5c93c8cb162701becbc81b"
+    },
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 15,
+      "exec_command": 40,
+      "lab_command_receipt": 5
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07cd9-8629-75f0-b745-db260587b117",
+        "started_ms": 1788801025537,
+        "ended_ms": 1788801364257,
+        "usage": {
+          "input_tokens": 731585,
+          "cached_input_tokens": 677626,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 34980,
+          "reasoning_output_tokens": 17992,
+          "total_tokens": 766565
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07cde-b17e-7080-996c-e3dac4e5a573",
+        "started_ms": 1788801364333,
+        "ended_ms": 1788801495829,
+        "usage": {
+          "input_tokens": 577730,
+          "cached_input_tokens": 538505,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 20026,
+          "reasoning_output_tokens": 8171,
+          "total_tokens": 597756
+        },
+        "report_counts": {
+          "v-unittest": 1,
+          "v-api-matrix": 1,
+          "v-cli-matrix": 1
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "ac-submit",
+                "ac-transitions",
+                "ac-cli",
+                "ac-tests"
+              ],
+              "call_id": "c39f1e",
+              "verification_id": "v-unittest"
+            },
+            {
+              "acceptance_criteria": [
+                "ac-submit",
+                "ac-transitions"
+              ],
+              "call_id": "2750e5",
+              "verification_id": "v-api-matrix"
+            },
+            {
+              "acceptance_criteria": [
+                "ac-cli",
+                "ac-tests"
+              ],
+              "call_id": "50afce",
+              "verification_id": "v-cli-matrix"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 470401
+  },
+  {
+    "id": "queue-r4-baa",
+    "block": 4,
+    "planner": "b",
+    "executor": "a",
+    "verifier": "a",
+    "workflow": "queue-baa-v1",
+    "parent": null,
+    "preparation_id": "queue-r4-baa-prepared",
+    "execution_id": "queue-r4-baa-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r4-baa/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r4-baa/fixture.json",
+    "run_id": "queue-r4-baa-edited-execution",
+    "target": {
+      "run_id": "queue-r4-baa-edited-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "4bbedb0c01e564ba45a4715d96292784b84639217de5fc39f0afd9757fc523ab",
+      "run_spec_sha256": "95f1c68f73bb25c511cfec15fdeeec9da6f8075aaa88c7347d09e80f4a12be65"
+    },
+    "parent_plan": "queue-r4-baa",
+    "original_plan_approved_without_edit": false,
+    "accepted_plan_text_changes": 1,
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "audited_task_success": true,
+    "cli_format_audit_changed_check": false,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 485954,
+      "output_tokens": 39986,
+      "cached_input_tokens": 424570
+    },
+    "tool_calls": 39,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "plan_deviations": null,
+    "all_phases_shutdown": true,
+    "task_success": true,
+    "public_test_success": true,
+    "hidden_test_success": true,
+    "private_passed": 73,
+    "private_total": 73,
+    "failed_checks": [],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 13,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py",
+        "tmp24y3yyop/req.json",
+        "tmp3ws4nuky/req.json",
+        "tmp4np2xz1o/req.json",
+        "tmp_6gnda1i/req.json",
+        "tmphz5id8fv/req.json",
+        "tmpmnz83j7c/req.json",
+        "tmpq79jh8vb/req.json",
+        "tmpx7s5xrd7/req.json",
+        "tmpxtfaujoc/req.json"
+      ],
+      "diff_bytes": 48231,
+      "diff_sha256": "5b7d3aa7e91bb9dd3b2b8c7c6b7a128a5a0599f01c6b2f341c8af6762aed3a55"
+    },
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 13,
+      "exec_command": 15,
+      "lab_command_receipt": 5
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07cda-24c4-7ae2-884f-85babaf10d13",
+        "started_ms": 1788801066142,
+        "ended_ms": 1788801308182,
+        "usage": {
+          "input_tokens": 300739,
+          "cached_input_tokens": 260669,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 27583,
+          "reasoning_output_tokens": 15261,
+          "total_tokens": 328322
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07cdd-d66c-7ab1-b772-612d602bae8a",
+        "started_ms": 1788801308250,
+        "ended_ms": 1788801422145,
+        "usage": {
+          "input_tokens": 185215,
+          "cached_input_tokens": 163901,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 12403,
+          "reasoning_output_tokens": 5051,
+          "total_tokens": 197618
+        },
+        "report_counts": {
+          "V1": 1,
+          "V2": 1,
+          "V3": 1
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "A1",
+                "A2",
+                "A3",
+                "A4"
+              ],
+              "call_id": "call_01a07cde93957c90b6e4671588d9db35",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "A2",
+                "A3",
+                "A4"
+              ],
+              "call_id": "call_01a07cdf0ff276c399e0678ce7e38f29",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "A1",
+                "A2",
+                "A3",
+                "A4"
+              ],
+              "call_id": "call_01a07cdf47467b308683bbe5272c1b77",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 356186
+  },
+  {
+    "id": "queue-r4-bab",
+    "block": 4,
+    "planner": "b",
+    "executor": "a",
+    "verifier": "b",
+    "workflow": "queue-bab-v1",
+    "parent": "queue-r4-baa",
+    "preparation_id": "queue-r4-bab-prepared",
+    "execution_id": "queue-r4-bab-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r4-bab/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r4-bab/fixture.json",
+    "run_id": "queue-r4-bab-edited-execution",
+    "target": {
+      "run_id": "queue-r4-bab-edited-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "4bbedb0c01e564ba45a4715d96292784b84639217de5fc39f0afd9757fc523ab",
+      "run_spec_sha256": "687bf801cb4d7052cac69d5fb97f870b901547924532c45d5f674905a6f46bfa"
+    },
+    "parent_plan": "queue-r4-baa",
+    "original_plan_approved_without_edit": false,
+    "accepted_plan_text_changes": 1,
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "audited_task_success": false,
+    "cli_format_audit_changed_check": false,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 1746612,
+      "output_tokens": 56914,
+      "cached_input_tokens": 1654976
+    },
+    "tool_calls": 79,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "plan_deviations": null,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 4,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 56129,
+      "diff_sha256": "17f15d3643b90c182955119afb555b4afea7669cfaf9023bccd450765f07b1a8"
+    },
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 7,
+      "lab_repo_read": 16,
+      "exec_command": 35,
+      "lab_command_receipt": 21
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07cda-afcb-7ed0-921a-31fda479315d",
+        "started_ms": 1788801101753,
+        "ended_ms": 1788801399351,
+        "usage": {
+          "input_tokens": 512362,
+          "cached_input_tokens": 467555,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 31794,
+          "reasoning_output_tokens": 15474,
+          "total_tokens": 544156
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07cdf-3a9c-7802-9184-a8087d7896ae",
+        "started_ms": 1788801399434,
+        "ended_ms": 1788801694157,
+        "usage": {
+          "input_tokens": 1234250,
+          "cached_input_tokens": 1187421,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 25120,
+          "reasoning_output_tokens": 12662,
+          "total_tokens": 1259370
+        },
+        "report_counts": {
+          "V1": 1,
+          "V2": 1,
+          "V3": 1
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "A1",
+                "A2",
+                "A3",
+                "A4"
+              ],
+              "call_id": "call_01a07ce05b1175538000d469b2f3990c",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "A2",
+                "A3",
+                "A4"
+              ],
+              "call_id": "call_01a07ce08d077dd3b33f5becb6ea9025",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "A1",
+                "A2",
+                "A3"
+              ],
+              "call_id": "call_01a07ce05b1175538000d469b2f3990c",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 592615
+  },
+  {
+    "id": "queue-r4-bba",
+    "block": 4,
+    "planner": "b",
+    "executor": "b",
+    "verifier": "a",
+    "workflow": "queue-bba-v1",
+    "parent": "queue-r4-baa",
+    "preparation_id": "queue-r4-bba-prepared",
+    "execution_id": "queue-r4-bba-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r4-bba/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r4-bba/fixture.json",
+    "run_id": "queue-r4-bba-edited-execution",
+    "target": {
+      "run_id": "queue-r4-bba-edited-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "4bbedb0c01e564ba45a4715d96292784b84639217de5fc39f0afd9757fc523ab",
+      "run_spec_sha256": "e57a1db1ed5ceb2341642c57dd6a3f1825bf5742bb05c2fe7edd7cf5e5dd695b"
+    },
+    "parent_plan": "queue-r4-baa",
+    "original_plan_approved_without_edit": false,
+    "accepted_plan_text_changes": 1,
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "audited_task_success": false,
+    "cli_format_audit_changed_check": false,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 1123687,
+      "output_tokens": 40864,
+      "cached_input_tokens": 1039852
+    },
+    "tool_calls": 59,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "plan_deviations": null,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 4,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 54227,
+      "diff_sha256": "2e29a51e0f9967e5baf40d361d1c119ca9aefcff78c7c6a205b54cb87351d0d3"
+    },
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 15,
+      "exec_command": 35,
+      "lab_command_receipt": 3
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07cdb-579b-78e1-99b6-6ba4802b5c5b",
+        "started_ms": 1788801144712,
+        "ended_ms": 1788801462943,
+        "usage": {
+          "input_tokens": 1022492,
+          "cached_input_tokens": 954242,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 33097,
+          "reasoning_output_tokens": 15572,
+          "total_tokens": 1055589
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07ce0-32fe-7311-b96f-57d95a2fbe36",
+        "started_ms": 1788801463020,
+        "ended_ms": 1788801558525,
+        "usage": {
+          "input_tokens": 101195,
+          "cached_input_tokens": 85610,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 7767,
+          "reasoning_output_tokens": 3365,
+          "total_tokens": 108962
+        },
+        "report_counts": {
+          "V1": 1,
+          "V2": 1,
+          "V3": 1
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "A1",
+                "A2",
+                "A3",
+                "A4"
+              ],
+              "call_id": "call_01a07ce0d1ff7230bbb75a51beb00927",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "A2",
+                "A3",
+                "A4"
+              ],
+              "call_id": "call_01a07ce1121f7a73b60031b910068180",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "A1",
+                "A2",
+                "A3"
+              ],
+              "call_id": "call_01a07ce14c0d7a53839c4cdb5032c5ac",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 413969
+  },
+  {
+    "id": "queue-r4-bbb",
+    "block": 4,
+    "planner": "b",
+    "executor": "b",
+    "verifier": "b",
+    "workflow": "queue-bbb-v1",
+    "parent": "queue-r4-baa",
+    "preparation_id": "queue-r4-bbb-prepared",
+    "execution_id": "queue-r4-bbb-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r4-bbb/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r4-bbb/fixture.json",
+    "run_id": "queue-r4-bbb-edited-execution",
+    "target": {
+      "run_id": "queue-r4-bbb-edited-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "4bbedb0c01e564ba45a4715d96292784b84639217de5fc39f0afd9757fc523ab",
+      "run_spec_sha256": "f31625af3c9ef9af69ee59f63fbc6c854bd9d561cc89f82c3c0b5a70ea8ea6e0"
+    },
+    "parent_plan": "queue-r4-baa",
+    "original_plan_approved_without_edit": false,
+    "accepted_plan_text_changes": 1,
+    "exit_code": 1,
+    "evaluation_exit_code": 0,
+    "audited_task_success": false,
+    "cli_format_audit_changed_check": false,
+    "workflow_state": "failed",
+    "terminal_change": {
+      "type": "failed",
+      "reason": "verification did not reference a completed host command"
+    },
+    "usage": {
+      "input_tokens": 1390262,
+      "output_tokens": 55320,
+      "cached_input_tokens": 1303879
+    },
+    "tool_calls": 70,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "plan_deviations": null,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 5,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py",
+        "tmp8e0rm76r/x"
+      ],
+      "diff_bytes": 47905,
+      "diff_sha256": "e04e8897ec343d9f281446b759e040d4e66435161ea2f7b8ad8efa35bf36dc94"
+    },
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 15,
+      "exec_command": 41,
+      "lab_command_receipt": 8
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07cdb-73c8-7643-b512-002a05489b19",
+        "started_ms": 1788801151925,
+        "ended_ms": 1788801482464,
+        "usage": {
+          "input_tokens": 685716,
+          "cached_input_tokens": 638217,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 34501,
+          "reasoning_output_tokens": 17359,
+          "total_tokens": 720217
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07ce0-7f41-70d0-913a-d38fc43f492c",
+        "started_ms": 1788801482544,
+        "ended_ms": 1788801714704,
+        "usage": {
+          "input_tokens": 704546,
+          "cached_input_tokens": 665662,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 20819,
+          "reasoning_output_tokens": 10308,
+          "total_tokens": 725365
+        },
+        "report_counts": {
+          "V1": 1,
+          "V2": 1,
+          "V3": 1
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "A1",
+                "A2",
+                "A3",
+                "A4"
+              ],
+              "call_id": "db0fce",
+              "verification_id": "V1"
+            },
+            {
+              "acceptance_criteria": [
+                "A2",
+                "A3",
+                "A4"
+              ],
+              "call_id": "d5ac28",
+              "verification_id": "V2"
+            },
+            {
+              "acceptance_criteria": [
+                "A1",
+                "A2",
+                "A3"
+              ],
+              "call_id": "cd569a",
+              "verification_id": "V3"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 562875
+  },
+  {
+    "id": "queue-r4-aaa",
+    "block": 4,
+    "planner": "a",
+    "executor": "a",
+    "verifier": "a",
+    "workflow": "queue-aaa-v1",
+    "parent": null,
+    "preparation_id": "queue-r4-aaa-prepared",
+    "execution_id": "queue-r4-aaa-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r4-aaa/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r4-aaa/fixture.json",
+    "run_id": "queue-r4-aaa-edited-execution",
+    "target": {
+      "run_id": "queue-r4-aaa-edited-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "5b43b778679e693f6c6b18be2b1c1d9a6d7a1d923b36fff775e001117876ee8b",
+      "run_spec_sha256": "db9dc96570f921507ed6448da398bd672d563fe7a2c8d57825ab1de0752b3663"
+    },
+    "parent_plan": "queue-r4-aaa",
+    "original_plan_approved_without_edit": false,
+    "accepted_plan_text_changes": 2,
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "audited_task_success": false,
+    "cli_format_audit_changed_check": false,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 1346872,
+      "output_tokens": 55771,
+      "cached_input_tokens": 1230309
+    },
+    "tool_calls": 69,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "plan_deviations": null,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 19,
+      "changed_files": [
+        "_api_check.py",
+        "_cli_check.py",
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py",
+        "tmp0yta5kd_/q.db",
+        "tmp21vkv52b/q.db",
+        "tmp3qpy2eh9/q.db",
+        "tmp4uiad2rl/q.db",
+        "tmp8rvgwl0z/q.db",
+        "tmpff4_xrqg/q.db",
+        "tmpfowmu73d/q.db",
+        "tmplub0naxt/q.db",
+        "tmpm7syz0l_/q.db",
+        "tmpm7syz0l_/r.json",
+        "tmpn0jowe6r/q.db",
+        "tmpo89vrwil/q.db",
+        "tmpw76y0tzm/q.db"
+      ],
+      "diff_bytes": 65186,
+      "diff_sha256": "2e46bde07db4c960e94b0e45a30fedf6042ff0c0f383c8ca869f5f49164f292f"
+    },
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 15,
+      "exec_command": 28,
+      "lab_command_receipt": 20
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07cde-6d66-7c02-aacf-a0c856a2f1f5",
+        "started_ms": 1788801346899,
+        "ended_ms": 1788801636535,
+        "usage": {
+          "input_tokens": 302944,
+          "cached_input_tokens": 260300,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 31911,
+          "reasoning_output_tokens": 18823,
+          "total_tokens": 334855
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07ce2-d914-7043-9208-cdd6dab2a0d2",
+        "started_ms": 1788801636611,
+        "ended_ms": 1788801911932,
+        "usage": {
+          "input_tokens": 1043928,
+          "cached_input_tokens": 970009,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 23860,
+          "reasoning_output_tokens": 13745,
+          "total_tokens": 1067788
+        },
+        "report_counts": {
+          "v-unittest": 1,
+          "v-api-matrix": 1,
+          "v-cli-matrix": 1
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "ac-submit",
+                "ac-transitions",
+                "ac-cli",
+                "ac-tests"
+              ],
+              "call_id": "call_01a07ce3d6e071b29d0d448aace201e7",
+              "verification_id": "v-unittest"
+            },
+            {
+              "acceptance_criteria": [
+                "ac-submit",
+                "ac-transitions"
+              ],
+              "call_id": "call_01a07ce3d6e071b29d0d448aace201e7",
+              "verification_id": "v-api-matrix"
+            },
+            {
+              "acceptance_criteria": [
+                "ac-cli",
+                "ac-tests"
+              ],
+              "call_id": "call_01a07ce3d6e071b29d0d448aace201e7",
+              "verification_id": "v-cli-matrix"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 565233
+  },
+  {
+    "id": "queue-r4-aab",
+    "block": 4,
+    "planner": "a",
+    "executor": "a",
+    "verifier": "b",
+    "workflow": "queue-aab-v1",
+    "parent": "queue-r4-aaa",
+    "preparation_id": "queue-r4-aab-prepared",
+    "execution_id": "queue-r4-aab-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r4-aab/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r4-aab/fixture.json",
+    "run_id": "queue-r4-aab-edited-execution",
+    "target": {
+      "run_id": "queue-r4-aab-edited-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "5b43b778679e693f6c6b18be2b1c1d9a6d7a1d923b36fff775e001117876ee8b",
+      "run_spec_sha256": "25fe7a58326ad61044afb4542c77b09c4d47fba1d5300751fbbb956c045ed2e3"
+    },
+    "parent_plan": "queue-r4-aaa",
+    "original_plan_approved_without_edit": false,
+    "accepted_plan_text_changes": 2,
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "audited_task_success": false,
+    "cli_format_audit_changed_check": false,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 1056606,
+      "output_tokens": 50380,
+      "cached_input_tokens": 983442
+    },
+    "tool_calls": 64,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "plan_deviations": null,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 71,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 17,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py",
+        "tmp2jwl3ny2/q.db",
+        "tmpcksw_0f1/q.db",
+        "tmpda_sustf/q.db",
+        "tmpf5ocfxwa/q.db",
+        "tmpgmm50y4z/q.db",
+        "tmpgmv97zma/q.db",
+        "tmpif3xcg4n/q.db",
+        "tmpk535_kn4/q.db",
+        "tmpoenneoob/q.db",
+        "tmpqqatzdn4/q.db",
+        "tmpuclb8134/q.db",
+        "tmpuf64psul/q.db",
+        "tmpy_tm4jza/q.db"
+      ],
+      "diff_bytes": 60659,
+      "diff_sha256": "ad06729e56cd582c92ee826fccb149aa68bb2239c08423ea8cd0495db83aa33b"
+    },
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 6,
+      "lab_repo_read": 14,
+      "exec_command": 23,
+      "lab_command_receipt": 21
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07cde-daea-78a0-b184-ff83fa7282ce",
+        "started_ms": 1788801374936,
+        "ended_ms": 1788801636914,
+        "usage": {
+          "input_tokens": 312572,
+          "cached_input_tokens": 274478,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 28867,
+          "reasoning_output_tokens": 14476,
+          "total_tokens": 341439
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07ce2-da86-7b21-b2b7-27544f871387",
+        "started_ms": 1788801636981,
+        "ended_ms": 1788801906631,
+        "usage": {
+          "input_tokens": 744034,
+          "cached_input_tokens": 708964,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 21513,
+          "reasoning_output_tokens": 14098,
+          "total_tokens": 765547
+        },
+        "report_counts": {
+          "v-unittest": 1,
+          "v-api-matrix": 1,
+          "v-cli-matrix": 1
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "ac-submit",
+                "ac-transitions",
+                "ac-cli",
+                "ac-tests"
+              ],
+              "call_id": "call_01a07ce3ac947bd1bf833e19a3c6c3fd",
+              "verification_id": "v-unittest"
+            },
+            {
+              "acceptance_criteria": [
+                "ac-submit",
+                "ac-transitions"
+              ],
+              "call_id": "call_01a07ce3ac947bd1bf833e19a3c6c3fd",
+              "verification_id": "v-api-matrix"
+            },
+            {
+              "acceptance_criteria": [
+                "ac-cli",
+                "ac-tests"
+              ],
+              "call_id": "call_01a07ce3ac947bd1bf833e19a3c6c3fd",
+              "verification_id": "v-cli-matrix"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 531898
+  },
+  {
+    "id": "queue-r4-aba",
+    "block": 4,
+    "planner": "a",
+    "executor": "b",
+    "verifier": "a",
+    "workflow": "queue-aba-v1",
+    "parent": "queue-r4-aaa",
+    "preparation_id": "queue-r4-aba-prepared",
+    "execution_id": "queue-r4-aba-execution",
+    "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r4-aba/repository",
+    "commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "fixture_manifest": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r4-aba/fixture.json",
+    "run_id": "queue-r4-aba-edited-execution",
+    "target": {
+      "run_id": "queue-r4-aba-edited-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "5b43b778679e693f6c6b18be2b1c1d9a6d7a1d923b36fff775e001117876ee8b",
+      "run_spec_sha256": "51063a92e06c69f9ba4d4aa88250100c116df8ab53e68c2c3df986e826d9f2da"
+    },
+    "parent_plan": "queue-r4-aaa",
+    "original_plan_approved_without_edit": false,
+    "accepted_plan_text_changes": 2,
+    "exit_code": 0,
+    "evaluation_exit_code": 0,
+    "audited_task_success": false,
+    "cli_format_audit_changed_check": true,
+    "workflow_state": "completed",
+    "terminal_change": {
+      "type": "completed"
+    },
+    "usage": {
+      "input_tokens": 1624019,
+      "output_tokens": 62393,
+      "cached_input_tokens": 1528105
+    },
+    "tool_calls": 65,
+    "phase_turns": 2,
+    "plan_amendments": 0,
+    "plan_deviations": null,
+    "all_phases_shutdown": true,
+    "task_success": false,
+    "public_test_success": true,
+    "hidden_test_success": false,
+    "private_passed": 70,
+    "private_total": 73,
+    "failed_checks": [
+      {
+        "case": "durable_views",
+        "mode": "cli"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "api"
+      },
+      {
+        "case": "json_type_idempotency",
+        "mode": "cli"
+      }
+    ],
+    "git": {
+      "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+      "files_changed": 4,
+      "changed_files": [
+        "durable_queue/__main__.py",
+        "durable_queue/queue.py",
+        "durable_queue/storage.py",
+        "tests/test_regression.py"
+      ],
+      "diff_bytes": 37939,
+      "diff_sha256": "67b53ae780c681115b6d3d51da83d4834888a75260ea79bfac454b74835c3b4b"
+    },
+    "approval_preceded_every_tool": true,
+    "tool_calls_by_name": {
+      "lab_repo_list": 5,
+      "lab_repo_read": 11,
+      "exec_command": 37,
+      "lab_command_receipt": 12
+    },
+    "phases": [
+      {
+        "phase": "implementation",
+        "epoch": 1,
+        "thread_id": "01a07cdf-93fb-7cc1-8ea7-42923fb4932b",
+        "started_ms": 1788801422314,
+        "ended_ms": 1788801778961,
+        "usage": {
+          "input_tokens": 852506,
+          "cached_input_tokens": 798345,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 36155,
+          "reasoning_output_tokens": 22075,
+          "total_tokens": 888661
+        }
+      },
+      {
+        "phase": "verification",
+        "epoch": 2,
+        "thread_id": "01a07ce5-059f-79d0-adba-e2a6bec052a5",
+        "started_ms": 1788801779069,
+        "ended_ms": 1788802041283,
+        "usage": {
+          "input_tokens": 771513,
+          "cached_input_tokens": 729760,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 26238,
+          "reasoning_output_tokens": 14736,
+          "total_tokens": 797751
+        },
+        "report_counts": {
+          "v-unittest": 1,
+          "v-api-matrix": 1,
+          "v-cli-matrix": 1
+        },
+        "report": {
+          "checks": [
+            {
+              "acceptance_criteria": [
+                "ac-submit",
+                "ac-transitions",
+                "ac-cli",
+                "ac-tests"
+              ],
+              "call_id": "call_01a07ce5e96b7432abe24e99157af2b7",
+              "verification_id": "v-unittest"
+            },
+            {
+              "acceptance_criteria": [
+                "ac-submit",
+                "ac-transitions"
+              ],
+              "call_id": "call_01a07ce5e96b7432abe24e99157af2b7",
+              "verification_id": "v-api-matrix"
+            },
+            {
+              "acceptance_criteria": [
+                "ac-cli",
+                "ac-tests"
+              ],
+              "call_id": "call_01a07ce5e96b7432abe24e99157af2b7",
+              "verification_id": "v-cli-matrix"
+            }
+          ]
+        }
+      }
+    ],
+    "decision_to_exit_ms": 619132
+  }
+]

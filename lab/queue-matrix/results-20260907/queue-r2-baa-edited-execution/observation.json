@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "run": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r2-baa-edited-execution",
+  "workflow_state": "completed",
+  "terminal_change": {
+    "type": "completed"
+  },
+  "all_started_phases_shutdown": true,
+  "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r2-baa/repository",
+  "first_plan_human_approval": true,
+  "phase_turns": 2,
+  "planner_phases": 0,
+  "tool_admissions": 37,
+  "usage": {
+    "input_tokens": 488122,
+    "output_tokens": 32594,
+    "cached_input_tokens": 394234
+  },
+  "workflow_terminal_elapsed_ms": 796560,
+  "human_plan_edits": 0,
+  "plan_amendments": 0,
+  "plan_deviations": null,
+  "source_artifact_sha256": {
+    "events.jsonl": "747a3b2aaadf3eb29930ce5ecb5b975431de054e8dc1e162735a6c775ed91ec3",
+    "runtime-events.jsonl": "8744b46c15b87aba121e85989705f6f7a36a49c13e1821575e6e1607d0d6a099",
+    "evidence/input-01.json": "5c1afbdfa55a0503ae1a1e1c3eaafb08399a15bae96e507eae17e9bedd1047d3",
+    "evidence/phase-01.json": "2f825292fdef41fb448c4fcc5f9c2ff486402d68bbd78f1cd831469d96fe3e75",
+    "evidence/input-02.json": "9224b8850aea5a1dcd7641de5a1ef424117208ade4f46618c4d803b575277ed5",
+    "evidence/phase-02.json": "2743cd00c4ece59ee12efef6651e3a855f9d0248f53dcfdc549961437e24438b",
+    "config/run-spec.json": "510cf37a07c4a42b4751d1d9a449a9b9476e7bfaed418a61f0cda28b01974da5"
+  },
+  "authority_restored": false,
+  "git": {
+    "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "files_changed": 11,
+    "changed_files": [
+      "durable_queue/__main__.py",
+      "durable_queue/queue.py",
+      "durable_queue/storage.py",
+      "tests/test_processes.py",
+      "tests/test_regression.py",
+      "tmp031d_kql/q.db",
+      "tmp031d_kql/req.json",
+      "tmp031d_kql/req2.json",
+      "tmp031d_kql/req3.json",
+      "tmp_v3check/q.db",
+      "tmp_v3check/req.json"
+    ],
+    "diff_bytes": 54449,
+    "diff_sha256": "d9cc9e943c7e7aed130d1b6efb225bdc40452e1c3dcfeaf4c312541ff661e059"
+  }
+}

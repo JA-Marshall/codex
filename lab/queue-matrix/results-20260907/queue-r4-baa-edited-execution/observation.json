@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "run": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r4-baa-edited-execution",
+  "workflow_state": "completed",
+  "terminal_change": {
+    "type": "completed"
+  },
+  "all_started_phases_shutdown": true,
+  "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r4-baa/repository",
+  "first_plan_human_approval": true,
+  "phase_turns": 2,
+  "planner_phases": 0,
+  "tool_admissions": 39,
+  "usage": {
+    "input_tokens": 485954,
+    "output_tokens": 39986,
+    "cached_input_tokens": 424570
+  },
+  "workflow_terminal_elapsed_ms": 1394445,
+  "human_plan_edits": 0,
+  "plan_amendments": 0,
+  "plan_deviations": null,
+  "source_artifact_sha256": {
+    "events.jsonl": "4d452d8d5ef102de69f1eaec68f60438984049008e630229c0b0df82cd4ca8b3",
+    "runtime-events.jsonl": "cd4591d37750e6f1625447fc235a8ad8d39213aa43b935d2e19d2cbff678d2fc",
+    "evidence/input-01.json": "e9ebbc5db5ba413dd9bd5f513934da357235933b35920d6b648097e9b6218bdc",
+    "evidence/phase-01.json": "a8b866323ad7fad16b2147388c3a4c5bf6b797a94ff118b4e79da6c6c352fd82",
+    "evidence/input-02.json": "bc81496d74b316d62fa342ce5e88161ab829009677a707afe19087a27dffc67b",
+    "evidence/phase-02.json": "d6f2d9f3dfaddab761262b9d5e06a85556c07b5905e74a6dfb7939bea4e92cf5",
+    "config/run-spec.json": "510cf37a07c4a42b4751d1d9a449a9b9476e7bfaed418a61f0cda28b01974da5"
+  },
+  "authority_restored": false,
+  "git": {
+    "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "files_changed": 13,
+    "changed_files": [
+      "durable_queue/__main__.py",
+      "durable_queue/queue.py",
+      "durable_queue/storage.py",
+      "tests/test_regression.py",
+      "tmp24y3yyop/req.json",
+      "tmp3ws4nuky/req.json",
+      "tmp4np2xz1o/req.json",
+      "tmp_6gnda1i/req.json",
+      "tmphz5id8fv/req.json",
+      "tmpmnz83j7c/req.json",
+      "tmpq79jh8vb/req.json",
+      "tmpx7s5xrd7/req.json",
+      "tmpxtfaujoc/req.json"
+    ],
+    "diff_bytes": 48231,
+    "diff_sha256": "5b7d3aa7e91bb9dd3b2b8c7c6b7a128a5a0599f01c6b2f341c8af6762aed3a55"
+  }
+}

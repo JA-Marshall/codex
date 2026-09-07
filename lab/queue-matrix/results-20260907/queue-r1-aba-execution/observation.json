@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "run": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/runs/queue-r1-aba-execution",
+  "workflow_state": "completed",
+  "terminal_change": {
+    "type": "completed"
+  },
+  "all_started_phases_shutdown": true,
+  "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r1-aba/repository",
+  "first_plan_human_approval": true,
+  "phase_turns": 2,
+  "planner_phases": 0,
+  "tool_admissions": 62,
+  "usage": {
+    "input_tokens": 1159848,
+    "output_tokens": 38284,
+    "cached_input_tokens": 1093251
+  },
+  "workflow_terminal_elapsed_ms": 406534,
+  "human_plan_edits": 0,
+  "plan_amendments": 0,
+  "plan_deviations": null,
+  "source_artifact_sha256": {
+    "events.jsonl": "0336cded7a6c70e36e621ea21ac0bc47bcda75b03eff267e6cb846ab9b39de8a",
+    "runtime-events.jsonl": "b7bb24a99a4843f13e5e87c8f6db0b6610f18cccc962a2cd1d914f76e87ee098",
+    "evidence/input-01.json": "2bee8c6059ce4b49e231bd722ce0cbbe219e06bc0712448e5d2236aeaab66fbd",
+    "evidence/phase-01.json": "4c04033dcc47cd63e8b1b79321a574ec18db9ba059601dd85270c37a7a6936ee",
+    "evidence/input-02.json": "5e56803a2a1d10d2dc6790bda2b9e50852c1487efcc96c61003daa5164af22b4",
+    "evidence/phase-02.json": "83b08fdef2536f8503c00dabc11c6f7cad91542d9fcf62153dbda03bcbcd5244",
+    "config/run-spec.json": "9eb65865552c55df1914e90f250c00982060a3a8a77443ffdec867188da71c2b"
+  },
+  "authority_restored": false,
+  "git": {
+    "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "files_changed": 16,
+    "changed_files": [
+      "durable_queue/__main__.py",
+      "durable_queue/queue.py",
+      "durable_queue/storage.py",
+      "tests/test_processes.py",
+      "tests/test_regression.py",
+      "tmpyexw2y42/q.db",
+      "tmpyexw2y42/req/r0.json",
+      "tmpyexw2y42/req/r1.json",
+      "tmpyexw2y42/req/r2.json",
+      "tmpyexw2y42/req/r3.json",
+      "tmpyexw2y42/req/r4.json",
+      "tmpyexw2y42/req/r5.json",
+      "tmpyexw2y42/req/r6.json",
+      "tmpyexw2y42/req/r7.json",
+      "tmpyexw2y42/req/r8.json",
+      "tmpyexw2y42/req/r9.json"
+    ],
+    "diff_bytes": 53593,
+    "diff_sha256": "35f30c43ddfc4048abacca177d67aed8ab02511037e221cbc2e0eb0235bdf01e"
+  }
+}

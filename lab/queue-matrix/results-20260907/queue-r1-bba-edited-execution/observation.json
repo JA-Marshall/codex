@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "run": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/proposed-edits/runs/queue-r1-bba-edited-execution",
+  "workflow_state": "completed",
+  "terminal_change": {
+    "type": "completed"
+  },
+  "all_started_phases_shutdown": true,
+  "repository": "/home/james/.cache/codex-lab-queue-matrix/20260907T163300Z/tasks/queue-r1-bba/repository",
+  "first_plan_human_approval": true,
+  "phase_turns": 2,
+  "planner_phases": 0,
+  "tool_admissions": 64,
+  "usage": {
+    "input_tokens": 1562093,
+    "output_tokens": 40002,
+    "cached_input_tokens": 1490917
+  },
+  "workflow_terminal_elapsed_ms": 445923,
+  "human_plan_edits": 0,
+  "plan_amendments": 0,
+  "plan_deviations": null,
+  "source_artifact_sha256": {
+    "events.jsonl": "9050259e52a9a26b7970e414d8cc230e131aaa2d8868662c3ad56341744f82c1",
+    "runtime-events.jsonl": "3482a43f07bd2786df85f514fe1b13d45f26c20494e84f59f56caa6678679e9f",
+    "evidence/input-01.json": "262840efc6dd1ccaa74861087b6efe5849d4e46dc66c1c6854d5aac4587160f2",
+    "evidence/phase-01.json": "248d89dab39402cc35a456bf58050a2d3d069fed9f22755c3c671636063ae7b7",
+    "evidence/input-02.json": "b046f0bab6c3b3e5a45baa63ea672693b9437abd34eb14ee8dc7df08849070bf",
+    "evidence/phase-02.json": "b4b6a537a410b4908ec83b6a29fb74e566148e4b939aea74ee260d379e44374d",
+    "config/run-spec.json": "0b16f81a85df3538dd8b6d90b0fc96e5a02fd3d79be32c55994d741774ff97c3"
+  },
+  "authority_restored": false,
+  "git": {
+    "base_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "final_commit": "689b3bd49dd3ef4f746481e909edfad041ab16b0",
+    "files_changed": 25,
+    "changed_files": [
+      "durable_queue/__main__.py",
+      "durable_queue/queue.py",
+      "durable_queue/storage.py",
+      "tests/test_regress.py",
+      "tmplt0j2q8u/q.sqlite",
+      "tmplt0j2q8u/req-0cb8a9d8d8c94157869eea4e70058300.json",
+      "tmplt0j2q8u/req-1520cb8736e94b2c82fbde9f9fe42446.json",
+      "tmplt0j2q8u/req-3d8149f587434a2b83857f8939f00eb6.json",
+      "tmplt0j2q8u/req-3d94570e8a9e4d2fa652af4f7ed8981c.json",
+      "tmplt0j2q8u/req-49e8e15d39e341bfbadc7812f868094b.json",
+      "tmplt0j2q8u/req-49fdb668325c413db1b2117de9d34e8b.json",
+      "tmplt0j2q8u/req-656f9680835c4f8d85624e7ba85c5db1.json",
+      "tmplt0j2q8u/req-87fe9c8173c4493eb88213a4280267d3.json",
+      "tmplt0j2q8u/req-94f29d3b6c624320bd1fcc8464c65e75.json",
+      "tmplt0j2q8u/req-9d0f7e6af10743feb5b5feede7bc64f4.json",
+      "tmplt0j2q8u/req-9e65d744fc56421f8c06ffcfcbee8f36.json",
+      "tmplt0j2q8u/req-ace5c2b7014b4328ae0d1573f346c03c.json",
+      "tmplt0j2q8u/req-bccc0d424b2d485bb8a0f484dd72af49.json",
+      "tmplt0j2q8u/req-d3f0152c4a744624afadadc323c2123a.json",
+      "tmplt0j2q8u/req-d7ca4ded40b3454697d2fba8432e3ec3.json",
+      "tmplt0j2q8u/req-da2331bd9eff41e399d5fd8119d98500.json",
+      "tmplt0j2q8u/req-ddd64fc328b24727a60cc5624c941e09.json",
+      "tmplt0j2q8u/req-e57202ddbe27487fbca2e16642a5236a.json",
+      "tmplt0j2q8u/req-e8c2203b344e4ed3bd4d8d2b95950dfe.json",
+      "tmplt0j2q8u/req-f17f1dc981484bfa889fda8f519c50d1.json"
+    ],
+    "diff_bytes": 50268,
+    "diff_sha256": "5f4bb0bdccca4424e359f5caaaf6d8f9d03d7790855fbe4647a936b1a9ad2bf6"
+  }
+}
