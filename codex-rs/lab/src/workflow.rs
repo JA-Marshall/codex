@@ -91,6 +91,10 @@ pub(crate) enum Command {
         target: ApprovalTarget,
         reviewer: String,
     },
+    ApproveDelegated {
+        target: ApprovalTarget,
+        policy_sha256: String,
+    },
     Reject {
         target: ApprovalTarget,
         reviewer: String,
@@ -129,6 +133,10 @@ pub(crate) enum Change {
     HumanApproved {
         target: ApprovalTarget,
         reviewer: String,
+    },
+    DelegatedApproved {
+        target: ApprovalTarget,
+        policy_sha256: String,
     },
     HumanRejected {
         target: ApprovalTarget,
@@ -259,6 +267,33 @@ impl Workflow {
                 self.snapshot.approved = Some(target.clone());
                 self.snapshot.state = WorkflowState::Implementing;
                 Ok(Change::HumanApproved { target, reviewer })
+            }
+            Command::ApproveDelegated {
+                target,
+                policy_sha256,
+            } => {
+                self.require_review()?;
+                self.require_target(&target)?;
+                if policy_sha256.len() != 64
+                    || !policy_sha256
+                        .bytes()
+                        .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+                {
+                    return Err(LabError::Invalid(
+                        "campaign policy requires a lowercase SHA-256 digest".into(),
+                    ));
+                }
+                if !self.current_plan()?.blockers.is_empty() {
+                    return Err(LabError::Invalid(
+                        "resolve plan blockers before delegated approval".into(),
+                    ));
+                }
+                self.snapshot.approved = Some(target.clone());
+                self.snapshot.state = WorkflowState::Implementing;
+                Ok(Change::DelegatedApproved {
+                    target,
+                    policy_sha256,
+                })
             }
             Command::Reject {
                 target,

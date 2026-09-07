@@ -13,6 +13,7 @@ use std::time::UNIX_EPOCH;
 use serde::Serialize;
 
 use crate::ActionKind;
+use crate::ApprovalPolicy;
 use crate::ApprovalTarget;
 use crate::JsonRenderer;
 use crate::LabError;
@@ -287,6 +288,21 @@ impl LabRun {
         })
     }
 
+    /// Authorize a fresh exact target under an operator-delegated campaign policy.
+    /// The trusted host must validate and preserve that policy before calling this;
+    /// a digest alone is not proof of permission and must never be a model tool.
+    pub fn approve_delegated(&mut self, target: ApprovalTarget, policy_sha256: &str) -> Result<()> {
+        if self.spec.workflow.approval != ApprovalPolicy::CampaignDelegated {
+            return Err(LabError::Invalid(
+                "workflow requires human plan approval".into(),
+            ));
+        }
+        self.transition(Command::ApproveDelegated {
+            target,
+            policy_sha256: policy_sha256.into(),
+        })
+    }
+
     pub fn reject(&mut self, target: ApprovalTarget, reviewer: &str, reason: &str) -> Result<()> {
         self.transition(Command::Reject {
             target,
@@ -402,20 +418,22 @@ impl LabRun {
                 Change::RunStarted
                 | Change::PlanningStarted
                 | Change::HumanApproved { .. }
+                | Change::DelegatedApproved { .. }
                 | Change::HumanRejected { .. }
                 | Change::AmendmentRequested { .. }
                 | Change::StepUpdated { .. }
                 | Change::VerificationStarted
+                | Change::RepairStarted { .. }
                 | Change::VerificationRecorded { .. }
                 | Change::Completed
                 | Change::Failed { .. }
                 | Change::ActionAdmitted { .. }
-                | Change::ActionFinished { .. }
-                | Change::RepairStarted { .. } => {}
+                | Change::ActionFinished { .. } => {}
             }
             if matches!(
                 change,
                 Change::HumanApproved { .. }
+                    | Change::DelegatedApproved { .. }
                     | Change::HumanRejected { .. }
                     | Change::PlanEdited { .. }
             ) {

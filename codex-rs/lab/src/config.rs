@@ -23,6 +23,8 @@ pub enum Renderer {
 #[serde(rename_all = "snake_case")]
 pub enum ApprovalPolicy {
     HumanRequired,
+    /// A trusted host may authorize exact targets under a recorded campaign policy.
+    CampaignDelegated,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
