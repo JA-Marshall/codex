@@ -564,6 +564,24 @@ impl ToolRegistry {
             return Err(err);
         }
 
+        let _admission_permits = match super::admission::admit_tool(&invocation).await {
+            Ok(permits) => permits,
+            Err(err) => {
+                if tool.is_builtin_control_tool() {
+                    let mut analytics = ControlToolCallGuard::new(&invocation);
+                    analytics.finish(ControlToolCallStatus::Rejected);
+                }
+                dispatch_trace.record_failed(&err);
+                notify_tool_finish_if_unclaimed(
+                    &invocation,
+                    terminal_outcome_reached.as_deref(),
+                    ToolCallOutcome::Blocked,
+                )
+                .await;
+                return Err(err);
+            }
+        };
+
         if let Some(pre_tool_use_payload) = tool.pre_tool_use_payload(&invocation) {
             match run_pre_tool_use_hooks(
                 &invocation.session,
