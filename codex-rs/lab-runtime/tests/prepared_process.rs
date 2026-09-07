@@ -30,7 +30,7 @@ fn child(fixture: &support::Fixture) -> Result<Command> {
     Ok(command)
 }
 
-async fn prepare(fixture: &support::Fixture) -> Result<std::path::PathBuf> {
+async fn prepare(fixture: &support::Fixture, id: &str, workflow: &str) -> Result<std::path::PathBuf> {
     let task = fixture.home.join("task.txt");
     let catalog = fixture.home.join("workflows.toml");
     let plan = fixture.home.join("plan.json");
@@ -40,7 +40,7 @@ async fn prepare(fixture: &support::Fixture) -> Result<std::path::PathBuf> {
     let result = timeout(Duration::from_secs(45), child(fixture)?.arg("prepare")
         .arg("--repository").arg(&fixture.repository).arg("--commit").arg(&fixture.commit)
         .arg("--codex-home").arg(&fixture.home).arg("--runs-directory").arg(&fixture.runs)
-        .args(["--run-id", "prepared", "--workflow", "md"])
+        .args(["--run-id", id, "--workflow", workflow])
         .arg("--task-file").arg(task).arg("--workflow-catalog").arg(catalog)
         .arg("--instruction-root").arg(&fixture.instruction_root).arg("--plan-file").arg(plan)
         .output()).await??;
@@ -73,7 +73,7 @@ fn successful_responses() -> Vec<String> {
 async fn prepared_survives_process_exit_eof_cannot_approve_and_lock_excludes_competitors() -> Result<()> {
     let server = MockServer::start().await;
     let fixture = support::Fixture::new(&server.uri()).await?;
-    let prepared = prepare(&fixture).await?; // This CLI process has exited.
+    let prepared = prepare(&fixture, "prepared", "md").await?; // This CLI process has exited.
     let source_events = fs::read(fixture.runs.join("prepared/events.jsonl"))?;
     let eof = timeout(Duration::from_secs(45), execution(&fixture, &prepared, "eof")?.output()).await??;
     ensure!(!eof.status.success());
@@ -111,5 +111,48 @@ async fn prepared_survives_process_exit_eof_cannot_approve_and_lock_excludes_com
     assert_eq!(mock.requests().len(), 5);
     assert_eq!(fs::read(fixture.repository.join("greeting.txt"))?, b"hello\n");
     assert_eq!(fs::read(fixture.runs.join("prepared/events.jsonl"))?, source_events);
+    Ok(())
+}
+
+async fn approve_fixture(fixture: &support::Fixture, prepared: &Path, id: &str) -> Result<()> {
+    let mut host = execution(fixture, prepared, id)?.stdin(Stdio::piped()).spawn()?;
+    host.stdin.take().context("stdin missing")?.write_all(format!("approve {}\n", support::plan(1)?.digest()?).as_bytes()).await?;
+    let output = timeout(Duration::from_secs(45), host.wait_with_output()).await??;
+    ensure!(output.status.success(), "{}", String::from_utf8_lossy(&output.stderr));
+    Ok(())
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn prepared_completed_cli_pair_compares_only_renderer() -> Result<()> {
+    let server = MockServer::start().await;
+    let fixture = support::Fixture::new(&server.uri()).await?;
+    let prepared = prepare(&fixture, "prepared", "md").await?;
+    let mock = responses::mount_sse_sequence(&server, successful_responses()).await;
+    approve_fixture(&fixture, &prepared, "approved").await?;
+    assert_eq!(mock.requests().len(), 5);
+    // A second condition consumes the same canonical plan with JSON rendering.
+    // Synthetic evaluator records test the comparison adapter, not task quality.
+    fs::remove_file(fixture.repository.join("greeting.txt"))?;
+    let prepared_json = prepare(&fixture, "prepared-json", "json").await?;
+    let mock_json = responses::mount_sse_sequence(&server, successful_responses()).await;
+    approve_fixture(&fixture, &prepared_json, "approved-json").await?;
+    assert_eq!(mock_json.requests().len(), 5);
+    for id in ["approved", "approved-json"] {
+        use sha2::Digest;
+        let run = fixture.runs.join(id);
+        let spec: Value = serde_json::from_slice(&fs::read(run.join("config/run-spec.json"))?)?;
+        let task_sha256 = format!("{:x}", sha2::Sha256::digest(spec["task"].as_str().unwrap().as_bytes()));
+        fs::create_dir(run.join("evaluation"))?;
+        fs::write(run.join("evaluation/evaluation.json"), serde_json::to_vec(&json!({
+            "schema_version":1,"run":run,"fixture":"mock-greeting","fixture_commit":fixture.commit,
+            "task_sha256":task_sha256,"python":{"version":"test-only"},"evaluator_sha256":"test-only",
+            "sandbox_sha256":"test-only","task_success":true,"hidden_test_success":true,"public_test_success":true
+        }))?)?;
+    }
+    let report_path = codex_lab_runtime::compare_runs(&fixture.runs.join("approved"), &fixture.runs.join("approved-json"),
+        "plan.renderer", &fixture.runs.join("comparison"))?;
+    let report: Value = serde_json::from_slice(&fs::read(report_path)?)?;
+    assert_eq!(report["classification"], "controlled_recorded_pair", "{}", serde_json::to_string_pretty(&report)?);
+    assert_eq!(report["control_differences"], json!([{"path":"plan.renderer","left":"markdown","right":"json"}]));
     Ok(())
 }

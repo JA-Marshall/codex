@@ -116,10 +116,10 @@ pub(crate) async fn finish_run(
     mut driver: Driver,
     options: &RunOptions,
     reviewer: &mut impl HumanReviewer,
+    started: Instant,
 ) -> Result<RunResult> {
-    let started = Instant::now();
     let execution: Result<RunResult> = async {
-    driver.run(&options, reviewer).await?;
+    driver.run(options, reviewer).await?;
     let diff = capture_git_diff(&options.repository, &options.repository_commit).await?;
     driver.evidence.write_bytes("final.diff", &diff.diff)?;
     driver.evidence.write_json("git.json", &serde_json::json!({"base_commit":diff.base_commit,

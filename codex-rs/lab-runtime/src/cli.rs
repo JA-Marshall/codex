@@ -12,6 +12,7 @@ use codex_lab::PlanRevision;
 use codex_lab_runtime::RunOptions;
 use codex_lab_runtime::TerminalReviewer;
 use codex_lab_runtime::execute_run;
+use codex_lab_runtime::compare_runs;
 use codex_lab_runtime::prepare_run;
 use codex_lab_runtime::run_prepared;
 
@@ -24,6 +25,15 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
+    /// Compare recorded controls and outcomes without running a model.
+    Compare {
+        left: PathBuf,
+        right: PathBuf,
+        #[arg(long)]
+        vary: String,
+        #[arg(long)]
+        output: PathBuf,
+    },
     /// Research, plan and ask for human approval in this process.
     Run(Arguments),
     /// Save an unapproved plan and exit after clean phase shutdown.
@@ -80,6 +90,7 @@ pub async fn run(arg0_paths: Arg0DispatchPaths) -> Result<()> {
         Cli::parse_from(arguments).command
     };
     let result = match command {
+        Command::Compare { left, right, vary, output } => serde_json::to_value(compare_runs(&left, &right, &vary, &output)?)?,
         Command::Run(args) => serde_json::to_value(execute_run(args.into_options()?, arg0_paths, &mut TerminalReviewer).await?)?,
         Command::Prepare(args) => serde_json::to_value(prepare_run(args.into_options()?, arg0_paths).await?)?,
         Command::RunPrepared { prepared, run_id } => serde_json::to_value(run_prepared(&prepared, run_id, arg0_paths, &mut TerminalReviewer).await?)?,

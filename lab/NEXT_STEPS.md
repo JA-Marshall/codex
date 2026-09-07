@@ -21,7 +21,7 @@ The present `driver.rs::execute_run` constructs fresh `LabRun` and `EvidenceStor
 
 Use the existing clean boundary: `backend.rs::run_phase` waits for upstream shutdown; `Driver::phase` finishes the phase authority and stores evidence before returning. Seal a checkpoint after the plan is submitted and both executor/verifier projections fit the context budget. Return `prepared` as a host result while the original workflow remains `awaiting_plan_approval`; do not call it task completion.
 
-Proposed interfaces, **not implemented yet**:
+Implemented interfaces:
 
 ```text
 codex-lab prepare <existing run options>
@@ -47,7 +47,7 @@ Use `lab/fixtures/csv-summary-v1/` for the fixture and `lab/experiments/` for it
 
 ## N04: a controlled first pair
 
-Proposed interface, **not implemented yet**:
+Implemented comparison interface (the live pilot still requires task-specific approvals):
 
 ```text
 codex-lab compare RUN_A RUN_B --vary plan.renderer --output REPORT_DIRECTORY

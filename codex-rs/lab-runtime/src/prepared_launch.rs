@@ -21,9 +21,10 @@ use crate::prepared_lock;
 /// Run immediately, retaining the existing trusted host review boundary.
 /// Await through shutdown; dropping the future is not supported recovery.
 pub async fn execute_run(options: RunOptions, paths: Arg0DispatchPaths, reviewer: &mut impl HumanReviewer) -> Result<RunResult> {
+    let started = Instant::now();
     let _lock = prepared_lock::acquire(&options.repository).await?;
     let driver = initialize(&options, paths, None).await?;
-    finish_run(driver, &options, reviewer).await
+    finish_run(driver, &options, reviewer, started).await
 }
 
 /// Finish research/planning and exit with a sealed unapproved checkpoint.
@@ -54,11 +55,12 @@ pub async fn prepare_run(options: RunOptions, paths: Arg0DispatchPaths) -> Resul
 /// Revalidate frozen inputs and ask for a new target-specific human decision.
 /// The source run remains immutable and no saved approval is accepted.
 pub async fn run_prepared(path: &Path, run_id: String, paths: Arg0DispatchPaths, reviewer: &mut impl HumanReviewer) -> Result<RunResult> {
+    let started = Instant::now();
     let before_lock = prepared::load(path, run_id.clone())?;
     let _lock = prepared_lock::acquire(&before_lock.options.repository).await?;
     let checkpoint = prepared::load(path, run_id)?;
     ensure!(checkpoint.lineage == before_lock.lineage, "checkpoint changed while acquiring launch lock");
     let driver = initialize(&checkpoint.options, paths, Some((&checkpoint.settings, &checkpoint.run_spec_sha256))).await?;
     driver.evidence.write_json("parent-preparation.json", &checkpoint.lineage)?;
-    finish_run(driver, &checkpoint.options, reviewer).await
+    finish_run(driver, &checkpoint.options, reviewer, started).await
 }
