@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "authorization": "User answered Go to the explicit question approving both exact targets for one attempt each concurrently with --jobs 2.",
+  "recorded_at": "2026-09-07T15:36:06.9998609Z",
+  "jobs": 2,
+  "attempts_per_condition": 1,
+  "amendments_approved": false,
+  "retries_approved": false,
+  "targets": [
+    {
+      "run_id": "verifier-v1-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "0eadb6d14529a2989108b40ffbbb8e44bbca0b0be88e776b8424730c74449a53",
+      "run_spec_sha256": "14ba875e066ffdce03df13d494c7a83bbf4cd3006a500ed0e2765e4c6627b3e5"
+    },
+    {
+      "run_id": "verifier-single-v2-execution",
+      "plan_id": "task-plan",
+      "revision": 1,
+      "content_sha256": "0eadb6d14529a2989108b40ffbbb8e44bbca0b0be88e776b8424730c74449a53",
+      "run_spec_sha256": "d13619e47c519b9a3ee16ba52fc070eab395b4d9ad7da23e44f3fb5c988b1483"
+    }
+  ]
+}

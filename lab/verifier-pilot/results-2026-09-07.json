@@ -1,0 +1,344 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-09-07T15:40:27.711415+00:00",
+  "classification": "descriptive_verifier_pair",
+  "independent_variable": "workflow.roles.verifier",
+  "root": "/home/james/.cache/codex-lab-verifier-pilot/20260907T153300Z",
+  "preparation_sha256": "c69f0d9cfb902744ca95abe8857d063c410f9b639e2b36d12be76918459bab0e",
+  "control_differences": [
+    "inheritance_chain",
+    "instructions.verifier.content",
+    "instructions.verifier.path",
+    "instructions.verifier.selector",
+    "instructions.verifier.sha256",
+    "workflow.roles.verifier",
+    "workflow_name"
+  ],
+  "runs": [
+    {
+      "run_id": "verifier-v1-execution",
+      "workflow": "plan-md-v1",
+      "approval_target": {
+        "run_id": "verifier-v1-execution",
+        "plan_id": "task-plan",
+        "revision": 1,
+        "content_sha256": "0eadb6d14529a2989108b40ffbbb8e44bbca0b0be88e776b8424730c74449a53",
+        "run_spec_sha256": "14ba875e066ffdce03df13d494c7a83bbf4cd3006a500ed0e2765e4c6627b3e5"
+      },
+      "workflow_state": "failed",
+      "terminal_change": {
+        "type": "failed",
+        "reason": "every planned verification requires one observation"
+      },
+      "exit_code": 1,
+      "task_success": true,
+      "api_passed": 14,
+      "cli_passed": 14,
+      "cases_per_interface": 14,
+      "public_test_success": true,
+      "failed_cases": [],
+      "verifier_report_count_by_id": {
+        "v-unittest": 1,
+        "v-cli": 5
+      },
+      "inference_calls_observed": 44,
+      "traced_model_calls": 44,
+      "usage": {
+        "input_tokens": 458331,
+        "output_tokens": 15839,
+        "cached_input_tokens": 423050
+      },
+      "tool_admissions": 49,
+      "tool_admissions_by_name": {
+        "lab_repo_list": 5,
+        "lab_repo_read": 10,
+        "exec_command": 25,
+        "lab_command_receipt": 9
+      },
+      "phase_turns": 2,
+      "planner_phases": 0,
+      "first_plan_human_approval": true,
+      "human_plan_edits": 0,
+      "plan_amendments": 0,
+      "plan_deviations": null,
+      "decision_to_exit_ms": 206869,
+      "active_interval": {
+        "start_unix_ms": 1788795392840,
+        "end_unix_ms": 1788795599709
+      },
+      "phases": [
+        {
+          "phase": "implementation",
+          "epoch": 1,
+          "start_unix_ms": 1788795392874,
+          "thread_id": "01a07c83-9383-7ca0-bed4-7243969c007b",
+          "end_unix_ms": 1788795515370,
+          "usage": {
+            "input_tokens": 241990,
+            "cached_input_tokens": 222405,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 8805,
+            "reasoning_output_tokens": 3964,
+            "total_tokens": 250795
+          },
+          "traced_model_calls": 22
+        },
+        {
+          "phase": "verification",
+          "epoch": 2,
+          "start_unix_ms": 1788795515436,
+          "thread_id": "01a07c85-723e-78f3-97c5-ae987af63b2d",
+          "end_unix_ms": 1788795599658,
+          "usage": {
+            "input_tokens": 216341,
+            "cached_input_tokens": 200645,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 7034,
+            "reasoning_output_tokens": 4501,
+            "total_tokens": 223375
+          },
+          "traced_model_calls": 22
+        }
+      ],
+      "git": {
+        "base_commit": "8e166376f2a0a057c828d33d7fee32170ab136b4",
+        "final_commit": "8e166376f2a0a057c828d33d7fee32170ab136b4",
+        "files_changed": 3,
+        "changed_files": [
+          "cli.py",
+          "dependency_order.py",
+          "tests/test_regression.py"
+        ],
+        "diff_bytes": 8214,
+        "diff_sha256": "941e434bd515d40f2b53830f32d86865e47dffac8e8abd67fa3423ca7f4bea9e"
+      },
+      "approval_preceded_every_tool": true,
+      "all_started_phases_shutdown": true,
+      "trace_sha256": {
+        "traces/trace-e0f27a50-a8ca-4c06-bc7e-6f41bb701d9d-01a07c83-9383-7ca0-bed4-7243969c007b/trace.jsonl": "ef9cc4a56c96b3fb59762afb162da7e1a9dd0a8e9bfb37cfbd23f55bc0e52a6f",
+        "traces/trace-b44273ba-140d-415b-869b-5398b662f97f-01a07c85-723e-78f3-97c5-ae987af63b2d/trace.jsonl": "b8d4decd58469d52475397b3ac1c02d1281a834348c1a52e30cb06fe6ac0f2aa"
+      },
+      "artifact_sha256": {
+        "config/run-spec.json": "c994453494b9326953708dde3c66836bea497bcdd5e8a28a3ff736ff4040807f",
+        "config/workflow.effective.json": "f19f72162369d4d0e6c3b8d83b97caefd97701f46986968c4e1e931890487b1f",
+        "config/workflow.source.toml": "20e3c21b7061137378f1344f6c576896d1c6d7c747a8d72706cd02b895f43499",
+        "decisions/4.json": "aafd8b6dc193b9fcf57bfb32b390f64e120795f36918dd3387400b70a655dd31",
+        "evaluation/candidate.diff": "941e434bd515d40f2b53830f32d86865e47dffac8e8abd67fa3423ca7f4bea9e",
+        "evaluation/evaluation.json": "3908dc247d0163dae0899ac74a1f211eed02a83f6d92983488f405caf8e96c76",
+        "evaluation/observation.json": "fbcfcd47b954474dadfa0ec25e3bedf5b6a38b900d55db92aa44fd83fc0959ee",
+        "events.jsonl": "51ed3c2e958d90e519160803209fdbd1a2e6eb8bf7e668a3f7167dfe62750f34",
+        "evidence/effective-settings.json": "6d6f06f6099c9a16ce8ecf06d18c24371d8f37dbbe7d8a242bef92356ad5d0c8",
+        "evidence/environment.json": "5edfee94933335dc8d13f41c6b3df2d894660b30689b5f3835e0e943e32ec2bb",
+        "evidence/failure.json": "4a7ccef3a39b6a9183c87239ada620a8e186da05d09495e246f071bf163e2862",
+        "evidence/input-01.json": "167b9b210848964aa839697e85f7827ca8f3efdf1e1c47b3ebfc7dafbf906205",
+        "evidence/input-02.json": "7087bdbff2061accf41048f898d8319d2ccb6fb30c1263858173ef2952323b26",
+        "evidence/parent-preparation.json": "114078a664c350b47d0edfb4245c06c34300230ea00bdb0d841de9032ce2cce6",
+        "evidence/phase-01.json": "c7b6337bfd44efff27009860084f571a5b190239a0f8166adae09279548b74a3",
+        "evidence/phase-02.json": "e1039702a0cc32809171260699612f465977704337c4efa2fef6935464fcd152",
+        "evidence/runtime-manifest.json": "d95765a1106ba4041344a43e99d56c8fd303ac39eac869dbcf1e1a88d168a43f",
+        "instructions/executor.SKILL.md": "af8e2201e88556a27b91fba8472ace0db4faf9602ba4e6cb18d847c40e39f91a",
+        "instructions/planner.SKILL.md": "332e74c240dc794a496bbc2c9e10de0ccc394ee8826f90111b94285cda2472c4",
+        "instructions/verifier.SKILL.md": "46ea6eca22efb6107ca4d255226592f63a1113be642265567bceedfcd556769d",
+        "manifest.json": "775795b285ce01c86c87ff54d7d777cd645d0fa6de2e11431a5dab6ce8d3aab8",
+        "metrics.json": "be926661df4aae7b7154c48f973d488a773ef1288c0eff5ca6612eb4c41047ee",
+        "plans/1/PLAN.md": "9afc487525c0e60f0775307703f8b0d0939adb1d5fcc689b563ef2666707a58a",
+        "plans/1/plan.json": "0eadb6d14529a2989108b40ffbbb8e44bbca0b0be88e776b8424730c74449a53",
+        "runtime-events.jsonl": "dbc06845d2e9d4cc4a83e89fd386845f002055aec679161b3721046f520f8dd0"
+      }
+    },
+    {
+      "run_id": "verifier-single-v2-execution",
+      "workflow": "plan-md-single-observation-v2",
+      "approval_target": {
+        "run_id": "verifier-single-v2-execution",
+        "plan_id": "task-plan",
+        "revision": 1,
+        "content_sha256": "0eadb6d14529a2989108b40ffbbb8e44bbca0b0be88e776b8424730c74449a53",
+        "run_spec_sha256": "d13619e47c519b9a3ee16ba52fc070eab395b4d9ad7da23e44f3fb5c988b1483"
+      },
+      "workflow_state": "completed",
+      "terminal_change": {
+        "type": "completed"
+      },
+      "exit_code": 0,
+      "task_success": true,
+      "api_passed": 14,
+      "cli_passed": 14,
+      "cases_per_interface": 14,
+      "public_test_success": true,
+      "failed_cases": [],
+      "verifier_report_count_by_id": {
+        "v-unittest": 1,
+        "v-cli": 1
+      },
+      "inference_calls_observed": 25,
+      "traced_model_calls": 25,
+      "usage": {
+        "input_tokens": 209762,
+        "output_tokens": 14747,
+        "cached_input_tokens": 174902
+      },
+      "tool_admissions": 29,
+      "tool_admissions_by_name": {
+        "lab_repo_list": 4,
+        "lab_repo_read": 7,
+        "exec_command": 14,
+        "lab_command_receipt": 4
+      },
+      "phase_turns": 2,
+      "planner_phases": 0,
+      "first_plan_human_approval": true,
+      "human_plan_edits": 0,
+      "plan_amendments": 0,
+      "plan_deviations": null,
+      "decision_to_exit_ms": 139801,
+      "active_interval": {
+        "start_unix_ms": 1788795392841,
+        "end_unix_ms": 1788795532642
+      },
+      "phases": [
+        {
+          "phase": "implementation",
+          "epoch": 1,
+          "start_unix_ms": 1788795392874,
+          "thread_id": "01a07c83-9383-72b3-b427-27693a40ff3f",
+          "end_unix_ms": 1788795465311,
+          "usage": {
+            "input_tokens": 115799,
+            "cached_input_tokens": 100669,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 6830,
+            "reasoning_output_tokens": 2583,
+            "total_tokens": 122629
+          },
+          "traced_model_calls": 14
+        },
+        {
+          "phase": "verification",
+          "epoch": 2,
+          "start_unix_ms": 1788795465361,
+          "thread_id": "01a07c84-aea3-7312-a587-bbe95e854a5c",
+          "end_unix_ms": 1788795532377,
+          "usage": {
+            "input_tokens": 93963,
+            "cached_input_tokens": 74233,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 7917,
+            "reasoning_output_tokens": 4236,
+            "total_tokens": 101880
+          },
+          "traced_model_calls": 11
+        }
+      ],
+      "git": {
+        "base_commit": "8e166376f2a0a057c828d33d7fee32170ab136b4",
+        "final_commit": "8e166376f2a0a057c828d33d7fee32170ab136b4",
+        "files_changed": 24,
+        "changed_files": [
+          ".tmp_cli_verify/bad.json",
+          ".tmp_cli_verify/cycle.json",
+          ".tmp_cli_verify/e2.txt",
+          ".tmp_cli_verify/e3.txt",
+          ".tmp_cli_verify/e4.txt",
+          ".tmp_cli_verify/e5.txt",
+          ".tmp_cli_verify/e6.txt",
+          ".tmp_cli_verify/e7.txt",
+          ".tmp_cli_verify/e8.txt",
+          ".tmp_cli_verify/err.txt",
+          ".tmp_cli_verify/nondict.json",
+          ".tmp_cli_verify/o2.txt",
+          ".tmp_cli_verify/o3.txt",
+          ".tmp_cli_verify/o4.txt",
+          ".tmp_cli_verify/o5.txt",
+          ".tmp_cli_verify/o6.txt",
+          ".tmp_cli_verify/o7.txt",
+          ".tmp_cli_verify/o8.txt",
+          ".tmp_cli_verify/out.txt",
+          ".tmp_cli_verify/unknown.json",
+          ".tmp_cli_verify/valid.json",
+          "cli.py",
+          "dependency_order.py",
+          "tests/test_regression.py"
+        ],
+        "diff_bytes": 10773,
+        "diff_sha256": "f97894240ecd5e36f63853911976f769986d6f95e60fe55d64bb10e30a73c5a9"
+      },
+      "approval_preceded_every_tool": true,
+      "all_started_phases_shutdown": true,
+      "trace_sha256": {
+        "traces/trace-4b7c7554-33cf-4ff5-893e-b08d1628b861-01a07c83-9383-72b3-b427-27693a40ff3f/trace.jsonl": "5823449fc7253e6bb1f9b2dc18a7be560b2d0d17fa0d97c7f3dc8ca8bc400c88",
+        "traces/trace-46171a2c-1c68-4382-8041-ec476e97d2c1-01a07c84-aea3-7312-a587-bbe95e854a5c/trace.jsonl": "84c3ae9ca1c9342a4bf85e941dfb5ca63b395e7ec330b07084ef2b2be669c69e"
+      },
+      "artifact_sha256": {
+        "config/run-spec.json": "3554fb6b10785d6fa7b7f9afe8ed2d4a1a80f2137acbeb46951d93ad1ef5e1ea",
+        "config/workflow.effective.json": "bc6287cee200c030cec06b7f852a7fbfcdc803c0a24501edff5234054762f209",
+        "config/workflow.source.toml": "20e3c21b7061137378f1344f6c576896d1c6d7c747a8d72706cd02b895f43499",
+        "decisions/4.json": "27e6f0ff6ca0111346cce56df3aae4568d0ce31b86c4edd726b16f48a689531c",
+        "evaluation/candidate.diff": "f97894240ecd5e36f63853911976f769986d6f95e60fe55d64bb10e30a73c5a9",
+        "evaluation/evaluation.json": "ddf9592243ac0a5633b5ef8c0fdaba98082a2c0e155c8f6dfa9b2755da1e2078",
+        "evaluation/observation.json": "9a899f47cf4026d8272f76cda9a015d6420e6d9576e52c5967f811f238a9bedf",
+        "events.jsonl": "aa2d9f0408ad27e81d33b00283738098dbb3a40be77af8b5ebc519d66d5291eb",
+        "evidence/effective-settings.json": "6d6f06f6099c9a16ce8ecf06d18c24371d8f37dbbe7d8a242bef92356ad5d0c8",
+        "evidence/environment.json": "5edfee94933335dc8d13f41c6b3df2d894660b30689b5f3835e0e943e32ec2bb",
+        "evidence/final.diff": "f97894240ecd5e36f63853911976f769986d6f95e60fe55d64bb10e30a73c5a9",
+        "evidence/git.json": "26a7c7808a4aecccc97ed805549af7c3c378543cb50afaebc991da1ffd63b82b",
+        "evidence/input-01.json": "167b9b210848964aa839697e85f7827ca8f3efdf1e1c47b3ebfc7dafbf906205",
+        "evidence/input-02.json": "62a57360eaf707d4fb040afb8d5b2207ca7d66dcd44c55fb708ef6b429928e8b",
+        "evidence/metrics.json": "d8f348c2697cfe5c1fcdfdaf68b40db9c01935d018d0bc04166cf972fdffa7dd",
+        "evidence/parent-preparation.json": "390e7435a31241852e256841a247b5a57d051f724ed35c5821dc4d03c74e54c2",
+        "evidence/phase-01.json": "c6d9234c81d93e109ad886120fbb746bf9953a8ff87f0b32f37ac7d340dd1274",
+        "evidence/phase-02.json": "b1cf319a0bf66fede65cb4212d919a351e77a66f2801562287cdf9aaa7a4dee6",
+        "evidence/runtime-manifest.json": "d95765a1106ba4041344a43e99d56c8fd303ac39eac869dbcf1e1a88d168a43f",
+        "instructions/executor.SKILL.md": "af8e2201e88556a27b91fba8472ace0db4faf9602ba4e6cb18d847c40e39f91a",
+        "instructions/planner.SKILL.md": "332e74c240dc794a496bbc2c9e10de0ccc394ee8826f90111b94285cda2472c4",
+        "instructions/verifier.SKILL.md": "3a10deca2adacfd18a855bfabb0c2c0fe86f5c02828cbc4d823c1966732e242b",
+        "manifest.json": "04f1955dc064778db484164c2c8f6e935e399c3629f0abc1760437fc32a8f2e6",
+        "metrics.json": "be926661df4aae7b7154c48f973d488a773ef1288c0eff5ca6612eb4c41047ee",
+        "plans/1/PLAN.md": "9afc487525c0e60f0775307703f8b0d0939adb1d5fcc689b563ef2666707a58a",
+        "plans/1/plan.json": "0eadb6d14529a2989108b40ffbbb8e44bbca0b0be88e776b8424730c74449a53",
+        "runtime-events.jsonl": "e725d2801b9a0f16b108992e797478e8df00d43a4ab66e2e3284466a127f5ed1",
+        "verification/10.json": "22667a2996939e03b6633dbc53704a5653ea96c3a1e408bbf77c7311a030becd",
+        "verification/9.json": "caf9f7f3faddbc8d6cdedca0ecc6fe298fe84408be8434c94b6e038c56dfc258"
+      }
+    }
+  ],
+  "concurrency": {
+    "jobs": 2,
+    "max_recorded_active_jobs": 2,
+    "host_active_overlap_ms": 139801,
+    "phase_overlap_ms": 139387,
+    "model_request_overlap_ms": 104416,
+    "model_overlap_meaning": "overlapping client request intervals; includes network/provider queueing, not proof of simultaneous server computation"
+  },
+  "batch_result": {
+    "schema_version": 1,
+    "failed": true,
+    "exit_codes": {
+      "verifier-v1-execution": 1,
+      "verifier-single-v2-execution": 0
+    },
+    "note": "Process exits are not task success or proof of tool shutdown; use the existing evaluator."
+  },
+  "batch_artifact_sha256": {
+    "batch.json": "9e958001e5b76d3b9aad7da0dcd26329fe0f5e0a4d87229cee8dc863dd4301c6",
+    "events.jsonl": "883ca53fe47816f6d0c9e5a45542938ad98b78dc69e32d56b49d8499e9d11c78",
+    "result.json": "f828808ad1c999eb3807db8377d83f182438d3240429f3e113caf9dce7ba7194",
+    "verifier-single-v2-execution/review-01.json": "191ddb5e7d7df5a167547a97a4f4177d22e9eef07cf017f80687f2986f789e8e",
+    "verifier-single-v2-execution/stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "verifier-single-v2-execution/stdout.log": "76dbce34d8ea5d229b1ca21c2c2a55010a05b3497391c849cc63e485f05efb4d",
+    "verifier-v1-execution/review-01.json": "db1a1e14db959496118f98496fba4c83a2bc52dcb4fea2910934400776e3b616",
+    "verifier-v1-execution/stderr.log": "5f18f6f9e11c01e1cd30a284c4a718d9f8c5b7c5e4a9781b688485961617d796",
+    "verifier-v1-execution/stdout.log": "8d9a9c4dd6aca37f65479202f775a53c298e7a191470cba2fd89bab5d917e71c"
+  },
+  "preparation_model_calls": 0,
+  "automatic_retries": 0,
+  "limitations": [
+    "One run per condition; no statistical improvement claim",
+    "Independent executor samples produce different candidates despite identical executor settings",
+    "Unknown immutable remote model revision and provider queueing",
+    "Plan deviations unscored",
+    "Finite external test corpus; task success is limited to those checks",
+    "No cumulative token/spend cap",
+    "Raw model traces and credentials remain local"
+  ]
+}

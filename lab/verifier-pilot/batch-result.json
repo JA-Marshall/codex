@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "failed": true,
+  "exit_codes": {
+    "verifier-v1-execution": 1,
+    "verifier-single-v2-execution": 0
+  },
+  "note": "Process exits are not task success or proof of tool shutdown; use the existing evaluator."
+}

@@ -1,0 +1,225 @@
+diff --git a/cli.py b/cli.py
+index d401367..ccae040 100644
+--- a/cli.py
++++ b/cli.py
+@@ -11,7 +11,7 @@ def main():
+     try:
+         graph = json.loads(Path(sys.argv[1]).read_bytes().decode("utf-8"))
+         output = json.dumps(order_tasks(graph)) + "\n"
+-    except (OSError, ValueError) as error:
++    except Exception as error:
+         print(str(error), file=sys.stderr)
+         return 2
+     sys.stdout.write(output)
+diff --git a/dependency_order.py b/dependency_order.py
+index df55e1d..216282b 100644
+--- a/dependency_order.py
++++ b/dependency_order.py
+@@ -1,5 +1,38 @@
+ """Order tasks for execution."""
+ 
++import heapq
++
+ 
+ def order_tasks(graph: dict[str, list[str]]) -> list[str]:
+-    return sorted(graph)
++    if not isinstance(graph, dict):
++        raise ValueError("graph must be a dict")
++    for key, deps in graph.items():
++        if not isinstance(key, str) or not key:
++            raise ValueError("task names must be nonempty strings")
++        if not isinstance(deps, list):
++            raise ValueError("dependencies must be lists")
++        for dep in deps:
++            if not isinstance(dep, str) or not dep:
++                raise ValueError("dependency names must be nonempty strings")
++            if dep not in graph:
++                raise ValueError(f"unknown dependency: {dep!r}")
++    indegree = {}
++    dependents: dict[str, list[str]] = {key: [] for key in graph}
++    for key, deps in graph.items():
++        unique = set(deps)
++        indegree[key] = len(unique)
++        for dep in unique:
++            dependents[dep].append(key)
++    heap = [key for key, deg in indegree.items() if deg == 0]
++    heapq.heapify(heap)
++    result: list[str] = []
++    while heap:
++        task = heapq.heappop(heap)
++        result.append(task)
++        for dependent in dependents[task]:
++            indegree[dependent] -= 1
++            if indegree[dependent] == 0:
++                heapq.heappush(heap, dependent)
++    if len(result) != len(graph):
++        raise ValueError("cycle detected")
++    return result
+diff --git a/tests/test_regression.py b/tests/test_regression.py
+new file mode 100644
+index 0000000..b461bd7
+--- /dev/null
++++ b/tests/test_regression.py
+@@ -0,0 +1,162 @@
++import copy
++import json
++import os
++import subprocess
++import sys
++import tempfile
++import unittest
++from pathlib import Path
++
++from dependency_order import order_tasks
++
++
++class OrderTieBreakTests(unittest.TestCase):
++    def test_lexicographically_smallest_first(self):
++        self.assertEqual(
++            order_tasks({"c": [], "b": [], "a": []}), ["a", "b", "c"]
++        )
++
++    def test_tie_break_across_steps(self):
++        graph = {"m": ["a"], "b": ["a"], "a": [], "z": []}
++        self.assertEqual(order_tasks(graph), ["a", "b", "m", "z"])
++
++    def test_diamond(self):
++        graph = {"d": ["b", "c"], "b": ["a"], "c": ["a"], "a": []}
++        self.assertEqual(order_tasks(graph), ["a", "b", "c", "d"])
++
++    def test_disconnected_components_order(self):
++        graph = {"b": ["a"], "a": [], "d": ["c"], "c": []}
++        self.assertEqual(order_tasks(graph), ["a", "b", "c", "d"])
++
++    def test_duplicate_dependencies_count_once(self):
++        self.assertEqual(order_tasks({"a": ["b", "b"], "b": []}), ["b", "a"])
++
++    def test_python_string_ordering(self):
++        # Uppercase sorts before lowercase in Python str ordering.
++        self.assertEqual(order_tasks({"a": [], "B": []}), ["B", "a"])
++
++
++class OrderValidationTests(unittest.TestCase):
++    def test_invalid_shapes_raise_value_error(self):
++        bad_graphs = [
++            [],
++            "x",
++            None,
++            42,
++            {"": []},
++            {123: []},
++            {None: []},
++            {True: []},
++            {"a": "b"},
++            {"a": ("b",)},
++            {"a": "setup"},
++            {"a": None},
++            {"a": [""]},
++            {"a": [123]},
++            {"a": [None]},
++            {"a": ["b"]},  # unknown dep (b missing)
++            {"a": [] , "": []},
++        ]
++        for bad in bad_graphs:
++            with self.subTest(graph=bad):
++                with self.assertRaises(ValueError):
++                    order_tasks(bad)
++
++    def test_unknown_dependency(self):
++        with self.assertRaises(ValueError):
++            order_tasks({"a": ["missing"], "b": []})
++
++    def test_self_cycle(self):
++        with self.assertRaises(ValueError):
++            order_tasks({"a": ["a"]})
++
++    def test_direct_cycle(self):
++        with self.assertRaises(ValueError):
++            order_tasks({"a": ["b"], "b": ["a"]})
++
++    def test_disconnected_cycle(self):
++        with self.assertRaises(ValueError):
++            order_tasks({"a": [], "b": ["c"], "c": ["b"]})
++
++    def test_empty_graph(self):
++        self.assertEqual(order_tasks({}), [])
++
++    def test_does_not_mutate_input(self):
++        graph = {"b": ["a", "a"], "a": [], "c": ["b"]}
++        snapshot = copy.deepcopy(graph)
++        result = order_tasks(graph)
++        self.assertEqual(graph, snapshot)
++        self.assertEqual(graph["b"], ["a", "a"])
++        self.assertEqual(result, ["a", "b", "c"])
++
++    def test_returns_every_task_once(self):
++        graph = {"d": ["b", "c"], "b": ["a"], "c": ["a"], "a": [], "e": []}
++        result = order_tasks(graph)
++        self.assertEqual(sorted(result), sorted(graph))
++        self.assertEqual(len(result), len(set(result)))
++        pos = {t: i for i, t in enumerate(result)}
++        for task, deps in graph.items():
++            for dep in set(deps):
++                self.assertLess(pos[dep], pos[task])
++
++
++class CliRegressionTests(unittest.TestCase):
++    def _run_cli(self, *args):
++        return subprocess.run(
++            [sys.executable, "cli.py", *args],
++            capture_output=True,
++            cwd=Path(__file__).resolve().parent.parent,
++        )
++
++    def _write_graph_file(self, tmpdir, name, data_bytes):
++        path = Path(tmpdir) / name
++        path.write_bytes(data_bytes)
++        return str(path)
++
++    def test_cli_success_bytes(self):
++        with tempfile.TemporaryDirectory(dir=os.getcwd()) as tmpdir:
++            graph = {"b": ["a"], "a": [], "z": []}
++            path = self._write_graph_file(
++                tmpdir, "valid.json", json.dumps(graph).encode("utf-8")
++            )
++            proc = self._run_cli(path)
++            self.assertEqual(proc.returncode, 0)
++            self.assertEqual(proc.stderr, b"")
++            expected = (json.dumps(["a", "b", "z"]) + "\n").encode("utf-8")
++            self.assertEqual(proc.stdout, expected)
++            # Exactly one trailing newline.
++            self.assertTrue(proc.stdout.endswith(b"\n"))
++            self.assertFalse(proc.stdout.endswith(b"\n\n"))
++            self.assertEqual(proc.stdout.count(b"\n"), 1)
++
++    def test_cli_invalid_graph_exits_2_empty_stdout(self):
++        with tempfile.TemporaryDirectory(dir=os.getcwd()) as tmpdir:
++            cases = {
++                "cycle.json": json.dumps({"a": ["a"]}).encode("utf-8"),
++                "unknown.json": json.dumps({"a": ["missing"]}).encode("utf-8"),
++                "shape.json": json.dumps({"a": "b"}).encode("utf-8"),
++                "nondict.json": json.dumps([1, 2]).encode("utf-8"),
++                "badjson.json": b"{not json",
++                "badutf8.json": b"\xff\xfe",
++            }
++            for name, payload in cases.items():
++                with self.subTest(case=name):
++                    path = self._write_graph_file(tmpdir, name, payload)
++                    proc = self._run_cli(path)
++                    self.assertEqual(proc.returncode, 2, proc)
++                    self.assertEqual(proc.stdout, b"")
++
++    def test_cli_usage_and_missing_file(self):
++        proc = self._run_cli()
++        self.assertEqual(proc.returncode, 2)
++        self.assertEqual(proc.stdout, b"")
++        proc = self._run_cli("a.json", "b.json")
++        self.assertEqual(proc.returncode, 2)
++        self.assertEqual(proc.stdout, b"")
++        proc = self._run_cli("no-such-file-xyz.json")
++        self.assertEqual(proc.returncode, 2)
++        self.assertEqual(proc.stdout, b"")
++
++
++if __name__ == "__main__":
++    unittest.main()
