@@ -50,7 +50,7 @@ fn help_displays_required_inputs_and_explicit_unapproved_plan_option() -> anyhow
         .collect::<Vec<_>>()
         .join("\n");
     insta::assert_snapshot!(rendered, @r###"
-    Run a restricted Codex workflow with explicit human plan approval
+    Run a restricted Codex workflow with explicit human approval or campaign delegation
 
     Usage: codex-lab [OPTIONS] --repository <REPOSITORY> --commit <COMMIT> --codex-home <CODEX_HOME> --runs-directory <RUNS_DIRECTORY> --run-id <RUN_ID> --task-file <TASK_FILE> --workflow-catalog <WORKFLOW_CATALOG> --instruction-root <INSTRUCTION_ROOT> --workflow <WORKFLOW>
 
@@ -77,6 +77,8 @@ fn help_displays_required_inputs_and_explicit_unapproved_plan_option() -> anyhow
               Reuse canonical JSON; this does not approve the plan
           --verification-input <VERIFICATION_INPUT>
               Verify a frozen candidate and imported report without planner/executor calls
+          --campaign-policy <CAMPAIGN_POLICY>
+              Delegate this exact trial using a frozen policy outside the task repository (run only)
       -h, --help
               Print help
     "###);

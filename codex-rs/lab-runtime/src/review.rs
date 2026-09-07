@@ -12,13 +12,17 @@ use codex_lab::RenderedPlan;
 #[derive(Debug, PartialEq, Eq)]
 pub enum HumanDecision {
     Approve(ApprovalTarget),
+    ApproveDelegated {
+        target: ApprovalTarget,
+        policy_sha256: String,
+    },
     Reject(String),
     Edit(PlanRevision),
     Abort,
 }
 
-/// Trusted human input boundary. Production uses stdin; tests provide explicit
-/// decisions separately from mocked model output. This is never a model tool.
+/// Trusted host decision boundary. Manual runs use stdin; campaign runs use a
+/// separately validated policy. Decisions never originate from a model tool.
 pub trait HumanReviewer {
     fn review(&mut self, target: &ApprovalTarget, rendered: &RenderedPlan)
     -> Result<HumanDecision>;

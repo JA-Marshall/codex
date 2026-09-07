@@ -124,12 +124,15 @@ pub(crate) async fn initialize(
         amendment_feedback: None,
         repairs: 0,
         max_repairs: workflow.max_repairs,
+        max_amendments: None,
+        delegation_sha256: None,
+        delegated_approvals: 0,
     };
     driver.evidence.write_json("runtime-manifest.json", &serde_json::json!({
         "schema_version":1,"implementation":"codex-lab-runtime-v1",
         "live_codex_enforcement":true,"domain_manifest":"../manifest.json",
         "domain_manifest_scope":"independent domain library; runtime capabilities are described here",
-        "approval":"trusted human input bound to run, plan revision and effective settings",
+        "approval":"trusted host decision bound to run, plan revision and effective settings; delegated decisions require campaign policy evidence",
         "runtime_events":"../runtime-events.jsonl","workflow_events":"../events.jsonl",
         "completion_authority":"terminal workflow event; metrics are prepared before completion",
         "resume_supported":false
@@ -157,6 +160,7 @@ pub(crate) async fn finish_run(
         "task_success":null,"hidden_test_success":null,
         "verification_command_results":"passed; semantic adequacy remains reviewer/evaluator responsibility",
         "first_plan_human_approval":driver.first_approval,"human_plan_edits":driver.human_edits,
+        "delegated_plan_approvals":driver.delegated_approvals,
         "plan_amendments":driver.amendments,"plan_deviations":null,
         "repair_attempts":driver.repairs,
         "input_tokens":input_tokens,"output_tokens":output_tokens,"turns":driver.phase_count,
@@ -192,4 +196,7 @@ pub(crate) struct Driver {
     pub amendment_feedback: Option<String>,
     pub repairs: u8,
     pub max_repairs: u8,
+    pub max_amendments: Option<u8>,
+    pub delegation_sha256: Option<String>,
+    pub delegated_approvals: usize,
 }

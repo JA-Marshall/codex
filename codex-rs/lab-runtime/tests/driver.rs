@@ -6,6 +6,9 @@ mod support;
 #[path = "driver/repair.rs"]
 mod repair;
 
+#[path = "driver/campaign.rs"]
+mod campaign;
+
 use std::path::PathBuf;
 use std::sync::atomic::AtomicUsize;
 use std::sync::atomic::Ordering;
