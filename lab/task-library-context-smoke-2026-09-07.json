@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "source_commit": "b99ba9215f74ca5ba60bcb34bf69906b7094befd",
+  "bundle": "/home/james/.cache/codex-lab-binaries/task-library-context-v3-20260907",
+  "binary_sha256": "5b60d14c9bd78774dc943e3cf52cbcd04acf1151dadb6842f6147b752dedd117",
+  "campaign": "/home/james/.cache/codex-lab-campaigns/varied-context-v3-smoke-20260907/campaign.json",
+  "campaign_sha256": "52a0b4867dd0f1cdf83efe941f4cd369462af7fa8621df3334b46d8e85a74c37",
+  "results_sha256": "051204e79b782652f48a1d90a2fb5ee8f7a073bf193a9f992123b47298f8c34a",
+  "pipeline_passed": 3,
+  "pipeline_total": 3,
+  "jobs": 12,
+  "peak_concurrent_hosts": 3,
+  "campaign_elapsed_ms": 485481,
+  "context_fragment_byte_limit": null,
+  "combined_context_byte_limit": null,
+  "context_limit_source": "selected model and upstream runtime",
+  "provider_requests": 136,
+  "provider_statuses": {
+    "200": 136
+  },
+  "provider_profile_changed": false,
+  "rate_limit_per_minute": 100,
+  "phase_timeout_minutes": 30,
+  "validation": {
+    "affected_rust_tests_passed": 143,
+    "python_matrix_tests_passed": 4,
+    "one_existing_rust_test_passed_after_automatic_timeout_retry": true,
+    "scoped_lint": "passed",
+    "changed_file_format_checks": "passed",
+    "full_workspace_suite": false,
+    "tests_rerun_after_format": false
+  },
+  "timing": "/home/james/.cache/codex-lab-timing/varied-context-v3-smoke-20260907/audit/timing.json",
+  "timing_sha256": "83573d3fe29862e356db5e7e24d2ae4ac7b919299fc6babdebd0a089c200bf66",
+  "provider_trace_sha256": "58727f2b77f5aae261bcf8a6d5d745f61c0a8956488ce1123759dc4a533aeeb5",
+  "unknown_timings": 0,
+  "runs": [
+    {
+      "run_id": "trial-0001",
+      "fixture": "rust_copy_plan",
+      "workflow": "repository-repair-v2",
+      "status": "finished",
+      "task_success": true,
+      "host_exit_code": 0,
+      "evaluation_exit_code": 0,
+      "worker_exit_code": 0,
+      "error": null,
+      "elapsed_ms": 437974,
+      "queue_wait_union_ms": 2652,
+      "request_count": 51,
+      "timing_status": "observed",
+      "public_test_success": true,
+      "private_test_success": true,
+      "private_checks": 9,
+      "scope_violations": [],
+      "all_phases_stopped": true,
+      "phase_turns": 4,
+      "phase_inputs": [
+        {
+          "instructions_bytes": 2234,
+          "prompt_bytes": 3381
+        },
+        {
+          "instructions_bytes": 2234,
+          "prompt_bytes": 5816
+        },
+        {
+          "instructions_bytes": 969,
+          "prompt_bytes": 8326
+        },
+        {
+          "instructions_bytes": 1305,
+          "prompt_bytes": 8673
+        }
+      ],
+      "max_prompt_bytes": 8673,
+      "context_fragment_byte_limit": null,
+      "combined_context_byte_limit": null,
+      "model_context_window": 1048576,
+      "effective_settings_sha256": "7e46a2a1263cdc8a20dafbaeea66394e76c50bb6ecf16a0a6c74555003828c31",
+      "phase_input_sha256": {
+        "input-01.json": "ecd42222f4002532b0da6584c83e26387020c3d62e229438251b19b0f14c9565",
+        "input-02.json": "3750370f9f35737185085ec886a7c03fa5de326a28dc6745e8f6a7ba8fe15ab2",
+        "input-03.json": "1da13e12c90b457f8be2bc2a52f634a9796ed5d104f0745dddb0d14cf6a29728",
+        "input-04.json": "1491ed0a2977e05c01faa747fd636caa050d5bf799822ed6405ab1d78f25041a"
+      }
+    },
+    {
+      "run_id": "trial-0002",
+      "fixture": "rust_checked_totals",
+      "workflow": "repository-repair-v2",
+      "status": "finished",
+      "task_success": true,
+      "host_exit_code": 0,
+      "evaluation_exit_code": 0,
+      "worker_exit_code": 0,
+      "error": null,
+      "elapsed_ms": 481079,
+      "queue_wait_union_ms": 2869,
+      "request_count": 46,
+      "timing_status": "observed",
+      "public_test_success": true,
+      "private_test_success": true,
+      "private_checks": 8,
+      "scope_violations": [],
+      "all_phases_stopped": true,
+      "phase_turns": 4,
+      "phase_inputs": [
+        {
+          "instructions_bytes": 2234,
+          "prompt_bytes": 3204
+        },
+        {
+          "instructions_bytes": 2234,
+          "prompt_bytes": 6446
+        },
+        {
+          "instructions_bytes": 969,
+          "prompt_bytes": 7552
+        },
+        {
+          "instructions_bytes": 1305,
+          "prompt_bytes": 7899
+        }
+      ],
+      "max_prompt_bytes": 7899,
+      "context_fragment_byte_limit": null,
+      "combined_context_byte_limit": null,
+      "model_context_window": 1048576,
+      "effective_settings_sha256": "7e46a2a1263cdc8a20dafbaeea66394e76c50bb6ecf16a0a6c74555003828c31",
+      "phase_input_sha256": {
+        "input-01.json": "3d5d378a4237b3d01f8518bf66fe23b5edcb547806e0309b1ff9f7a8d23654c5",
+        "input-02.json": "6a6a4173a9f35fd819e615b213fc3e32f6bc03e055d8761e20c1b428a1487e20",
+        "input-03.json": "59ca329c53c118a9fd87c58bffc84c1ea98b05d34a6866602ec449349de88862",
+        "input-04.json": "20b5ee31c8ebc1a4abc5afd6405b3a2d9a7d67a695b283707b566922bfe293c1"
+      }
+    },
+    {
+      "run_id": "trial-0003",
+      "fixture": "rust_atomic_export",
+      "workflow": "repository-repair-v2",
+      "status": "finished",
+      "task_success": true,
+      "host_exit_code": 0,
+      "evaluation_exit_code": 0,
+      "worker_exit_code": 0,
+      "error": null,
+      "elapsed_ms": 303597,
+      "queue_wait_union_ms": 897,
+      "request_count": 39,
+      "timing_status": "observed",
+      "public_test_success": true,
+      "private_test_success": true,
+      "private_checks": 8,
+      "scope_violations": [],
+      "all_phases_stopped": true,
+      "phase_turns": 4,
+      "phase_inputs": [
+        {
+          "instructions_bytes": 2234,
+          "prompt_bytes": 4063
+        },
+        {
+          "instructions_bytes": 2234,
+          "prompt_bytes": 7261
+        },
+        {
+          "instructions_bytes": 969,
+          "prompt_bytes": 8584
+        },
+        {
+          "instructions_bytes": 1305,
+          "prompt_bytes": 8931
+        }
+      ],
+      "max_prompt_bytes": 8931,
+      "context_fragment_byte_limit": null,
+      "combined_context_byte_limit": null,
+      "model_context_window": 1048576,
+      "effective_settings_sha256": "7e46a2a1263cdc8a20dafbaeea66394e76c50bb6ecf16a0a6c74555003828c31",
+      "phase_input_sha256": {
+        "input-01.json": "8a52c5b846c70f8982b8df4dfb7837c00816a761e5db78be989544ff10cd715e",
+        "input-02.json": "219d2ebc9a36616f9536aced729bfe47a34745c36b2d4e033b26e89381246852",
+        "input-03.json": "5d5b8a62d8ab547986e9be71fe8f0f876d866571bb510063fe032892f968ba16",
+        "input-04.json": "53741a29a875afc632994f850efb50434d988d98192faac1c293b4560ef53da8"
+      }
+    }
+  ],
+  "next_campaign": {
+    "path": "/home/james/.cache/codex-lab-campaigns/varied-library-v3-200-jobs12-20260907/campaign.json",
+    "sha256": "a3479705fa1a98a6ca3ed7924678938ac6b8e56c1ef2391502960721c125d1cd",
+    "trials": 200,
+    "jobs": 12,
+    "started": false
+  },
+  "older_full_campaigns_unchanged_and_unstarted": {
+    "varied-library-v1-200-20260907": "21e4d947c453ca1e968b41991bcbf127957a77853750ae83f63e252d4883eab4",
+    "varied-library-v2-200-20260907": "8458f9b7de7644a3fafc6aead65e0ddf494277aa3892f80c585352a05e03b94b",
+    "varied-library-v2-200-jobs12-20260907": "7fddb2c9314532b5f7c82dc14abfe9db182e42564ca6cab7c632c8788d502316"
+  },
+  "limitations": [
+    "Fresh reruns use newly generated plans; they are not a paired performance comparison with the failed attempts.",
+    "Three concurrent trials validate the cap removal; the earlier twelve-task smoke established twelve-way host concurrency.",
+    "Native model context, plan structure, tool-output budgets, artifact resource limits and runtime deadlines still apply."
+  ]
+}

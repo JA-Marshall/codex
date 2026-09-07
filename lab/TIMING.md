@@ -74,3 +74,7 @@ hosts, 328 successful provider responses, a peak of 89 dispatches per rolling mi
 individual queue wait of 5.767 seconds. Nine tasks passed; three failed the prompt-size check before
 implementation. This is throughput evidence with shared contention, not an isolated-speed estimate
 or a test of prolonged timeout behavior. The twelve-worker 200-trial preparation remains unstarted.
+
+The [context-cap removal rerun](CONTEXT_LIMIT_REMOVAL.md) subsequently passed the three blocked tasks
+on a rebuilt binary. It preserves this timing calculation and the original limiter/phase timeout.
+The replacement 200-trial preparation is recorded there and remains unstarted at twelve workers.

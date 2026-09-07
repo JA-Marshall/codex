@@ -10,9 +10,9 @@ The subsequent [live smoke](TASK_LIBRARY_SMOKE.md) passed two corrected trials a
 dispatch and planner path instructions. Queue-aware reporting now matches the published timing fix;
 the current v2 200-trial preparation remains unstarted. A subsequent [twelve-task parallel smoke](TASK_LIBRARY_PARALLEL_SMOKE.md)
 confirmed twelve concurrent hosts; nine tasks passed and three hit the 8 KiB prompt cap before
-implementation. The launcher now defaults to twelve workers. The subsequent source change removes
-those harness context caps while preserving scope and phase budgets. Validate and freeze the
-updated binary before launching the full batch; the existing preparation remains unstarted.
+implementation. The launcher now defaults to twelve workers. The [context-cap removal](CONTEXT_LIMIT_REMOVAL.md)
+is installed and all three blocked tasks passed fresh reruns. Scope and phase budgets remain;
+the rebuilt 200-trial preparation remains unstarted.
 The actual inventory, interfaces, evidence limits, and artifact locations
 are recorded in [TASK_LIBRARY.md](TASK_LIBRARY.md). The earlier installed release and its focused
 checks are recorded in

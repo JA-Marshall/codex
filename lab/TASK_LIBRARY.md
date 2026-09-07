@@ -10,9 +10,10 @@ two generic workflows differing only in their maximum repair rounds. Final share
 sandbox calibration passed: all 80 variants matched their expected outcomes with zero model calls.
 The frozen offline preparation contains **200 trials = 20 tasks ×
 2 workflows × 5 repetitions**, with twelve active workers by default if subsequently executed. Preparation
-does not launch model hosts. The subsequent [twelve-task parallel smoke](TASK_LIBRARY_PARALLEL_SMOKE.md)
-confirmed twelve overlapping hosts: nine tasks passed and three stopped at the 8 KiB prompt limit.
-Address that limit before launching the 200-trial batch, which remains stopped. The earlier
+does not launch model hosts. The [twelve-task parallel smoke](TASK_LIBRARY_PARALLEL_SMOKE.md)
+confirmed twelve overlapping hosts: nine tasks passed and three stopped at the old 8 KiB prompt limit.
+The [context-cap removal rerun](CONTEXT_LIMIT_REMOVAL.md) passed all three blocked tasks with the new binary.
+The fresh 200-trial batch remains stopped. The earlier
 [serial smoke](TASK_LIBRARY_SMOKE.md) records the initial bugs found and corrected.
 
 ## Inventory
@@ -158,7 +159,7 @@ all 20 study tasks, both workflows, five repetitions, and twelve jobs. Freeze wi
 `-PrepareOnly` or `-Execute` prepares and starts a new campaign. Use the current v2 preparation;
 the earlier v1 200-trial preparation predates the sandbox alias fix and should not be launched.
 
-The current bundle is `/home/james/.cache/codex-lab-binaries/task-library-timing-v2-20260907`. It reuses
+The current bundle is `/home/james/.cache/codex-lab-binaries/task-library-context-v3-20260907`. It reuses
 `/home/james/.config/codex-lab/muse-contributor-unattended-v2` unchanged and the existing shared
 provider service. Final shared calibration completed successfully:
 
@@ -176,10 +177,12 @@ change removes harness context-size caps after the parallel smoke exposed ordina
 prompts exceeding them. Scope permissions and phase budgets remain enforced; model context
 capacity and upstream compaction now govern those inputs.
 Lint, formatting, format checking, and the final build passed. No tests were rerun after formatting.
-The current prepared campaign is `/home/james/.cache/codex-lab-campaigns/varied-library-v2-200-jobs12-20260907/campaign.json`;
+The current prepared campaign is `/home/james/.cache/codex-lab-campaigns/varied-library-v3-200-jobs12-20260907/campaign.json`;
 all frozen pins validate, and it contains no started trials. The [smoke receipt](task-library-smoke-2026-09-07.json)
 records the preceding serial smoke and eight-worker preparation. The [parallel smoke receipt](task-library-parallel-smoke-12-2026-09-07.json)
-records the current twelve-worker preparation and the prompt-limit blocker. Earlier frozen manifests
+records the preceding twelve-worker preparation and the original prompt-limit blocker. The
+[context-removal receipt](task-library-context-smoke-2026-09-07.json) records the rebuilt binary,
+three successful reruns and current twelve-worker preparation. Earlier frozen manifests
 are preserved. [Initial offline validation](TASK_LIBRARY_VALIDATION.json)
 and the [initial release receipt](task-library-release-2026-09-07.json) remain historical evidence.
 The same queue-aware timing calculation is now available through [campaign timing reports](TIMING.md).
