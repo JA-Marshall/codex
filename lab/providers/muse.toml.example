@@ -1,8 +1,9 @@
 # Direct Contributor routing verified against Meta's portal and model API.
-# End-to-end lab compatibility still requires a verified exact model catalog.
+# Live function/command compatibility tested; workflow limitations are in
+# MUSE_VALIDATION.md. Copy muse-contributor.models.json into the dedicated home.
 model = "muse-spark-1.3-contributor"
 model_provider = "muse-lab"
-model_catalog_json = "<absolute-path-to-verified-exact-model-catalog.json>"
+model_catalog_json = "<absolute-path-to-muse-contributor.models.json>"
 model_reasoning_effort = "high"
 model_reasoning_summary = "auto"
 model_context_window = 1048576
@@ -19,5 +20,7 @@ supports_websockets = false
 # Context/reasoning/compaction settings follow Meta's Codex setup guide.
 # This upstream revision represents reasoning-summary support in the model
 # catalog; it rejects the old model_supports_reasoning_summaries config key.
-# Pin the remaining tool/output metadata after contract verification. Do not
-# use unknown-model fallback. Keep API keys in the environment, never here.
+# The tested catalog disables unsupported custom/freeform apply_patch tools.
+# Keep its instruction/context policies fixed when comparing workflows. Output
+# limits and compaction under pressure remain unverified. Do not use unknown-model
+# fallback. Keep API keys in the environment, never here.
