@@ -84,6 +84,9 @@ struct Arguments {
     /// Reuse canonical JSON; this does not approve the plan.
     #[arg(long)]
     plan_file: Option<PathBuf>,
+    /// Verify a frozen candidate and imported report without planner/executor calls.
+    #[arg(long, requires = "plan_file")]
+    verification_input: Option<PathBuf>,
 }
 
 pub async fn run(arg0_paths: Arg0DispatchPaths) -> Result<()> {
@@ -148,6 +151,9 @@ impl Arguments {
             instruction_root: self.instruction_root,
             workflow: self.workflow,
             plan,
+            verification_input: self.verification_input.as_ref().map(|path| {
+                codex_lab_runtime::VerificationInput::from_json(read_bounded(path, 8192)?.as_bytes())
+            }).transpose()?,
         })
     }
 }

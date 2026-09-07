@@ -34,6 +34,7 @@ fn fixture() -> Result<(tempfile::TempDir, RunAuthority, EvidenceStore, RunOptio
         instruction_root: root.path().to_owned(),
         workflow: "test".into(),
         plan: None,
+        verification_input: None,
     };
     Ok((root, authority, evidence, options))
 }

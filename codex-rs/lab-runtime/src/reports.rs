@@ -9,12 +9,13 @@ use codex_lab::VerificationEvidence;
 use codex_protocol::protocol::EventMsg;
 use codex_protocol::protocol::ExecCommandStatus;
 use serde::Deserialize;
+use serde::Serialize;
 use serde_json::Value;
 use serde_json::json;
 
 use crate::PhaseOutput;
 
-#[derive(Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub(crate) struct ImplementationReport {
     pub completed_steps: Vec<String>,
