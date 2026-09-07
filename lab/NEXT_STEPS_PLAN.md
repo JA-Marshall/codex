@@ -1,0 +1,206 @@
+# Implementation plan
+
+This is a projection of the canonical plan; it does not grant approval.
+
+Text values use JSON string notation inside code spans to preserve exact content.
+
+- Schema version: 1
+- Plan ID: `"lab-next-steps-v1"`
+- Revision: 1
+
+## Goal
+
+`"Make human plan review independent of a live waiting process, then execute and compare one controlled Markdown/JSON pair on a realistic coding fixture while preserving upstream Codex architecture."`
+
+## Assumptions
+
+- `"The user's current instruction authorizes a concrete plan and merging the already completed foundation/runtime changes. This next implementation sequence remains proposed until explicitly approved; every live experimental task still requires its own exact-target human approval."`
+- `"Target Linux/Ubuntu WSL first. Keep the current restricted provider/catalog and fixed procedural role variants. No Muse-specific core code, new TUI, generic session restoration or automatic approval."`
+- `"Inspected lab source: 2aafd83ce5a64e94e72192b86a064cc9481cb4aa. Fork main at merge: 694b6319d3ad2399f6e435760a22d9b9357f0697. The disjoint merge is f7b63bf3ab7601aec563f9221e8ca19ce5cc729f; implementation must recheck these seams against its actual starting commit."`
+- `"Prepared review is a host-owned data checkpoint, never deserialized execution authority. Later execution receives a new run ID with explicit parent linkage and a fresh human decision; original planning journals are not reopened or relabeled completed."`
+- `"Use an isolated committed evaluation repository and a dedicated Codex home. The experiment does not submit unrelated local files or credentials. Each run starts from a clean baseline; no hidden-test data enters model context."`
+
+## Implementation steps
+
+### Step `"N01"`
+
+- ID: `"N01"`
+- Title: `"Persist a sealed prepared-plan checkpoint"`
+- Instructions: `"Add a private prepared.rs module in lab-runtime with versioned bounded data DTOs, exact file hashes and strict parsing. Capture canonical plan bytes/digest/revision, task bytes/digest, original planning-run identity, effective RunSpec digest, workflow source/resolved selector, frozen role hashes, provider/catalog and effective runtime settings hashes, runtime/helper executable hashes, baseline Git commit and source artifact references. Store only explicit non-secret projections. Reuse existing EvidenceStore write-once/fsync primitives and publish the checkpoint descriptor last, only after successful research/planning shutdown, context-size validation and canonical plan submission. Limit descriptor to 64 KiB, plan to current 64 KiB and task to current 8 KiB; reference larger bounded artifacts by safe relative path and digest, rejecting escaping paths/symlinks. Unsupported schema, partial/missing/mismatched artifacts, nonpending or already executing source state must fail closed. Keep LabRun/RunSpec non-deserializable as authority. Test round trip, partial writes, corruption, size/path checks and zero approval. Do not add a general event bus or journal replay."`
+
+**Affected files**
+
+- `"codex-rs/lab-runtime/src/prepared.rs"`
+- `"codex-rs/lab-runtime/src/prepared_tests.rs"`
+- `"codex-rs/lab-runtime/src/evidence.rs"`
+- `"codex-rs/lab-runtime/src/lib.rs"`
+- `"codex-rs/lab-runtime/tests/prepared.rs"`
+
+**Dependencies**
+
+_None._
+
+**Acceptance criteria**
+
+- `"A01"`
+- `"A02"`
+- `"A07"`
+
+**Verification**
+
+- `"V01"`
+- `"V02"`
+
+### Step `"N02"`
+
+- ID: `"N02"`
+- Title: `"Add prepare and run-prepared commands with a later exact human gate"`
+- Instructions: `"Retain the current flag-only invocation as a compatibility alias for immediate run. Add explicit run, prepare and run-prepared CLI modes. Extract preparation/common phase orchestration into a private driver_preparation.rs so driver.rs stays under the repository size target; leave backend shutdown and RunAuthority admission unchanged. prepare uses existing research/planning and imported-plan paths, validates both execution prompts, writes N01 checkpoint and preparation metrics, returns an explicit prepared result and exits with no reviewer call, approval, implementation or completion claim. run-prepared loads only sealed data, resolves current inputs via PreparedRuntime::load and RunSpec::resolve, verifies exact plan/config/instructions/helper/baseline fingerprints and repository cleanliness, then creates a new execution run and immutable lineage record. Acquire an exclusive repository launch lock using std::fs::File::try_lock, following thread-store/src/local/writer_lock.rs before revalidation; competing lab launches fail and the lock spans approval through shutdown. Recheck baseline after review before admitting the first tool; external edits still require a quiescent repository. Always call existing HumanReviewer and LabRun::approve for the new exact target; EOF/reject/abort cannot execute. A human edit creates a new canonical revision in the child run and requires fresh approval; the prepared source stays immutable. Changed experimental settings require a new prepared record. Prepared import cannot recover a partly implemented workspace or reuse old approval. Tests launch independent processes: prepare exits, a later host can review, no model/tool implementation starts before approval, changed inputs and concurrent launches fail, and amended/rejected plans revoke authority. Document explicit preparation/execution metrics and parent linkage rather than claiming uninterrupted session resume."`
+
+**Affected files**
+
+- `"codex-rs/lab-runtime/src/cli.rs"`
+- `"codex-rs/lab-runtime/src/cli_tests.rs"`
+- `"codex-rs/lab-runtime/src/driver.rs"`
+- `"codex-rs/lab-runtime/src/driver_preparation.rs"`
+- `"codex-rs/lab-runtime/src/prepared_lock.rs"`
+- `"codex-rs/lab-runtime/src/prepared_lock_tests.rs"`
+- `"codex-rs/lab-runtime/src/review.rs"`
+- `"codex-rs/lab-runtime/src/prepared.rs"`
+- `"codex-rs/lab-runtime/src/lib.rs"`
+- `"codex-rs/lab-runtime/tests/driver.rs"`
+- `"codex-rs/lab-runtime/tests/prepared.rs"`
+- `"lab/RUNNING.md"`
+- `"lab/PROGRESS.md"`
+
+**Dependencies**
+
+- `"N01"`
+
+**Acceptance criteria**
+
+- `"A02"`
+- `"A03"`
+- `"A04"`
+- `"A07"`
+
+**Verification**
+
+- `"V01"`
+- `"V03"`
+- `"V04"`
+
+### Step `"N03"`
+
+- ID: `"N03"`
+- Title: `"Add one realistic committed task fixture and an independent evaluator"`
+- Instructions: `"Create csv-summary-v1 as a Python 3.12 standard-library repository fixture with existing parser/CLI/public tests and an intentionally broken comma-splitting implementation. Freeze this contract before any run: summarize(text: str) returns category-to-count totals from an exact category,count header; csv_summary CLI reads one UTF-8 input path and writes JSON with sorted keys plus LF. Accept RFC-style quoted commas, CRLF and an optional initial UTF-8 BOM. Empty or header-only input returns an empty mapping; blank records are ignored. Counts must be nonnegative ASCII decimal integers and each data row must contain exactly two fields; invalid header/row/quoting raises ValueError in the API and makes CLI exit 2 without partial stdout. Preserve category text and sum repeated categories. Task: fix parser behavior, retain API/CLI and add public regression tests. Pin task text, baseline tree/commit, public command, Python binary/version, setup procedure and evaluator hash in the manifest. Setup copies only project/task/public tests into an isolated Git repository and records its exact commit; evaluator cases stay outside the model-writable tree and model context. Run the independent evaluator after host shutdown through the existing upstream Linux sandbox entrypoint with an explicit clean environment, no credentials/network, read-only evaluator inputs and isolated output; do not execute submitted Python with unrestricted host authority. Record public and hidden results separately from verifier reports and workflow completion; zero tests or harness tampering cannot pass. Test baseline failure, a passing reference patch, no-op failure and a plausible incomplete fix failing hidden cases. No benchmark framework, containers or dependency installer."`
+
+**Affected files**
+
+- `"lab/fixtures/csv-summary-v1/task.md"`
+- `"lab/fixtures/csv-summary-v1/manifest.json"`
+- `"lab/fixtures/csv-summary-v1/project/csv_summary.py"`
+- `"lab/fixtures/csv-summary-v1/project/cli.py"`
+- `"lab/fixtures/csv-summary-v1/project/tests/test_public.py"`
+- `"lab/fixtures/csv-summary-v1/evaluator/test_hidden.py"`
+- `"lab/fixtures/csv-summary-v1/reference.patch"`
+- `"lab/experiments/setup_fixture.py"`
+- `"lab/experiments/evaluate_fixture.py"`
+- `"lab/experiments/test_fixture.py"`
+- `"lab/PROGRESS.md"`
+
+**Dependencies**
+
+- `"N02"`
+
+**Acceptance criteria**
+
+- `"A05"`
+- `"A07"`
+
+**Verification**
+
+- `"V05"`
+
+### Step `"N04"`
+
+- ID: `"N04"`
+- Title: `"Compare exact controls and run one Markdown/JSON pilot pair"`
+- Instructions: `"Add a bounded read-only comparison command in private comparison.rs plus CLI wiring. Proposed interface: codex-lab compare RUN_A RUN_B --vary plan.renderer --output REPORT_DIRECTORY. Refuse an output within either input run; never alter source artifacts. Write machine-readable comparison.json and a Markdown table. Compare canonical plan digest, task digest, baseline commit, requested provider/model/catalog, binary/helper versions, effective reasoning/context/tool policies, procedural role bytes, report contracts and evaluator/fixture hashes. Separate run IDs, paths, timestamps and workflow name/inheritance provenance as metadata; verify resolved behavioral settings differ only by the declared renderer, and always show all observed differences. Missing controls, changed plans/human edits/amendments, different model settings or changed harness settings prevent a controlled-pair label; allow a clearly labeled descriptive report. Unknown provider serving revision remains unknown and prevents an immutable-model claim. Resolve the existing plan-md-v1 and plan-json-v1 profiles, prepare one canonical plan once with a fixed planner, and create renderer-specific prepared conditions from that same plan without additional planning. After distinct exact-target human approval for each execution, run one fresh baseline checkout per renderer with the same model/catalog/roles/runtime. Use N03 evaluator, capture phase-scope usage, calls, time, final diffs and parent linkage. Publish a result with two observations, no winner/significance/reliability claim. Repetitions, sweeps, GitHub renderer and automated approvals remain deferred."`
+
+**Affected files**
+
+- `"codex-rs/lab-runtime/src/comparison.rs"`
+- `"codex-rs/lab-runtime/src/comparison_tests.rs"`
+- `"codex-rs/lab-runtime/src/cli.rs"`
+- `"codex-rs/lab-runtime/src/cli_tests.rs"`
+- `"codex-rs/lab-runtime/src/lib.rs"`
+- `"lab/experiments/csv-summary-pair-v1.toml"`
+- `"lab/experiments/README.md"`
+- `"lab/RUNNING.md"`
+- `"lab/PROGRESS.md"`
+
+**Dependencies**
+
+- `"N02"`
+- `"N03"`
+
+**Acceptance criteria**
+
+- `"A06"`
+- `"A07"`
+
+**Verification**
+
+- `"V01"`
+- `"V06"`
+- `"V07"`
+
+## Risks
+
+- `"A saved digest detects accidental corruption, not a malicious full-access host rewriting all records. Keep checkpoint/evaluator locations outside the verified model sandbox; reuse current authority isolation checks."`
+- `"Approval must bind the new execution run plus canonical plan and effective settings. A checkpoint or prior approval file must never itself grant permission; historical journals remain read-only."`
+- `"An exclusive lab launch lock prevents competing lab hosts, not unrelated editors. Revalidate before admission and require quiescence; do not imply universal filesystem isolation or exactly-once recovery after an implementation crash."`
+- `"Do not reopen active LabRun or EvidenceStore objects. Fresh phase threads and child execution runs deliberately avoid the much larger problem of restoring live tools, sandbox processes, session history or mid-implementation state."`
+- `"Configuration fingerprints intentionally reject changed binaries, skills, catalog or permissions. Re-preparing after an upgrade is preferable to accepting unverifiable stale authority."`
+- `"Renderer-only comparison changes prompt length and tokens by design; hold configured limits and unrelated text constant rather than forcibly equalizing observed token usage. First pilot has only one observation per condition."`
+- `"Direct Contributor model routing is known, but the external provider's immutable serving revision is not. Record this limitation instead of claiming fixed weights."`
+- `"driver.rs, run.rs, workflow.rs and authority.rs are already near the 500-line target. New modules and small adapters are required; no generic persistence, plugin, evaluator or policy framework in this sequence."`
+
+## Acceptance criteria
+
+- `"A01"`: `"A sealed, bounded checkpoint preserves canonical data and effective experiment identity; malformed or incomplete data never produces authority."`
+- `"A02"`: `"Preparation can exit with no implementation, and a later independent process can review the unchanged prepared plan without a model planning call or an old live process."`
+- `"A03"`: `"Every child execution needs explicit human approval for its exact target; stale, changed, rejected, edited or concurrent conditions cannot silently inherit permission."`
+- `"A04"`: `"Artifact lineage distinguishes planning from execution, preserves original journals, records scopes for usage/time, and makes no general resume or uninterrupted-run claim."`
+- `"A05"`: `"The fixture and independent evaluator distinguish a broken baseline, reference fix, no-op and incomplete fix; model reports do not define evaluator success."`
+- `"A06"`: `"The comparison exposes every control difference, labels only renderer-only conditions as matched subject to observed-provider limits, and reports the two approved pilot executions without statistical claims."`
+- `"A07"`: `"Keep upstream core/provider/TUI/session/auth/sandbox sources unchanged in N01-N04. Each implementation module stays below 500 lines, tests cover the gate across process boundaries, and docs clearly distinguish implemented commands from proposals."`
+
+## Verification strategy
+
+- `"V01"`: `"For each Rust stage run just test -p codex-lab -p codex-lab-runtime. Include extension/core admission tests only if their seam changes; if common/core/protocol changes become necessary, stop for a plan amendment and run the full suite under existing authorization. Finish with scoped just fix, just fmt and strict all-target Clippy; follow AGENTS.md ordering and do not rerun tests after final fix/format."`
+- `"V02"`: `"Checkpoint unit/integration tests: complete round trip; file/directory synchronization failure; missing/truncated/corrupted descriptor or artifact; unknown fields/version; oversized input; traversal/symlink escape; changed plan; and absence of any reconstructed approval."`
+- `"V03"`: `"Real sandbox/mock Responses process tests: prepare exits after graceful research/planning shutdown; fresh run-prepared has zero planner calls; no tool starts until current human approval; EOF/abort/reject, changed binary/catalog/settings/skills/commit, dirty worktree and simultaneous launch fail closed; human edit changes revision and requires new approval."`
+- `"V04"`: `"Build codex-lab and exercise the existing flag-only CLI plus proposed prepare/run/run-prepared help and results. Inspect parent/child journals, usage scopes and unchanged original artifacts. After task-specific human approval, perform one bounded live delayed-approval smoke check without using any automatic approval path."`
+- `"V05"`: `"Run python3 -m unittest discover -s lab/experiments -p 'test_*.py' for fixture/evaluator tooling. Validate deterministic fixture/task/evaluator hashes, documented Python version, baseline failure, reference-patch success, no-op and partial-fix failure, hidden-test isolation and clean reset through new Git checkouts."`
+- `"V06"`: `"Comparison tests cover a valid renderer-only pair, unknown serving version, different role bytes/model/catalog/limits/commit/plan, incomplete or failed runs, corrupted artifacts, amended plans, absent evaluator output and different phase scopes. Reports must preserve null/unknown values rather than treating them as zero."`
+- `"V07"`: `"Run exactly one approved Markdown execution and one approved JSON execution from the frozen fixture using the same canonical plan. Check both exact approval targets, effective control comparison, final diff, actual verification command receipts, external evaluator output and model/tool usage records. Preserve failures and avoid averaging unrelated preparation or earlier exploratory runs into execution metrics."`
+
+## Discoveries
+
+- `"codex-rs/lab-runtime/src/cli.rs currently has one flat Arguments parser and --plan-file; importing a plan never approves it."`
+- `"driver.rs::execute_run resolves configuration, verifies Git, freezes RunSpec/roles and creates new LabRun/EvidenceStore objects. Driver::run generates/submits a canonical plan and synchronously waits on HumanReviewer in the same process."`
+- `"review.rs::TerminalReviewer reads stdin; HumanDecision::Approve carries a full ApprovalTarget. EOF becomes Abort. Reuse this trusted host boundary rather than model tools or approval markers."`
+- `"backend.rs::CodexBackend::run_phase drains shutdown_and_wait before reporting success; Driver::phase finishes authority only after that shutdown and records phase evidence. This provides the clean preparation checkpoint boundary."`
+- `"lab/src/run.rs::RunSpec is Serialize-only and LabRun::create refuses reused run IDs. lab-runtime/src/evidence.rs::EvidenceStore::new refuses an existing evidence directory; neither provides safe reopen/replay."`
+- `"git_evidence.rs::verify_git_baseline validates root, pinned HEAD, tracked changes and nonignored untracked files; capture_git_diff already records deterministic final patches. It does not lock unrelated writers."`
+- `"core-api reexports upstream ThreadManager; existing lab phases intentionally create fresh upstream threads. Reopening Codex sessions cannot reconstruct the lab's independent approval authority and is unnecessary for the proposed pre-execution handoff."`
+- `"lab/workflows/foundation.toml already supplies inherited plan-md-v1 and plan-json-v1 profiles with the same planner/executor/verifier snapshots. No new procedural variants or model-routing changes are needed for the first comparison."`
+- `"Live Muse validation succeeded only after manual replacement of an expired approval-wait host using the exact reviewed plan/spec. The new checkpoint/lineage path makes that limited operation explicit and verifiable without rewriting the original run."`
+- `"thread-store/src/local/writer_lock.rs and arg0/src/lib.rs already use std::fs::File::try_lock on the pinned Rust toolchain. Follow that primitive in a private lab lock adapter; no new locking dependency or upstream writer-lifecycle modification is needed."`
+
+## Blockers
+
+_None._

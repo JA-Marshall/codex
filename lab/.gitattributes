@@ -1,5 +1,6 @@
 # Preserve the file-byte digests recorded at human review across platforms.
 implementation-plan.json text eol=lf
 live-integration-plan.json text eol=lf
+next-steps-plan.json text eol=lf
 # Preserve the exact capability-catalog digest recorded during live validation.
 providers/muse-contributor.models.json text eol=lf
