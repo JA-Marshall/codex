@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-07",
+  "scope": "Local Linux/WSL validation of completed lab merge, before publication to fork main",
+  "merge_commit": "f7b63bf3ab7601aec563f9221e8ca19ce5cc729f",
+  "main_parent": "694b6319d3ad2399f6e435760a22d9b9357f0697",
+  "lab_parent": "2aafd83ce5a64e94e72192b86a064cc9481cb4aa",
+  "tested_code_commit": "b4c978917ba2db309a530122c870457c2fbc4050",
+  "plan_commit": "843b8fb",
+  "merge_conflicts": 0,
+  "preserved_upstream_paths": 89,
+  "preserved_lab_paths": 89,
+  "subsequent_test_only_repair": {
+    "added_lines": 2,
+    "files": [
+      "codex-rs/tui/src/app/tests.rs",
+      "codex-rs/tui/src/app/tests/startup_defaults_tests.rs"
+    ],
+    "reason": "Supply cwd: None in two upstream SessionTarget test initializers; no production change"
+  },
+  "targeted_lab_extension": {
+    "run": 127,
+    "passed": 127,
+    "skipped": 0
+  },
+  "workspace_binary_build": "passed",
+  "initial_full_test_attempt": "compile failed before execution due to two missing upstream fixture fields",
+  "repaired_fixture_selection": {
+    "run": 2,
+    "passed": 2,
+    "filtered_out": 4312
+  },
+  "full_suite": {
+    "run": 17731,
+    "passed": 17691,
+    "failed": 40,
+    "timed_out": 0,
+    "skipped": 34,
+    "passed_after_retry": 1,
+    "elapsed_seconds": 1461.282,
+    "exit_code": 100,
+    "all_green": false
+  },
+  "full_suite_lab_extension_passed": 127,
+  "full_suite_core_admission_passed": 5,
+  "failures_not_seen_in_original_full_run": [],
+  "comparison_limit": "Failure-name comparison plus prior documented triage; not a new upstream reproduction of every failure",
+  "remaining_failures": [
+    "codex-app-server::all suite::v2::turn_start_zsh_fork::turn_start_shell_zsh_fork_subcommand_decline_marks_parent_declined_v2",
+    "codex-core-plugins startup_sync::tests::ordinary_clone_rejects_tracked_embedded_bare_repository",
+    "codex-core::all suite::approvals::env_zsh_script_spawned_by_python_can_request_escalation_under_zsh_fork",
+    "codex-core::all suite::approvals::matched_prefix_rule_runs_unsandboxed_under_zsh_fork",
+    "codex-core::all suite::approvals::zsh_fork_inner_allowed_script_inherits_active_permission_profile",
+    "codex-core::all suite::approvals::zsh_fork_receives_brokered_github_credential_and_provider_context",
+    "codex-core::all suite::cyber_exec_policy::saved_prefix_only_bypasses_guardian_for_general_models::cyber_zsh_unified_exec_is_reviewed",
+    "codex-core::all suite::hooks::async_hook_finishing_while_idle_waits_for_the_next_turn::user_turn",
+    "codex-core::all suite::plugins::persisted_remote_plugin_command_attribution_flows_through_turn_context::zsh_fork_shell",
+    "codex-core::all suite::skill_approval::shell_zsh_fork_skill_scripts_ignore_declared_permissions",
+    "codex-core::all suite::skill_approval::shell_zsh_fork_still_enforces_workspace_write_sandbox",
+    "codex-core::all suite::unified_exec_zsh_fork_approvals::unified_exec_zsh_fork_guardian_reviews_intercepted_execve",
+    "codex-core::all suite::unified_exec_zsh_fork_approvals::unified_exec_zsh_fork_guardian_reviews_persistent_terminal_in_current_turn",
+    "codex-core::all suite::unified_exec_zsh_fork_approvals::unified_exec_zsh_fork_parent_approval_escalates_intercepted_exec",
+    "codex-core::all suite::unified_exec_zsh_fork_approvals::unified_exec_zsh_fork_parent_approval_keeps_explicit_prompt_rule",
+    "codex-core::all suite::unified_exec_zsh_fork_approvals::unified_exec_zsh_fork_parent_approval_preserves_denied_reads",
+    "codex-exec-server::file_system_unix shared::sandboxed_file_operations_cannot_read_helper_siblings",
+    "codex-exec::all suite::worktree::worktree_start_and_fork_use_host_pool_and_preserve_legacy_resume",
+    "codex-http-client route_aware_client_pool::tests::request_failures_classify_real_untrusted_certificate_handshakes",
+    "codex-http-client route_aware_client_pool::tls_fallback_tests::does_not_retry_a_non_replayable_streaming_request",
+    "codex-http-client route_aware_client_pool::tls_fallback_tests::retries_a_native_tls_failure_after_another_request_caches_rustls",
+    "codex-http-client route_aware_client_pool::tls_fallback_tests::retries_a_native_tls_protocol_failure_once_with_rustls",
+    "codex-http-client route_aware_client_pool::tls_fallback_tests::retries_a_tls_protocol_failure_when_request_url_contains_certificate_markers",
+    "codex-http-client route_aware_client_pool::tls_fallback_tests::successful_rustls_fallback_replays_the_request_and_reuses_the_destination",
+    "codex-skills-extension host_roots::tests::repo_ancestry_without_project_marker_does_not_walk_parents",
+    "codex-tui app::tests::session_lifecycle_requests::managed_worktree_transitions_bind_owner_and_preserve_only_fork_history",
+    "codex-tui bottom_pane::chat_composer::agents_navigation_tests::agents_navigation_hint_snapshots",
+    "codex-tui bottom_pane::chat_composer::tests::footer_mode_snapshots",
+    "codex-tui bottom_pane::chat_composer::tests::shortcut_footer_displays_configured_chords",
+    "codex-v8-poc tests::sandbox_feature_matches_linked_v8",
+    "codex-worktree::worktree cli_creation_shares_default_and_custom_desktop_pools_without_enabling_cleanup",
+    "codex-worktree::worktree creation_listing_and_thread_binding_preserve_native_repository_paths",
+    "codex-worktree::worktree listing_ignores_worktrees_outside_the_desktop_bucket_layout",
+    "codex-worktree::worktree listing_only_includes_managed_worktrees_for_the_requested_repository",
+    "codex-worktree::worktree listing_preserves_inventory_when_a_branch_name_is_not_utf8",
+    "codex-worktree::worktree listing_rejects_a_primary_checkout_even_when_its_path_matches_the_layout",
+    "codex-worktree::worktree listing_rejects_a_stale_registration_reused_by_another_repository",
+    "codex-worktree::worktree listing_rejects_a_stale_registration_reused_by_the_same_repository",
+    "codex-worktree::worktree listing_rejects_checkout_and_bucket_aliases_but_allows_a_root_alias",
+    "codex-worktree::worktree listing_skips_worktrees_without_a_safe_source_working_directory"
+  ],
+  "prior_failures_absent_now": [
+    "codex-lab-runtime::repository_tools reads_utf8_and_lists_only_immediate_entries",
+    "codex-tui app::tests::external_editor_writable_directory_rejected_snapshot",
+    "codex-voice-host::bin/codex-voice-host devices::playout::tests::real_decoder_renders_current_rtp_and_rejects_pre_epoch_arrivals"
+  ],
+  "format": "passed; no tracked source changes",
+  "format_check": "passed",
+  "tests_repeated_after_final_format": false,
+  "diagnostic_snapshots": [
+    {
+      "name": "codex_tui__bottom_pane__chat_composer__tests__agents_navigation_help.snap.new",
+      "sha256": "657351e1c854cd5c120142acd6eae6d6a731b938a5a1b1d604f2f981171878fb"
+    },
+    {
+      "name": "codex_tui__bottom_pane__chat_composer__tests__footer_mode_configured_key_chords.snap.new",
+      "sha256": "c8793fb2d7fc38ca3f59fc503a7b04945a4992916a161e81d3c10ab285364de1"
+    },
+    {
+      "name": "codex_tui__bottom_pane__chat_composer__tests__footer_mode_shortcut_overlay.snap.new",
+      "sha256": "bbf7d20dadf21ccd7b0cf42be3615a524c987021cbd0f207c83f3af4a4cb65df"
+    }
+  ],
+  "log_sha256": {
+    "codex-lab-main-merge-20260907-targeted.log": "bff63832130ba47d46d558e187ebd2c2177859890a76cf06bacab106677f400e",
+    "codex-lab-main-merge-20260907-build.log": "6afbc5ad24e3a4868c8899c148884d873dec2c541a73c06735803df972f23f91",
+    "codex-lab-main-merge-20260907-full.log": "61dcf008d986e8d28869eb05b4be74a079d73524c0619186686d8ad145f943f1",
+    "codex-lab-main-merge-repaired-20260907-fixtures.log": "20210001ef29b247194f2daacfddf7e82e7134fe8250e9d2730a71aa49942688",
+    "codex-lab-main-merge-repaired-20260907-full.log": "e712e5df321f11077627ddf27efc68412f2e254f6ea645fc46978c298161b485",
+    "codex-lab-main-merge-repaired-20260907-fmt.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "codex-lab-main-merge-repaired-20260907-fmt-check.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "limitations": [
+    "40 known-name upstream/environment test failures remain",
+    "34 existing skipped tests",
+    "No new live Muse inference in this merge validation",
+    "Native Windows test execution and remote CI not claimed"
+  ]
+}
