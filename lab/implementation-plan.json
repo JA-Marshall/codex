@@ -1,0 +1,462 @@
+{
+  "schema_version": 1,
+  "plan_id": "codex-lab-foundation",
+  "revision": 1,
+  "status": "awaiting_plan_approval",
+  "source_of_truth": "lab/implementation-plan.json",
+  "presentation": "lab/IMPLEMENTATION_PLAN.md",
+  "baseline": {
+    "repository": "https://github.com/openai/codex.git",
+    "commit": "112be0bd74ce327788613f4f8f92e8b7c92447c7",
+    "branch": "main",
+    "shallow_clone": true,
+    "research_date": "2026-09-07"
+  },
+  "goal": "Establish a tested, core-independent workflow-laboratory foundation with canonical plan revisions, Markdown/JSON renderers, runtime workflow configuration, deterministic role instruction selection, explicit revision-bound human approval transitions, and lab-owned run artifacts. Defer live Codex enforcement until a separately reviewed integration proves complete tool admission and amendment quiescence.",
+  "approval": {
+    "required": true,
+    "decision": null,
+    "approved_revision": null,
+    "approved_content_sha256": null,
+    "authority": "Explicit human approval in this conversation for this plan revision; neither this file's status nor model text grants approval.",
+    "scope": "Foundation steps F01-F06 only. No live agent integration or model calls."
+  },
+  "assumptions": [
+    "Keep this isolated nested checkout; do not modify the unrelated parent repository or its Python files.",
+    "Use upstream Rust workspace conventions, existing dependency versions and Cargo/Bazel build systems.",
+    "One small new codex-lab crate is cleaner than adding workflow fields across core, protocol, CLI and TUI.",
+    "Muse is an unresolved provider/model identity; generic foundation work does not depend on resolving it.",
+    "The first release enforces domain transitions and admission only for consumers of its API; it must not claim live Codex tools are gated.",
+    "No automatic approval, unattended baseline or resume after process restart is included."
+  ],
+  "discoveries": [
+    {
+      "id": "D01",
+      "summary": "Current upstream has extracted extension, provider, config, skills, history, rollout and trace crates.",
+      "evidence": [
+        "codex-rs/ext/extension-api/src/lib.rs",
+        "codex-rs/Cargo.toml"
+      ]
+    },
+    {
+      "id": "D02",
+      "summary": "Lifecycle callbacks cannot veto; command hooks are optional and can fail open.",
+      "evidence": [
+        "codex-rs/ext/extension-api/src/contributors.rs",
+        "codex-rs/hooks/src/events/pre_tool_use.rs",
+        "codex-rs/core/src/tools/registry.rs"
+      ]
+    },
+    {
+      "id": "D03",
+      "summary": "Current provider wire protocol supports Responses, not Chat Completions.",
+      "evidence": [
+        "codex-rs/model-provider-info/src/lib.rs"
+      ]
+    },
+    {
+      "id": "D04",
+      "summary": "Profile-v2 and explicit typed skill invocation already exist.",
+      "evidence": [
+        "codex-rs/config/src/loader/mod.rs",
+        "codex-rs/protocol/src/user_input.rs",
+        "codex-rs/ext/skills/src/host_prompt.rs"
+      ]
+    },
+    {
+      "id": "D05",
+      "summary": "Existing rollout-trace supplies detailed best-effort diagnostic evidence; lab approval recording must remain distinct.",
+      "evidence": [
+        "codex-rs/rollout-trace/README.md"
+      ]
+    }
+  ],
+  "affected_files": {
+    "new": [
+      "codex-rs/lab/Cargo.toml",
+      "codex-rs/lab/BUILD.bazel",
+      "codex-rs/lab/src/lib.rs",
+      "codex-rs/lab/src/plan.rs",
+      "codex-rs/lab/src/render.rs",
+      "codex-rs/lab/src/config.rs",
+      "codex-rs/lab/src/instructions.rs",
+      "codex-rs/lab/src/workflow.rs",
+      "codex-rs/lab/src/run.rs",
+      "codex-rs/lab/tests/",
+      "codex-rs/lab/examples/inspect.rs",
+      "lab/workflows/",
+      "lab/instructions/",
+      "lab/README.md"
+    ],
+    "mechanical_existing": [
+      "codex-rs/Cargo.toml",
+      "codex-rs/Cargo.lock",
+      "MODULE.bazel.lock"
+    ],
+    "optional_generated_build": [
+      "Bazel registration metadata only if required by the current workspace rules; document the exact diff before changing it."
+    ],
+    "forbidden_without_amendment": [
+      "codex-rs/core/src/",
+      "codex-rs/config/src/",
+      "codex-rs/protocol/src/",
+      "codex-rs/app-server-protocol/",
+      "codex-rs/app-server/src/",
+      "codex-rs/tui/",
+      "codex-rs/cli/src/",
+      "codex-rs/model-provider/",
+      "codex-rs/ext/extension-api/src/"
+    ]
+  },
+  "steps": [
+    {
+      "id": "F01",
+      "title": "Introduce the isolated crate and canonical plan/rendering abstractions",
+      "status": "pending",
+      "depends_on": [],
+      "files": [
+        "codex-rs/lab/Cargo.toml",
+        "codex-rs/lab/BUILD.bazel",
+        "codex-rs/lab/src/lib.rs",
+        "codex-rs/lab/src/plan.rs",
+        "codex-rs/lab/src/render.rs",
+        "codex-rs/lab/tests/plan.rs",
+        "codex-rs/lab/tests/render.rs",
+        "codex-rs/Cargo.toml",
+        "codex-rs/Cargo.lock",
+        "MODULE.bazel.lock"
+      ],
+      "implementation": [
+        "Keep private modules with a small exported API; no dependency on codex-core or runtime subsystems.",
+        "Version immutable PlanRevision data and progress separately; validate IDs, dependency DAGs, criteria references, relative paths and size bounds.",
+        "Define deterministic canonical JSON and content digest; implement documented pure PlanRenderer with Markdown and JSON implementations.",
+        "Render the same semantic content from the same revision; never parse PLAN.md to authorize execution."
+      ],
+      "acceptance_criteria": [
+        "AC01",
+        "AC02"
+      ],
+      "verification": [
+        "V01"
+      ],
+      "stop_if": "Adding the crate requires invasive changes to runtime initialization or build ownership."
+    },
+    {
+      "id": "F02",
+      "title": "Resolve runtime workflow configuration and explicit role instructions",
+      "status": "pending",
+      "depends_on": [
+        "F01"
+      ],
+      "files": [
+        "codex-rs/lab/src/config.rs",
+        "codex-rs/lab/src/instructions.rs",
+        "codex-rs/lab/tests/config.rs",
+        "codex-rs/lab/tests/instructions.rs",
+        "lab/workflows/",
+        "lab/instructions/"
+      ],
+      "implementation": [
+        "Strict versioned TOML, one named parent, bounded depth, explicit merge semantics, cycle/missing-parent/unknown-field errors.",
+        "Create plan-md-v1 and plan-json-v1 from a shared parent; effective behavioral configuration differs only by plan.renderer.",
+        "Role catalog names one planner, executor and verifier local skill directory each, containing valid upstream-format SKILL.md metadata/body, with exact content hash and size bound; reject missing or changed mandatory inputs.",
+        "Resolve/freeze local SKILL.md bytes without creating another skill discovery system; later register/discover the exact metadata and invoke upstream UserInput::Skill. Extension-owned skill URIs and UserInput::Mention integration are deferred.",
+        "Keep model/provider and Codex permission/context configuration outside workflow inheritance."
+      ],
+      "acceptance_criteria": [
+        "AC03",
+        "AC04"
+      ],
+      "verification": [
+        "V02"
+      ],
+      "stop_if": "Deterministic selection would require patching upstream skill loading in this foundation."
+    },
+    {
+      "id": "F03",
+      "title": "Enforce domain approval, revision and amendment invariants",
+      "status": "pending",
+      "depends_on": [
+        "F01"
+      ],
+      "files": [
+        "codex-rs/lab/src/workflow.rs",
+        "codex-rs/lab/tests/workflow.rs"
+      ],
+      "implementation": [
+        "Implement researching, planning, awaiting_plan_approval, implementing, awaiting_plan_amendment, verifying, completed and failed states.",
+        "Separate model-originated proposals/progress/amendment requests from host-originated human decisions.",
+        "Bind approval to run ID, plan ID, revision, content digest and effective run-spec digest; approval is unavailable through rendered-plan data or observation events.",
+        "Default-deny implementation admission before current matching approval; revoke admission on amendment and reject stale references.",
+        "Require verification evidence before completion; keep step progress distinct from immutable plan content.",
+        "Use a fake execution boundary in behavioral tests to prove denied actions never execute; document that real Codex integration is not included."
+      ],
+      "acceptance_criteria": [
+        "AC05",
+        "AC06"
+      ],
+      "verification": [
+        "V03"
+      ],
+      "stop_if": "A domain-only API is being described as protecting live Codex or an approval path can be reached from untrusted plan/model data."
+    },
+    {
+      "id": "F04",
+      "title": "Persist lab artifacts and approval-critical journal records",
+      "status": "pending",
+      "depends_on": [
+        "F01",
+        "F02",
+        "F03"
+      ],
+      "files": [
+        "codex-rs/lab/src/run.rs",
+        "codex-rs/lab/tests/run.rs"
+      ],
+      "implementation": [
+        "Create collision-refusing, single-writer run directories with resolved workflow, instruction snapshots, immutable plan versions, selected views, human edits/decisions and bounded JSONL events.",
+        "Check and synchronize approval-critical writes to storage before admitting implementation in the lab API; ordinary flush is insufficient and I/O failure never grants permission.",
+        "Use sequence IDs and references for evidence; record trace availability and unknown metrics explicitly.",
+        "Reserve links to upstream rollout-trace; do not implement another model/tool trace collector.",
+        "Store only explicit non-secret metadata and credential reference names; locate run authority outside evaluated repository writable roots and document that the later adapter must verify actual sandbox/host write isolation.",
+        "Reject live restore/recovery in this increment; incomplete artifacts are reviewable evidence only."
+      ],
+      "acceptance_criteria": [
+        "AC07",
+        "AC08"
+      ],
+      "verification": [
+        "V04"
+      ],
+      "stop_if": "Durability requires replacing Codex session persistence or building a generic database/event-sourcing platform."
+    },
+    {
+      "id": "F05",
+      "title": "Provide an offline foundation walkthrough and integration contracts",
+      "status": "pending",
+      "depends_on": [
+        "F02",
+        "F03",
+        "F04"
+      ],
+      "files": [
+        "codex-rs/lab/examples/inspect.rs",
+        "lab/README.md",
+        "lab/ARCHITECTURE.md",
+        "lab/PROGRESS.md"
+      ],
+      "implementation": [
+        "Add a small offline example accepting a workflow name and fixture plan, showing resolved configuration, rendered output and approval-required state without starting a model or executing task tools.",
+        "Document API usage, artifact formats, supported scope and exact limitations.",
+        "Document conditional Muse provider configuration and the source-backed Responses compatibility checklist; do not invent credentials, endpoint or model metadata.",
+        "Specify later extension admission ordering and amendment stop/drain tests, preserving upstream ownership."
+      ],
+      "acceptance_criteria": [
+        "AC09"
+      ],
+      "verification": [
+        "V05"
+      ],
+      "stop_if": "The example starts turning into a benchmark scheduler, TUI, live provider client or full agent driver."
+    },
+    {
+      "id": "F06",
+      "title": "Validate and hand off the smallest coherent foundation",
+      "status": "pending",
+      "depends_on": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05"
+      ],
+      "files": [
+        "lab/PROGRESS.md",
+        "lab/README.md",
+        "codex-rs/Cargo.lock",
+        "MODULE.bazel.lock"
+      ],
+      "implementation": [
+        "Provision the repository-pinned build tools in a task-scoped/user-local environment after approval; do not change the required Rust version to fit installed 1.75.",
+        "Run behavioral lab tests and relevant unchanged upstream package tests using just test.",
+        "Refresh/check Bazel lock and build registration after dependency changes, run scoped lint/fmt according to AGENTS.md, and inspect the final diff.",
+        "Record exact commands/results/skips and remaining integration blockers; stop before expanding into live enforcement."
+      ],
+      "acceptance_criteria": [
+        "AC10"
+      ],
+      "verification": [
+        "V01",
+        "V02",
+        "V03",
+        "V04",
+        "V05",
+        "V06"
+      ],
+      "stop_if": "Tests cannot be run with the pinned toolchain or build prerequisites; report the concrete blocker without claiming validation."
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC01",
+      "description": "Canonical plans have stable IDs, validated references/dependencies and versioned immutable content; status/progress cannot silently rewrite approved content."
+    },
+    {
+      "id": "AC02",
+      "description": "Both renderers consume identical canonical data, preserve required information and produce deterministic outputs without mutating their input."
+    },
+    {
+      "id": "AC03",
+      "description": "Runtime configuration resolution is deterministic; renderer-only profiles compare equal on every effective behavioral field except renderer."
+    },
+    {
+      "id": "AC04",
+      "description": "Required role instructions are explicitly selected, bounded and content-pinned; missing/changed/ambiguous resources fail before any execution is admitted."
+    },
+    {
+      "id": "AC05",
+      "description": "No domain implementation action executes before an explicit current host human approval; stale/wrong-run/wrong-revision/wrong-spec approvals are rejected."
+    },
+    {
+      "id": "AC06",
+      "description": "Amendment requests revoke future domain admission; replacement revisions require fresh human approval; completion requires verification evidence."
+    },
+    {
+      "id": "AC07",
+      "description": "Canonical revisions, human decisions/edits, configuration and selected views are reviewable in a unique run artifact directory; write failure never releases the gate."
+    },
+    {
+      "id": "AC08",
+      "description": "No credentials or arbitrary environment dumps enter lab manifests; missing live measurements are marked unavailable and not reported as zero."
+    },
+    {
+      "id": "AC09",
+      "description": "An offline walkthrough demonstrates configuration, rendering and approval state without model calls; docs clearly distinguish foundation from live enforcement."
+    },
+    {
+      "id": "AC10",
+      "description": "Behavioral tests and relevant upstream regressions have recorded outcomes; build metadata is consistent; no upstream runtime file is modified."
+    }
+  ],
+  "verification_strategy": [
+    {
+      "id": "V01",
+      "checks": [
+        "Whole-object canonical JSON round-trip; invalid duplicate/missing/cyclic dependencies and escaping paths rejected.",
+        "Same plan in both renderers; escaping/newlines, all required fields and unchanged input verified."
+      ]
+    },
+    {
+      "id": "V02",
+      "checks": [
+        "Multi-level config resolution and cycle/missing-parent/unknown-key rejection.",
+        "Renderer-only effective difference assertion; exact role byte/hash selection; missing, changed and oversized resources rejected."
+      ]
+    },
+    {
+      "id": "V03",
+      "checks": [
+        "Transition/admission matrix including approval, rejection, edit, amendment, verification and terminal states.",
+        "Fake execution side effect count remains zero on every unapproved/stale path.",
+        "Run/revision/config binding, progress-only updates and amendment revocation checked behaviorally."
+      ]
+    },
+    {
+      "id": "V04",
+      "checks": [
+        "Temporary-directory end-to-end artifact creation and JSONL parse/order; duplicate run IDs refuse overwrite.",
+        "Injected writer failure before approval cannot produce implementation admission.",
+        "Human edit records retain prior revisions; absent live metrics remain unavailable; credential fields cannot enter typed manifests."
+      ]
+    },
+    {
+      "id": "V05",
+      "checks": [
+        "Run offline example for both renderer profiles with same fixture plan; compare artifacts.",
+        "Verify docs examples and documented unsupported operations match final API."
+      ]
+    },
+    {
+      "id": "V06",
+      "commands": [
+        "just test -p codex-lab",
+        "just test -p codex-model-provider-info -p codex-models-manager -p codex-config -p codex-skills -p codex-skills-extension -p codex-rollout-trace",
+        "just bazel-lock-update",
+        "just bazel-lock-check",
+        "just fix -p codex-lab",
+        "just fmt"
+      ],
+      "notes": [
+        "Use pinned Rust 1.95.0, just, cargo-nextest and required Bazel/format helpers; never substitute direct cargo test.",
+        "Refresh lock metadata as soon as dependencies change; final command ordering follows AGENTS.md, including avoiding redundant reruns after fix/fmt.",
+        "No core/common/protocol changes are planned, so no full workspace test is proposed for this increment.",
+        "If core integration is proposed later, add real integration tests and revisit full-suite requirements under the separately approved plan."
+      ]
+    }
+  ],
+  "risks": [
+    {
+      "id": "R01",
+      "description": "A state-machine-only foundation can be mistaken for a working hard gate in Codex.",
+      "mitigation": "Explicit domain-only claims, offline example, no live --workflow launch; live milestone needs separate admission integration tests."
+    },
+    {
+      "id": "R02",
+      "description": "Overbuilding the requested list could produce a large speculative change.",
+      "mitigation": "Separate F01-F05 into reviewable dependency-ordered patches; small private modules and concrete data types; stop on listed boundaries."
+    },
+    {
+      "id": "R03",
+      "description": "Config, renderer, skill and model differences could confound comparisons.",
+      "mitigation": "Separate selectors and hashes; canonical plan reuse; assertion that renderer profiles differ in only one behavioral field."
+    },
+    {
+      "id": "R04",
+      "description": "Approval/logging state can drift or be forged by model-controlled files.",
+      "mitigation": "Host-only decisions bound to run/content/spec; immutable snapshots; checked writes; external artifact root; no unsafe live recovery."
+    },
+    {
+      "id": "R05",
+      "description": "Current upstream changes rapidly, especially orchestration and public config/protocol surfaces.",
+      "mitigation": "Pin baseline; no source edits in those surfaces for foundation; isolate later adapters."
+    },
+    {
+      "id": "R06",
+      "description": "Muse API identity and compatibility are unknown.",
+      "mitigation": "Leave provider conditional; use existing custom-provider configuration if Responses compatible; external adapter only if needed."
+    },
+    {
+      "id": "R07",
+      "description": "Build tooling is not ready and this large Rust workspace has significant dependency costs.",
+      "mitigation": "Preflight after approval, use pinned toolchain and focused tests, record actual failures and never claim unrun tests passed."
+    }
+  ],
+  "blockers": [
+    {
+      "id": "B01",
+      "blocks": "All implementation steps",
+      "description": "Awaiting explicit human approval of this concrete plan revision.",
+      "status": "open"
+    },
+    {
+      "id": "B02",
+      "blocks": "Live Muse feasibility proof only, not the generic foundation",
+      "description": "Need provider/API documentation and exact Muse model ID; no credentials are requested in repository artifacts.",
+      "status": "open"
+    },
+    {
+      "id": "B03",
+      "blocks": "Compiling/testing after approval",
+      "description": "Native Windows cargo/rustc/rustup/just/Bazel absent; Ubuntu WSL has cargo/rustc 1.75, below required Rust 1.95. Toolchain setup remains to be done.",
+      "status": "open"
+    }
+  ],
+  "deferred": [
+    "Live Codex driver and universal dispatch admission contributor; amendment interrupt/drain barrier.",
+    "Upstream --workflow flag and TUI/protocol integration.",
+    "Actual Muse contract smoke tests and any external protocol adapter.",
+    "Additional skill variants, GitHub synchronization/Actions orchestration, XML/compact renderers.",
+    "Subagent workflow experiments, benchmark run/compare commands, hidden-test service and parameter sweeps.",
+    "Live resume/crash recovery, new compaction strategies and complete metric reduction."
+  ]
+}

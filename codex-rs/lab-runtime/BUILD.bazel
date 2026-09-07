@@ -1,0 +1,9 @@
+load("//:defs.bzl", "codex_rust_crate")
+
+codex_rust_crate(
+    name = "lab-runtime",
+    compile_data = glob(["tests/authority_support/**"]),
+    crate_name = "codex_lab_runtime",
+    extra_binaries = ["//codex-rs/bwrap:bwrap"],
+    test_tags = ["no-sandbox"],
+)

@@ -1,0 +1,2 @@
+# The workflow catalog pins the exact SKILL.md bytes across platforms.
+*.md text eol=lf

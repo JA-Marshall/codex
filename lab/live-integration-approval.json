@@ -1,0 +1,11 @@
+{
+  "plan_id": "codex-lab-live-integration",
+  "revision": 1,
+  "plan_file_sha256": "be7d4e95cae386b1f5b592d30384a21e5df441ab7dfbe093c61792c4fc579ebc",
+  "decision": "approved",
+  "source": "Explicit user reply to the concrete G01-G06 approval question in this conversation",
+  "user_reply": "Yes",
+  "scope": ["G01", "G02", "G03", "G04", "G05", "G06"],
+  "includes": ["Full workspace test suite", "Necessary local build dependencies", "In-scope fixes", "Local checkpoint commits"],
+  "excludes": ["Automatic approval of experimental task plans", "Live Muse requests without local credentials and task-plan approval", "Pushes, deployments, purchases and account changes"]
+}

@@ -3730,6 +3730,57 @@ dependencies = [
 ]
 
 [[package]]
+name = "codex-lab"
+version = "0.0.0"
+dependencies = [
+ "insta",
+ "pretty_assertions",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "tempfile",
+ "thiserror 2.0.18",
+ "toml 0.9.11+spec-1.1.0",
+]
+
+[[package]]
+name = "codex-lab-runtime"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "codex-arg0",
+ "codex-config",
+ "codex-core",
+ "codex-core-api",
+ "codex-exec-server",
+ "codex-extension-api",
+ "codex-features",
+ "codex-file-system",
+ "codex-lab",
+ "codex-login",
+ "codex-protocol",
+ "codex-tools",
+ "codex-utils-absolute-path",
+ "codex-utils-cargo-bin",
+ "codex-utils-output-truncation",
+ "codex-utils-path-uri",
+ "core_test_support",
+ "futures",
+ "insta",
+ "pretty_assertions",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "tempfile",
+ "tokio",
+ "tokio-util",
+ "toml 0.9.11+spec-1.1.0",
+ "url",
+ "wiremock",
+]
+
+[[package]]
 name = "codex-linux-sandbox"
 version = "0.0.0"
 dependencies = [
@@ -9258,6 +9309,7 @@ checksum = "e82db8c87c7f1ccecb34ce0c24399b8a73081427f3c7c50a5d597925356115e4"
 dependencies = [
  "console",
  "once_cell",
+ "serde",
  "similar",
  "tempfile",
 ]

@@ -16,6 +16,10 @@ use crate::NoopExtensionEventSink;
 use crate::SkillInvocationContributor;
 use crate::ThreadLifecycleContributor;
 use crate::TokenUsageContributor;
+use crate::ToolAdmissionContributor;
+use crate::ToolAdmissionError;
+use crate::ToolAdmissionInput;
+use crate::ToolAdmissionPermit;
 use crate::ToolContributor;
 use crate::ToolLifecycleContributor;
 use crate::TurnInputContributor;
@@ -43,6 +47,7 @@ impl<C: Sync> Default for ExtensionRegistryBuilder<C> {
                 turn_input_contributors: Vec::new(),
                 tool_contributors: Vec::new(),
                 tool_lifecycle_contributors: Vec::new(),
+                tool_admission_contributors: Vec::new(),
                 turn_item_contributors: Vec::new(),
             },
         }
@@ -132,6 +137,11 @@ impl<C: Sync> ExtensionRegistryBuilder<C> {
         self.registry.tool_lifecycle_contributors.push(contributor);
     }
 
+    /// Registers an additional mandatory tool admission policy.
+    pub fn tool_admission_contributor(&mut self, contributor: Arc<dyn ToolAdmissionContributor>) {
+        self.registry.tool_admission_contributors.push(contributor);
+    }
+
     /// Registers one ordered turn-item contributor.
     pub fn turn_item_contributor(&mut self, contributor: Arc<dyn TurnItemContributor>) {
         self.registry.turn_item_contributors.push(contributor);
@@ -156,6 +166,7 @@ pub struct ExtensionRegistry<C: Sync> {
     turn_input_contributors: Vec<Arc<dyn TurnInputContributor>>,
     tool_contributors: Vec<Arc<dyn ToolContributor>>,
     tool_lifecycle_contributors: Vec<Arc<dyn ToolLifecycleContributor>>,
+    tool_admission_contributors: Vec<Arc<dyn ToolAdmissionContributor>>,
     turn_item_contributors: Vec<Arc<dyn TurnItemContributor>>,
     approval_review_contributors: Vec<Arc<dyn ApprovalReviewContributor>>,
 }
@@ -277,6 +288,27 @@ impl<C: Sync> ExtensionRegistry<C> {
     /// Returns the registered tool-lifecycle contributors.
     pub fn tool_lifecycle_contributors(&self) -> &[Arc<dyn ToolLifecycleContributor>] {
         &self.tool_lifecycle_contributors
+    }
+
+    /// Returns all mandatory tool admission policies installed by the host.
+    pub fn tool_admission_contributors(&self) -> &[Arc<dyn ToolAdmissionContributor>] {
+        &self.tool_admission_contributors
+    }
+
+    /// Obtains every registered policy's permit in registration order.
+    ///
+    /// Empty registries preserve upstream dispatch behavior. A denial or
+    /// cancellation drops permits already obtained; success requires the caller
+    /// to retain all permits for the full dispatch lifetime.
+    pub async fn admit_tool(
+        &self,
+        input: ToolAdmissionInput<'_>,
+    ) -> Result<Vec<ToolAdmissionPermit>, ToolAdmissionError> {
+        let mut permits = Vec::with_capacity(self.tool_admission_contributors.len());
+        for contributor in &self.tool_admission_contributors {
+            permits.push(contributor.admit(input.clone()).await?);
+        }
+        Ok(permits)
     }
 
     /// Returns the registered ordered turn-item contributors.

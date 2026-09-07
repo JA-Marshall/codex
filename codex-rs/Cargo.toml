@@ -73,6 +73,8 @@ members = [
     "ext/web-search",
     "external-agent-migration",
     "keyring-store",
+    "lab",
+    "lab-runtime",
     "file-search",
     "file-watcher",
     "linux-sandbox",
@@ -200,6 +202,7 @@ codex-connectors-extension = { path = "ext/connectors" }
 codex-context-fragments = { path = "context-fragments" }
 codex-core = { path = "core" }
 codex-core-api = { path = "core-api" }
+codex-lab = { path = "lab" }
 codex-core-plugins = { path = "core-plugins" }
 codex-diagnostics = { path = "diagnostics" }
 codex-exec = { path = "exec" }
