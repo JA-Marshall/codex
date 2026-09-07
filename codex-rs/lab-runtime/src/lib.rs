@@ -1,6 +1,7 @@
 //! Restricted experimental host; the upstream runtime owns model and tool execution.
 
 mod amendment_tool;
+mod artifact_input;
 mod authority;
 mod backend;
 mod bootstrap;
@@ -10,6 +11,8 @@ mod driver;
 mod evidence;
 mod git_evidence;
 mod preflight;
+mod prepared;
+mod prepared_journal;
 mod reports;
 mod repository_tools;
 mod review;
