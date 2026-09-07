@@ -1,4 +1,5 @@
 import copy
+import fcntl
 import json
 import os
 from pathlib import Path
@@ -31,12 +32,23 @@ def make_run(path, state="failed"):
     ]
     write_journal(path / "runtime-events.jsonl", events)
     write_json(path / "evidence/input-01.json", {})
-    write_json(path / "evidence/phase-01.json", {"thread_id": "test-thread", "events": [{"msg": {"type": "shutdown_complete"}}], "token_usage": {"total_token_usage": {"input_tokens": 10, "output_tokens": 2, "cached_input_tokens": 5}}})
+    write_json(path / "evidence/phase-01.json", {"thread_id": "test-thread", "events": [{"msg": {"type": "session_configured", "session_id": "test-thread", "cwd": str(path.parent / "fixture/repository")}}, {"msg": {"type": "shutdown_complete"}}], "token_usage": {"total_token_usage": {"input_tokens": 10, "output_tokens": 2, "cached_input_tokens": 5}}})
     write_json(path / "config/run-spec.json", {})
     return events
 
 
 class TerminalTests(unittest.TestCase):
+    def test_evaluation_respects_repository_launch_lock(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            setup(root / "fixture")
+            repository = root / "fixture/repository"
+            with (repository / ".git/codex-lab-launch.lock").open("a+b") as lock:
+                fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                with self.assertRaises(BlockingIOError):
+                    evaluate(repository, root / "codex-linux-sandbox", root / "evaluation", root / "fixture/fixture.json")
+            self.assertFalse((root / "evaluation").exists())
+
     def test_terminal_snapshot_accepts_failure_and_detects_later_changes(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -107,6 +119,10 @@ class TerminalTests(unittest.TestCase):
             self.assertEqual(observation["workflow_state"], "failed")
             self.assertEqual(observation["git"]["files_changed"], 0)
             self.assertEqual(before, {str(p): p.read_bytes() for p in run.rglob("*") if p.is_file()})
+            other = setup(root / "other")
+            with self.assertRaisesRegex(ValueError, "run belongs to another"):
+                evaluate(Path(other["repository"]), sandbox, root / "wrong-repo", root / "other/fixture.json", run)
+            self.assertFalse((root / "wrong-repo").exists())
             old_metadata = copy.deepcopy(metadata)
             old_metadata["evaluator_sha256"] = "0" * 64
             write_json(root / "fixture/fixture.json", old_metadata)

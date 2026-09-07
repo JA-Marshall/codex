@@ -109,11 +109,16 @@ def observe_terminal(run: Path):
     if active is not None or calls:
         raise ValueError("missing phase shutdown")
     totals = {key: 0 for key in ("input_tokens", "output_tokens", "cached_input_tokens")}
+    repositories = set()
     for index, phase in enumerate(phases, 1):
         snapshot.json(f"evidence/input-{index:02}.json")
         output = snapshot.json(f"evidence/phase-{index:02}.json")
         if output.get("thread_id") != phase["thread_id"] or not any(e.get("msg", {}).get("type") == "shutdown_complete" for e in output.get("events", [])):
             raise ValueError("missing or foreign phase shutdown artifact")
+        configured = [e["msg"] for e in output["events"] if e.get("msg", {}).get("type") == "session_configured"]
+        if len(configured) != 1 or configured[0].get("session_id") != phase["thread_id"] or not configured[0].get("cwd"):
+            raise ValueError("missing phase repository binding")
+        repositories.add(str(Path(configured[0]["cwd"]).resolve()))
         usage = (output.get("token_usage") or {}).get("total_token_usage", {})
         for key in totals:
             value = usage.get(key)
@@ -125,9 +130,14 @@ def observe_terminal(run: Path):
     if {p.name for p in (snapshot.root / "evidence").glob("input-*.json")} != expected_inputs:
         raise ValueError("unexpected phase input inventory")
     spec = snapshot.json("config/run-spec.json")
+    if len(repositories) != 1:
+        raise ValueError("missing or inconsistent run repository")
+    decisions = [e["change"]["type"] for e in events if e["change"]["type"] in ("human_approved", "human_rejected", "plan_edited")]
     observation = {
         "schema_version": 1, "run": str(snapshot.root), "workflow_state": events[-1]["state"],
         "terminal_change": events[-1]["change"], "all_started_phases_shutdown": True,
+        "repository": next(iter(repositories)),
+        "first_plan_human_approval": decisions[0] == "human_approved" if decisions else None,
         "phase_turns": len(phases), "planner_phases": sum(p["phase"] == "planning" for p in phases),
         "tool_admissions": sum(e["type"] == "tool_admitted" for e in runtime),
         "usage": totals, "workflow_terminal_elapsed_ms": events[-1].get("elapsed_ms"),

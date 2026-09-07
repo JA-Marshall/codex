@@ -179,6 +179,8 @@ def evaluate_locked(
         raise ValueError("use the existing codex-linux-sandbox dispatch alias")
     metadata = bounded_json(fixture_manifest)
     selected = fixture(metadata["fixture"])
+    if Path(metadata["repository"]).resolve() != repository:
+        raise ValueError("fixture manifest belongs to another repository")
     if git(repository, "rev-parse", "HEAD") != metadata["commit"]:
         raise ValueError("candidate commit differs from fixture baseline")
     if metadata["python"]["sha256"] != sha256(Path(sys.executable).resolve()):
@@ -191,6 +193,8 @@ def evaluate_locked(
     snapshot, observation = None, None
     if run is not None:
         snapshot, spec, observation = observe_terminal(run)
+        if observation["repository"] != str(repository):
+            raise ValueError("run belongs to another repository")
         if (
             spec["repository"]["commit"] != metadata["commit"]
             or spec["task"].encode() != (selected.root / "task.txt").read_bytes()
