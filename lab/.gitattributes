@@ -1,0 +1,3 @@
+# Preserve the file-byte digests recorded at human review across platforms.
+implementation-plan.json text eol=lf
+live-integration-plan.json text eol=lf

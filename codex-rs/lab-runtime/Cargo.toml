@@ -1,0 +1,53 @@
+[package]
+edition.workspace = true
+license.workspace = true
+name = "codex-lab-runtime"
+version.workspace = true
+
+[lib]
+doctest = false
+name = "codex_lab_runtime"
+path = "src/lib.rs"
+
+[[bin]]
+name = "codex-lab"
+path = "src/main.rs"
+
+[lints]
+workspace = true
+
+[dependencies]
+anyhow = { workspace = true }
+clap = { workspace = true, features = ["derive"] }
+codex-arg0 = { workspace = true }
+codex-core = { workspace = true }
+codex-core-api = { workspace = true }
+codex-config = { workspace = true }
+codex-exec-server = { workspace = true }
+codex-extension-api = { workspace = true }
+codex-features = { workspace = true }
+codex-file-system = { workspace = true }
+codex-lab = { workspace = true }
+codex-login = { workspace = true }
+codex-protocol = { workspace = true }
+codex-tools = { workspace = true }
+codex-utils-absolute-path = { workspace = true }
+codex-utils-path-uri = { workspace = true }
+futures = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+tempfile = { workspace = true }
+tokio = { workspace = true, features = ["io-util", "io-std", "macros", "rt-multi-thread", "signal"] }
+tokio-util = { workspace = true }
+toml = { workspace = true }
+url = { workspace = true }
+
+[dev-dependencies]
+codex-utils-cargo-bin = { workspace = true }
+codex-utils-output-truncation = { workspace = true }
+core_test_support = { path = "../core/tests/common" }
+insta = { workspace = true, features = ["json"] }
+pretty_assertions = { workspace = true }
+tempfile = { workspace = true }
+wiremock = { workspace = true }

@@ -1,0 +1,19 @@
+# Candidate direct Meta API configuration, not a tested working preset.
+# Confirm your account's Contributor identifier first: the public cookbook
+# documents the standard model, not the direct Contributor tier identifier.
+# The Vercel Contributor slug is not assumed to be a direct Meta API slug.
+model = "<verified-direct-meta-contributor-model-id>"
+model_provider = "muse-lab"
+model_catalog_json = "<absolute-path-to-verified-exact-model-catalog.json>"
+
+[model_providers.muse-lab]
+name = "Muse lab provider"
+base_url = "https://api.meta.ai/v1"
+env_key = "MODEL_API_KEY"
+wire_api = "responses"
+requires_openai_auth = false
+supports_websockets = false
+
+# Add verified reasoning/context/output settings to the exact catalog and pin
+# them for the experiment batch. Do not fill these from Codex's unknown-model
+# fallback. Keep API keys in the environment, never in a run configuration.

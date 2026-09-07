@@ -1,0 +1,245 @@
+{
+  "schema_version": 1,
+  "plan_id": "codex-lab-live-integration",
+  "revision": 1,
+  "goal": "Connect the approved laboratory foundation to real Codex tool dispatch and deliver a restricted local workflow driver with a tested hard human approval boundary, while retaining upstream lifecycle and provider code.",
+  "assumptions": [
+    "The foundation at upstream commit 112be0bd74ce327788613f4f8f92e8b7c92447c7 remains the base; its reviewed plan is immutable.",
+    "This is the next bounded milestone, not the full long-term benchmark, GitHub renderer, UI or subagent roadmap.",
+    "Development approval covers the implementation and tests described here. Future experimental task plans still require their own explicit human approval.",
+    "Initial supported runtime is Linux, including the existing Ubuntu WSL verification environment, with effective sandbox isolation verified before use.",
+    "Fresh upstream threads per workflow phase are acceptable and must be recorded consistently across representations.",
+    "No live Muse request is necessary for implementation or mocked end-to-end completion; credentials are supplied locally through existing authentication."
+  ],
+  "steps": [
+    {
+      "id": "G01",
+      "title": "Add universal dispatch admission",
+      "instructions": "Add an optional typed ToolAdmissionContributor with all-contributors-must-admit composition and non-clone RAII permits. Hold permits across dispatch including hooks; denial must precede hook/handler side effects. Empty registries retain baseline behavior. Reuse existing tool outcomes/tracing, and test cancellation and nested paths. Keep the core call small and helper isolated.",
+      "affected_files": [
+        "codex-rs/ext/extension-api/src/contributors/tool_admission.rs",
+        "codex-rs/ext/extension-api/src/contributors.rs",
+        "codex-rs/ext/extension-api/src/lib.rs",
+        "codex-rs/ext/extension-api/src/registry.rs",
+        "codex-rs/ext/extension-api/tests/registry.rs",
+        "codex-rs/core/src/tools/admission.rs",
+        "codex-rs/core/src/tools/mod.rs",
+        "codex-rs/core/src/tools/registry.rs",
+        "codex-rs/core/src/tools/registry_tests.rs"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [
+        "AC01",
+        "AC02"
+      ],
+      "verification": [
+        "V01",
+        "V02"
+      ]
+    },
+    {
+      "id": "G02",
+      "title": "Build isolated approval adapter",
+      "instructions": "Add a separate lab-runtime crate, keeping codex-lab independent of core. Bind admission to current canonical target and phase under synchronized host authority. Track active permits and fail closed on state or journal errors. Revoke before interruption; use upstream shutdown_and_wait and then drain permits before publishing amendment paused. Do not equate permit release with terminated OS processes. The model gets no approve operation. Add minimal lab-domain API changes only where needed to bridge actual asynchronous admission safely.",
+      "affected_files": [
+        "codex-rs/lab-runtime/Cargo.toml",
+        "codex-rs/lab-runtime/BUILD.bazel",
+        "codex-rs/lab-runtime/src/lib.rs",
+        "codex-rs/lab-runtime/src/admission.rs",
+        "codex-rs/lab-runtime/src/authority.rs",
+        "codex-rs/lab-runtime/tests/authority.rs",
+        "codex-rs/lab/src/run.rs",
+        "codex-rs/lab/src/workflow.rs",
+        "codex-rs/lab/tests/run.rs",
+        "codex-rs/Cargo.toml",
+        "codex-rs/Cargo.lock",
+        "MODULE.bazel.lock"
+      ],
+      "depends_on": [
+        "G01"
+      ],
+      "acceptance_criteria": [
+        "AC02",
+        "AC03"
+      ],
+      "verification": [
+        "V01",
+        "V02"
+      ]
+    },
+    {
+      "id": "G03",
+      "title": "Add restricted local workflow driver",
+      "instructions": "Build a separate codex-lab executable using core-api/ThreadManager and existing config, auth, environments and shutdown. Select workflow declaratively; drive research, strict canonical planning, human review/edits, implementation, verification and completion. Add two bounded repository read/list extension tools wrapping existing ExecutorFileSystem and sandbox context because no general built-in read/list tools exist. Deny arbitrary shell and unknown capabilities before approval. Reject unsupported hooks, MCP/plugins, native implicit skills, subagents, background/code modes, provider built-in tools and unsafe effective sandbox configurations. Inject frozen role instruction bytes through existing Config.developer_instructions and its typed fragment; document these as procedural modules, not native skill invocations. Verify bounded plan/instruction delivery and protected authority/artifacts. Host stdin supplies exact-target human decisions with no automatic approval. Revoke, upstream shutdown and drain before amendment pause; record fresh phase threads. Do not expose host UserShellCommand or direct MCP operations. No app-server/TUI/protocol changes merely for the CLI.",
+      "affected_files": [
+        "codex-rs/lab-runtime/src/main.rs",
+        "codex-rs/lab-runtime/src/cli.rs",
+        "codex-rs/lab-runtime/src/driver.rs",
+        "codex-rs/lab-runtime/src/bootstrap.rs",
+        "codex-rs/lab-runtime/src/preflight.rs",
+        "codex-rs/lab-runtime/src/context.rs",
+        "codex-rs/lab-runtime/src/evidence.rs",
+        "codex-rs/lab-runtime/tests/driver.rs",
+        "codex-rs/lab-runtime/tests/preflight.rs",
+        "codex-rs/lab-runtime/src/repository_tools.rs",
+        "codex-rs/lab-runtime/tests/repository_tools.rs"
+      ],
+      "depends_on": [
+        "G02"
+      ],
+      "acceptance_criteria": [
+        "AC03",
+        "AC04",
+        "AC05"
+      ],
+      "verification": [
+        "V02",
+        "V03"
+      ]
+    },
+    {
+      "id": "G04",
+      "title": "Prepare Muse configuration and reproducibility evidence",
+      "instructions": "Keep model/provider and reasoning controls separate from workflows. Prepare a documented custom-provider configuration for Meta Muse Spark 1.3 Contributor using primary-source verified values; leave unverified Contributor capabilities explicit rather than guess. Provide local credential instructions and offline/mock contract coverage, reuse upstream rollout tracing, and save effective config/catalog/instruction/environment evidence plus final diff and verification results. A live request remains pending local credentials and a separately approved task plan; no secret collection or global account setting changes.",
+      "affected_files": [
+        "lab/providers/muse.toml.example",
+        "lab/README.md",
+        "lab/ARCHITECTURE.md",
+        "codex-rs/lab-runtime/src/evidence.rs",
+        "codex-rs/lab-runtime/tests/provider_contract.rs"
+      ],
+      "depends_on": [
+        "G03"
+      ],
+      "acceptance_criteria": [
+        "AC04",
+        "AC06"
+      ],
+      "verification": [
+        "V03",
+        "V04"
+      ]
+    },
+    {
+      "id": "G05",
+      "title": "Prove the live boundary with mocked integration tests",
+      "instructions": "Exercise real Codex dispatch with mocked Responses, including attempted writes before approval, exact-target approval, stale targets, amended plans, denied hook side effects, nested dispatch and concurrent cancellation/draining. Verify renderer-only variants preserve plan and other effective settings. Cover missing/modified skills, unsafe preflight and interrupted records. Run targeted relevant crates and suites, then the full existing workspace suite for core changes, followed by required lint/format/Bazel checks. Report environmental failures accurately; never count skips or mocked calls as a real Muse smoke test.",
+      "affected_files": [
+        "codex-rs/core/tests/suite/tool_admission.rs",
+        "codex-rs/core/tests/suite/main.rs",
+        "codex-rs/lab-runtime/tests/driver.rs",
+        "codex-rs/lab-runtime/tests/preflight.rs",
+        "lab/PROGRESS.md"
+      ],
+      "depends_on": [
+        "G01",
+        "G02",
+        "G03",
+        "G04"
+      ],
+      "acceptance_criteria": [
+        "AC01",
+        "AC02",
+        "AC03",
+        "AC04",
+        "AC05",
+        "AC06"
+      ],
+      "verification": [
+        "V01",
+        "V02",
+        "V03",
+        "V04"
+      ]
+    },
+    {
+      "id": "G06",
+      "title": "Review and hand off the completed milestone",
+      "instructions": "Review upstream-sensitive diffs and keep changes staged into coherent units. Update documentation, progress, validation and limitations. Preserve user's unrelated files, foundation approval evidence and credentials. Local commits may checkpoint coherent verified work if approved; no push, deployment, purchase or account changes. Stop for a plan amendment if universal enforcement or host isolation would require broad upstream ownership. Do not claim milestone completion while required checks or driver guarantees remain unresolved.",
+      "affected_files": [
+        "lab/README.md",
+        "lab/PROGRESS.md",
+        "lab/LIVE_INTEGRATION_PLAN.md",
+        "lab/live-integration-approval.json"
+      ],
+      "depends_on": [
+        "G05"
+      ],
+      "acceptance_criteria": [
+        "AC07"
+      ],
+      "verification": [
+        "V04"
+      ]
+    }
+  ],
+  "risks": [
+    "Core tool registry and extension API are changing upstream surfaces; keep wiring minimal and isolate policy.",
+    "RAII permits track dispatch lifetime, not background OS processes; upstream shutdown must complete before pause.",
+    "Tool dispatch does not cover host-direct MCP calls, startup hooks or other host actions; the restricted host must exclude unsupported paths before starting.",
+    "Provider documentation does not prove full Contributor Responses compatibility; an actual smoke test remains separate.",
+    "Effective sandbox settings can be overridden by config layers; unsupported isolation must fail preflight.",
+    "Driver bootstrap and exact skill delivery may expose unavailable seams. Broader app-server/session refactors require amendment, not silent scope expansion.",
+    "Full workspace compilation/tests may exceed two hours or encounter unrelated environmental failures; preserve evidence and continue necessary work without weakening checks."
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC01",
+      "description": "Ordinary Codex with no admission contributors retains existing behavior; relevant upstream regression checks pass."
+    },
+    {
+      "id": "AC02",
+      "description": "Unapproved, stale or revoked implementation calls never reach hooks/handlers; nested and concurrent call paths are covered."
+    },
+    {
+      "id": "AC03",
+      "description": "Only explicit trusted human decisions for the current target activate authority; amendments revoke and stop active execution before reporting paused."
+    },
+    {
+      "id": "AC04",
+      "description": "Workflow, model, instructions, canonical plan and representation remain separate, with effective run evidence preserved and unavailable measurements identified."
+    },
+    {
+      "id": "AC05",
+      "description": "Restricted Linux/WSL CLI completes the real Codex workflow under mocked Responses and fails preflight for unsupported authority/isolation paths."
+    },
+    {
+      "id": "AC06",
+      "description": "Muse setup uses existing custom-provider infrastructure; verified versus unverified contract details and live-test limits are explicit."
+    },
+    {
+      "id": "AC07",
+      "description": "Code, tests, source-backed docs and progress ledger are complete for this bounded milestone or clearly identify an unresolved blocker requiring amendment."
+    }
+  ],
+  "verification_strategy": [
+    {
+      "id": "V01",
+      "description": "Run just test for codex-extension-api, codex-lab and codex-lab-runtime; use integration tests for actual agent behavior."
+    },
+    {
+      "id": "V02",
+      "description": "Run relevant codex-core tool admission/lifecycle/hooks/parallelism/skills integration tests, then just test full workspace after targeted checks pass."
+    },
+    {
+      "id": "V03",
+      "description": "Run mocked end-to-end Markdown and JSON workflow tasks including approval denial, human approval, amendment and verification; compare artifacts."
+    },
+    {
+      "id": "V04",
+      "description": "Review effective configuration, source diff and documentation; run required Bazel lock/target, strict lint and formatting checks without claiming unrun native/live tests."
+    }
+  ],
+  "discoveries": [
+    "ToolLifecycleContributor returns Future<()> and cannot veto; dispatch_any_with_terminal_outcome is the shared direct/nested boundary before hooks.",
+    "ExtensionRegistryBuilder and thread_extension_init already provide isolated host registration/state.",
+    "app-server-client has no extension injection; core-api/ThreadManager avoids adding fields through app-server transport.",
+    "CodexThread::shutdown_and_wait reuses upstream task, terminal, code-mode, MCP and persistence shutdown; Interrupt alone does not drain background terminals.",
+    "Meta cookbook documents Responses support, but Contributor exact tool/SSE parity remains unverified.",
+    "No general-purpose read/list built-in exists; bounded lab adapters can reuse ExecutorFileSystem and its existing sandbox context.",
+    "Freeze role bytes in Config.developer_instructions through the existing typed fragment; native skill loading can warn and continue, so native invocation is deferred."
+  ],
+  "blockers": [
+    "Implementation is awaiting explicit approval of this revision. Live Muse requests additionally require local credentials and approval of the generated experimental task plan."
+  ]
+}
