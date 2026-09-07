@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "binary": "/home/james/.cache/codex-lab-binaries/receipt-fix-v1-20260907/codex-lab",
+  "binary_sha256": "de6b3c0ed3a8bb976b5fe6aa77dc0df1c39318c32892a073a5168b76d819f59b",
+  "runs": [
+    {
+      "run_id": "queue-r1-aaa-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r1-aaa-prepared/evidence/prepared.json",
+      "prepared_sha256": "9aad397d52219674d9a1204684f5a95d575548f17d16f9fc16e236357ab04203"
+    },
+    {
+      "run_id": "queue-r1-aab-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r1-aab-prepared/evidence/prepared.json",
+      "prepared_sha256": "586e275a295d2dc77325f0c4438a975467376b3a1af6759643748f8417e2cdc8"
+    },
+    {
+      "run_id": "queue-r1-aba-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r1-aba-prepared/evidence/prepared.json",
+      "prepared_sha256": "500c3a9df5c92610dd7981ce3867786ccd2185bd5139612116c2f3f09d0a722e"
+    },
+    {
+      "run_id": "queue-r1-abb-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r1-abb-prepared/evidence/prepared.json",
+      "prepared_sha256": "77ba1092d7eab39dabb7bef85dad16e3228f4ca92ce453485337a7439b1cff68"
+    },
+    {
+      "run_id": "queue-r1-baa-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r1-baa-prepared/evidence/prepared.json",
+      "prepared_sha256": "37c4ce7723d9075422079d7ee7aff972cbc183334882765e88593f552e51e63e"
+    },
+    {
+      "run_id": "queue-r1-bab-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r1-bab-prepared/evidence/prepared.json",
+      "prepared_sha256": "6da54271257cf9c30aa7b9c79bbce58c75eef53649a1297d952629a518a8af05"
+    },
+    {
+      "run_id": "queue-r1-bba-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r1-bba-prepared/evidence/prepared.json",
+      "prepared_sha256": "3ef728325f1ee151e55e9ae7f0bda161a81e4433d8a31ebc85b245cfb424f575"
+    },
+    {
+      "run_id": "queue-r1-bbb-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r1-bbb-prepared/evidence/prepared.json",
+      "prepared_sha256": "8445c499107ea0b79ae26bc7f53e3656855150b8b96b91a1fa41823e0e98119a"
+    },
+    {
+      "run_id": "queue-r2-aab-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r2-aab-prepared/evidence/prepared.json",
+      "prepared_sha256": "69b332215fd34cb9473e6c4d53770c9353f6faacc9205b695d312244ef5b09ea"
+    },
+    {
+      "run_id": "queue-r2-aba-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r2-aba-prepared/evidence/prepared.json",
+      "prepared_sha256": "1ac5061c31fafeda9decd28b37f2c7a80b3c688d7855c52bc78042c5da9cdbd5"
+    },
+    {
+      "run_id": "queue-r2-abb-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r2-abb-prepared/evidence/prepared.json",
+      "prepared_sha256": "5a910915dadf94eeffc769e67c62a45d10f6e581e8221b4f3d92e94661b751d1"
+    },
+    {
+      "run_id": "queue-r2-baa-execution-reviewed",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r2-baa-prepared-reviewed/evidence/prepared.json",
+      "prepared_sha256": "cc6f7be340900b992f5b9196d1068a4911584b51ecccd8e5d1c4af19cfdd802f"
+    },
+    {
+      "run_id": "queue-r2-bab-execution-reviewed",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r2-bab-prepared-reviewed/evidence/prepared.json",
+      "prepared_sha256": "e3ea7b2e906c15b29d20e58c8828298e83a3f200e1558ff0daa0d029e4d34f88"
+    },
+    {
+      "run_id": "queue-r2-bba-execution-reviewed",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r2-bba-prepared-reviewed/evidence/prepared.json",
+      "prepared_sha256": "1f84b2eaaad950094a4b7c8b314a8b1cd8eaed382242c53ec164e37fd0747c1f"
+    },
+    {
+      "run_id": "queue-r2-bbb-execution-reviewed",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r2-bbb-prepared-reviewed/evidence/prepared.json",
+      "prepared_sha256": "a18d11a5f22d93324ae081687e298fde8aa5b515d364b3f0c24f6d498fbc0706"
+    },
+    {
+      "run_id": "queue-r2-aaa-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r2-aaa-prepared/evidence/prepared.json",
+      "prepared_sha256": "2a3cb8168a0ddcb550b49d0dbc709d527002eb801530cdb8d0f1f7952c6b4df3"
+    },
+    {
+      "run_id": "queue-r3-aba-execution-reviewed",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r3-aba-prepared-reviewed/evidence/prepared.json",
+      "prepared_sha256": "0ae4c8577e5f6429694287588e621c8062a71e7d0b83b76d270058b5933c58dc"
+    },
+    {
+      "run_id": "queue-r3-abb-execution-reviewed",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r3-abb-prepared-reviewed/evidence/prepared.json",
+      "prepared_sha256": "2056cba3c724713d5d8ed59a6cd8488b3fbc3b229cf64162cf6648e1c6d2ebcf"
+    },
+    {
+      "run_id": "queue-r3-baa-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r3-baa-prepared/evidence/prepared.json",
+      "prepared_sha256": "428fb413c28259d9811c4e975c110e55c03cfaf3394c4d3f1e2d62b11a3218f8"
+    },
+    {
+      "run_id": "queue-r3-bab-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r3-bab-prepared/evidence/prepared.json",
+      "prepared_sha256": "fa47f5c36c01de7389da37fd04dc20c89b5038348aaa228720570c62465fb3e7"
+    },
+    {
+      "run_id": "queue-r3-bba-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r3-bba-prepared/evidence/prepared.json",
+      "prepared_sha256": "387854547e168407bf7772ded603a2a347d587e62177a32c1280c6da3c12b8d7"
+    },
+    {
+      "run_id": "queue-r3-bbb-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r3-bbb-prepared/evidence/prepared.json",
+      "prepared_sha256": "d1e17e551d157f2b1de27c74c2d70eb6e34c615640eef3c7cf0ded233c50da94"
+    },
+    {
+      "run_id": "queue-r3-aaa-execution-reviewed",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r3-aaa-prepared-reviewed/evidence/prepared.json",
+      "prepared_sha256": "379787d322f64150f9900394bf79ef454ec1a618c7a050428bbd585a79d8133f"
+    },
+    {
+      "run_id": "queue-r3-aab-execution-reviewed",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r3-aab-prepared-reviewed/evidence/prepared.json",
+      "prepared_sha256": "f6885e4a1f0151cecd4944cd8704eef6b2fb3d80e746ac45ded95cc0bb67129c"
+    },
+    {
+      "run_id": "queue-r4-abb-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r4-abb-prepared/evidence/prepared.json",
+      "prepared_sha256": "9cdb816d4f9d7d7c8be4d2dc166879b4d9be5e8d0e157980d4472403caff43f6"
+    },
+    {
+      "run_id": "queue-r4-baa-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r4-baa-prepared/evidence/prepared.json",
+      "prepared_sha256": "9578eda38942e33eb1038e0c4da9f16727ccd11af9dc5c2e5ad97c600ee887d4"
+    },
+    {
+      "run_id": "queue-r4-bab-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r4-bab-prepared/evidence/prepared.json",
+      "prepared_sha256": "d24318d0cffb61dd7eb7d5ba7e6700efb376dd1cf089ddfe56e755732769b3f5"
+    },
+    {
+      "run_id": "queue-r4-bba-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r4-bba-prepared/evidence/prepared.json",
+      "prepared_sha256": "a549c4ef1dc2cb571b241039b06415ee991a2921f0b5eec443a3181128581a36"
+    },
+    {
+      "run_id": "queue-r4-bbb-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r4-bbb-prepared/evidence/prepared.json",
+      "prepared_sha256": "cd89826ee5648623d558fbf3eebdc4f52a49293b9600c47794b4c4a502c18a86"
+    },
+    {
+      "run_id": "queue-r4-aaa-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r4-aaa-prepared/evidence/prepared.json",
+      "prepared_sha256": "8c9b9d1155412641894df8d12c26a457d382da3f763ea1eb6e3c1f1e604e7c93"
+    },
+    {
+      "run_id": "queue-r4-aab-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r4-aab-prepared/evidence/prepared.json",
+      "prepared_sha256": "6342bef58b0c40c90b16b38696c1a1d7b56010c7b0e9df66acac5d0155da097c"
+    },
+    {
+      "run_id": "queue-r4-aba-execution",
+      "prepared": "/home/james/.cache/codex-lab-queue-matrix/20260907T190853Z-fresh-v1/runs/queue-r4-aba-prepared/evidence/prepared.json",
+      "prepared_sha256": "37ba525503066a17d1b3ae21733043d5457534b1b4b732f39b77a90f1cf4b7c7"
+    }
+  ]
+}

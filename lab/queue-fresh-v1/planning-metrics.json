@@ -1,0 +1,17 @@
+{
+  "scope": "fresh preparation including original planner samples and proposed corrections, not implementation",
+  "input_tokens": 208089,
+  "output_tokens": 45526,
+  "phase_threads": 16,
+  "provider_events": {
+    "request_queued": 64,
+    "request_dispatched": 64,
+    "request_finished": 64
+  },
+  "http_statuses": {
+    "200": 64
+  },
+  "task_success": null,
+  "human_approval": false,
+  "historical_results_included": false
+}
