@@ -1,5 +1,14 @@
 # Shared Muse request limit
 
+This machine's configured lab home is
+`/home/james/.config/codex-lab/muse-contributor-limited`.
+Use it for future preparations. The frozen service is installed at
+`/home/james/.cache/codex-lab-provider-proxy/v1-20260907`, listening on port 8765.
+Its local `service.json` records the PID/config/source identities; `events.jsonl`
+contains metadata. The [setup receipt](rate-limit-setup-20260907.json) is a snapshot,
+not a promise that the process survives logout/reboot. It has no automatic restart.
+The original direct home and cancelled campaign artifacts remain unchanged.
+
 All parallel workers must use **one loopback proxy** for the same Muse account.
 The proxy permits at most 100 upstream request writes per rolling minute and
 paces them at least 0.6 seconds apart. Response streams overlap: sixteen workers

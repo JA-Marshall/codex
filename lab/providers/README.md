@@ -1,5 +1,10 @@
 # Muse provider feasibility
 
+For new parallel experiments, use the [shared request limiter](RATE_LIMIT.md).
+The user-reported Muse allowance is 100 requests per minute across workers.
+Historical direct-provider profiles below remain frozen; the new limited home
+routes through one loopback proxy without changing model or workflow behavior.
+
 The selected target is **Muse Spark 1.3 Contributor**. On 2026-09-07, Meta's authenticated developer portal and [model documentation](https://dev.meta.ai/docs/models/) confirmed the direct identifier `muse-spark-1.3-contributor` and a context window of 1,048,576 tokens. Contributor permits Meta to use submitted inputs and outputs for training and improvement. Select the tier through the exact model identifier; the API key itself is not restricted to Contributor.
 
 Meta's dashboard Codex guide pairs that Contributor identifier with `https://api.meta.ai/v1`, `MODEL_API_KEY`, and `wire_api = "responses"`. Authenticated model metadata and subsequent live Responses probes returned the exact Contributor ID. Inference access is confirmed. The metadata's `created = 0` is not a serving revision, and these checks do not establish billing status or immutable weights. No gateway is used in this configuration.
