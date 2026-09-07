@@ -1,0 +1,25 @@
+schema_version = 1
+
+[skills."planner/repository-v2"]
+path = "instructions/planner/repository-v2"
+sha256 = "40837bc7884dd48520e639d5538efe99181ecbb9ceed2855f97391039d4dc8ec"
+
+[skills."executor/repository-v1"]
+path = "instructions/executor/repository-v1"
+sha256 = "c7f9a7f6e071d6e95c196bbfc00cb41e2395554d1fcfc3919d279926224d6fee"
+
+[skills."verifier/repository-v1"]
+path = "instructions/verifier/repository-v1"
+sha256 = "7206865bd73366b09f265314e334db6130b5de02f8e78ebe4bcd42f7cc398294"
+
+[workflows.repository-v2]
+approval = "campaign_delegated"
+plan.renderer = "markdown"
+roles.planner = "planner/repository-v2"
+roles.executor = "executor/repository-v1"
+roles.verifier = "verifier/repository-v1"
+max_repairs = 0
+
+[workflows.repository-repair-v2]
+extends = "repository-v2"
+max_repairs = 1

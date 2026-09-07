@@ -37,9 +37,11 @@ class CampaignInputTests(unittest.TestCase):
         home.mkdir()
         (home / "config.toml").write_text('model = "test-model"\n')
         source = Path(__file__).resolve().parents[1]
+        sandbox_alias = self.root / "codex-linux-sandbox"
+        sandbox_alias.symlink_to(Path(sys.executable).resolve())
         args = argparse.Namespace(
             binary=Path(sys.executable),
-            sandbox=Path(sys.executable),
+            sandbox=sandbox_alias,
             codex_home=home,
             instruction_root=source,
             catalog=source / "workflows/queue-matrix-v2.toml",
@@ -57,6 +59,9 @@ class CampaignInputTests(unittest.TestCase):
         self.assertEqual(len(manifest["trials"]), 200)
         self.assertEqual(manifest["measurement_purpose"], "throughput")
         self.assertEqual(manifest["phase_timeout_clock"], "wall_clock_including_provider_queue")
+        self.assertEqual(manifest["sandbox"], str(sandbox_alias))
+        self.assertIn(str(sandbox_alias), manifest["pins"])
+        self.assertIn(str(Path(sys.executable).resolve()), manifest["pins"])
         self.assertFalse((args.output / "trials").exists())
         self.assertGreater(len(manifest["pins"]), 40)
         self.assertEqual(read_json(args.output / "campaign.json"), manifest)

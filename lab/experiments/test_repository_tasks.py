@@ -180,6 +180,27 @@ class RepositoryTaskTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "input changed"):
             load_campaign(args.output / "campaign.json")
 
+    def test_frozen_sandbox_alias_executes_independent_grading(self):
+        sandbox = self.sandbox()
+        source = Path(__file__).resolve().parents[1]
+        home = self.root / "home"
+        home.mkdir()
+        (home / "config.toml").write_text('model = "test-model"\n')
+        args = argparse.Namespace(binary=sandbox.resolve(), sandbox=sandbox,
+                                  codex_home=home, instruction_root=source,
+                                  catalog=source / "workflows/queue-matrix-v2.toml",
+                                  workflow=["queue-aaa-v2"], fixture=[self.task.name],
+                                  repetitions=1, jobs=1, max_amendments=0,
+                                  output=self.root / "campaign", task_root=self.root / "library")
+        manifest = freeze(args)
+        frozen = discover(manifest["task_root"])[self.task.name]
+        metadata = setup(self.root / "candidate", frozen)
+        repository = Path(metadata["repository"])
+        overlay(frozen.root / "solution", repository)
+        result = evaluate(repository, Path(manifest["sandbox"]), self.root / "grade",
+                          self.root / "candidate/fixture.json")
+        self.assertTrue(result["task_success"])
+
 
 if __name__ == "__main__":
     unittest.main()

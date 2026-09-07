@@ -81,10 +81,15 @@ def freeze(args):
         raise ValueError(
             "require 1..1000 trials, jobs 1..32, amendments 0..4, unique selections"
         )
-    binary, sandbox, home, instruction_root = (
+    binary, home, instruction_root = (
         path.resolve(strict=True)
-        for path in (args.binary, args.sandbox, args.codex_home, args.instruction_root)
+        for path in (args.binary, args.codex_home, args.instruction_root)
     )
+    # argv[0] selects the sandbox entry point in the multicall binary. Resolve
+    # the parent, but retain the alias name even when it targets codex-lab.
+    sandbox = args.sandbox.parent.resolve(strict=True) / args.sandbox.name
+    if not sandbox.is_file():
+        raise ValueError("sandbox executable does not exist")
     catalog = args.catalog.resolve(strict=True)
     effective, parsed = delegated_catalog(
         catalog.read_text(encoding="utf-8"), workflows
