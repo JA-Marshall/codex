@@ -133,6 +133,13 @@ impl Driver {
         // A successful backend result proves upstream shutdown completed.
         let amendment = self.authority.finish_phase_after_shutdown(&gate)?;
         self.evidence.write_json(&filename, &output)?;
+        if let Some(scope) = &output.task_scope
+            && scope["audit"]["authorized"] != true
+        {
+            return Err(crate::task_scope::ScopeBlocked(anyhow::anyhow!(
+                "task scope audit detected an unauthorized candidate change; phase shutdown confirmed"
+            )).into());
+        }
         if let Some(reason) = amendment {
             self.amendments += 1;
             self.evidence.write_json(

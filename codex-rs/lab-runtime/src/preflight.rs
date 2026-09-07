@@ -93,6 +93,15 @@ pub fn validate_runtime_config(
     paths: &RuntimePaths,
     access: PhaseAccess,
 ) -> Result<()> {
+    validate_phase_config(config, paths, access, None)
+}
+
+pub(crate) fn validate_phase_config(
+    config: &Config,
+    paths: &RuntimePaths,
+    access: PhaseAccess,
+    profile: Option<&PermissionProfile>,
+) -> Result<()> {
     ensure!(
         cfg!(target_os = "linux"),
         "lab runtime currently requires Linux"
@@ -113,7 +122,10 @@ pub fn validate_runtime_config(
         "lab runtime requires mechanically enforced managed permissions"
     );
     ensure!(
-        config.legacy_sandbox_policy() == access.policy(),
+        profile.map_or_else(
+            || config.legacy_sandbox_policy() == access.policy(),
+            |profile| config.permissions.effective_permission_profile() == *profile
+        ),
         "effective permissions differ from the restricted phase policy"
     );
     ensure!(
@@ -136,7 +148,7 @@ pub fn validate_runtime_config(
     for root in filesystem.get_writable_roots_with_cwd(paths.repository()) {
         let canonical = root.root.as_path().canonicalize()?;
         ensure!(
-            canonical == paths.repository(),
+            profile.is_some() || canonical == paths.repository(),
             "unexpected effective writable root"
         );
         for protected in [paths.codex_home(), paths.artifacts()] {
@@ -230,7 +242,12 @@ pub fn validate_runtime_config(
             .shell_environment_policy
             .r#set
             .keys()
-            .all(|key| key == "PATH"),
+            .all(|key| key == "PATH"
+                || (profile.is_some()
+                    && matches!(
+                        key.as_str(),
+                        "TMPDIR" | "CARGO_TARGET_DIR" | "CARGO_HOME" | "PYTHONDONTWRITEBYTECODE"
+                    ))),
         "only a pinned PATH may be provided to model shell commands"
     );
     let provider = &config.model_provider;

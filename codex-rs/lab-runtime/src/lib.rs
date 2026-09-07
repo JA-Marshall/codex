@@ -24,7 +24,10 @@ mod reports;
 mod repository_tools;
 mod review;
 mod review_channel;
+mod scope_audit;
+mod scope_context;
 mod settings;
+mod task_scope;
 mod verification_input;
 
 #[cfg(test)]

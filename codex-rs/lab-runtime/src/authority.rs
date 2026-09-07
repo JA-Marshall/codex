@@ -33,6 +33,7 @@ use serde::Serialize;
 use tokio_util::sync::CancellationToken;
 
 use crate::preflight::PhaseAccess;
+use crate::task_scope::BoundTaskScope;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
 #[serde(rename_all = "snake_case")]
@@ -89,6 +90,7 @@ struct State {
     calls: BTreeMap<String, bool>,
     faulted: bool,
     started: Instant,
+    task_scope: Option<Arc<BoundTaskScope>>,
 }
 
 /// Trusted, single-writer authority shared by the host and its dispatch contributors.
@@ -119,6 +121,7 @@ impl RunAuthority {
                 calls: BTreeMap::new(),
                 faulted: false,
                 started: Instant::now(),
+                task_scope: None,
             })),
         })
     }
@@ -224,6 +227,16 @@ impl RunAuthority {
         }))
     }
 
+    pub(crate) fn bind_task_scope(&self, scope: Arc<BoundTaskScope>) -> Result<()> {
+        let mut state = self.lock()?;
+        if state.epoch != 0 || state.faulted || state.task_scope.is_some() {
+            bail!("task scope must be bound once before the first phase");
+        }
+        state.record(serde_json::json!({"type":"task_scope_bound","scope_sha256":scope.sha256}))?;
+        state.task_scope = Some(scope);
+        Ok(())
+    }
+
     /// The host MUST await upstream thread/process shutdown before calling this.
     /// Active dispatch accounting alone does not establish subprocess termination.
     pub fn finish_phase_after_shutdown(&self, gate: &PhaseGate) -> Result<Option<String>> {
@@ -259,6 +272,22 @@ pub struct PhaseGate {
 }
 
 impl PhaseGate {
+    pub(crate) fn task_scope(&self) -> Result<Option<(Arc<BoundTaskScope>, Phase)>> {
+        self.expected_access()?;
+        let state = self.authority.lock()?;
+        let phase = state.phase.as_ref().context("no active phase")?.phase;
+        Ok(state
+            .task_scope
+            .as_ref()
+            .map(|scope| (Arc::clone(scope), phase)))
+    }
+
+    pub(crate) fn record_scope(&self, kind: &str, evidence: &serde_json::Value) -> Result<()> {
+        self.authority
+            .lock()?
+            .record(serde_json::json!({"type":kind,"epoch":self.epoch,"evidence":evidence}))
+    }
+
     pub(crate) fn expected_access(&self) -> Result<PhaseAccess> {
         let state = self.authority.lock()?;
         let active = state.phase.as_ref().context("no active phase")?;

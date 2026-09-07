@@ -75,6 +75,7 @@ fn command(call_id: &str, exit_code: i32, status: ExecCommandStatus) -> anyhow::
 
 fn output(checks: Value, events: Vec<Event>) -> PhaseOutput {
     PhaseOutput {
+        task_scope: None,
         thread_id: "thread-1".into(),
         text: json!({"checks":checks}).to_string(),
         token_usage: None,

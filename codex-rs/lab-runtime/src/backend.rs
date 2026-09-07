@@ -35,7 +35,7 @@ use crate::bootstrap::PreparedRuntime;
 use crate::context::MAX_PHASE_FRAGMENT_BYTES;
 use crate::context::validate_phase_context;
 use crate::preflight::PhaseAccess;
-use crate::preflight::validate_runtime_config;
+use crate::preflight::validate_phase_config;
 
 const MAX_PHASE_EVENTS: usize = 10_000;
 const MAX_PHASE_EVENT_BYTES: usize = 4 * 1024 * 1024;
@@ -58,6 +58,8 @@ pub struct PhaseOutput {
     pub token_usage: Option<TokenUsageInfo>,
     pub events: Vec<Event>,
     pub cancelled: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub task_scope: Option<Value>,
 }
 
 /// Restricted embedding of upstream Core. Only ordinary user turns are exposed;
@@ -95,7 +97,17 @@ impl CodexBackend {
     /// Arbitrary future cancellation is not an asynchronous cleanup guarantee.
     pub async fn run_phase(&self, request: PhaseRequest) -> Result<PhaseOutput> {
         validate_phase_authority(&self.extensions, &request.gate, request.access)?;
-        validate_phase_context(&request.instructions, &request.prompt)?;
+        let bound_scope = request.gate.task_scope()?;
+        let scoped = bound_scope
+            .as_ref()
+            .map(|(scope, phase)| scope.begin_phase(*phase, &self.prepared.config))
+            .transpose()
+            .map_err(crate::task_scope::ScopeBlocked)?;
+        let mut instructions = request.instructions;
+        if let Some(scoped) = &scoped {
+            instructions.push_str(&scoped.instructions());
+        }
+        validate_phase_context(&instructions, &request.prompt)?;
         if let Some(schema) = &request.output_schema {
             validate_output_schema(schema)?;
         }
@@ -105,12 +117,32 @@ impl CodexBackend {
             "phase cancelled before startup"
         );
         let mut config = self.prepared.config.clone();
-        config.set_legacy_sandbox_policy(request.access.policy())?;
+        if let Some(scoped) = &scoped {
+            scoped
+                .configure(&mut config)
+                .map_err(crate::task_scope::ScopeBlocked)?;
+        } else {
+            config.set_legacy_sandbox_policy(request.access.policy())?;
+        }
         if request.access == PhaseAccess::WorkspaceWrite {
             config.features.enable(Feature::ShellTool)?;
         }
-        config.developer_instructions = Some(request.instructions);
-        validate_runtime_config(&config, &self.prepared.paths, request.access)?;
+        config.developer_instructions = Some(instructions);
+        validate_phase_config(
+            &config,
+            &self.prepared.paths,
+            request.access,
+            scoped.as_ref().map(|scope| &scope.profile),
+        )?;
+        if let Some(scoped) = &scoped {
+            scoped
+                .verify_sandbox(&config, self.prepared.paths.repository())
+                .await
+                .map_err(crate::task_scope::ScopeBlocked)?;
+            request
+                .gate
+                .record_scope("phase_scope_permissions", &scoped.evidence)?;
+        }
         let expected_profile = config.permissions.effective_permission_profile();
         let expected_model = config.model.clone().context("missing model")?;
         let expected_provider = config.model_provider_id.clone();
@@ -146,6 +178,7 @@ impl CodexBackend {
                 msg: EventMsg::SessionConfigured(new_thread.session_configured.clone()),
             }],
             cancelled: false,
+            task_scope: scoped.as_ref().map(|scope| scope.evidence.clone()),
         };
         // Effective startup state must agree before the first model call.
         let execution = async {
@@ -186,6 +219,22 @@ impl CodexBackend {
         let shutdown = shutdown_and_drain(&thread, &mut output.events).await;
         output.token_usage = thread.token_usage_info().await;
         shutdown.context("upstream phase shutdown failed")?;
+        if let Some((scope, _)) = &bound_scope
+            && let Some(scoped) = &scoped
+        {
+            let audit = scope.audit(scoped);
+            let evidence = match &audit {
+                Ok(evidence) => evidence.clone(),
+                Err(error) => {
+                    serde_json::json!({"scope_sha256":scope.sha256,"authorized":false,"error":error.to_string()})
+                }
+            };
+            request.gate.record_scope("phase_scope_audit", &evidence)?;
+            output
+                .task_scope
+                .as_mut()
+                .context("missing scope evidence")?["audit"] = evidence;
+        }
         execution?;
         Ok(output)
     }

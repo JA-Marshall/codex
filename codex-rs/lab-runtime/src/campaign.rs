@@ -24,6 +24,7 @@ use crate::artifact_input::digest;
 use crate::driver_preparation::finish_run;
 use crate::driver_preparation::initialize;
 use crate::prepared_lock;
+use crate::task_scope::TaskScope;
 
 const MAX_POLICY_BYTES: usize = 16 * 1024;
 
@@ -40,6 +41,7 @@ struct CampaignPolicy {
     workflow_catalog_sha256: String,
     #[serde(default)]
     max_amendments: u8,
+    task_scope: Option<TaskScope>,
 }
 
 /// Run one explicitly delegated trial without reading terminal decisions.
@@ -56,6 +58,40 @@ pub async fn execute_campaign_run(
     let policy_sha256 = digest(&bytes);
     let _lock = prepared_lock::acquire(&options.repository).await?;
     let mut driver = initialize(&options, paths, None).await?;
+    let scope = match async {
+        let scope = policy
+            .task_scope
+            .map(|scope| scope.bind(driver.runtime.paths()))
+            .transpose()?;
+        if let Some(scope) = &scope {
+            scope.validate_runtime(&driver.runtime).await?;
+        }
+        Ok::<_, anyhow::Error>(scope)
+    }
+    .await
+    {
+        Ok(scope) => scope,
+        Err(error) => {
+            let error = crate::task_scope::ScopeBlocked(error);
+            driver.authority.fail(&error.to_string())?;
+            driver.evidence.write_json(
+                "failure.json",
+                &serde_json::json!({"classification":"scope_blocked","error":error.to_string()}),
+            )?;
+            return Err(error.into());
+        }
+    };
+    if let Some(scope) = scope {
+        driver.evidence.write_json(
+            "task-scope.json",
+            &serde_json::json!({
+                "scope":scope.definition,"scope_sha256":scope.sha256
+            }),
+        )?;
+        driver
+            .authority
+            .bind_task_scope(std::sync::Arc::new(scope))?;
+    }
     driver
         .evidence
         .write_bytes("campaign-policy.json", &bytes)?;

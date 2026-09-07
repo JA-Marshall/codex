@@ -177,6 +177,7 @@ pub(crate) async fn finish_run(
     if let Err(error) = &execution {
         let _ = driver.authority.fail(&error.to_string());
         let _ = driver.evidence.write_json("failure.json", &serde_json::json!({"error":error.to_string(),
+            "classification":if error.is::<crate::task_scope::ScopeBlocked>() {"scope_blocked"} else {"runtime_failed"},
             "partial_phase_evidence":"consult upstream rollout; collection failure may leave gaps"}));
     }
     execution

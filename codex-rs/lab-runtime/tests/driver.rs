@@ -9,6 +9,9 @@ mod repair;
 #[path = "driver/campaign.rs"]
 mod campaign;
 
+#[path = "driver/task_scope.rs"]
+mod task_scope;
+
 use std::path::PathBuf;
 use std::sync::atomic::AtomicUsize;
 use std::sync::atomic::Ordering;

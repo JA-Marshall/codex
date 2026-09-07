@@ -26,7 +26,7 @@ use super::implementation_and_verification;
 use super::response;
 use super::support;
 
-fn policy(options: &RunOptions, max_amendments: u8) -> Value {
+pub(super) fn policy(options: &RunOptions, max_amendments: u8) -> Value {
     json!({
         "schema_version":1,"campaign_id":"campaign-test","run_id":options.run_id,
         "repository":options.repository,"repository_commit":options.repository_commit,
@@ -50,7 +50,7 @@ fn write_policy(
     Ok(path)
 }
 
-fn campaign_options(fixture: &support::Fixture, id: &str) -> RunOptions {
+pub(super) fn campaign_options(fixture: &support::Fixture, id: &str) -> RunOptions {
     let mut options = fixture.options(id, "md", None);
     options.workflow_catalog = options
         .workflow_catalog
