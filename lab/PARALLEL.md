@@ -1,5 +1,7 @@
 # Parallel prepared-run batches
 
+For queue accounting and the serial `--purpose isolated-timing` mode, see [Timing under a shared provider limit](TIMING.md). Parallel batches default to `--purpose throughput`.
+
 The batch coordinator launches independent Codex lab hosts and bounds their active work. A host waiting for human approval holds its checkout lock but consumes no execution slot. An amendment waits independently; other approved conditions keep running. No core agent-loop, model/provider, TUI, sandbox or session-lifecycle changes are required.
 
 ## Run a batch

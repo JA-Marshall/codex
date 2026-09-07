@@ -1,0 +1,567 @@
+{
+  "schema_version": 1,
+  "measurement_purpose": "throughput",
+  "jobs": 16,
+  "unthrottled_speed_estimate": null,
+  "phase_timeout_clock": "wall_clock_including_provider_queue",
+  "queue_interval_clock": "wall timestamps checked against monotonic queued_ms; 25ms tolerance",
+  "limitations": [
+    "Subtraction describes this observed run, not counterfactual unthrottled speed.",
+    "Remaining time includes model, tools, network, host overhead and human waits.",
+    "Isolation checks see only the supplied proxy trace; use its full experiment interval."
+  ],
+  "runs": [
+    {
+      "run_id": "queue-r1-aaa-execution",
+      "elapsed_ms": 458990,
+      "request_count": 27,
+      "request_wait_sum_ms": 70868,
+      "queue_wait_union_ms": 70868,
+      "observed_elapsed_excluding_queue_ms": 388122,
+      "queue_fraction": 0.1543998779929846,
+      "competing_proxy_requests": 534,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests"
+      ]
+    },
+    {
+      "run_id": "queue-r1-aab-execution",
+      "elapsed_ms": 511881,
+      "request_count": 32,
+      "request_wait_sum_ms": 92528,
+      "queue_wait_union_ms": 92528,
+      "observed_elapsed_excluding_queue_ms": 419353,
+      "queue_fraction": 0.18076076275540603,
+      "competing_proxy_requests": 606,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests"
+      ]
+    },
+    {
+      "run_id": "queue-r1-aba-execution",
+      "elapsed_ms": 459757,
+      "request_count": 31,
+      "request_wait_sum_ms": 95122,
+      "queue_wait_union_ms": 95122,
+      "observed_elapsed_excluding_queue_ms": 364635,
+      "queue_fraction": 0.20689625171558018,
+      "competing_proxy_requests": 533,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests"
+      ]
+    },
+    {
+      "run_id": "queue-r1-abb-execution",
+      "elapsed_ms": 564835,
+      "request_count": 51,
+      "request_wait_sum_ms": 134373,
+      "queue_wait_union_ms": 134373,
+      "observed_elapsed_excluding_queue_ms": 430462,
+      "queue_fraction": 0.2378977931608346,
+      "competing_proxy_requests": 660,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests"
+      ]
+    },
+    {
+      "run_id": "queue-r1-baa-execution",
+      "elapsed_ms": 544159,
+      "request_count": 36,
+      "request_wait_sum_ms": 105019,
+      "queue_wait_union_ms": 105019,
+      "observed_elapsed_excluding_queue_ms": 439140,
+      "queue_fraction": 0.19299322440683697,
+      "competing_proxy_requests": 652,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests"
+      ]
+    },
+    {
+      "run_id": "queue-r1-bab-execution",
+      "elapsed_ms": 516230,
+      "request_count": 37,
+      "request_wait_sum_ms": 113213,
+      "queue_wait_union_ms": 113213,
+      "observed_elapsed_excluding_queue_ms": 403017,
+      "queue_fraction": 0.21930728551227166,
+      "competing_proxy_requests": 611,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests"
+      ]
+    },
+    {
+      "run_id": "queue-r1-bba-execution",
+      "elapsed_ms": 1015261,
+      "request_count": 96,
+      "request_wait_sum_ms": 228105,
+      "queue_wait_union_ms": 228105,
+      "observed_elapsed_excluding_queue_ms": 787156,
+      "queue_fraction": 0.22467621626360118,
+      "competing_proxy_requests": 1247,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests"
+      ]
+    },
+    {
+      "run_id": "queue-r1-bbb-execution",
+      "elapsed_ms": 658484,
+      "request_count": 81,
+      "request_wait_sum_ms": 162733,
+      "queue_wait_union_ms": 162733,
+      "observed_elapsed_excluding_queue_ms": 495751,
+      "queue_fraction": 0.24713280808645313,
+      "competing_proxy_requests": 763,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests"
+      ]
+    },
+    {
+      "run_id": "queue-r2-aab-execution",
+      "elapsed_ms": 634389,
+      "request_count": 43,
+      "request_wait_sum_ms": 103913,
+      "queue_wait_union_ms": 103913,
+      "observed_elapsed_excluding_queue_ms": 530476,
+      "queue_fraction": 0.16380012894296717,
+      "competing_proxy_requests": 762,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests"
+      ]
+    },
+    {
+      "run_id": "queue-r2-aba-execution",
+      "elapsed_ms": 575179,
+      "request_count": 48,
+      "request_wait_sum_ms": 127743,
+      "queue_wait_union_ms": 127743,
+      "observed_elapsed_excluding_queue_ms": 447436,
+      "queue_fraction": 0.22209260073820497,
+      "competing_proxy_requests": 677,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests"
+      ]
+    },
+    {
+      "run_id": "queue-r2-abb-execution",
+      "elapsed_ms": 639914,
+      "request_count": 56,
+      "request_wait_sum_ms": 143289,
+      "queue_wait_union_ms": 143289,
+      "observed_elapsed_excluding_queue_ms": 496625,
+      "queue_fraction": 0.2239191516360011,
+      "competing_proxy_requests": 758,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests"
+      ]
+    },
+    {
+      "run_id": "queue-r2-baa-execution-reviewed",
+      "elapsed_ms": 391625,
+      "request_count": 30,
+      "request_wait_sum_ms": 79076,
+      "queue_wait_union_ms": 79076,
+      "observed_elapsed_excluding_queue_ms": 312549,
+      "queue_fraction": 0.20191765081391638,
+      "competing_proxy_requests": 435,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests"
+      ]
+    },
+    {
+      "run_id": "queue-r2-bab-execution-reviewed",
+      "elapsed_ms": 575100,
+      "request_count": 54,
+      "request_wait_sum_ms": 146372,
+      "queue_wait_union_ms": 146372,
+      "observed_elapsed_excluding_queue_ms": 428728,
+      "queue_fraction": 0.25451573639367064,
+      "competing_proxy_requests": 673,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests"
+      ]
+    },
+    {
+      "run_id": "queue-r2-bba-execution-reviewed",
+      "elapsed_ms": 464439,
+      "request_count": 46,
+      "request_wait_sum_ms": 115130,
+      "queue_wait_union_ms": 115130,
+      "observed_elapsed_excluding_queue_ms": 349309,
+      "queue_fraction": 0.24789046570163142,
+      "competing_proxy_requests": 527,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests"
+      ]
+    },
+    {
+      "run_id": "queue-r2-bbb-execution-reviewed",
+      "elapsed_ms": 498524,
+      "request_count": 40,
+      "request_wait_sum_ms": 98951,
+      "queue_wait_union_ms": 98951,
+      "observed_elapsed_excluding_queue_ms": 399573,
+      "queue_fraction": 0.19848793638821802,
+      "competing_proxy_requests": 580,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests"
+      ]
+    },
+    {
+      "run_id": "queue-r2-aaa-execution",
+      "elapsed_ms": 446316,
+      "request_count": 28,
+      "request_wait_sum_ms": 92882,
+      "queue_wait_union_ms": 92882,
+      "observed_elapsed_excluding_queue_ms": 353434,
+      "queue_fraction": 0.20810815655275633,
+      "competing_proxy_requests": 515,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests"
+      ]
+    },
+    {
+      "run_id": "queue-r3-aba-execution-reviewed",
+      "elapsed_ms": 590199,
+      "request_count": 43,
+      "request_wait_sum_ms": 108301,
+      "queue_wait_union_ms": 108301,
+      "observed_elapsed_excluding_queue_ms": 481898,
+      "queue_fraction": 0.18349912487144165,
+      "competing_proxy_requests": 797,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests"
+      ]
+    },
+    {
+      "run_id": "queue-r3-abb-execution-reviewed",
+      "elapsed_ms": 468174,
+      "request_count": 45,
+      "request_wait_sum_ms": 102286,
+      "queue_wait_union_ms": 102286,
+      "observed_elapsed_excluding_queue_ms": 365888,
+      "queue_fraction": 0.2184785998368128,
+      "competing_proxy_requests": 622,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests"
+      ]
+    },
+    {
+      "run_id": "queue-r3-baa-execution",
+      "elapsed_ms": 667202,
+      "request_count": 66,
+      "request_wait_sum_ms": 127006,
+      "queue_wait_union_ms": 127006,
+      "observed_elapsed_excluding_queue_ms": 540196,
+      "queue_fraction": 0.19035614401635487,
+      "competing_proxy_requests": 842,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests"
+      ]
+    },
+    {
+      "run_id": "queue-r3-bab-execution",
+      "elapsed_ms": 683837,
+      "request_count": 53,
+      "request_wait_sum_ms": 110858,
+      "queue_wait_union_ms": 110858,
+      "observed_elapsed_excluding_queue_ms": 572979,
+      "queue_fraction": 0.1621117313043898,
+      "competing_proxy_requests": 869,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests"
+      ]
+    },
+    {
+      "run_id": "queue-r3-bba-execution",
+      "elapsed_ms": 673298,
+      "request_count": 90,
+      "request_wait_sum_ms": 143929,
+      "queue_wait_union_ms": 143929,
+      "observed_elapsed_excluding_queue_ms": 529369,
+      "queue_fraction": 0.21376715807859226,
+      "competing_proxy_requests": 821,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests"
+      ]
+    },
+    {
+      "run_id": "queue-r3-bbb-execution",
+      "elapsed_ms": 698644,
+      "request_count": 64,
+      "request_wait_sum_ms": 120961,
+      "queue_wait_union_ms": 120961,
+      "observed_elapsed_excluding_queue_ms": 577683,
+      "queue_fraction": 0.17313681932429106,
+      "competing_proxy_requests": 834,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests"
+      ]
+    },
+    {
+      "run_id": "queue-r3-aaa-execution-reviewed",
+      "elapsed_ms": 538534,
+      "request_count": 45,
+      "request_wait_sum_ms": 102946,
+      "queue_wait_union_ms": 102946,
+      "observed_elapsed_excluding_queue_ms": 435588,
+      "queue_fraction": 0.19115970393698448,
+      "competing_proxy_requests": 719,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests"
+      ]
+    },
+    {
+      "run_id": "queue-r3-aab-execution-reviewed",
+      "elapsed_ms": 533641,
+      "request_count": 42,
+      "request_wait_sum_ms": 98728,
+      "queue_wait_union_ms": 98728,
+      "observed_elapsed_excluding_queue_ms": 434913,
+      "queue_fraction": 0.18500827335230988,
+      "competing_proxy_requests": 714,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests",
+        "runtime_failure",
+        "host_failure"
+      ]
+    },
+    {
+      "run_id": "queue-r4-abb-execution",
+      "elapsed_ms": 616369,
+      "request_count": 65,
+      "request_wait_sum_ms": 113478,
+      "queue_wait_union_ms": 113478,
+      "observed_elapsed_excluding_queue_ms": 502891,
+      "queue_fraction": 0.1841072474443069,
+      "competing_proxy_requests": 750,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests"
+      ]
+    },
+    {
+      "run_id": "queue-r4-baa-execution",
+      "elapsed_ms": 470450,
+      "request_count": 34,
+      "request_wait_sum_ms": 79504,
+      "queue_wait_union_ms": 79504,
+      "observed_elapsed_excluding_queue_ms": 390946,
+      "queue_fraction": 0.16899564246997556,
+      "competing_proxy_requests": 638,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests"
+      ]
+    },
+    {
+      "run_id": "queue-r4-bab-execution",
+      "elapsed_ms": 554734,
+      "request_count": 50,
+      "request_wait_sum_ms": 94773,
+      "queue_wait_union_ms": 94773,
+      "observed_elapsed_excluding_queue_ms": 459961,
+      "queue_fraction": 0.17084404417252233,
+      "competing_proxy_requests": 704,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests"
+      ]
+    },
+    {
+      "run_id": "queue-r4-bba-execution",
+      "elapsed_ms": 451986,
+      "request_count": 35,
+      "request_wait_sum_ms": 77896,
+      "queue_wait_union_ms": 77896,
+      "observed_elapsed_excluding_queue_ms": 374090,
+      "queue_fraction": 0.17234162120065666,
+      "competing_proxy_requests": 614,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests"
+      ]
+    },
+    {
+      "run_id": "queue-r4-bbb-execution",
+      "elapsed_ms": 497560,
+      "request_count": 38,
+      "request_wait_sum_ms": 85468,
+      "queue_wait_union_ms": 85468,
+      "observed_elapsed_excluding_queue_ms": 412092,
+      "queue_fraction": 0.1717742583808988,
+      "competing_proxy_requests": 639,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests"
+      ]
+    },
+    {
+      "run_id": "queue-r4-aaa-execution",
+      "elapsed_ms": 522130,
+      "request_count": 32,
+      "request_wait_sum_ms": 56239,
+      "queue_wait_union_ms": 56239,
+      "observed_elapsed_excluding_queue_ms": 465891,
+      "queue_fraction": 0.10771072338306552,
+      "competing_proxy_requests": 655,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests"
+      ]
+    },
+    {
+      "run_id": "queue-r4-aab-execution",
+      "elapsed_ms": 620101,
+      "request_count": 49,
+      "request_wait_sum_ms": 73847,
+      "queue_wait_union_ms": 73847,
+      "observed_elapsed_excluding_queue_ms": 546254,
+      "queue_fraction": 0.11908866458851058,
+      "competing_proxy_requests": 639,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests"
+      ]
+    },
+    {
+      "run_id": "queue-r4-aba-execution",
+      "elapsed_ms": 515357,
+      "request_count": 48,
+      "request_wait_sum_ms": 26692,
+      "queue_wait_union_ms": 26692,
+      "observed_elapsed_excluding_queue_ms": 488665,
+      "queue_fraction": 0.05179322295030435,
+      "competing_proxy_requests": 302,
+      "isolated_timing_eligible": false,
+      "exclusion_reasons": [
+        "not_declared_isolated_timing",
+        "concurrent_hosts",
+        "competing_proxy_requests"
+      ]
+    }
+  ],
+  "input_sha256": {
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/batch-batch.json": "c572966d7d7c4ec58f57f459a1bba80b48f91e63c1761d9f34bf42f6f5f36ea2",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/batch-events.jsonl": "810a001a4766b9afaccc406a4fdc7fddbcf57a9ddb1ca898c1da9d8d88b74f2b",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/provider-events.jsonl": "b3744b3638b9f84d20d9cdd34b58bbfb72d1b5b157d4b921bff90d3c1c4e0e24",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r1-aaa-execution/runtime-events.jsonl": "f095d0904d67b3616b9481ad800f3b8b33d6f418f84d026bf6a005ebb88deb20",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r1-aab-execution/runtime-events.jsonl": "6803dd4d6573117e4701ffc2fbbe38a585cb1caaef3f09ab9805a02f242e5524",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r1-aba-execution/runtime-events.jsonl": "289ec5709742f0e6704571c385217695a41a4dc8a7ef56f1dd949be6b3424ecb",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r1-abb-execution/runtime-events.jsonl": "7436ff74f49c67b0604d1511ef138209c4af1e447f665b651c7a495a02b6186f",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r1-baa-execution/runtime-events.jsonl": "6178b2623563da6165b4b1b51badce50cea422611715c677dfb22cf2bcfcd322",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r1-bab-execution/runtime-events.jsonl": "622c471434989636bcf0d090e3cdc48a7a65a8929f330fd8be3bdf7c237cc657",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r1-bba-execution/runtime-events.jsonl": "86ec8c9266bd9088271653ee73088602207d20a647de68322afbe334173bd227",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r1-bbb-execution/runtime-events.jsonl": "419d7cc4521ced2bdaebe12fba3687215182eb87752be6cf6ac020491b88d64b",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r2-aab-execution/runtime-events.jsonl": "b1e0430f8553bea37ec4c158c040204ad8e2d560fbac77c6dba1b4039944a495",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r2-aba-execution/runtime-events.jsonl": "209f7b99bf265a4f51f27a05e64e00fab8fcde306eff40abc688bd6c9b28a103",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r2-abb-execution/runtime-events.jsonl": "8203f3e7b600a4427b6235daa98187e4bdaecc81db81b4c15c991a5623608d7b",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r2-baa-execution-reviewed/runtime-events.jsonl": "addd3e000f41c669a5af662e6b4ef565fa38c3c204279be29a6d8d1d06536253",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r2-bab-execution-reviewed/runtime-events.jsonl": "53aba07f8a61b3b41aa5792436ed1c11d27b0298db6ccb5ec5ffc5054ebbbe6e",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r2-bba-execution-reviewed/runtime-events.jsonl": "8562d93476485a93cbd4aa7794d9134fb4d21c4e93b562e86ab3308a73f8c2ba",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r2-bbb-execution-reviewed/runtime-events.jsonl": "7b5cba00c40402fbaf8842d3aef22def7d4832e483b6044e4d5dd83fc3a03b8f",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r2-aaa-execution/runtime-events.jsonl": "105dea6d304223009bbbb79162106169161c1e69dc9c834b692537c67900c2ad",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r3-aba-execution-reviewed/runtime-events.jsonl": "45b278f39290a0591db6e2ad458d2578b96de94b48273fd62008e6e782f1e623",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r3-abb-execution-reviewed/runtime-events.jsonl": "fd1958ae520e88af226df8bbda8cbcae7d3f20e07d8e01901631919d1b98a8d8",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r3-baa-execution/runtime-events.jsonl": "47672070714e8323e901680d5c6c3f63e9ebb5d6ba980dfab1c24cfd2dd69d75",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r3-bab-execution/runtime-events.jsonl": "416f675811c6aa574cf8fc01d02dc4d855b86cd3a15dda5d98b4a73f90debf47",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r3-bba-execution/runtime-events.jsonl": "c350959ec3abc1fb58a44fe320ccf4fdc545c5f6573b04489149873f7d27cdee",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r3-bbb-execution/runtime-events.jsonl": "4f8f3f7b5520071cc6de0351502b2476e8295c27b96be79dd1aa475589f91de8",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r3-aaa-execution-reviewed/runtime-events.jsonl": "a6b853ec6ea8f4b368ed3d0c4a13af140b976d149abb8d0d3bad84371a7f65fd",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r3-aab-execution-reviewed/runtime-events.jsonl": "79ff1a841c1c153c9671365b77320a1a105e5316514236caaabb31562740ac63",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r4-abb-execution/runtime-events.jsonl": "e238fde80c63449d7bcb31d9760372f1d9e945aee35a050e7c681377a77e0ff8",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r4-baa-execution/runtime-events.jsonl": "0120f3b057f254f597e39d90013236f95767b63e8d5185a8d8306118891eab15",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r4-bab-execution/runtime-events.jsonl": "32f2783e4bed95428399f0bd50aeab1a6d45442ca85bf7cf1004e21e9d47c0e7",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r4-bba-execution/runtime-events.jsonl": "84bd44cce0c174efa29ca672d67a64bcf6db17499e77db86c01ad73eb2555542",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r4-bbb-execution/runtime-events.jsonl": "707dab2e5106f2dcf468da195b24787564422232a6e028ea28f3a064bc9122fa",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r4-aaa-execution/runtime-events.jsonl": "8b59a72d8248c79b475a04a8ae8964901c108e59da3e508b6a7d47b79a18e5e5",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r4-aab-execution/runtime-events.jsonl": "4c0d151e56eefdaa4128e4989abfb25c048aabd572659f75744186c204cf6080",
+    "/home/james/.cache/codex-lab-verify/lab/queue-fresh-v1/results/queue-r4-aba-execution/runtime-events.jsonl": "67bc6f937a3ab95f61099dcd9152c33c75fa9a1ddfe14846cfd4e8241ebd786d"
+  },
+  "analyzer_sha256": "ba193552ba7ed97718e4bf964c77542d5ed8d99155954aa97fea2cd985f424f5"
+}
