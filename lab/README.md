@@ -6,6 +6,8 @@ The approved follow-up in [NEXT_STEPS.md](NEXT_STEPS.md) is implemented: durable
 
 [Failure measurement and varied tasks](MEASUREMENT.md) extend the external evaluator to safely stopped failed runs and add dependency-ordering and configuration-merging fixtures. New live task implementations retain their separate human plan approval gates.
 
+[Parallel batches](PARALLEL.md) launch independent prepared hosts with a configurable job limit and separate live review channels. Approval and amendment waits do not occupy execution slots or block unrelated approved conditions.
+
 The foundation is implemented in [`codex-rs/lab`](../codex-rs/lab). It is an offline Rust library for experiment configuration, canonical plans, representations, human decisions and recording. It does not yet intercept live Codex tools, call Muse, or add an upstream `--workflow` flag.
 
 The approved scope and source investigation are retained in [`implementation-plan.json`](implementation-plan.json), [`APPROVAL.json`](APPROVAL.json), [`ARCHITECTURE.md`](ARCHITECTURE.md) and [`PROGRESS.md`](PROGRESS.md). The reviewed implementation plan is intentionally unchanged; current progress lives in the ledger.

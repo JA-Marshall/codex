@@ -21,6 +21,7 @@ mod prepared_lock;
 mod reports;
 mod repository_tools;
 mod review;
+mod review_channel;
 mod settings;
 
 #[cfg(test)]
@@ -59,3 +60,4 @@ pub use review::HumanDecision;
 pub use review::HumanReviewer;
 pub use review::TerminalReviewer;
 pub use review::parse_decision;
+pub use review_channel::JsonReviewer;

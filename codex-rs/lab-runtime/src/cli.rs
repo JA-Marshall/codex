@@ -9,6 +9,7 @@ use clap::Parser;
 use clap::Subcommand;
 use codex_core_api::Arg0DispatchPaths;
 use codex_lab::PlanRevision;
+use codex_lab_runtime::JsonReviewer;
 use codex_lab_runtime::RunOptions;
 use codex_lab_runtime::TerminalReviewer;
 use codex_lab_runtime::compare_runs;
@@ -47,6 +48,9 @@ enum Command {
         prepared: PathBuf,
         #[arg(long)]
         run_id: String,
+        /// Exchange exact-target review requests and decisions as JSON lines on stdio.
+        #[arg(long)]
+        review_json: bool,
     },
 }
 
@@ -105,9 +109,18 @@ pub async fn run(arg0_paths: Arg0DispatchPaths) -> Result<()> {
         Command::Prepare(args) => {
             serde_json::to_value(prepare_run(args.into_options()?, arg0_paths).await?)?
         }
-        Command::RunPrepared { prepared, run_id } => serde_json::to_value(
-            run_prepared(&prepared, run_id, arg0_paths, &mut TerminalReviewer).await?,
-        )?,
+        Command::RunPrepared {
+            prepared,
+            run_id,
+            review_json,
+        } => {
+            let result = if review_json {
+                run_prepared(&prepared, run_id, arg0_paths, &mut JsonReviewer::default()).await?
+            } else {
+                run_prepared(&prepared, run_id, arg0_paths, &mut TerminalReviewer).await?
+            };
+            serde_json::to_value(result)?
+        }
     };
     println!("{}", serde_json::to_string_pretty(&result)?);
     Ok(())

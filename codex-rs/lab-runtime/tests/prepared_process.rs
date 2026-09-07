@@ -216,6 +216,77 @@ async fn approve_fixture(fixture: &support::Fixture, prepared: &Path, id: &str) 
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn json_review_wait_does_not_block_an_independent_host_or_accept_its_decision() -> Result<()>
+{
+    let left_server = MockServer::start().await;
+    let right_server = MockServer::start().await;
+    let left = support::Fixture::new(&left_server.uri()).await?;
+    let right = support::Fixture::new(&right_server.uri()).await?;
+    let (left_plan, right_plan) = tokio::try_join!(
+        prepare(&left, "prepared", "md"),
+        prepare(&right, "prepared", "json"),
+    )?;
+    let mut left_host = execution(&left, &left_plan, "left")?
+        .arg("--review-json")
+        .stdin(Stdio::piped())
+        .spawn()?;
+    let mut right_host = execution(&right, &right_plan, "right")?
+        .arg("--review-json")
+        .stdin(Stdio::piped())
+        .spawn()?;
+    let mut left_output = BufReader::new(left_host.stdout.take().context("left stdout")?);
+    let mut right_output = BufReader::new(right_host.stdout.take().context("right stdout")?);
+    let mut left_line = String::new();
+    let mut right_line = String::new();
+    timeout(Duration::from_secs(45), async {
+        tokio::try_join!(
+            left_output.read_line(&mut left_line),
+            right_output.read_line(&mut right_line)
+        )
+    })
+    .await??;
+    let left_request: Value = serde_json::from_str(&left_line)?;
+    let right_request: Value = serde_json::from_str(&right_line)?;
+    assert_eq!(left_request["type"], "lab_review");
+    assert_eq!(right_request["type"], "lab_review");
+    let mock = responses::mount_sse_sequence(&right_server, successful_responses()).await;
+    let decision = json!({"schema_version":1,"request_id":right_request["request_id"],
+        "target":right_request["target"],"command":format!("approve {}",support::plan(1)?.digest()?)});
+    right_host
+        .stdin
+        .take()
+        .context("right stdin")?
+        .write_all(format!("{decision}\n").as_bytes())
+        .await?;
+    let mut tail = String::new();
+    let (status, _) = timeout(Duration::from_secs(60), async {
+        tokio::try_join!(right_host.wait(), right_output.read_to_string(&mut tail))
+    })
+    .await??;
+    ensure!(status.success(), "independent reviewed host failed");
+    assert_eq!(mock.requests().len(), 5);
+    assert_eq!(fs::read(right.repository.join("greeting.txt"))?, b"hello\n");
+    assert!(left_host.try_wait()?.is_none());
+    assert!(!left.repository.join("greeting.txt").exists());
+    assert!(left_server.received_requests().await.unwrap().is_empty());
+    // Identical canonical digest is insufficient: the response belongs to right.
+    left_host
+        .stdin
+        .take()
+        .context("left stdin")?
+        .write_all(format!("{decision}\n").as_bytes())
+        .await?;
+    let output = timeout(Duration::from_secs(20), left_host.wait_with_output()).await??;
+    assert!(!output.status.success());
+    assert!(
+        String::from_utf8_lossy(&output.stderr)
+            .contains("does not match current request and target")
+    );
+    assert!(left_server.received_requests().await.unwrap().is_empty());
+    Ok(())
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn prepared_completed_cli_pair_compares_only_renderer() -> Result<()> {
     let server = MockServer::start().await;
     let fixture = support::Fixture::new(&server.uri()).await?;
