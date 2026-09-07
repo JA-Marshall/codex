@@ -60,3 +60,29 @@ async fn prepared_generated_plan_shuts_down_then_child_requires_a_new_decision()
     assert_eq!(parent["approval_reused"], false);
     Ok(())
 }
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn prepared_rejects_current_role_settings_catalog_and_repository_drift_before_review() -> Result<()> {
+    let server = MockServer::start().await;
+    let fixture = support::Fixture::new(&server.uri()).await?;
+    let prepared = prepare_run(fixture.options("prepared", "json", Some(support::plan(1)?)), fixture.paths.clone()).await?;
+    for (index, path) in [fixture.instruction_root.join("executor/SKILL.md"), fixture.home.join("config.toml"),
+        fixture.home.join("catalog.json"), fixture.repository.join("README.md")].into_iter().enumerate() {
+        let original = fs::read(&path)?;
+        let changed = if index == 1 {
+            format!("model_context_window = 16000\n{}", String::from_utf8(original.clone())?).into_bytes()
+        } else if index == 2 {
+            let mut catalog: Value = serde_json::from_slice(&original)?;
+            catalog["models"][0]["context_window"] = 16000.into();
+            serde_json::to_vec(&catalog)?
+        } else { [original.clone(), b"changed\n".to_vec()].concat() };
+        fs::write(&path, changed)?;
+        let mut reviewer = Decline { targets: Vec::new() };
+        assert!(run_prepared(&prepared.prepared, format!("drift-{index}"), fixture.paths.clone(), &mut reviewer).await.is_err());
+        assert!(reviewer.targets.is_empty());
+        assert!(!fixture.runs.join(format!("drift-{index}")).exists());
+        fs::write(path, original)?;
+    }
+    assert!(server.received_requests().await.unwrap().is_empty());
+    Ok(())
+}
