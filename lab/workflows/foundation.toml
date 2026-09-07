@@ -1,0 +1,28 @@
+schema_version = 1
+
+# Resolve skill paths relative to the lab directory, not this file's directory.
+[skills."planner/minimal-v1"]
+path = "instructions/planner/minimal-v1"
+sha256 = "332e74c240dc794a496bbc2c9e10de0ccc394ee8826f90111b94285cda2472c4"
+
+[skills."executor/default-v1"]
+path = "instructions/executor/default-v1"
+sha256 = "af8e2201e88556a27b91fba8472ace0db4faf9602ba4e6cb18d847c40e39f91a"
+
+[skills."verifier/tests-only-v1"]
+path = "instructions/verifier/tests-only-v1"
+sha256 = "46ea6eca22efb6107ca4d255226592f63a1113be642265567bceedfcd556769d"
+
+[workflows.plan-base]
+approval = "human_required"
+plan.renderer = "markdown"
+roles.planner = "planner/minimal-v1"
+roles.executor = "executor/default-v1"
+roles.verifier = "verifier/tests-only-v1"
+
+[workflows.plan-md-v1]
+extends = "plan-base"
+
+[workflows.plan-json-v1]
+extends = "plan-base"
+plan.renderer = "json"

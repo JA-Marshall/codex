@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "plan_id": "parser-example",
+  "revision": 1,
+  "goal": "Add a bounded UTF-8 parser with clear errors",
+  "assumptions": ["The existing parser has no external callers"],
+  "steps": [
+    {
+      "id": "S01",
+      "title": "Implement the parser",
+      "instructions": "Validate input size and return structured errors for malformed records.",
+      "affected_files": ["src/parser.rs"],
+      "depends_on": [],
+      "acceptance_criteria": ["AC01"],
+      "verification": ["V01"]
+    },
+    {
+      "id": "S02",
+      "title": "Add parser regression coverage",
+      "instructions": "Cover valid input, malformed input and the maximum supported input size.",
+      "affected_files": ["tests/parser.rs"],
+      "depends_on": ["S01"],
+      "acceptance_criteria": ["AC01"],
+      "verification": ["V01"]
+    }
+  ],
+  "risks": ["The input limit could reject previously accepted files"],
+  "acceptance_criteria": [{"id": "AC01", "description": "Invalid input returns errors without panicking"}],
+  "verification_strategy": [{"id": "V01", "description": "Run the parser integration tests"}],
+  "discoveries": [],
+  "blockers": []
+}
