@@ -323,6 +323,8 @@ Codex supports running connected app-server and exec-server on different operati
 
 ## Lab experiment concurrency
 
+- The user now explicitly wants unattended campaigns with hundreds of queued trials. For the opt-in campaign runner described in `lab/UNATTENDED.md`, an operator-authorized finite campaign policy delegates generated-plan decisions; do not ask for separate human approval of every plan or implementation step. Record delegated decisions honestly and follow the campaign's amendment and repair limits. This does not convert historical interactive approvals into new execution authority.
+
 - Run independent, explicitly approved experiment conditions concurrently with a bounded concurrency limit. This is concurrency between isolated lab host processes; it does not require parallel agents within a condition.
 - Give each condition its own checkout, run ID, artifacts and decision channel. Preserve the repository launch lock and each run's exact plan approval/amendment gate. A waiting decision or failure in one condition must not serialize unrelated approved conditions.
 - Do not add predecessor-exit barriers or silently choose serial execution for reproducibility. Record concurrency, launch/finish timing and resource/provider limits as experiment metadata. Use serial execution only for a real dependency, a concrete resource limitation or an explicitly selected serial experiment.
