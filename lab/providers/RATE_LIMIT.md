@@ -1,5 +1,59 @@
 # Shared Muse request limit
 
+## Zen first, Meta fallback
+
+The source relay now supports OpenCode Zen before Meta. It reads `OPENCODE_API_KEY`
+or the private file `~/.config/codex-lab/credentials/opencode-zen-api-key`; without
+a Zen key it keeps the original Meta-only behaviour. Credentials stay outside the
+repository and are never written to the event journal. This source change does
+not replace the historical frozen service described below.
+
+Zen uses `https://opencode.ai/inference/openai/v1/responses`, the current
+[Console Responses endpoint](https://opencode.ai/v2/docs/console/inference).
+`--zen-upstream https://opencode.ai/zen/v1` selects the legacy Zen endpoint.
+The current model list is available at `https://opencode.ai/inference/v1/models`.
+Meta contributor model IDs are translated to Zen's matching `-contributor-free`
+IDs for Zen only; the Meta request keeps its original model and body. Free model
+access may depend on Zen's policy; a rejected request falls back to Meta.
+
+There are two Zen attempts by default (`--zen-attempts`, range 1–3), with a
+30-second socket timeout (`--zen-timeout`) and up to two seconds of backoff.
+Connection failures, HTTP 408/429 and server errors trigger retry, then Meta.
+HTTP 401/402/403/404 trigger immediate fallback and a 60-second Zen cooldown.
+`Retry-After` is respected: waits over two seconds skip directly to Meta and keep
+Zen on cooldown for the requested duration. Meta still uses the shared paced
+limiter; its errors remain visible to the caller. Each new request starts with
+Zen unless its cooldown is active. Compaction and unsupported models use Meta.
+
+The first opened response stream is relayed immediately and never replayed after
+partial output. Invalid-request HTTP 400 responses remain visible. Local
+authentication is checked before either provider is called. `/health` reports
+whether Zen is enabled. The original startup cooldown still applies to Meta.
+
+Run the regression coverage without contacting either live provider:
+
+```sh
+cd lab/experiments
+python3 -m unittest test_provider_proxy test_provider_failover -v
+```
+
+The historical frozen-service instructions follow.
+
+Observed setup on 30 September 2026: the updated relay is running at the same
+`http://127.0.0.1:8765/v1` address from
+`/home/james/.cache/codex-lab-provider-proxy/zen-20260930`. That directory contains
+the copied source, `service.json`, metadata-only `events-*.jsonl`, and
+`live-validation.json`. Restart it with
+`python3 /home/james/.cache/codex-lab-provider-proxy/zen-20260930/run.py` while
+port 8765 is free. It is a detached process with no automatic boot restart.
+
+The inference-only Zen key is private at the credential path above (mode 0600).
+The live test observed Zen HTTP 403 (`FreeTierError`: free models can only be used
+from within OpenCode), followed by Meta HTTP 200 with a completed `OK` answer.
+The free Contributor model is therefore currently unavailable through this relay.
+Funding alone does not change that free-model restriction; using paid Zen models
+would also require selecting a paid model. No credits or payment method were added.
+
 This machine's configured lab home is
 `/home/james/.config/codex-lab/muse-contributor-limited`.
 Use it for future preparations. The frozen service is installed at

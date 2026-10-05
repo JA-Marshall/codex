@@ -9,6 +9,12 @@ model_reasoning_summary = "auto"
 model_context_window = 1048576
 model_auto_compact_token_limit = 900000
 
+# Browser access for Muse: the backend-served Playwright browser is unreachable
+# without ChatGPT auth, so expose the local browser_navigate tool instead.
+# Requires a fork build with the browser extension; off by default.
+[features]
+browser_navigate = true
+
 [model_providers.muse-lab]
 name = "Muse lab provider"
 base_url = "https://api.meta.ai/v1"

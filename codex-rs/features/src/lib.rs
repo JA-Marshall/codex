@@ -155,6 +155,12 @@ pub enum Feature {
     WebSearchCached,
     /// Expose the extension-backed standalone web search tool.
     StandaloneWebSearch,
+    /// Expose the local `browser_navigate` tool backed by direct page fetch.
+    ///
+    /// This mirrors the argument shape of the backend-served Playwright
+    /// `browser_navigate` tool so models that cannot reach the ChatGPT apps
+    /// backend (for example Muse lab providers) can still navigate pages.
+    BrowserNavigate,
     /// Use the legacy Landlock Linux sandbox fallback instead of the default
     /// bubblewrap pipeline.
     UseLegacyLandlock,
@@ -1070,6 +1076,12 @@ pub const FEATURES: &[FeatureSpec] = &[
     FeatureSpec {
         id: Feature::StandaloneWebSearch,
         key: "standalone_web_search",
+        stage: Stage::UnderDevelopment,
+        default_enabled: false,
+    },
+    FeatureSpec {
+        id: Feature::BrowserNavigate,
+        key: "browser_navigate",
         stage: Stage::UnderDevelopment,
         default_enabled: false,
     },

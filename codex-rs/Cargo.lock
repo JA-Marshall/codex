@@ -2180,6 +2180,7 @@ dependencies = [
  "codex-arg0",
  "codex-aws-auth",
  "codex-backend-client",
+ "codex-browser-extension",
  "codex-chatgpt",
  "codex-cloud-config",
  "codex-code-mode",
@@ -2522,6 +2523,27 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_with",
+]
+
+[[package]]
+name = "codex-browser-extension"
+version = "0.0.0"
+dependencies = [
+ "codex-core",
+ "codex-extension-api",
+ "codex-features",
+ "codex-http-client",
+ "codex-login",
+ "codex-protocol",
+ "codex-tools",
+ "codex-utils-output-truncation",
+ "futures",
+ "http 1.4.0",
+ "pretty_assertions",
+ "serde",
+ "serde_json",
+ "tokio",
+ "url",
 ]
 
 [[package]]
@@ -2969,6 +2991,7 @@ dependencies = [
  "codex-apply-patch",
  "codex-async-utils",
  "codex-attachment-store",
+ "codex-browser-extension",
  "codex-client",
  "codex-code-mode",
  "codex-config",

@@ -70,6 +70,7 @@ members = [
     "ext/mcp",
     "ext/queue",
     "ext/skills",
+    "ext/browser",
     "ext/web-search",
     "external-agent-migration",
     "keyring-store",
@@ -235,6 +236,7 @@ codex-lmstudio = { path = "lmstudio" }
 codex-login = { path = "login" }
 codex-message-history = { path = "message-history" }
 codex-memories-extension = { path = "ext/memories" }
+codex-browser-extension = { path = "ext/browser" }
 codex-web-search-extension = { path = "ext/web-search" }
 codex-memories-read = { path = "memories/read" }
 codex-memories-write = { path = "memories/write" }

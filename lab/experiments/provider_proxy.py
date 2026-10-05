@@ -1,4 +1,4 @@
-"""Loopback Responses relay with a shared 100-request/minute ceiling; no retries."""
+"""Loopback Responses relay with optional Zen retries and paced Meta fallback."""
 
 import argparse
 import hashlib
@@ -17,6 +17,7 @@ from urllib.parse import urlsplit
 import uuid
 
 from provider_rate_limit import Cancelled, SharedLimiter, retry_after
+from provider_failover import ZenProvider
 
 HOP = {
     "connection",
@@ -51,7 +52,7 @@ class Proxy(ThreadingHTTPServer):
     daemon_threads = True
     allow_reuse_address = False
 
-    def __init__(self, port, upstream, key, limiter, journal):
+    def __init__(self, port, upstream, key, limiter, journal, zen=None):
         endpoint = urlsplit(upstream)
         if (
             endpoint.scheme not in ("https", "http")
@@ -78,6 +79,7 @@ class Proxy(ThreadingHTTPServer):
             journal,
         )
         self.capacity = threading.BoundedSemaphore(64)
+        self.zen = zen
         super().__init__(("127.0.0.1", port), Handler)
 
     def process_request(self, request, address):
@@ -129,6 +131,7 @@ class Handler(BaseHTTPRequestHandler):
             {
                 "status": "ready",
                 "requests_per_minute": self.server.limiter.policy.limit,
+                "zen_enabled": bool(self.server.zen),
             },
         )
 
@@ -192,16 +195,30 @@ class Handler(BaseHTTPRequestHandler):
         headers["Authorization"] = "Bearer " + self.server.key
         headers["Content-Length"] = str(len(body))
         try:
-            with self.server.limiter.dispatch(self.disconnected):
-                journal.event(
-                    "request_dispatched",
-                    request_id=request_id,
-                    queued_ms=round((time.monotonic() - started) * 1000),
+            primary = (
+                self.server.zen.open(
+                    self.path, body, headers, self.disconnected, journal, request_id
                 )
-                upstream.request("POST", self.path, body=body, headers=headers)
-            response = upstream.getresponse()
+                if self.server.zen
+                else None
+            )
+            if primary:
+                upstream.close()
+                upstream, response = primary
+            else:
+                with self.server.limiter.dispatch(self.disconnected):
+                    journal.event(
+                        "request_dispatched",
+                        request_id=request_id,
+                        provider="meta",
+                        queued_ms=round((time.monotonic() - started) * 1000),
+                    )
+                    upstream.request("POST", self.path, body=body, headers=headers)
+                response = upstream.getresponse()
             status = response.status
-            if status == 429 or (status == 503 and response.getheader("Retry-After")):
+            if not primary and (
+                status == 429 or (status == 503 and response.getheader("Retry-After"))
+            ):
                 delay = retry_after(response.getheader("Retry-After"))
                 self.server.limiter.cooldown(delay)
                 journal.event(
@@ -253,11 +270,35 @@ def main():
     parser.add_argument("--requests-per-minute", type=int, default=100)
     parser.add_argument("--key-env", default="MODEL_API_KEY")
     parser.add_argument("--events", type=Path, required=True)
+    parser.add_argument(
+        "--zen-upstream", default="https://opencode.ai/inference/openai/v1"
+    )
+    parser.add_argument("--zen-key-env", default="OPENCODE_API_KEY")
+    parser.add_argument(
+        "--zen-key-file",
+        type=Path,
+        default=Path.home() / ".config/codex-lab/credentials/opencode-zen-api-key",
+    )
+    parser.add_argument("--zen-attempts", type=int, default=2)
+    parser.add_argument("--zen-timeout", type=float, default=30)
     args = parser.parse_args()
+    zen_key = os.environ.get(args.zen_key_env, "")
+    if not zen_key and args.zen_key_file.is_file():
+        zen_key = args.zen_key_file.read_text().strip()
+    zen = (
+        ZenProvider(args.zen_upstream, zen_key, args.zen_attempts, args.zen_timeout)
+        if zen_key
+        else None
+    )
     limiter = SharedLimiter(args.requests_per_minute)
     journal = Journal(args.events)
     server = Proxy(
-        args.port, args.upstream, os.environ.get(args.key_env, ""), limiter, journal
+        args.port,
+        args.upstream,
+        os.environ.get(args.key_env, ""),
+        limiter,
+        journal,
+        zen,
     )
     journal.event(
         "proxy_started",
@@ -266,12 +307,18 @@ def main():
         startup_cooldown_seconds=60,
         port=server.server_port,
         upstream=args.upstream,
-        automatic_retries=0,
+        automatic_retries=args.zen_attempts - 1 if zen else 0,
+        zen_enabled=bool(zen),
+        zen_upstream=args.zen_upstream if zen else None,
         source_sha256={
             name: hashlib.sha256(
                 Path(__file__).with_name(name).read_bytes()
             ).hexdigest()
-            for name in ("provider_proxy.py", "provider_rate_limit.py")
+            for name in (
+                "provider_proxy.py",
+                "provider_rate_limit.py",
+                "provider_failover.py",
+            )
         },
     )
 
