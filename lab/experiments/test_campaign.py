@@ -26,19 +26,79 @@ result={'run_id':name,'status':'finished','host_exit_code':7 if name=='trial-000
 """
 
 FAKE_STAGE = r"""
-import json,sys
+import hashlib,json,sys
 from pathlib import Path
 mode,root=sys.argv[1],Path(sys.argv[2])
 if mode=='host':
     phase=root/'runs/trial-0001/evidence'; phase.mkdir(parents=True)
     (phase/'phase-01.json').write_text(json.dumps({'token_usage':{'total_token_usage':{'input_tokens':9,'output_tokens':3,'cached_input_tokens':1}}}))
+    (phase.parent/'events.jsonl').write_text(json.dumps({'schema_version':1,'sequence':1,'state':'failed'})+'\n')
     sys.exit(7)
 out=root/'trials/trial-0001/evaluation'; out.mkdir()
-(out/'evaluation.json').write_text(json.dumps({'task_success':True,'public_test_success':True,'hidden_test_success':True}))
+(out/'observation.json').write_text(json.dumps({'schema_version':1,'source_artifact_sha256':{'events.jsonl':hashlib.sha256((root/'runs/trial-0001/events.jsonl').read_bytes()).hexdigest()},'all_started_phases_shutdown':True,'workflow_state':'failed','run':str(root/'runs/trial-0001'),'repository':str(root/'trials/trial-0001/fixture/repository')}))
+(out/'evaluation.json').write_text(json.dumps({'schema_version':1,'fixture':'durable-queue-v1','fixture_commit':'a'*40,'task_success':True,'public_test_success':True,'hidden_test_success':True,'candidate_files':{'TASK.md':'a'*64}}))
 """
 
 
 class CampaignTests(unittest.TestCase):
+    def test_disk_admission_stops_queue_before_any_worker_dispatch(self):
+        self.entries(2)
+        self.manifest["storage_policy"] = dict(
+            max_bytes=1,
+            reserve_per_active_trial=100,
+            min_free_bytes=0,
+            debug_bytes_per_trial=100,
+            full_trace_sample=[],
+        )
+        with (
+            patch("run_campaign.worker_command") as command,
+            contextlib.redirect_stdout(io.StringIO()),
+        ):
+            result = coordinate(self.manifest)
+        command.assert_not_called()
+        self.assertTrue(result["storage_admission_stopped"])
+        self.assertEqual(
+            [row["status"] for row in result["trials"]], ["not_started", "not_started"]
+        )
+
+    def test_retention_failure_does_not_replace_actual_grade(self):
+        self.entries(1)
+        self.manifest["storage_policy"] = dict(
+            max_bytes=10000000,
+            reserve_per_active_trial=100,
+            min_free_bytes=0,
+            debug_bytes_per_trial=100,
+            full_trace_sample=[],
+        )
+        with (
+            patch("run_campaign.worker_command", self.fake_command),
+            patch(
+                "study_storage.retain_debug",
+                side_effect=OSError("debug cleanup failed"),
+            ),
+            contextlib.redirect_stdout(io.StringIO()),
+        ):
+            result = coordinate(self.manifest)
+        self.assertIs(result["trials"][0]["task_success"], True)
+        self.assertEqual(result["trials"][0]["retention"]["action"], "incomplete")
+
+    def test_normalized_unknown_workflow_is_not_counted_as_completed(self):
+        self.entries(1)
+        self.fake.write_text(
+            FAKE_WORKER.replace(
+                "result={'run_id'",
+                "result={'workflow_result':{'workflow_status':'unknown'},'run_id'",
+            )
+        )
+        with (
+            patch("run_campaign.worker_command", self.fake_command),
+            contextlib.redirect_stdout(io.StringIO()),
+        ):
+            result = coordinate(self.manifest)
+        self.assertEqual(result["workflow_completed"], 0)
+        self.assertEqual(result["workflow_unknown"], 1)
+        self.assertEqual(result["task_passed"], 1)
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.root = Path(self.temp.name)
@@ -47,6 +107,7 @@ class CampaignTests(unittest.TestCase):
         self.output = self.root / "campaign"
         self.output.mkdir()
         self.manifest = dict(
+            schema_version=1,
             campaign_id="test-campaign",
             output=str(self.output),
             pins={},
@@ -81,10 +142,23 @@ class CampaignTests(unittest.TestCase):
         command.assert_not_called()
         self.assertFalse((self.output / "events.jsonl").exists())
         self.manifest["jobs"] = 1
-        with patch("run_campaign.worker_command", self.fake_command), contextlib.redirect_stdout(io.StringIO()):
+        with (
+            patch("run_campaign.worker_command", self.fake_command),
+            contextlib.redirect_stdout(io.StringIO()),
+        ):
             result = coordinate(self.manifest)
-        events = [json.loads(line) for line in (self.output / "events.jsonl").read_text().splitlines()]
-        self.assertEqual([event["active_jobs"] for event in events if event["type"] == "trial_started"], [1, 1])
+        events = [
+            json.loads(line)
+            for line in (self.output / "events.jsonl").read_text().splitlines()
+        ]
+        self.assertEqual(
+            [
+                event["active_jobs"]
+                for event in events
+                if event["type"] == "trial_started"
+            ],
+            [1, 1],
+        )
         self.assertEqual(result["measurement_purpose"], "isolated-timing")
 
     def test_hundred_subprocess_trials_are_bounded_and_failures_are_retained(self):
@@ -161,6 +235,47 @@ class CampaignTests(unittest.TestCase):
             [record["status"] for record in result["trials"]], ["not_started"] * 5
         )
 
+    def test_malformed_zero_exit_evaluator_keeps_a_failed_result(self):
+        self.entries(1)
+        directory = self.output / "trials/trial-0001"
+        repository = directory / "fixture/repository"
+        repository.mkdir(parents=True)
+        (repository / "TASK.md").write_text("task")
+
+        def launch(command, prefix):
+            if prefix.name == "host":
+                run = self.output / "runs/trial-0001"
+                run.mkdir(parents=True)
+                (run / "events.jsonl").write_text(
+                    json.dumps(dict(schema_version=1, sequence=1, state="failed"))
+                    + "\n"
+                )
+                return 7
+            output = directory / "evaluation"
+            output.mkdir()
+            (output / "evaluation.json").write_text("[]")
+            (output / "observation.json").write_text("{}")
+            return 0
+
+        with (
+            patch(
+                "run_campaign.setup_trial",
+                return_value=dict(repository=str(repository), commit="a" * 40),
+            ),
+            patch("run_campaign.trial_commands", return_value=([], [])),
+            patch("run_campaign.run_logged", side_effect=launch),
+        ):
+            result = run_trial(self.manifest, self.manifest["trials"][0])
+        self.assertEqual(
+            (
+                result["status"],
+                result["task_success"],
+                result["workflow_result"]["evaluation_status"],
+            ),
+            ("failed", None, "failed"),
+        )
+        self.assertEqual(read_json(directory / "result.json"), result)
+
     def test_failed_host_still_evaluates_and_policy_binds_frozen_catalog_and_task(self):
         self.entries(1)
         (self.output / "trials/trial-0001").mkdir(parents=True)
@@ -181,7 +296,10 @@ class CampaignTests(unittest.TestCase):
         with (
             patch("run_campaign.setup_trial", setup),
             patch("run_campaign.trial_commands", commands),
-            patch("run_campaign.time.time_ns", side_effect=[1000000, 2000000, 3000000, 4000000]),
+            patch(
+                "run_campaign.time.time_ns",
+                side_effect=[1000000, 2000000, 3000000, 4000000],
+            ),
         ):
             record = run_trial(self.manifest, self.manifest["trials"][0])
         self.assertEqual(
@@ -193,7 +311,32 @@ class CampaignTests(unittest.TestCase):
             (7, 0, True),
         )
         self.assertEqual(
-            [record[key] for key in ("started_unix_ms", "host_started_unix_ms", "host_finished_unix_ms", "finished_unix_ms")],
+            {
+                key: record["workflow_result"][key]
+                for key in (
+                    "workflow_status",
+                    "stop_status",
+                    "evaluation_status",
+                    "task_success",
+                )
+            },
+            {
+                "workflow_status": "failed",
+                "stop_status": "confirmed",
+                "evaluation_status": "completed",
+                "task_success": True,
+            },
+        )
+        self.assertEqual(
+            [
+                record[key]
+                for key in (
+                    "started_unix_ms",
+                    "host_started_unix_ms",
+                    "host_finished_unix_ms",
+                    "finished_unix_ms",
+                )
+            ],
             [1, 2, 3, 4],
         )
         self.assertEqual(

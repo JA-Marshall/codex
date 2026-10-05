@@ -1,0 +1,43 @@
+{
+  "requirements": [
+    {
+      "id": "r-csv",
+      "critical": true,
+      "cases": [
+        "comma",
+        "quote-and-newline",
+        "empty-fields"
+      ]
+    },
+    {
+      "id": "r-identity",
+      "critical": true,
+      "cases": [
+        "opaque-identifiers"
+      ]
+    },
+    {
+      "id": "r-compat",
+      "critical": true,
+      "cases": [
+        "legacy-simple",
+        "header-only",
+        "invalid-fields"
+      ]
+    }
+  ],
+  "owner_facts": [],
+  "milestones": [],
+  "changes": [],
+  "mutant_failures": {
+    "normalize-identifiers": [
+      "r-identity"
+    ],
+    "comma-only": [
+      "r-csv"
+    ],
+    "stringify-fields": [
+      "r-compat"
+    ]
+  }
+}

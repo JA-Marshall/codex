@@ -1,0 +1,37 @@
+{
+  "schema_version": 2,
+  "id": "py-checkout-change",
+  "project_id": "checkout-change",
+  "family": "extension",
+  "language": "python",
+  "size": "small",
+  "split": "development",
+  "track": "B",
+  "pressure": "change",
+  "capabilities": [
+    "cli",
+    "changed-requirements"
+  ],
+  "write_paths": [
+    "src",
+    "tests"
+  ],
+  "command": [
+    "{python}",
+    "{repository}/src/main.py"
+  ],
+  "build": [],
+  "public_command": [
+    "{python}",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests"
+  ],
+  "mutants": [
+    "shipping-before-discount",
+    "discount-gift-cards"
+  ],
+  "structural_checks": []
+}

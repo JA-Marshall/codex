@@ -1,5 +1,7 @@
 # Codex workflow laboratory: foundation v1
 
+For a live, read-only view of campaign progress and task results, open the [experiment monitor](dashboard/README.md).
+
 For unattended planning, execution and evaluation of hundreds of queued trials, see [UNATTENDED.md](UNATTENDED.md). The opt-in campaign policy replaces per-plan human review for that campaign and preserves its automatic decision records.
 
 For the new restricted live host, see [RUNNING.md](RUNNING.md). The material below records the original offline foundation milestone; its statements about runtime integration and upstream edits describe that earlier scope. Current validation and remaining work are tracked in [PROGRESS.md](PROGRESS.md).

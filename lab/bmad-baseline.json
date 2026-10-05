@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "captured_utc": "2026-09-10T13:45:31.451148+00:00",
+  "repository": "C:\\Users\\james\\Desktop\\Code\\trees\\codex-lab-workflow-study",
+  "head": "db0f5c188a1b37959b92c7d0f5f35f52aff9175e",
+  "branch": "lab/workflow-study-integration",
+  "dirty_files_sha256": {
+    "codex-rs/lab-runtime/src/command_receipts.rs": "55d285c76c4e57628c68822c1e0c8920caa731fef50bc0195d2935c0df4fc1aa",
+    "codex-rs/lab-runtime/src/command_receipts_tests.rs": "16e687ff4bc7aca491b444205a2e8f2c8c1559a9f6cd92ee438cb2da9c3f8933",
+    "codex-rs/lab-runtime/tests/driver.rs": "38852f34b334df3a4c9ab1c1b330187323299807ba2e58fdb84302cb7efe4bcb",
+    "codex-rs/lab-runtime/tests/pilot_task_startup.rs": "77bade56501b9926cb6433547b40ad096ad8af9a3bd2cb19768abb3fa06192e6",
+    "codex-rs/linux-sandbox/src/bwrap.rs": "23e472bc0febbe3e0b01f91547032d208d5cdf3b143711b379d5f06e9117a562",
+    "codex-rs/linux-sandbox/tests/suite/landlock.rs": "a29e41a92cb212cd3c3178af2115ee0c5b26dbc630545d27181b734b0dba5726",
+    "lab/README.md": "7e47bda3eb543dd85daa99790d0a1585e34468030d5718279129a1bbf7d1768d",
+    "lab/TASK_LIBRARY.md": "1c53375d77e31b444503fdc9e46cc37532c5feb60a1ac27f858d41cbf4ed2237",
+    "lab/dashboard/README.md": "3926aab1e67dcc7136c8250f97d73cc34029ca82d9e1e7eedc1183412383c57b",
+    "lab/dashboard/app.js": "1dc7864f5adb2c1a8cf573574456488c9eac2839087f5de7ffd8a997dd0acc77",
+    "lab/dashboard/index.html": "f049f61746ae90d329a0499a3090da18751199a0db85acb3708664162d6fff6b",
+    "lab/dashboard/lan_proxy.py": "b067522287b443727dec652d2e6a82afa765cc55a0d92014f6465fc4d62cec8e",
+    "lab/dashboard/open-dashboard.ps1": "140665d4b1a21d4966bd59baeafd6aaa9c250f9f87824410463dd64366495fd1",
+    "lab/dashboard/server.py": "ea3d2c53a7dad5a43ce9a607a1697e2e1af537d5ab436310b9f66ed1588a2561",
+    "lab/dashboard/style.css": "3d9a8c0e2455e168cb3505389ec9fd4656163c10c6c96cdc3c8de225cdfe0749",
+    "lab/dashboard/test_lan_proxy.py": "ebbec358f0a364b553f725da4267efc3694385f86b8454f293d8c880b35ae468",
+    "lab/dashboard/test_server.py": "dfe12a923aecc4a99befa42139936670e38b1fed5f4e67f488ec4d45bf2e01ad",
+    "lab/experiments/campaign_inputs.py": "f6e1a0dfce3cc97db8064a14a867c9540ed6b990057222283b72263a2a017fdf",
+    "lab/experiments/campaign_python.py": "6296211cb0c1db924efdad41cc0cd67cb089901f151c03b03b41677934182dd3",
+    "lab/experiments/run_campaign.py": "d0cbdad3159a0bf44defeb57616ec472f0e1162dda4f8fcf14308f5287a19fee",
+    "lab/experiments/terminal_run.py": "2c41e9af2def123786dbe867a2cf7c71d3591aeefedf5d7c895b399a1ab1cf2c",
+    "lab/experiments/test_campaign_python.py": "e333ce20073f907bffff9771be221b7a05abfa3949b8f738f075a84084734bf9",
+    "lab/experiments/test_campaign_service.py": "704ebe55f7fcfdf490c142e99b2fc0e4b9a9e264000fc2e12d7e22898671068e",
+    "lab/experiments/test_terminal_run.py": "e5b52f0537adf43f861fdd3b8aad84e6dce5f95d9f1f1702255a9c5cf5b36053"
+  },
+  "tracked_diff_sha256": "0d3715dbb3f3d9f29c8c5efb7bec59f061183f95d51ac128aa7f58005bf66537",
+  "original_file_backup": "C:\\Users\\james\\Desktop\\Code\\trees\\work\\bmad-plan\\p0-original-files",
+  "runner": "lab/experiments/run_campaign.py; Linux/Python 3.12",
+  "evaluators": [
+    "evaluate_task.py",
+    "evaluate_fixture.py",
+    "evaluate_queue.py"
+  ],
+  "terminal_boundary": "terminal_run.observe_terminal under evaluator launch lock",
+  "provider_assumptions": {
+    "model": "muse-spark-1.3-contributor",
+    "requests_per_rolling_minute": 100,
+    "source": "prior frozen campaign; must validate before live execution",
+    "credentials_read": false
+  },
+  "sdk_assumptions": {
+    "source": "sdk/python with matching app-server binary",
+    "experimental_callback_support": "not yet validated; P2",
+    "used_by_P1": false
+  },
+  "historical_campaigns": [
+    "varied-library-v3-200-jobs12-20260907",
+    "github-difficulty-pilot-v3-6-20260908"
+  ],
+  "historical_results_modified": false,
+  "first_boundary": "Add versioned result projection to legacy run_trial; leave execution policy and grader authority unchanged."
+}

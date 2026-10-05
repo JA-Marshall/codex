@@ -1,0 +1,55 @@
+{
+  "requirements": [
+    {
+      "id": "r-reserve",
+      "critical": true,
+      "cases": [
+        "reserve",
+        "validation"
+      ]
+    },
+    {
+      "id": "r-cancel",
+      "critical": true,
+      "cases": [
+        "cancel-summary",
+        "cancel-idempotent",
+        "unknown-cancel"
+      ]
+    },
+    {
+      "id": "r-integration",
+      "critical": true,
+      "cases": [
+        "release-reuse",
+        "mixed-orders"
+      ]
+    }
+  ],
+  "owner_facts": [],
+  "milestones": [
+    {
+      "id": "reservations-ready",
+      "cases": [
+        "reserve",
+        "validation"
+      ]
+    }
+  ],
+  "changes": [
+    {
+      "after": "reservations-ready",
+      "brief": "private/change.md"
+    }
+  ],
+  "mutant_failures": {
+    "stale-reservation-status": [
+      "r-cancel",
+      "r-integration"
+    ],
+    "missing-restock": [
+      "r-cancel",
+      "r-integration"
+    ]
+  }
+}

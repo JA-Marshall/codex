@@ -1,0 +1,55 @@
+{
+  "requirements": [
+    {
+      "id": "r-legacy",
+      "critical": true,
+      "cases": [
+        "small",
+        "boundary",
+        "empty"
+      ]
+    },
+    {
+      "id": "r-coupon",
+      "critical": true,
+      "cases": [
+        "gift-exclusion",
+        "coupon-cap",
+        "zero-coupon"
+      ]
+    },
+    {
+      "id": "r-shipping",
+      "critical": true,
+      "cases": [
+        "cross-threshold",
+        "discount-boundary"
+      ]
+    }
+  ],
+  "owner_facts": [],
+  "milestones": [
+    {
+      "id": "checkout-ready",
+      "cases": [
+        "small",
+        "boundary",
+        "empty"
+      ]
+    }
+  ],
+  "changes": [
+    {
+      "after": "checkout-ready",
+      "brief": "private/change.md"
+    }
+  ],
+  "mutant_failures": {
+    "shipping-before-discount": [
+      "r-shipping"
+    ],
+    "discount-gift-cards": [
+      "r-coupon"
+    ]
+  }
+}

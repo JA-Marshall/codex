@@ -1,0 +1,135 @@
+[
+  {
+    "id": "small",
+    "steps": [
+      {
+        "stdin": "{\"items\":[{\"sku\":\"00042\",\"category\":\"goods\",\"unit_price\":1000,\"quantity\":1}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "subtotal": 1000,
+            "shipping": 500,
+            "total": 1500
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "boundary",
+    "steps": [
+      {
+        "stdin": "{\"items\":[{\"sku\":\"00042\",\"category\":\"goods\",\"unit_price\":2500,\"quantity\":2}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "subtotal": 5000,
+            "shipping": 0,
+            "total": 5000
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "empty",
+    "steps": [
+      {
+        "stdin": "{\"items\":[]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "subtotal": 0,
+            "shipping": 500,
+            "total": 500
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "cross-threshold",
+    "steps": [
+      {
+        "stdin": "{\"items\":[{\"sku\":\"00042\",\"category\":\"goods\",\"unit_price\":5500,\"quantity\":1}],\"coupon\":1000}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "subtotal": 5500,
+            "discount": 1000,
+            "shipping": 500,
+            "total": 5000
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "gift-exclusion",
+    "steps": [
+      {
+        "stdin": "{\"items\":[{\"sku\":\"00042\",\"category\":\"gift-card\",\"unit_price\":4000,\"quantity\":1},{\"sku\":\"00042\",\"category\":\"goods\",\"unit_price\":1000,\"quantity\":1}],\"coupon\":3000}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "subtotal": 5000,
+            "discount": 1000,
+            "shipping": 500,
+            "total": 4500
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "coupon-cap",
+    "steps": [
+      {
+        "stdin": "{\"items\":[{\"sku\":\"00042\",\"category\":\"goods\",\"unit_price\":1200,\"quantity\":1}],\"coupon\":9000}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "subtotal": 1200,
+            "discount": 1200,
+            "shipping": 500,
+            "total": 500
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "discount-boundary",
+    "steps": [
+      {
+        "stdin": "{\"items\":[{\"sku\":\"00042\",\"category\":\"goods\",\"unit_price\":6000,\"quantity\":1}],\"coupon\":1000}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "subtotal": 6000,
+            "discount": 1000,
+            "shipping": 0,
+            "total": 5000
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "zero-coupon",
+    "steps": [
+      {
+        "stdin": "{\"items\":[{\"sku\":\"00042\",\"category\":\"goods\",\"unit_price\":5000,\"quantity\":1}],\"coupon\":0}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "subtotal": 5000,
+            "discount": 0,
+            "shipping": 0,
+            "total": 5000
+          }
+        }
+      }
+    ]
+  }
+]

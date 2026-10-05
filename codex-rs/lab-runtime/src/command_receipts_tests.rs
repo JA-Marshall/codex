@@ -23,6 +23,10 @@ impl ConversationHistorySnapshot for EmptyHistory {
 }
 
 async fn start(receipts: &CommandReceipts, id: &str, command: &str) {
+    start_with_arguments(receipts, id, &json!({"cmd":command}).to_string()).await;
+}
+
+async fn start_with_arguments(receipts: &CommandReceipts, id: &str, arguments: &str) {
     let store = ExtensionData::new("thread");
     receipts
         .on_tool_start(ToolStartInput {
@@ -35,12 +39,55 @@ async fn start(receipts: &CommandReceipts, id: &str, command: &str) {
             tool_name: &ToolName::namespaced("functions", "exec_command"),
             mcp_tool: None,
             payload: &ToolPayload::Function {
-                arguments: json!({"cmd":command}).to_string(),
+                arguments: arguments.to_owned(),
             },
             conversation_history: Arc::new(EmptyHistory),
             source: ToolCallSource::Direct,
         })
         .await;
+}
+
+#[tokio::test]
+async fn malformed_command_arguments_preserve_identity_and_later_receipts() -> anyhow::Result<()> {
+    for arguments in [
+        "{}",
+        r#"{"cmd":null}"#,
+        r#"{"cmd":42}"#,
+        r#"{"cmd":"private-preview", "#,
+    ] {
+        let receipts = CommandReceipts::default();
+        start_with_arguments(&receipts, "malformed-command", arguments).await;
+        finish(
+            &receipts,
+            "malformed-command",
+            ToolCallOutcome::Failed {
+                handler_executed: true,
+            },
+        )
+        .await;
+        start(&receipts, "later-command", "true").await;
+        finish(
+            &receipts,
+            "later-command",
+            ToolCallOutcome::Completed { success: true },
+        )
+        .await;
+        assert_eq!(
+            lookup(&receipts, "thread", "turn", r#"{"index":1}"#, 960).await?,
+            json!({"schema_version":1,"index":1,"commands_seen":2,"receipt":{
+                "call_id":"malformed-command","command_preview":"[preview unavailable: invalid command arguments]",
+                "preview_truncated":true,"tool_outcome":{"status":"failed","handler_executed":true}
+            }})
+        );
+        assert_eq!(
+            lookup(&receipts, "thread", "turn", r#"{"index":2}"#, 960).await?,
+            json!({"schema_version":1,"index":2,"commands_seen":2,"receipt":{
+                "call_id":"later-command","command_preview":"true",
+                "preview_truncated":false,"tool_outcome":{"status":"completed","success":true}
+            }})
+        );
+    }
+    Ok(())
 }
 
 async fn finish(receipts: &CommandReceipts, id: &str, outcome: ToolCallOutcome) {

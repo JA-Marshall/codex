@@ -1,0 +1,62 @@
+{
+  "requirements": [
+    {
+      "id": "r-clarify",
+      "kind": "clarification",
+      "critical": true,
+      "cases": [
+        "cutoff",
+        "legal-hold"
+      ]
+    },
+    {
+      "id": "r-retention",
+      "critical": true,
+      "cases": [
+        "cutoff",
+        "legal-hold"
+      ]
+    },
+    {
+      "id": "r-compat",
+      "critical": true,
+      "cases": [
+        "recent",
+        "metadata-order",
+        "empty"
+      ]
+    }
+  ],
+  "owner_facts": [
+    {
+      "id": "retention",
+      "requirement_id": "r-clarify",
+      "required": true,
+      "matchers": [
+        [
+          "retention"
+        ],
+        [
+          "keep",
+          "records"
+        ],
+        [
+          "legal",
+          "hold"
+        ]
+      ],
+      "answer": "Retain records whose age now_day - created_day is at most 30 days, including exactly 30 days and future dates. Retain every record with legal_hold true regardless of age. Preserve all fields and input order."
+    }
+  ],
+  "calibration_questions": ["What is the retention policy?"],
+  "milestones": [],
+  "changes": [],
+  "mutant_failures": {
+    "guess-seven-days": [
+      "r-retention"
+    ],
+    "drop-legal-holds": [
+      "r-retention"
+    ]
+  }
+}

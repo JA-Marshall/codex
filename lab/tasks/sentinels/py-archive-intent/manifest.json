@@ -1,0 +1,43 @@
+{
+  "schema_version": 2,
+  "oracle_revision": "diagnostics-v2",
+  "id": "py-archive-intent",
+  "project_id": "archive-intent",
+  "family": "extension",
+  "language": "python",
+  "size": "small",
+  "split": "development",
+  "track": "A",
+  "pressure": "intent",
+  "capabilities": [
+    "cli",
+    "audit-history",
+    "reversible-state"
+  ],
+  "write_paths": [
+    "src",
+    "tests"
+  ],
+  "command": [
+    "{python}",
+    "{repository}/src/main.py"
+  ],
+  "build": [],
+  "public_command": [
+    "{python}",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests"
+  ],
+  "mutants": [
+    "delete-history",
+    "duplicate-audit",
+    "unsupported-action",
+    "sort-visible",
+    "silent-errors"
+  ],
+  "valid_alternatives": ["diagnostic-wording"],
+  "structural_checks": []
+}

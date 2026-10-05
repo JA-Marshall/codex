@@ -123,6 +123,7 @@ class CampaignServiceTests(unittest.TestCase):
         service, pins = freeze_service(self.receipt, self.config)
         manifest = {
             "output": str(self.root),
+            "jobs": 1,
             "pins": pins,
             "provider_service": service,
             "requested_model": "muse-test",

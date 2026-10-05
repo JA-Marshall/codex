@@ -51,7 +51,9 @@ class Proxy(ThreadingHTTPServer):
     daemon_threads = True
     allow_reuse_address = False
 
-    def __init__(self, port, upstream, key, limiter, journal):
+    def __init__(
+        self, port, upstream, key, limiter, journal, *, observer=None, client_key=None
+    ):
         endpoint = urlsplit(upstream)
         if (
             endpoint.scheme not in ("https", "http")
@@ -78,6 +80,10 @@ class Proxy(ThreadingHTTPServer):
             journal,
         )
         self.capacity = threading.BoundedSemaphore(64)
+        self.idle = threading.Condition()
+        self.active_handlers = 0
+        self.observer = observer
+        self.client_key = client_key or key
         super().__init__(("127.0.0.1", port), Handler)
 
     def process_request(self, request, address):
@@ -85,8 +91,13 @@ class Proxy(ThreadingHTTPServer):
             request.close()
             return
         try:
+            with self.idle:
+                self.active_handlers += 1
             super().process_request(request, address)
         except BaseException:
+            with self.idle:
+                self.active_handlers -= 1
+                self.idle.notify_all()
             self.capacity.release()
             raise
 
@@ -95,6 +106,15 @@ class Proxy(ThreadingHTTPServer):
             super().process_request_thread(request, address)
         finally:
             self.capacity.release()
+            with self.idle:
+                self.active_handlers -= 1
+                self.idle.notify_all()
+
+    def wait_for_idle(self, timeout):
+        with self.idle:
+            return self.idle.wait_for(
+                lambda: self.active_handlers == 0, timeout=timeout
+            )
 
     def handle_error(self, request, address):
         # Do not emit request headers, bodies or credential-bearing exceptions.
@@ -146,7 +166,7 @@ class Handler(BaseHTTPRequestHandler):
             return self.reply(404, {"error": "unknown route"})
         auth = self.headers.get_all("Authorization", [])
         if len(auth) != 1 or not hmac.compare_digest(
-            auth[0].encode(), ("Bearer " + self.server.key).encode()
+            auth[0].encode(), ("Bearer " + self.server.client_key).encode()
         ):
             return self.reply(401, {"error": "invalid provider credential"})
         lengths = self.headers.get_all("Content-Length", [])
@@ -164,6 +184,14 @@ class Handler(BaseHTTPRequestHandler):
         if len(body) != length:
             return
         request_id = uuid.uuid4().hex
+        lease = None
+        if self.server.observer is not None:
+            try:
+                body, lease = self.server.observer.prepare(
+                    request_id, body, self.headers, self.path
+                )
+            except ValueError:
+                return self.reply(403, {"error": "study admission rejected"})
         journal = self.server.journal
         started = time.monotonic()
         journal.event(
@@ -187,12 +215,18 @@ class Handler(BaseHTTPRequestHandler):
         headers = {
             k: v
             for k, v in self.headers.items()
-            if k.lower() not in blocked | {"authorization"}
+            if k.lower() not in blocked | {"authorization", "x-lab-worker"}
         }
         headers["Authorization"] = "Bearer " + self.server.key
         headers["Content-Length"] = str(len(body))
         try:
-            with self.server.limiter.dispatch(self.disconnected):
+            if lease is not None:
+                lease.attach(upstream)
+            with self.server.limiter.dispatch(
+                lambda: self.disconnected() or (lease is not None and lease.cancelled())
+            ):
+                if lease is not None:
+                    lease.dispatch()
                 journal.event(
                     "request_dispatched",
                     request_id=request_id,
@@ -222,6 +256,8 @@ class Handler(BaseHTTPRequestHandler):
             self.end_headers()
             begun = True
             while chunk := response.read1(65536):
+                if lease is not None:
+                    lease.feed(chunk)
                 self.wfile.write(chunk)
                 self.wfile.flush()
         except Cancelled:
@@ -237,6 +273,8 @@ class Handler(BaseHTTPRequestHandler):
                     pass
         finally:
             upstream.close()
+            if lease is not None:
+                lease.finish(status)
             self.close_connection = True
             journal.event(
                 "request_finished",

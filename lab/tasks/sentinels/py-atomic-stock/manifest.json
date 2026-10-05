@@ -1,0 +1,38 @@
+{
+  "schema_version": 2,
+  "id": "py-atomic-stock",
+  "project_id": "atomic-stock",
+  "family": "extension",
+  "language": "python",
+  "size": "small",
+  "split": "development",
+  "track": "A",
+  "pressure": "compatibility",
+  "capabilities": [
+    "cli",
+    "transactions",
+    "backward-compatibility"
+  ],
+  "write_paths": [
+    "src",
+    "tests"
+  ],
+  "command": [
+    "{python}",
+    "{repository}/src/main.py"
+  ],
+  "build": [],
+  "public_command": [
+    "{python}",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests"
+  ],
+  "mutants": [
+    "partial-commit",
+    "overwrite-duplicate"
+  ],
+  "structural_checks": []
+}

@@ -208,6 +208,16 @@ async fn generated_workflow_enforces_review_before_real_patch_and_verification()
         receipt["receipt"]["tool_outcome"],
         json!({"status":"completed","success":true})
     );
+    let phase: Value = serde_json::from_slice(&std::fs::read(
+        result.artifacts.join("evidence/phase-01.json"),
+    )?)?;
+    assert_eq!(phase["terminal"]["schema_version"], json!(1));
+    assert_eq!(phase["terminal"]["shutdown_confirmed"], json!(true));
+    assert_eq!(
+        phase["terminal"]["session_configured"]["session_id"],
+        phase["thread_id"]
+    );
+    assert_eq!(phase["diagnostics_truncated"], json!(false));
     assert_eq!(mock.requests().len(), 9);
     Ok(())
 }
@@ -425,6 +435,149 @@ async fn amendment_stops_the_old_thread_and_requires_a_new_exact_approval() -> R
     )?)?;
     assert_eq!(metrics["plan_amendments"], 1);
     assert_eq!(mock.requests().len(), 7);
+    Ok(())
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn malformed_command_receipts_preserve_order_and_require_completed_host_evidence()
+-> Result<()> {
+    let command = "test \"$(cat greeting.txt)\" = hello && test ! -e forbidden.txt";
+    for report_call_id in ["valid-verify", "malformed-verify", "bogus-verify"] {
+        let server = MockServer::start().await;
+        let fixture = support::Fixture::new(&server.uri()).await?;
+        let mut sequence = implementation_and_verification("receipt-recovery");
+        sequence.truncate(/*len*/ 2);
+        sequence.extend([
+            response(
+                "malformed-command",
+                responses::ev_function_call("malformed-verify", "exec_command", "{}"),
+            ),
+            response(
+                "valid-command",
+                responses::ev_function_call(
+                    "valid-verify",
+                    "exec_command",
+                    &json!({"cmd":command,"max_output_tokens":1024,"timeout_ms":5000})
+                        .to_string(),
+                ),
+            ),
+            response(
+                "malformed-receipt",
+                responses::ev_function_call(
+                    "malformed-receipt",
+                    "lab_command_receipt",
+                    "{\"index\":1}",
+                ),
+            ),
+            response(
+                "valid-receipt",
+                responses::ev_function_call(
+                    "valid-receipt",
+                    "lab_command_receipt",
+                    "{\"index\":2}",
+                ),
+            ),
+            response(
+                "verification-done",
+                responses::ev_assistant_message(
+                    "verification",
+                    &json!({
+                        "checks":[{"verification_id":"V01","call_id":report_call_id,"acceptance_criteria":["AC01"]}]
+                    })
+                    .to_string(),
+                ),
+            ),
+        ]);
+        let mock = responses::mount_sse_sequence(&server, sequence).await;
+        let mut reviewer = Reviewer {
+            repository: fixture.repository.clone(),
+            targets: Vec::new(),
+            views: Vec::new(),
+            responses: Some(mock.clone()),
+            expected_requests_at_review: vec![0],
+            approve: true,
+        };
+        let result = execute_run(
+            fixture.options(
+                "receipt-recovery",
+                "md",
+                Some(support::plan(/*revision*/ 1)?),
+            ),
+            fixture.paths.clone(),
+            &mut reviewer,
+        )
+        .await;
+        let requests = mock.requests();
+        let request = requests.last().context("verification report request")?;
+        assert!(
+            request
+                .function_call_output_text("valid-verify")
+                .context("valid command output")?
+                .contains("Process exited with code 0")
+        );
+        for (lookup, expected) in [
+            (
+                "malformed-receipt",
+                json!({
+                    "schema_version":1,"index":1,"commands_seen":2,
+                    "receipt":{
+                        "call_id":"malformed-verify",
+                        "command_preview":"[preview unavailable: invalid command arguments]",
+                        "preview_truncated":true,
+                        "tool_outcome":{"status":"failed","handler_executed":true}
+                    }
+                }),
+            ),
+            (
+                "valid-receipt",
+                json!({
+                    "schema_version":1,"index":2,"commands_seen":2,
+                    "receipt":{
+                        "call_id":"valid-verify",
+                        "command_preview":command,
+                        "preview_truncated":false,
+                        "tool_outcome":{"status":"completed","success":true}
+                    }
+                }),
+            ),
+        ] {
+            let receipt = request
+                .function_call_output_text(lookup)
+                .with_context(|| format!("missing {lookup} output"))?;
+            let receipt: Value = serde_json::from_str(&receipt)
+                .with_context(|| format!("actual {lookup} output: {receipt}"))?;
+            assert_eq!(receipt, expected);
+        }
+        if report_call_id == "valid-verify" {
+            let result =
+                result.context("valid command must complete verification after recovery")?;
+            assert_eq!(result.state, WorkflowState::Completed);
+            let metrics: Value = serde_json::from_slice(&std::fs::read(
+                result.artifacts.join("evidence/metrics.json"),
+            )?)?;
+            assert_eq!(metrics["verification_ready"], true);
+        } else {
+            let error = result.expect_err("receipt identity alone cannot establish verification");
+            assert!(
+                error
+                    .to_string()
+                    .contains("verification did not reference a completed host command"),
+                "{report_call_id}: {error:#}"
+            );
+            let journal =
+                std::fs::read_to_string(fixture.runs.join("receipt-recovery/events.jsonl"))?;
+            let last: Value =
+                serde_json::from_str(journal.lines().last().context("last workflow event")?)?;
+            assert_eq!(last["state"], "failed");
+            assert!(
+                !fixture
+                    .runs
+                    .join("receipt-recovery/evidence/metrics.json")
+                    .exists()
+            );
+        }
+        assert_eq!(requests.len(), 7);
+    }
     Ok(())
 }
 

@@ -56,6 +56,8 @@ pub struct PhaseOutput {
     pub text: String,
     pub token_usage: Option<TokenUsageInfo>,
     pub events: Vec<Event>,
+    pub diagnostics_truncated: bool,
+    pub terminal: Option<Value>,
     pub cancelled: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub task_scope: Option<Value>,
@@ -173,6 +175,8 @@ impl CodexBackend {
                 id: new_thread.thread_id.to_string(),
                 msg: EventMsg::SessionConfigured(new_thread.session_configured.clone()),
             }],
+            diagnostics_truncated: false,
+            terminal: None,
             cancelled: false,
             task_scope: scoped.as_ref().map(|scope| scope.evidence.clone()),
         };
@@ -214,7 +218,12 @@ impl CodexBackend {
         // an amendment-pause/completion claim.
         let shutdown = shutdown_and_drain(&thread, &mut output.events).await;
         output.token_usage = thread.token_usage_info().await;
-        shutdown.context("upstream phase shutdown failed")?;
+        output.diagnostics_truncated |= shutdown.context("upstream phase shutdown failed")?;
+        output.terminal = Some(serde_json::json!({
+            "schema_version": 1,
+            "session_configured": new_thread.session_configured,
+            "shutdown_confirmed": true,
+        }));
         if let Some((scope, _)) = &bound_scope
             && let Some(scoped) = &scoped
         {
@@ -282,11 +291,6 @@ async fn collect_phase(
             () = &mut deadline => bail!("phase exceeded the 30-minute runtime limit"),
             event = thread.next_event() => event?,
         };
-        bytes = bytes.saturating_add(serde_json::to_vec(&event)?.len());
-        ensure!(
-            output.events.len() < MAX_PHASE_EVENTS && bytes <= MAX_PHASE_EVENT_BYTES,
-            "phase event evidence limit exceeded"
-        );
         let completed = match &event.msg {
             EventMsg::TurnComplete(completed) => {
                 ensure!(
@@ -314,14 +318,14 @@ async fn collect_phase(
             }
             _ => false,
         };
-        output.events.push(event);
+        output.diagnostics_truncated |= !retain_diagnostic(event, &mut output.events, &mut bytes)?;
         if completed {
             return Ok(());
         }
     }
 }
 
-async fn shutdown_and_drain(thread: &CodexThread, events: &mut Vec<Event>) -> Result<()> {
+async fn shutdown_and_drain(thread: &CodexThread, events: &mut Vec<Event>) -> Result<bool> {
     shutdown_and_drain_events(
         async { Ok(thread.shutdown_and_wait().await?) },
         || async { Ok(thread.next_event().await?) },
@@ -334,7 +338,7 @@ async fn shutdown_and_drain_events<S, N, E>(
     shutdown: S,
     mut next_event: N,
     events: &mut Vec<Event>,
-) -> Result<()>
+) -> Result<bool>
 where
     S: Future<Output = Result<()>>,
     N: FnMut() -> E,
@@ -352,6 +356,7 @@ where
         bytes,
         error,
         completed: false,
+        truncated: false,
     };
     let mut stream_open = true;
     loop {
@@ -377,7 +382,7 @@ where
                     bail!("{error}");
                 }
                 ensure!(evidence.completed, "upstream terminated without a graceful shutdown marker");
-                return Ok(());
+                return Ok(evidence.truncated);
             }
             event = next_event(), if stream_open => match event {
                 Ok(event) => evidence.record(event, events),
@@ -391,6 +396,7 @@ struct ShutdownEvidence {
     bytes: usize,
     error: Option<String>,
     completed: bool,
+    truncated: bool,
 }
 
 impl ShutdownEvidence {
@@ -402,20 +408,23 @@ impl ShutdownEvidence {
             }
             _ => {}
         }
-        let event_size = match serde_json::to_vec(&event) {
-            Ok(bytes) => bytes.len(),
-            Err(error) => {
-                self.error = Some(format!("cannot serialize shutdown evidence: {error}"));
-                MAX_PHASE_EVENT_BYTES
-            }
-        };
-        self.bytes = self.bytes.saturating_add(event_size);
-        if events.len() < MAX_PHASE_EVENTS && self.bytes <= MAX_PHASE_EVENT_BYTES {
-            events.push(event);
-        } else {
-            self.error = Some("phase shutdown evidence limit exceeded".to_string());
+        match retain_diagnostic(event, events, &mut self.bytes) {
+            Ok(retained) => self.truncated |= !retained,
+            Err(error) => self.error = Some(format!("cannot serialize shutdown evidence: {error}")),
         }
     }
+}
+
+// Retention is optional. Safety checks above still inspect every event, and the
+// compact terminal receipt is published only after graceful shutdown succeeds.
+fn retain_diagnostic(event: Event, events: &mut Vec<Event>, bytes: &mut usize) -> Result<bool> {
+    let size = serde_json::to_vec(&event)?.len();
+    if events.len() >= MAX_PHASE_EVENTS || bytes.saturating_add(size) > MAX_PHASE_EVENT_BYTES {
+        return Ok(false);
+    }
+    *bytes += size;
+    events.push(event);
+    Ok(true)
 }
 
 #[cfg(test)]

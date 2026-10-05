@@ -187,6 +187,32 @@ are preserved. [Initial offline validation](TASK_LIBRARY_VALIDATION.json)
 and the [initial release receipt](task-library-release-2026-09-07.json) remain historical evidence.
 The same queue-aware timing calculation is now available through [campaign timing reports](TIMING.md).
 
+## Optional Python dependency runtime
+
+Tasks with Python dependencies can use a separate standalone Python installation.
+Install and check the required package versions there before freezing a campaign,
+then invoke `run_campaign.py` using that installation's interpreter and pass
+`--python-runtime /absolute/standalone/python/prefix`. Virtual environments are
+not accepted by this option: task sandboxes already grant read access to the
+active interpreter's `sys.base_prefix`, so dependencies must reside within that
+same standalone installation. Keep it separate from runtimes used by other runs.
+
+The freezer records the runtime file inventory and hashes its files, including
+installed dependencies. Admission and evaluation validate those hashes; changed,
+added or removed runtime files invalidate the campaign. The standalone runtime
+must contain no bytecode caches or symbolic links: bytecode can execute even
+when cache writing is disabled. Copy source files while resolving links and
+excluding caches. Use `PYTHONDONTWRITEBYTECODE=1` and `PYTHONNOUSERSITE=1`, and
+unset `PYTHONPATH` and `PYTHONHOME`, when preparing and executing an experiment.
+This option does not install packages or
+enable network access for task candidates. Frozen campaigns without this option
+retain their existing interpreter pinning behaviour.
+
+Private repository-derived task packs can be kept outside this repository and
+selected with `--task-root`. Source provenance and graders belong outside each
+candidate's `project/` directory. Validate the pack's reference solutions and
+plausible broken variants using `task_library.py calibrate` before live trials.
+
 ## Remaining study work
 
 The broader [workflow study plan](WORKFLOW_STUDY_PLAN.md) remains a roadmap. The compact/evidence

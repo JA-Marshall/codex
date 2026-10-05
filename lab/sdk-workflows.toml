@@ -1,0 +1,12 @@
+# SDK trial identities. Workflow behavior lives in the pinned adapter and stock BMAD.
+[workflows.direct-v1]
+approval = "human_required"
+
+[workflows."bmad-build-auto-v6.12.0"]
+approval = "human_required"
+
+[workflows."bmad-orchestrated-v6.12.0-recipe1"]
+approval = "human_required"
+
+[workflows.our-v0]
+approval = "human_required"

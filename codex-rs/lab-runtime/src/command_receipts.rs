@@ -104,13 +104,19 @@ impl ToolLifecycleContributor for CommandReceipts {
                 )
             } else {
                 let arguments = serde_json::from_str::<Value>(arguments).ok();
-                let Some(command) = arguments.as_ref().and_then(|v| v["cmd"].as_str()) else {
-                    state.faulted = true;
-                    return;
-                };
-                let preview: String = command.chars().take(128).collect();
-                let truncated = preview.len() < command.len();
-                (preview, truncated)
+                if let Some(command) = arguments.as_ref().and_then(|v| v["cmd"].as_str()) {
+                    let preview: String = command.chars().take(128).collect();
+                    let truncated = preview.len() < command.len();
+                    (preview, truncated)
+                } else {
+                    // Model argument errors do not make the host call identity
+                    // ambiguous. Keep its place in start order; only a completed
+                    // command event can establish verification evidence.
+                    (
+                        "[preview unavailable: invalid command arguments]".to_owned(),
+                        true,
+                    )
+                }
             };
             state.receipts.push(Receipt {
                 thread: identity.0.to_owned(),

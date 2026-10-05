@@ -6,6 +6,7 @@ import threading
 import uuid
 from _thread import LockType
 from collections import deque
+from concurrent.futures import Executor
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -216,9 +217,17 @@ class CodexClient:
         self,
         config: CodexConfig | None = None,
         approval_handler: ApprovalHandler | None = None,
+        *,
+        server_request_executor: Executor | None = None,
     ) -> None:
         self.config = config or CodexConfig()
         self._approval_handler = approval_handler or self._default_approval_handler
+        # The caller owns executor shutdown. Offloading permits callbacks to make
+        # same-client RPCs while the sole reader continues routing responses.
+        self._server_request_executor = server_request_executor
+        self._server_request_slots = threading.BoundedSemaphore(8)
+        self._callback_generation = object()
+        self._close_lock = threading.Lock()
         self._proc: subprocess.Popen[str] | None = None
         self._lock = threading.Lock()
         self._thread_start_locks_guard = threading.Lock()
@@ -238,6 +247,8 @@ class CodexClient:
     def start(self) -> None:
         if self._proc is not None:
             return
+        self._callback_generation = object()
+        self._router = MessageRouter()
 
         path_dirs: tuple[Path, ...] = ()
         if self.config.launch_args_override is not None:
@@ -272,23 +283,39 @@ class CodexClient:
         self._start_reader_thread()
 
     def close(self) -> None:
+        with self._close_lock:
+            self._close_process()
+
+    def _close_process(self) -> None:
         if self._proc is None:
             return
         proc = self._proc
         self._proc = None
+        self._callback_generation = object()
+        self._router.fail_all(TransportClosedError("Codex process closed"))
 
         if proc.stdin:
-            proc.stdin.close()
+            try:
+                proc.stdin.close()
+            except BrokenPipeError:
+                # The child may have exited before a buffered callback reply
+                # was flushed. Still reap it and close both reader streams.
+                pass
         try:
             proc.terminate()
             proc.wait(timeout=2)
         except Exception:
             proc.kill()
+            proc.wait(timeout=2)
 
         if self._stderr_thread and self._stderr_thread.is_alive():
             self._stderr_thread.join(timeout=0.5)
         if self._reader_thread and self._reader_thread.is_alive():
             self._reader_thread.join(timeout=0.5)
+        if proc.stdout and (self._reader_thread is None or not self._reader_thread.is_alive()):
+            proc.stdout.close()
+        if proc.stderr and (self._stderr_thread is None or not self._stderr_thread.is_alive()):
+            proc.stderr.close()
 
     def initialize(self) -> InitializeResponse:
         result = self.request(
@@ -802,12 +829,30 @@ class CodexClient:
 
     def _reader_loop(self) -> None:
         """Continuously classify transport messages into requests, responses, and events."""
+        generation = self._callback_generation
         try:
             while True:
                 msg = self._read_message()
                 if "method" in msg and "id" in msg:
-                    response = self._handle_server_request(msg)
-                    self._write_message({"id": msg["id"], "result": response})
+                    if self._server_request_executor is None:
+                        response = self._handle_server_request(msg)
+                        self._write_message({"id": msg["id"], "result": response})
+                    elif not self._server_request_slots.acquire(blocking=False):
+                        self._write_message(
+                            {
+                                "id": msg["id"],
+                                "error": {"code": -32000, "message": "Callback capacity exceeded"},
+                            }
+                        )
+                    else:
+                        try:
+                            future = self._server_request_executor.submit(
+                                self._respond_to_server_request, msg, generation
+                            )
+                            future.add_done_callback(lambda _: self._server_request_slots.release())
+                        except BaseException:
+                            self._server_request_slots.release()
+                            raise
                     continue
                 if "method" in msg and "id" not in msg:
                     method = msg["method"]
@@ -816,9 +861,28 @@ class CodexClient:
                             self._coerce_notification(method, msg.get("params"))
                         )
                     continue
+                result = msg.get("result")
+                turn = result.get("turn") if isinstance(result, dict) else None
+                if isinstance(turn, dict) and isinstance(turn.get("id"), str):
+                    self._router.register_turn(turn["id"])
                 self._router.route_response(msg)
         except BaseException as exc:
-            self._router.fail_all(exc)
+            if generation is self._callback_generation:
+                self._router.fail_all(exc)
+
+    def _respond_to_server_request(self, msg: dict[str, JsonValue], generation: object) -> None:
+        try:
+            try:
+                response = self._handle_server_request(msg)
+                reply = {"id": msg["id"], "result": response}
+            except Exception:
+                # Callback exceptions can include private data; do not send them
+                # to the model or leave its server request waiting indefinitely.
+                reply = {"id": msg["id"], "error": {"code": -32603, "message": "Callback failed"}}
+            self._write_message(reply, generation=generation)
+        except BaseException as exc:
+            if generation is self._callback_generation:
+                self._router.fail_all(exc)
 
     def _stderr_tail(self, limit: int = 40) -> str:
         return "\n".join(list(self._stderr_lines)[-limit:])
@@ -833,12 +897,17 @@ class CodexClient:
             params if isinstance(params, dict) else None,
         )
 
-    def _write_message(self, payload: JsonObject) -> None:
-        if self._proc is None or self._proc.stdin is None:
+    def _write_message(self, payload: JsonObject, *, generation: object | None = None) -> None:
+        proc = self._proc
+        if proc is None or proc.stdin is None:
             raise TransportClosedError("Codex process is not running")
         with self._lock:
-            self._proc.stdin.write(json.dumps(payload) + "\n")
-            self._proc.stdin.flush()
+            if generation is not None and generation is not self._callback_generation:
+                raise TransportClosedError("Callback belongs to a closed process")
+            if self._proc is not proc:
+                raise TransportClosedError("Codex process changed")
+            proc.stdin.write(json.dumps(payload) + "\n")
+            proc.stdin.flush()
 
     def _read_message(self) -> dict[str, JsonValue]:
         if self._proc is None or self._proc.stdout is None:

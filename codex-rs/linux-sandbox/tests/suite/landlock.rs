@@ -402,6 +402,104 @@ async fn sandbox_ignores_missing_writable_roots_under_bwrap() {
 }
 
 #[tokio::test]
+async fn sandbox_writes_existing_file_without_widening_scope_under_bwrap() {
+    if should_skip_bwrap_tests().await {
+        eprintln!("skipping bwrap test: bwrap sandbox prerequisites are unavailable");
+        return;
+    }
+
+    let tempdir = tempfile::tempdir().expect("tempdir");
+    let allowed_file = tempdir.path().join("allowed.txt");
+    let sibling_file = tempdir.path().join("sibling.txt");
+    let writable_dir = tempdir.path().join("writable-directory");
+    std::fs::write(&allowed_file, "before").expect("seed allowed file");
+    std::fs::write(&sibling_file, "protected").expect("seed sibling file");
+    for name in [".git", ".agents", ".codex"] {
+        let metadata_dir = writable_dir.join(name);
+        std::fs::create_dir_all(&metadata_dir).expect("create metadata directory");
+        std::fs::write(metadata_dir.join("config"), "protected").expect("seed metadata file");
+    }
+
+    let cwd = AbsolutePathBuf::try_from(tempdir.path()).expect("absolute workspace");
+    let sandbox_helper = codex_linux_sandbox_exe();
+    let helper_dir = AbsolutePathBuf::try_from(sandbox_helper.parent().expect("helper parent"))
+        .expect("absolute helper directory");
+    // Match task scopes: the workspace is readable, with explicit writable
+    // file and directory roots and the minimal sandbox runtime paths.
+    let policy = FileSystemSandboxPolicy::restricted(vec![
+        FileSystemSandboxEntry::new(
+            FileSystemPath::Special {
+                value: FileSystemSpecialPath::Minimal,
+            },
+            FileSystemAccessMode::Read,
+        ),
+        FileSystemSandboxEntry::new(helper_dir.into(), FileSystemAccessMode::Read),
+        FileSystemSandboxEntry::new(cwd.clone().into(), FileSystemAccessMode::Read),
+        FileSystemSandboxEntry::new(
+            AbsolutePathBuf::try_from(allowed_file.as_path())
+                .expect("absolute allowed file")
+                .into(),
+            FileSystemAccessMode::Write,
+        ),
+        FileSystemSandboxEntry::new(
+            AbsolutePathBuf::try_from(writable_dir.as_path())
+                .expect("absolute writable directory")
+                .into(),
+            FileSystemAccessMode::Write,
+        ),
+    ]);
+    let output = run_cmd_result_with_permission_profile_for_cwd(
+        &[
+            "/bin/sh",
+            "-c",
+            r#"set -e
+test ! -w .
+printf after >> allowed.txt
+if { printf denied >> sibling.txt; } 2>/dev/null; then exit 71; fi
+if { printf denied > new-sibling.txt; } 2>/dev/null; then exit 72; fi
+printf allowed > writable-directory/ordinary.txt
+for name in .git .agents .codex; do
+    if { printf denied >> "writable-directory/$name/config"; } 2>/dev/null; then exit 73; fi
+    if { printf denied > "writable-directory/$name/new"; } 2>/dev/null; then exit 74; fi
+done
+printf scope-ok
+"#,
+        ],
+        cwd,
+        PermissionProfile::from_runtime_permissions(&policy, NetworkSandboxPolicy::Enabled),
+        create_env_from_core_vars(),
+        LONG_TIMEOUT_MS,
+        /*use_legacy_landlock*/ false,
+    )
+    .await
+    .expect("exact writable file scope should start under bubblewrap");
+
+    assert_eq!(output.exit_code, 0, "{}", output.stderr.text);
+    assert_eq!(output.stdout.text, "scope-ok");
+    assert_eq!(
+        std::fs::read_to_string(&allowed_file).expect("read allowed file"),
+        "beforeafter"
+    );
+    assert_eq!(
+        std::fs::read_to_string(&sibling_file).expect("read sibling file"),
+        "protected"
+    );
+    assert!(!tempdir.path().join("new-sibling.txt").exists());
+    assert_eq!(
+        std::fs::read_to_string(writable_dir.join("ordinary.txt")).expect("read ordinary file"),
+        "allowed"
+    );
+    for name in [".git", ".agents", ".codex"] {
+        let metadata_dir = writable_dir.join(name);
+        assert_eq!(
+            std::fs::read_to_string(metadata_dir.join("config")).expect("read metadata file"),
+            "protected"
+        );
+        assert!(!metadata_dir.join("new").exists());
+    }
+}
+
+#[tokio::test]
 async fn test_no_new_privs_is_enabled() {
     let output = run_cmd_output(
         &["bash", "-lc", "grep '^NoNewPrivs:' /proc/self/status"],

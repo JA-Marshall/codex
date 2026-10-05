@@ -1,0 +1,37 @@
+{
+  "schema_version": 2,
+  "id": "py-order-integration",
+  "project_id": "order-integration",
+  "family": "extension",
+  "language": "python",
+  "size": "small",
+  "split": "development",
+  "track": "B",
+  "pressure": "integration",
+  "capabilities": [
+    "cli",
+    "cross-increment-integration"
+  ],
+  "write_paths": [
+    "src",
+    "tests"
+  ],
+  "command": [
+    "{python}",
+    "{repository}/src/main.py"
+  ],
+  "build": [],
+  "public_command": [
+    "{python}",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests"
+  ],
+  "mutants": [
+    "stale-reservation-status",
+    "missing-restock"
+  ],
+  "structural_checks": []
+}

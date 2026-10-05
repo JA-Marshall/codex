@@ -26,6 +26,7 @@ class MessageRouter:
     def __init__(self) -> None:
         """Create empty response, turn, and global notification queues."""
         self._lock = threading.Lock()
+        self._failure: BaseException | None = None
         self._response_waiters: dict[str, queue.Queue[ResponseQueueItem]] = {}
         self._login_notifications: dict[str, queue.Queue[NotificationQueueItem]] = {}
         self._pending_login_notifications: dict[str, deque[Notification]] = {}
@@ -39,6 +40,9 @@ class MessageRouter:
 
         waiter: queue.Queue[ResponseQueueItem] = queue.Queue(maxsize=1)
         with self._lock:
+            if self._failure is not None:
+                waiter.put(self._failure)
+                return waiter
             self._response_waiters[request_id] = waiter
         return waiter
 
@@ -93,6 +97,8 @@ class MessageRouter:
         with self._lock:
             if turn_id in self._turn_notifications:
                 return
+            if self._failure is not None:
+                turn_queue.put(self._failure)
             # A turn can emit events immediately after turn/start, before the
             # caller receives the TurnHandle and starts streaming.
             pending = self._pending_turn_notifications.pop(turn_id, deque())
@@ -218,6 +224,7 @@ class MessageRouter:
         """Wake every blocked waiter when the reader thread exits."""
 
         with self._lock:
+            self._failure = exc
             response_waiters = list(self._response_waiters.values())
             self._response_waiters.clear()
             login_queues = list(self._login_notifications.values())

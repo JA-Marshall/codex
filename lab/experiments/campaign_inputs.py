@@ -12,7 +12,16 @@ import uuid
 
 from fixture_registry import FIXTURES
 from campaign_service import freeze_service
-from campaign_tasks import archive_just, archive_tasks, just_helper, selections, toolchain_pins
+from campaign_tasks import (
+    archive_just,
+    archive_tasks,
+    just_helper,
+    selections,
+    toolchain_pins,
+)
+from campaign_python import freeze_python_runtime, validate_python_runtime
+from dataclasses import asdict
+from workflows.contracts import StudySpec
 
 MAX_RUNS = 1000
 FIXTURE_NAMES = (*FIXTURES, "durable-queue-v1")
@@ -69,6 +78,9 @@ def freeze(args):
     validate_measurement(purpose, args.jobs)
     workflows, fixtures = args.workflow, args.fixture
     tasks, toolchain = selections(args, FIXTURE_NAMES)
+    python_metadata, python_files = freeze_python_runtime(
+        getattr(args, "python_runtime", None)
+    )
     task_just = just_helper(args, tasks)
     count = len(workflows) * len(fixtures) * args.repetitions
     if (
@@ -108,6 +120,8 @@ def freeze(args):
         protected += (toolchain,)
     if task_just:
         protected += (task_just,)
+    if python_metadata:
+        protected += (Path(python_metadata["python_runtime"]["root"]),)
     if output.exists() or any(
         output.is_relative_to(p) or p.is_relative_to(output) for p in protected
     ):
@@ -146,6 +160,7 @@ def freeze(args):
         pins.append(bundled_sandbox)
     pins.extend(path for path in archive.rglob("*") if path.is_file())
     pins.extend(toolchain_pins(toolchain))
+    pins.extend(python_files)
     trials = []
     for repetition in range(1, args.repetitions + 1):
         for fixture_name in fixtures:
@@ -158,7 +173,11 @@ def freeze(args):
                         "fixture": fixture_name,
                         "workflow": workflow,
                         "repetition": repetition,
-                        **(tasks[fixture_name].facets() if fixture_name in tasks else {}),
+                        **(
+                            tasks[fixture_name].facets()
+                            if fixture_name in tasks
+                            else {}
+                        ),
                     }
                 )
     manifest = {
@@ -171,6 +190,7 @@ def freeze(args):
         "codex_home": str(home),
         "catalog": str(frozen_catalog),
         "python": str(Path(sys.executable).resolve()),
+        **python_metadata,
         "requested_model": config.get("model"),
         "provider_service": service,
         **task_metadata,
@@ -192,11 +212,18 @@ def freeze(args):
         },
         "original_catalog_sha256": digest(catalog),
     }
+    if getattr(args, "sdk_config", None) is not None:
+        from workflows.sdk_freeze import freeze_sdk
+
+        freeze_sdk(manifest, args.sdk_config)
+    study = StudySpec.from_campaign(manifest)
+    write_json(output / "study.json", asdict(study))
     write_json(output / "campaign.json", manifest)
     return manifest
 
 
 def validate_pins(manifest):
+    validate_python_runtime(manifest)
     for name, expected in manifest["pins"].items():
         if digest(name) != expected:
             raise ValueError("frozen campaign input changed: " + name)
@@ -206,7 +233,9 @@ def validate_measurement(purpose, jobs):
     if purpose not in ("throughput", "isolated-timing"):
         raise ValueError("unknown measurement purpose")
     if purpose == "isolated-timing" and jobs != 1:
-        raise ValueError("isolated-timing requires jobs=1; parallel runs measure shared throughput")
+        raise ValueError(
+            "isolated-timing requires jobs=1; parallel runs measure shared throughput"
+        )
 
 
 def load_campaign(path, expected_digest=None):
@@ -215,8 +244,13 @@ def load_campaign(path, expected_digest=None):
     if expected_digest is not None and fingerprint != expected_digest:
         raise ValueError("campaign manifest changed after scheduling")
     manifest = read_json(path)
-    validate_measurement(manifest.get("measurement_purpose", "throughput"), manifest.get("jobs"))
-    if manifest.get("phase_timeout_clock", "wall_clock_including_provider_queue") != "wall_clock_including_provider_queue":
+    validate_measurement(
+        manifest.get("measurement_purpose", "throughput"), manifest.get("jobs")
+    )
+    if (
+        manifest.get("phase_timeout_clock", "wall_clock_including_provider_queue")
+        != "wall_clock_including_provider_queue"
+    ):
         raise ValueError("unsupported phase timeout clock")
     trials = manifest.get("trials")
     if (
@@ -254,8 +288,10 @@ def load_campaign(path, expected_digest=None):
             raise ValueError("task archive must belong to the frozen campaign")
     if any(entry.get("language") == "rust" for entry in trials):
         helper = path.parent / "inputs/lab/task-tools/just"
-        if (manifest.get("task_just") != str(helper)
-                or str(helper) not in manifest["pins"]):
+        if (
+            manifest.get("task_just") != str(helper)
+            or str(helper) not in manifest["pins"]
+        ):
             raise ValueError("Rust task helper must be pinned in the frozen campaign")
     validate_pins(manifest)
     manifest["manifest_sha256"] = fingerprint

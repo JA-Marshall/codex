@@ -74,6 +74,161 @@ def make_run(path, state="failed"):
 
 
 class TerminalTests(unittest.TestCase):
+    def test_dropped_dispatch_allows_confirmed_failed_shutdown_without_authority(self):
+        for revoked in (False, True):
+            with (
+                self.subTest(revoked=revoked),
+                tempfile.TemporaryDirectory() as directory,
+            ):
+                run = Path(directory) / "run"
+                events = make_run(run)
+                tail = [{"type": "admission_revoked", "epoch": 1}] if revoked else []
+                tail.extend(
+                    [
+                        {
+                            "type": "dispatch_dropped",
+                            "identity": "test-thread\0turn\0call",
+                        },
+                        events[-1],
+                        {
+                            "type": "runtime_failed",
+                            "phase_retained": False,
+                            "active_dispatches": 0,
+                            "shutdown_confirmed": False,
+                        },
+                    ]
+                )
+                write_journal(run / "runtime-events.jsonl", events[:3] + tail)
+                before = {
+                    str(path): path.read_bytes()
+                    for path in run.rglob("*")
+                    if path.is_file()
+                }
+                snapshot, _, observation = observe_terminal(run)
+                self.assertEqual(
+                    {
+                        key: observation[key]
+                        for key in (
+                            "workflow_state",
+                            "phase_turns",
+                            "tool_admissions",
+                            "all_started_phases_shutdown",
+                            "authority_restored",
+                        )
+                    },
+                    {
+                        "workflow_state": "failed",
+                        "phase_turns": 1,
+                        "tool_admissions": 1,
+                        "all_started_phases_shutdown": True,
+                        "authority_restored": False,
+                    },
+                )
+                snapshot.verify_unchanged()
+                self.assertEqual(
+                    before,
+                    {
+                        str(path): path.read_bytes()
+                        for path in run.rglob("*")
+                        if path.is_file()
+                    },
+                )
+
+    def test_dropped_dispatch_rejects_malformed_foreign_and_unmatched_identity(self):
+        identities = [
+            None,
+            1,
+            [],
+            "",
+            "test-thread",
+            "test-thread\0turn",
+            "test-thread\0turn\0call\0extra",
+            "\0turn\0call",
+            "test-thread\0\0call",
+            "test-thread\0turn\0",
+            "test-thread\0turn\0" + "x" * 513,
+            "test-thread\0turn\0" + "é" * 257,
+            "foreign-thread\0turn\0call",
+            "test-thread\0other-turn\0call",
+            "test-thread\0turn\0other-call",
+        ]
+        for identity in identities:
+            with (
+                self.subTest(identity=identity),
+                tempfile.TemporaryDirectory() as directory,
+            ):
+                run = Path(directory) / "run"
+                events = make_run(run)
+                events[3] = {"type": "dispatch_dropped", "identity": identity}
+                write_journal(run / "runtime-events.jsonl", events)
+                with self.assertRaises(ValueError):
+                    observe_terminal(run)
+
+    def test_dropped_dispatch_cannot_replace_other_completion_or_shutdown_proof(self):
+        for variant in (
+            "missing_identity",
+            "wrong_epoch",
+            "no_admission",
+            "before_thread",
+            "after_finish",
+            "duplicate_drop",
+            "finish_after_drop",
+            "after_stop",
+            "other_active_call",
+            "missing_stop",
+            "missing_shutdown",
+            "retained_phase",
+            "active_dispatches",
+        ):
+            with (
+                self.subTest(variant=variant),
+                tempfile.TemporaryDirectory() as directory,
+            ):
+                run = Path(directory) / "run"
+                original = make_run(run)
+                drop = {
+                    "type": "dispatch_dropped",
+                    "identity": "test-thread\0turn\0call",
+                }
+                events = original[:3] + [drop, original[-1]]
+                if variant == "missing_identity":
+                    del drop["identity"]
+                elif variant == "wrong_epoch":
+                    drop["epoch"] = 2
+                elif variant == "no_admission":
+                    events.pop(2)
+                elif variant == "before_thread":
+                    events = [original[0], drop, *original[1:]]
+                elif variant == "after_finish":
+                    events.insert(3, original[3])
+                elif variant == "duplicate_drop":
+                    events.insert(4, dict(drop))
+                elif variant == "finish_after_drop":
+                    events.insert(4, original[3])
+                elif variant == "after_stop":
+                    events = original + [drop]
+                elif variant == "other_active_call":
+                    events.insert(3, dict(original[2], call_id="other-call"))
+                elif variant == "missing_stop":
+                    events.pop()
+                elif variant == "missing_shutdown":
+                    path = run / "evidence/phase-01.json"
+                    output = json.loads(path.read_text())
+                    output["events"].pop()
+                    write_json(path, output)
+                elif variant in ("retained_phase", "active_dispatches"):
+                    events.append(
+                        {
+                            "type": "runtime_failed",
+                            "phase_retained": variant == "retained_phase",
+                            "active_dispatches": int(variant == "active_dispatches"),
+                            "shutdown_confirmed": False,
+                        }
+                    )
+                write_journal(run / "runtime-events.jsonl", events)
+                with self.assertRaises(ValueError):
+                    observe_terminal(run)
+
     def test_delegated_approval_is_not_reported_as_human_review(self):
         with tempfile.TemporaryDirectory() as directory:
             run = Path(directory) / "run"

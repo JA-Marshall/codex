@@ -4,7 +4,6 @@ import hashlib
 import json
 import os
 from pathlib import Path
-import resource
 import subprocess
 import tempfile
 
@@ -47,7 +46,9 @@ class RunSnapshot:
             raise ValueError("partial run journal")
         events = [json.loads(line) for line in data.splitlines()]
         if any(
-            e.get("sequence") != i + 1 or e.get("schema_version") != 1
+            not isinstance(e, dict)
+            or e.get("sequence") != i + 1
+            or e.get("schema_version") != 1
             for i, e in enumerate(events)
         ):
             raise ValueError("invalid journal sequence or version")
@@ -96,6 +97,26 @@ def observe_terminal(run: Path):
             ):
                 raise ValueError("failed run has unconfirmed shutdown")
             faulted = True
+        elif kind == "dispatch_dropped":
+            # CallLease::drop has no epoch: its identity binds the outstanding
+            # dispatch to the active phase's unique thread. It proves only that
+            # the lease ended, not that the phase or its subprocesses stopped.
+            if (
+                active is None
+                or event.get("epoch", active["epoch"]) != active["epoch"]
+                or "scope_audit" in active
+            ):
+                raise ValueError("dropped dispatch outside active phase")
+            identity = event.get("identity")
+            parts = identity.split("\0") if isinstance(identity, str) else []
+            if len(parts) != 3 or any(
+                not part or len(part.encode("utf-8")) > 512 for part in parts
+            ):
+                raise ValueError("invalid dropped dispatch identity")
+            call = tuple(parts[1:])
+            if parts[0] != active.get("thread_id") or call not in calls:
+                raise ValueError("unmatched or foreign dropped dispatch")
+            calls.remove(call)
         else:
             if active is None or event.get("epoch") != active["epoch"]:
                 raise ValueError("runtime event outside active phase")
@@ -142,29 +163,61 @@ def observe_terminal(run: Path):
         key: 0 for key in ("input_tokens", "output_tokens", "cached_input_tokens")
     }
     repositories = set()
-    scope_definition = snapshot.json("evidence/task-scope.json")["scope"] if scope_sha256 else None
+    scope_definition = (
+        snapshot.json("evidence/task-scope.json")["scope"] if scope_sha256 else None
+    )
     for index, phase in enumerate(phases, 1):
         snapshot.json(f"evidence/input-{index:02}.json")
         output = snapshot.json(f"evidence/phase-{index:02}.json")
-        if output.get("thread_id") != phase["thread_id"] or not any(
-            e.get("msg", {}).get("type") == "shutdown_complete"
-            for e in output.get("events", [])
+        if (
+            not isinstance(output, dict)
+            or output.get("thread_id") != phase["thread_id"]
         ):
-            raise ValueError("missing or foreign phase shutdown artifact")
-        configured = [
-            e["msg"]
-            for e in output["events"]
-            if e.get("msg", {}).get("type") == "session_configured"
-        ]
+            raise ValueError("foreign phase shutdown artifact")
+        terminal = output.get("terminal")
+        if terminal is not None:
+            if (
+                not isinstance(terminal, dict)
+                or terminal.get("schema_version") != 1
+                or terminal.get("shutdown_confirmed") is not True
+            ):
+                raise ValueError("invalid compact phase terminal receipt")
+            configured = [terminal.get("session_configured", {})]
+            retained = [
+                e["msg"]
+                for e in output.get("events", [])
+                if e.get("msg", {}).get("type") == "session_configured"
+            ]
+            # The serialized receipt has no EventMsg tag.
+            if retained and [dict(item, type=None) for item in retained] != [
+                dict(configured[0], type=None)
+            ]:
+                raise ValueError(
+                    "phase terminal receipt differs from diagnostic binding"
+                )
+        else:
+            if not any(
+                e.get("msg", {}).get("type") == "shutdown_complete"
+                for e in output.get("events", [])
+            ):
+                raise ValueError("missing phase shutdown artifact")
+            configured = [
+                e["msg"]
+                for e in output["events"]
+                if e.get("msg", {}).get("type") == "session_configured"
+            ]
         if (
             len(configured) != 1
+            or not isinstance(configured[0], dict)
             or configured[0].get("session_id") != phase["thread_id"]
             or not configured[0].get("cwd")
         ):
             raise ValueError("missing phase repository binding")
         repositories.add(str(Path(configured[0]["cwd"]).resolve()))
         if scope_sha256:
-            scope_observation.verify_phase(phase, output, configured[0], events[-1]["state"], scope_definition)
+            scope_observation.verify_phase(
+                phase, output, configured[0], events[-1]["state"], scope_definition
+            )
         usage = (output.get("token_usage") or {}).get("total_token_usage", {})
         for key in totals:
             value = usage.get(key)
@@ -222,6 +275,7 @@ def observe_terminal(run: Path):
 
 def capture_diff(repository: Path, baseline: str):
     """Bounded Git subprocess adapter; no index, checkout or commit mutations."""
+    import resource
 
     def limits():
         resource.setrlimit(resource.RLIMIT_FSIZE, (MAX_FILE, MAX_FILE))

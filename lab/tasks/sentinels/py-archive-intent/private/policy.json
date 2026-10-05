@@ -1,0 +1,51 @@
+{
+  "requirements": [
+    {
+      "id": "r-archive",
+      "critical": true,
+      "cases": [
+        "archive-keeps-record",
+        "untouched-records",
+        "visible-order"
+      ]
+    },
+    {
+      "id": "r-history",
+      "critical": true,
+      "cases": [
+        "restore-keeps-history",
+        "repeat-is-idempotent",
+        "restore-idempotent"
+      ]
+    },
+    {
+      "id": "r-compat",
+      "critical": true,
+      "cases": [
+        "old-list-api",
+        "unknown-id",
+        "unsupported-op"
+      ]
+    }
+  ],
+  "owner_facts": [],
+  "milestones": [],
+  "changes": [],
+  "mutant_failures": {
+    "delete-history": [
+      "r-archive"
+    ],
+    "duplicate-audit": [
+      "r-history"
+    ],
+    "unsupported-action": [
+      "r-compat"
+    ],
+    "sort-visible": [
+      "r-archive"
+    ],
+    "silent-errors": [
+      "r-compat"
+    ]
+  }
+}

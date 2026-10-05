@@ -1,0 +1,39 @@
+{
+  "schema_version": 2,
+  "id": "py-csv-review",
+  "project_id": "csv-review",
+  "family": "bug_fix",
+  "language": "python",
+  "size": "small",
+  "split": "development",
+  "track": "A",
+  "pressure": "review",
+  "capabilities": [
+    "cli",
+    "csv",
+    "review-calibration"
+  ],
+  "write_paths": [
+    "src",
+    "tests"
+  ],
+  "command": [
+    "{python}",
+    "{repository}/src/main.py"
+  ],
+  "build": [],
+  "public_command": [
+    "{python}",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests"
+  ],
+  "mutants": [
+    "normalize-identifiers",
+    "comma-only",
+    "stringify-fields"
+  ],
+  "structural_checks": []
+}

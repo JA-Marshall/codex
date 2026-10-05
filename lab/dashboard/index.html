@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Muse · Experiment monitor</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="/" aria-label="Muse experiment monitor"><span class="mark">m</span> muse<span class="brand-note">lab</span></a>
+    <div class="sidebar-heading">EXPERIMENTS <span id="campaign-count">—</span></div>
+    <nav id="campaigns" aria-label="Campaigns"><p class="muted">Loading campaigns…</p></nav>
+    <div class="sidebar-footer"><span class="lock">◈</span> Read-only observer<br><span class="muted">Your harness stays in control.</span></div>
+  </aside>
+  <main>
+    <header class="topbar"><span>Experiment monitor</span><span id="connection" role="status">Connecting…</span></header>
+    <div id="error" class="error" role="alert" hidden></div>
+    <section class="heading"><div><div class="eyebrow">CAMPAIGN OVERVIEW</div><h1 id="title">Your experiments, in view.</h1><p id="subtitle" class="muted">Reading local campaign records.</p></div><span id="campaign-state" class="badge">Loading</span></section>
+    <section class="overview" aria-label="Campaign progress">
+      <div class="progress-heading"><span id="completion">— trials complete</span><span id="percent">—</span></div>
+      <div id="progress" class="progress" role="progressbar" aria-label="Trials complete" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="passed-bar" class="passed"></span><span id="failed-bar" class="failed"></span><span id="cancelled-bar" class="cancelled"></span></div>
+      <div class="metrics"><div><span>Task accepted</span><strong id="accepted">—</strong></div><div><span>Task rejected</span><strong id="rejected">—</strong></div><div><span>Pending or unknown</span><strong id="acceptance-unknown">—</strong></div><div><span>Campaign elapsed</span><strong id="elapsed">—</strong></div></div>
+      <p id="campaign-note" class="note"></p>
+    </section>
+    <section class="tasks" aria-labelledby="tasks-heading">
+      <div class="section-heading"><h2 id="tasks-heading">Task activity</h2><span id="task-count" class="muted"></span></div>
+      <div class="legend"><span class="legend-passed">Passed</span><span class="legend-failed">Failed</span><span class="legend-in_progress">In progress</span><span class="legend-quiet">Quiet</span><span class="legend-queued">Queued</span><span class="legend-cancelled">Cancelled</span></div>
+      <div id="task-map" class="task-map" aria-label="Select a trial to inspect"></div>
+      <div class="filters"><label class="search">Find a task<input id="search" type="search" placeholder="Task name or trial ID…"></label><label>Status<select id="status-filter"><option value="all">All statuses</option><option value="in_progress">In progress</option><option value="quiet">Quiet</option><option value="failed">Failed</option><option value="passed">Passed</option><option value="queued">Queued</option><option value="cancelled">Cancelled</option></select></label><label>Task type<select id="family-filter"><option value="all">All task types</option></select></label></div>
+      <div class="table-scroll"><table><thead><tr><th>Task / trial</th><th>Workflow</th><th>Acceptance</th><th>Run status</th><th>Latest phase</th><th class="number">Elapsed</th></tr></thead><tbody id="trials"></tbody></table></div>
+      <p id="empty" class="empty" hidden>No tasks match these filters.</p>
+    </section>
+    <footer>Recorded activity, refreshed every 5 seconds. “Quiet” means no recent events; it does not confirm a stopped process.</footer>
+  </main>
+  <dialog id="detail" aria-labelledby="detail-title"><div class="detail-heading"><span class="eyebrow">TRIAL DETAILS</span><button id="close-detail" aria-label="Close trial details">×</button></div><div id="detail-content"></div></dialog>
+</body>
+</html>

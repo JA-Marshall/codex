@@ -1,0 +1,305 @@
+[
+  {
+    "id": "reserve",
+    "steps": [
+      {
+        "stdin": "{\"state\":{\"stock\":{\"a\":3,\"b\":2},\"orders\":{}},\"operations\":[{\"op\":\"reserve\",\"id\":\"0001\",\"sku\":\"a\",\"quantity\":2}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "state": {
+              "stock": {
+                "a": 1,
+                "b": 2
+              },
+              "orders": {
+                "0001": {
+                  "sku": "a",
+                  "quantity": 2,
+                  "status": "reserved"
+                }
+              }
+            },
+            "results": [
+              "ok"
+            ],
+            "summary": {
+              "available": {
+                "a": 1,
+                "b": 2
+              },
+              "reserved": {
+                "a": 2,
+                "b": 0
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "validation",
+    "steps": [
+      {
+        "stdin": "{\"state\":{\"stock\":{\"a\":3,\"b\":2},\"orders\":{}},\"operations\":[{\"op\":\"reserve\",\"id\":\"one\",\"sku\":\"a\",\"quantity\":4},{\"op\":\"reserve\",\"id\":\"one\",\"sku\":\"a\",\"quantity\":1},{\"op\":\"reserve\",\"id\":\"one\",\"sku\":\"b\",\"quantity\":1},{\"op\":\"reserve\",\"id\":\"bad\",\"sku\":\"a\",\"quantity\":true},{\"op\":\"reserve\",\"id\":\"zero\",\"sku\":\"a\",\"quantity\":0},{\"op\":\"reserve\",\"id\":\"missing\",\"sku\":\"x\",\"quantity\":1},{\"op\":\"other\"}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "state": {
+              "stock": {
+                "a": 2,
+                "b": 2
+              },
+              "orders": {
+                "one": {
+                  "sku": "a",
+                  "quantity": 1,
+                  "status": "reserved"
+                }
+              }
+            },
+            "results": [
+              "unavailable",
+              "ok",
+              "invalid-order",
+              "invalid-order",
+              "invalid-order",
+              "unavailable",
+              "unsupported-operation"
+            ],
+            "summary": {
+              "available": {
+                "a": 2,
+                "b": 2
+              },
+              "reserved": {
+                "a": 1,
+                "b": 0
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "cancel-summary",
+    "steps": [
+      {
+        "stdin": "{\"state\":{\"stock\":{\"a\":3,\"b\":2},\"orders\":{}},\"operations\":[{\"op\":\"reserve\",\"id\":\"one\",\"sku\":\"a\",\"quantity\":2},{\"op\":\"cancel\",\"id\":\"one\"}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "state": {
+              "stock": {
+                "a": 3,
+                "b": 2
+              },
+              "orders": {
+                "one": {
+                  "sku": "a",
+                  "quantity": 2,
+                  "status": "cancelled"
+                }
+              }
+            },
+            "results": [
+              "ok",
+              "ok"
+            ],
+            "summary": {
+              "available": {
+                "a": 3,
+                "b": 2
+              },
+              "reserved": {
+                "a": 0,
+                "b": 0
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "cancel-idempotent",
+    "steps": [
+      {
+        "stdin": "{\"state\":{\"stock\":{\"a\":3,\"b\":2},\"orders\":{}},\"operations\":[{\"op\":\"reserve\",\"id\":\"one\",\"sku\":\"a\",\"quantity\":2},{\"op\":\"cancel\",\"id\":\"one\"},{\"op\":\"cancel\",\"id\":\"one\"}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "state": {
+              "stock": {
+                "a": 3,
+                "b": 2
+              },
+              "orders": {
+                "one": {
+                  "sku": "a",
+                  "quantity": 2,
+                  "status": "cancelled"
+                }
+              }
+            },
+            "results": [
+              "ok",
+              "ok",
+              "ok"
+            ],
+            "summary": {
+              "available": {
+                "a": 3,
+                "b": 2
+              },
+              "reserved": {
+                "a": 0,
+                "b": 0
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "release-reuse",
+    "steps": [
+      {
+        "stdin": "{\"state\":{\"stock\":{\"a\":3,\"b\":2},\"orders\":{}},\"operations\":[{\"op\":\"reserve\",\"id\":\"one\",\"sku\":\"a\",\"quantity\":3},{\"op\":\"cancel\",\"id\":\"one\"},{\"op\":\"reserve\",\"id\":\"two\",\"sku\":\"a\",\"quantity\":3}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "state": {
+              "stock": {
+                "a": 0,
+                "b": 2
+              },
+              "orders": {
+                "one": {
+                  "sku": "a",
+                  "quantity": 3,
+                  "status": "cancelled"
+                },
+                "two": {
+                  "sku": "a",
+                  "quantity": 3,
+                  "status": "reserved"
+                }
+              }
+            },
+            "results": [
+              "ok",
+              "ok",
+              "ok"
+            ],
+            "summary": {
+              "available": {
+                "a": 0,
+                "b": 2
+              },
+              "reserved": {
+                "a": 3,
+                "b": 0
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "unknown-cancel",
+    "steps": [
+      {
+        "stdin": "{\"state\":{\"stock\":{\"a\":3,\"b\":2},\"orders\":{}},\"operations\":[{\"op\":\"cancel\",\"id\":\"unknown\"},{\"op\":\"reserve\",\"id\":\"one\",\"sku\":\"b\",\"quantity\":1}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "state": {
+              "stock": {
+                "a": 3,
+                "b": 1
+              },
+              "orders": {
+                "one": {
+                  "sku": "b",
+                  "quantity": 1,
+                  "status": "reserved"
+                }
+              }
+            },
+            "results": [
+              "unknown-order",
+              "ok"
+            ],
+            "summary": {
+              "available": {
+                "a": 3,
+                "b": 1
+              },
+              "reserved": {
+                "a": 0,
+                "b": 1
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "mixed-orders",
+    "steps": [
+      {
+        "stdin": "{\"state\":{\"stock\":{\"a\":3,\"b\":2},\"orders\":{}},\"operations\":[{\"op\":\"reserve\",\"id\":\"z\",\"sku\":\"a\",\"quantity\":2},{\"op\":\"reserve\",\"id\":\"a\",\"sku\":\"b\",\"quantity\":2},{\"op\":\"cancel\",\"id\":\"z\"},{\"op\":\"reserve\",\"id\":\"b\",\"sku\":\"a\",\"quantity\":1}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "state": {
+              "stock": {
+                "a": 2,
+                "b": 0
+              },
+              "orders": {
+                "z": {
+                  "sku": "a",
+                  "quantity": 2,
+                  "status": "cancelled"
+                },
+                "a": {
+                  "sku": "b",
+                  "quantity": 2,
+                  "status": "reserved"
+                },
+                "b": {
+                  "sku": "a",
+                  "quantity": 1,
+                  "status": "reserved"
+                }
+              }
+            },
+            "results": [
+              "ok",
+              "ok",
+              "ok",
+              "ok"
+            ],
+            "summary": {
+              "available": {
+                "a": 2,
+                "b": 0
+              },
+              "reserved": {
+                "a": 1,
+                "b": 2
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+]

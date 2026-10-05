@@ -1,0 +1,99 @@
+[
+  {
+    "id": "recent",
+    "steps": [
+      {
+        "stdin": "{\"now_day\":100,\"records\":[{\"id\":\"00042\",\"created_day\":99,\"note\":\"keep\"}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": [
+            {
+              "id": "00042",
+              "created_day": 99,
+              "note": "keep"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "cutoff",
+    "steps": [
+      {
+        "stdin": "{\"now_day\":100,\"records\":[{\"id\":\"a\",\"created_day\":69},{\"id\":\"b\",\"created_day\":70},{\"id\":\"c\",\"created_day\":71}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": [
+            {
+              "id": "b",
+              "created_day": 70
+            },
+            {
+              "id": "c",
+              "created_day": 71
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "legal-hold",
+    "steps": [
+      {
+        "stdin": "{\"now_day\":100,\"records\":[{\"id\":\"old\",\"created_day\":0,\"legal_hold\":true,\"note\":\"audit\"},{\"id\":\"expired\",\"created_day\":0,\"legal_hold\":false}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": [
+            {
+              "id": "old",
+              "created_day": 0,
+              "legal_hold": true,
+              "note": "audit"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "metadata-order",
+    "steps": [
+      {
+        "stdin": "{\"now_day\":100,\"records\":[{\"id\":\"z\",\"created_day\":101,\"note\":{\"a\":1}},{\"id\":\"0001\",\"created_day\":80,\"tags\":[\"α\"]}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": [
+            {
+              "id": "z",
+              "created_day": 101,
+              "note": {
+                "a": 1
+              }
+            },
+            {
+              "id": "0001",
+              "created_day": 80,
+              "tags": [
+                "α"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "empty",
+    "steps": [
+      {
+        "stdin": "{\"now_day\":100,\"records\":[]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": []
+        }
+      }
+    ]
+  }
+]

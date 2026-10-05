@@ -13,7 +13,6 @@ import threading
 import time
 
 from campaign_inputs import (
-    FIXTURE_NAMES,
     digest,
     freeze,
     load_campaign,
@@ -23,10 +22,14 @@ from campaign_inputs import (
     write_json,
 )
 from campaign_service import check_service
+from workflows.contracts import StudySpec, WorkflowAdapter
+from workflows.legacy import LegacyWorkflowAdapter
 
 
-def run_logged(command, prefix):
+def run_logged(command, prefix, *, deadline=None):
     """Drain subprocess pipes to bounded logs; never abandon a live child."""
+    if deadline is not None and time.monotonic() >= deadline:
+        raise TimeoutError("project deadline before process launch")
     process = subprocess.Popen(
         command,
         stdin=subprocess.DEVNULL,
@@ -62,7 +65,22 @@ def run_logged(command, prefix):
     for reader in readers:
         reader.start()
     try:
-        returncode = process.wait()
+        try:
+            returncode = process.wait(
+                timeout=max(0.001, deadline - time.monotonic())
+                if deadline is not None
+                else None
+            )
+        except subprocess.TimeoutExpired:
+            # The metered legacy host runs as PID1 inside its owned namespace.
+            # Terminating unshare triggers its kill-child boundary; wait for all
+            # inherited pipes to close, then require independent shutdown proof.
+            process.terminate()
+            try:
+                returncode = process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                returncode = process.wait()
     finally:
         process.wait()
         for reader in readers:
@@ -72,16 +90,21 @@ def run_logged(command, prefix):
     return returncode
 
 
-def setup_trial(destination, fixture_name, task_root=None, toolchain=None, task_just=None):
+def setup_trial(
+    destination, fixture_name, task_root=None, toolchain=None, task_just=None
+):
     if task_root is not None:
         from task_registry import discover, setup
 
         tasks = discover(task_root)
         if fixture_name in tasks:
             task = tasks[fixture_name]
-            return setup(destination, task,
-                         toolchain if task.manifest["language"] == "rust" else None,
-                         task_just if task.manifest["language"] == "rust" else None)
+            return setup(
+                destination,
+                task,
+                toolchain if task.manifest["language"] == "rust" else None,
+                task_just if task.manifest["language"] == "rust" else None,
+            )
     if fixture_name == "durable-queue-v1":
         from queue_fixture import setup
 
@@ -89,6 +112,16 @@ def setup_trial(destination, fixture_name, task_root=None, toolchain=None, task_
     from setup_fixture import setup
 
     return setup(destination, fixture_name)
+
+
+def backend_run_directory(manifest, entry):
+    output = Path(manifest["output"])
+    parent = (
+        output / "trials" / entry["run_id"] / "legacy-meter/runs"
+        if manifest.get("legacy_runtime")
+        else output / "runs"
+    )
+    return parent / entry["run_id"]
 
 
 def trial_commands(manifest, entry, metadata, directory):
@@ -103,7 +136,7 @@ def trial_commands(manifest, entry, metadata, directory):
         "--codex-home",
         manifest["codex_home"],
         "--runs-directory",
-        str(Path(manifest["output"]) / "runs"),
+        str(backend_run_directory(manifest, entry).parent),
         "--run-id",
         entry["run_id"],
         "--task-file",
@@ -117,10 +150,14 @@ def trial_commands(manifest, entry, metadata, directory):
         "--campaign-policy",
         str(directory / "policy.json"),
     ]
-    evaluator = "evaluate_task.py" if metadata.get("kind") == "repository_task" else (
-        "evaluate_queue.py"
-        if entry["fixture"] == "durable-queue-v1"
-        else "evaluate_fixture.py"
+    evaluator = (
+        "evaluate_task.py"
+        if metadata.get("kind") == "repository_task"
+        else (
+            "evaluate_queue.py"
+            if entry["fixture"] == "durable-queue-v1"
+            else "evaluate_fixture.py"
+        )
     )
     evaluate = [
         manifest["python"],
@@ -134,7 +171,7 @@ def trial_commands(manifest, entry, metadata, directory):
         "--fixture-manifest",
         str(directory / "fixture/fixture.json"),
         "--run",
-        str(Path(manifest["output"]) / "runs" / entry["run_id"]),
+        str(backend_run_directory(manifest, entry)),
     ]
     if metadata.get("language") == "rust":
         evaluate.extend(["--toolchain", manifest["task_toolchain"]])
@@ -161,6 +198,14 @@ def usage(run):
 
 
 def run_trial(manifest, entry):
+    if manifest.get("sdk_runtime") is not None:
+        from workflows.sdk_trial import run_sdk_trial
+
+        return run_sdk_trial(manifest, entry)
+    study = StudySpec.from_campaign(manifest)
+    if entry not in manifest["trials"]:
+        raise ValueError("trial is not part of the frozen study")
+    adapter: WorkflowAdapter = LegacyWorkflowAdapter()
     directory = Path(manifest["output"]) / "trials" / entry["run_id"]
     # A direct worker invocation must not overwrite a previous attempt either.
     with (directory / "started.json").open("x", encoding="utf-8") as receipt:
@@ -178,8 +223,13 @@ def run_trial(manifest, entry):
     try:
         validate_pins(manifest)
         if manifest.get("task_root"):
-            metadata = setup_trial(directory / "fixture", entry["fixture"], manifest["task_root"],
-                                   manifest.get("task_toolchain"), manifest.get("task_just"))
+            metadata = setup_trial(
+                directory / "fixture",
+                entry["fixture"],
+                manifest["task_root"],
+                manifest.get("task_toolchain"),
+                manifest.get("task_just"),
+            )
         else:
             metadata = setup_trial(directory / "fixture", entry["fixture"])
         repository = Path(metadata["repository"])
@@ -200,8 +250,14 @@ def run_trial(manifest, entry):
                 "write_paths": metadata["write_paths"],
                 "deny_read_paths": [manifest["task_root"]],
                 "read_paths": [str(Path(sys.base_prefix).resolve())]
-                + ([manifest["task_toolchain"], str(Path(manifest["task_just"]).parent)]
-                   if metadata["language"] == "rust" else []),
+                + (
+                    [
+                        manifest["task_toolchain"],
+                        str(Path(manifest["task_just"]).parent),
+                    ]
+                    if metadata["language"] == "rust"
+                    else []
+                ),
             }
         write_json(directory / "policy.json", policy)
         record.update(
@@ -212,11 +268,44 @@ def run_trial(manifest, entry):
         host, evaluate = trial_commands(manifest, entry, metadata, directory)
         validate_pins(manifest)
         check_service(manifest)
+        record["run_directory"] = str(backend_run_directory(manifest, entry))
         record["host_started_unix_ms"] = time.time_ns() // 1000000
-        record["host_exit_code"] = run_logged(host, directory / "host")
+        if manifest.get("legacy_runtime"):
+            import tomllib
+            from workflows.legacy_meter import LegacyMeter
+
+            profile = tomllib.loads(
+                (Path(manifest["codex_home"]) / "config.toml").read_text()
+            )
+            credential_name = profile["model_providers"][profile["model_provider"]][
+                "env_key"
+            ]
+            meter = LegacyMeter(
+                manifest, entry, directory, os.environ[credential_name]
+            ).start()
+            try:
+                record["host_exit_code"] = run_logged(
+                    meter.command(host),
+                    directory / "host",
+                    deadline=meter.ledger.deadline,
+                )
+            finally:
+                receipt = meter.close()
+                record["legacy_meter_sha256"] = digest(
+                    directory / "legacy-meter/result.json"
+                )
+            if (
+                not receipt["provider_handlers_stopped"]
+                or not receipt["namespace_stopped"]
+            ):
+                raise RuntimeError(
+                    "legacy metered shutdown unconfirmed; grading withheld"
+                )
+        else:
+            record["host_exit_code"] = run_logged(host, directory / "host")
         record["host_finished_unix_ms"] = time.time_ns() // 1000000
         if record["host_exit_code"] != 0:
-            failure = Path(manifest["output"]) / "runs" / entry["run_id"] / "evidence/failure.json"
+            failure = backend_run_directory(manifest, entry) / "evidence/failure.json"
             if failure.is_file():
                 classification = read_json(failure).get("classification")
                 if classification in ("scope_blocked", "runtime_failed"):
@@ -235,10 +324,18 @@ def run_trial(manifest, entry):
     except Exception as error:
         record["error"] = str(error)
     try:
-        record["usage"] = usage(Path(manifest["output"]) / "runs" / entry["run_id"])
+        record["usage"] = usage(backend_run_directory(manifest, entry))
     except (OSError, ValueError, TypeError, KeyError) as error:
         record["usage"] = None
         record["usage_error"] = str(error)
+    observed = adapter.collect(
+        record, directory, backend_run_directory(manifest, entry)
+    )
+    record["workflow_result"] = observed.to_dict()
+    record["study_inputs_sha256"] = study.inputs_sha256
+    record["task_success"] = observed.task_success
+    if observed.evaluation_status != "completed":
+        record["status"] = "failed"
     record["finished_unix_ms"] = time.time_ns() // 1000000
     write_json(directory / "result.json", record)
     return record
@@ -258,7 +355,9 @@ def worker_command(manifest, entry):
 
 
 def coordinate(manifest, cancelled=None):
-    validate_measurement(manifest.get("measurement_purpose", "throughput"), manifest["jobs"])
+    validate_measurement(
+        manifest.get("measurement_purpose", "throughput"), manifest["jobs"]
+    )
     cancelled = cancelled or threading.Event()
     output = Path(manifest["output"])
     validate_pins(manifest)
@@ -295,6 +394,16 @@ def coordinate(manifest, cancelled=None):
                 if record.get("run_id") != entry["run_id"]:
                     raise ValueError("foreign trial result")
                 record["worker_exit_code"] = code
+                if "storage_policy" in manifest:
+                    from study_storage import retain_debug
+
+                    try:
+                        record["retention"] = retain_debug(manifest, entry, record)
+                    except Exception as error:
+                        record["retention"] = {
+                            "action": "incomplete",
+                            "error": str(error)[:2048],
+                        }
                 return record
             except Exception as error:
                 return dict(
@@ -315,13 +424,22 @@ def coordinate(manifest, cancelled=None):
             automatic_retries=0,
             resume_supported=False,
         )
+        storage_stopped = False
         with ThreadPoolExecutor(max_workers=manifest["jobs"]) as pool:
             while pending or active:
                 while (
                     pending
                     and len(active) < manifest["jobs"]
                     and not cancelled.is_set()
+                    and not storage_stopped
                 ):
+                    from study_storage import disk_admission
+
+                    storage = disk_admission(manifest, len(active))
+                    if not storage["admit"]:
+                        storage_stopped = True
+                        event("campaign_admission_stopped", **storage)
+                        break
                     entry = pending.popleft()
                     (output / "trials" / entry["run_id"]).mkdir(exist_ok=False)
                     event(
@@ -350,7 +468,11 @@ def coordinate(manifest, cancelled=None):
                     )
         for entry in pending:
             records[entry["run_id"]] = dict(
-                entry, status="not_started", reason="campaign cancelled"
+                entry,
+                status="not_started",
+                reason="disk admission limit"
+                if storage_stopped
+                else "campaign cancelled",
             )
         ordered = [records[entry["run_id"]] for entry in manifest["trials"]]
         succeeded = sum(
@@ -377,15 +499,29 @@ def coordinate(manifest, cancelled=None):
             measurement_purpose=manifest.get("measurement_purpose", "throughput"),
             phase_timeout_clock="wall_clock_including_provider_queue",
             cancelled=cancelled.is_set(),
+            storage_admission_stopped=storage_stopped,
             total=len(ordered),
             passed=succeeded,
             failed=len(ordered) - succeeded,
             workflow_completed=sum(
-                record.get("host_exit_code") == 0 for record in ordered
+                (
+                    record["workflow_result"].get("workflow_status") == "completed"
+                    if "workflow_result" in record
+                    else record.get("host_exit_code") == 0
+                )
+                for record in ordered
+            ),
+            workflow_unknown=sum(
+                (record.get("workflow_result") or {}).get("workflow_status")
+                == "unknown"
+                for record in ordered
             ),
             task_passed=sum(record.get("task_success") is True for record in ordered),
             task_failed=sum(record.get("task_success") is False for record in ordered),
-            scope_blocked=sum(record.get("failure_classification") == "scope_blocked" for record in ordered),
+            scope_blocked=sum(
+                record.get("failure_classification") == "scope_blocked"
+                for record in ordered
+            ),
             evaluation_failures=sum(
                 record.get("evaluation_exit_code") not in (None, 0)
                 for record in ordered
@@ -429,16 +565,37 @@ def main():
         parser.add_argument("--" + name, type=Path)
     parser.add_argument("--workflow", action="append")
     parser.add_argument("--fixture", action="append")
-    parser.add_argument("--task-root", type=Path, help="Versioned repository task library")
-    parser.add_argument("--task-split", choices=("development", "study", "confirmation"),
-                        help="Select every repository task in this split instead of listing --fixture")
-    parser.add_argument("--task-toolchain", type=Path, help="Pinned Rust toolchain directory")
-    parser.add_argument("--task-just", type=Path, help="Existing just executable to freeze for Rust public test recipes")
+    parser.add_argument(
+        "--task-root", type=Path, help="Versioned repository task library"
+    )
+    parser.add_argument(
+        "--python-runtime",
+        type=Path,
+        help="Pin this active standalone Python prefix and installed task dependencies",
+    )
+    parser.add_argument(
+        "--task-split",
+        choices=("development", "study", "confirmation"),
+        help="Select every repository task in this split instead of listing --fixture",
+    )
+    parser.add_argument(
+        "--task-toolchain", type=Path, help="Pinned Rust toolchain directory"
+    )
+    parser.add_argument(
+        "--task-just",
+        type=Path,
+        help="Existing just executable to freeze for Rust public test recipes",
+    )
     parser.add_argument("--repetitions", type=int, default=1)
     parser.add_argument("--jobs", type=int, default=16)
-    parser.add_argument("--purpose", choices=("throughput", "isolated-timing"), default="throughput")
+    parser.add_argument(
+        "--purpose", choices=("throughput", "isolated-timing"), default="throughput"
+    )
     parser.add_argument("--max-amendments", type=int, default=0, choices=range(5))
     parser.add_argument("--prepare-only", action="store_true")
+    parser.add_argument(
+        "--sdk-config", type=Path, help="Frozen SDK/BMAD compatibility runtime settings"
+    )
     parser.add_argument(
         "--provider-service", type=Path, help="Pinned shared Muse proxy service.json"
     )
@@ -486,11 +643,16 @@ def main():
         return int(result["failed"] != 0 or result["cancelled"])
     if args.task_split:
         if args.fixture or not args.task_root:
-            parser.error("--task-split requires --task-root and cannot be combined with --fixture")
+            parser.error(
+                "--task-split requires --task-root and cannot be combined with --fixture"
+            )
         from task_registry import discover
 
-        args.fixture = sorted(task.name for task in discover(args.task_root).values()
-                              if task.manifest["split"] == args.task_split)
+        args.fixture = sorted(
+            task.name
+            for task in discover(args.task_root).values()
+            if task.manifest["split"] == args.task_split
+        )
         if not args.fixture:
             parser.error("the selected task split is empty")
     required = (

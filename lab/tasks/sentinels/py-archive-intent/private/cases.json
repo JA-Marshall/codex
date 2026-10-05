@@ -1,0 +1,231 @@
+[
+  {
+    "id": "archive-keeps-record",
+    "steps": [
+      {
+        "stdin": "{\"items\":[{\"id\":\"00042\",\"active\":true,\"events\":[\"created\"],\"note\":\"customer audit\"}],\"actions\":[{\"op\":\"archive\",\"id\":\"00042\"}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "items": [
+              {
+                "id": "00042",
+                "active": false,
+                "events": [
+                  "created",
+                  "archived"
+                ],
+                "note": "customer audit"
+              }
+            ],
+            "visible": []
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "restore-keeps-history",
+    "steps": [
+      {
+        "stdin": "{\"items\":[{\"id\":\"00042\",\"active\":true,\"events\":[\"created\"],\"note\":\"customer audit\"}],\"actions\":[{\"op\":\"archive\",\"id\":\"00042\"},{\"op\":\"restore\",\"id\":\"00042\"}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "items": [
+              {
+                "id": "00042",
+                "active": true,
+                "events": [
+                  "created",
+                  "archived",
+                  "restored"
+                ],
+                "note": "customer audit"
+              }
+            ],
+            "visible": [
+              "00042"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "repeat-is-idempotent",
+    "steps": [
+      {
+        "stdin": "{\"items\":[{\"id\":\"00042\",\"active\":true,\"events\":[\"created\"],\"note\":\"customer audit\"}],\"actions\":[{\"op\":\"archive\",\"id\":\"00042\"},{\"op\":\"archive\",\"id\":\"00042\"}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "items": [
+              {
+                "id": "00042",
+                "active": false,
+                "events": [
+                  "created",
+                  "archived"
+                ],
+                "note": "customer audit"
+              }
+            ],
+            "visible": []
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "untouched-records",
+    "steps": [
+      {
+        "stdin": "{\"items\":[{\"id\":\"00042\",\"active\":true,\"events\":[\"created\"],\"note\":\"customer audit\"},{\"id\":\"β\",\"active\":true,\"events\":[\"imported\"],\"metadata\":{\"source\":\"old\"}}],\"actions\":[{\"op\":\"archive\",\"id\":\"00042\"}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "items": [
+              {
+                "id": "00042",
+                "active": false,
+                "events": [
+                  "created",
+                  "archived"
+                ],
+                "note": "customer audit"
+              },
+              {
+                "id": "β",
+                "active": true,
+                "events": [
+                  "imported"
+                ],
+                "metadata": {
+                  "source": "old"
+                }
+              }
+            ],
+            "visible": [
+              "β"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "old-list-api",
+    "steps": [
+      {
+        "stdin": "{\"items\":[{\"id\":\"00042\",\"active\":true,\"events\":[\"created\"],\"note\":\"customer audit\"}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "items": [
+              {
+                "id": "00042",
+                "active": true,
+                "events": [
+                  "created"
+                ],
+                "note": "customer audit"
+              }
+            ],
+            "visible": [
+              "00042"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "unknown-id",
+    "steps": [
+      {
+        "stdin": "{\"items\":[{\"id\":\"00042\",\"active\":true,\"events\":[\"created\"],\"note\":\"customer audit\"}],\"actions\":[{\"op\":\"archive\",\"id\":\"missing\"}]}",
+        "expect": {
+          "exit": 2,
+          "stderr_nonempty": true
+        }
+      }
+    ]
+  },
+  {
+    "id": "unsupported-op",
+    "steps": [
+      {
+        "stdin": "{\"items\": [{\"id\": \"00042\", \"active\": true, \"events\": [\"created\"], \"note\": \"customer audit\"}], \"actions\": [{\"op\": \"delete\", \"id\": \"00042\"}]}",
+        "expect": {
+          "exit": 2,
+          "stderr_nonempty": true
+        }
+      }
+    ]
+  },
+  {
+    "id": "restore-idempotent",
+    "steps": [
+      {
+        "stdin": "{\"items\": [{\"id\": \"00042\", \"active\": true, \"events\": [\"created\"], \"note\": \"customer audit\"}], \"actions\": [{\"op\": \"archive\", \"id\": \"00042\"}, {\"op\": \"restore\", \"id\": \"00042\"}, {\"op\": \"restore\", \"id\": \"00042\"}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "items": [
+              {
+                "id": "00042",
+                "active": true,
+                "events": [
+                  "created",
+                  "archived",
+                  "restored"
+                ],
+                "note": "customer audit"
+              }
+            ],
+            "visible": [
+              "00042"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "visible-order",
+    "steps": [
+      {
+        "stdin": "{\"items\": [{\"id\": \"z\", \"active\": true, \"events\": []}, {\"id\": \"a\", \"active\": true, \"events\": []}, {\"id\": \"m\", \"active\": true, \"events\": []}], \"actions\": [{\"op\": \"archive\", \"id\": \"a\"}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "items": [
+              {
+                "id": "z",
+                "active": true,
+                "events": []
+              },
+              {
+                "id": "a",
+                "active": false,
+                "events": [
+                  "archived"
+                ]
+              },
+              {
+                "id": "m",
+                "active": true,
+                "events": []
+              }
+            ],
+            "visible": [
+              "z",
+              "m"
+            ]
+          }
+        }
+      }
+    ]
+  }
+]

@@ -1,0 +1,184 @@
+[
+  {
+    "id": "basic-batch",
+    "steps": [
+      {
+        "stdin": "{\"stock\":{\"a\":5,\"b\":2},\"commands\":[{\"op\":\"batch\",\"changes\":[{\"sku\":\"a\",\"delta\":-2},{\"sku\":\"b\",\"delta\":3}]}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "stock": {
+              "a": 3,
+              "b": 5
+            },
+            "results": [
+              {
+                "ok": true
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "legacy-adjust",
+    "steps": [
+      {
+        "stdin": "{\"stock\":{\"a\":5},\"commands\":[{\"op\":\"adjust\",\"sku\":\"a\",\"delta\":2},{\"op\":\"adjust\",\"sku\":\"a\",\"delta\":-1}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "stock": {
+              "a": 6
+            },
+            "results": [
+              {
+                "ok": true
+              },
+              {
+                "ok": true
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "unknown-is-atomic",
+    "steps": [
+      {
+        "stdin": "{\"stock\":{\"a\":5},\"commands\":[{\"op\":\"batch\",\"changes\":[{\"sku\":\"a\",\"delta\":-2},{\"sku\":\"missing\",\"delta\":1}]}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "stock": {
+              "a": 5
+            },
+            "results": [
+              {
+                "error": "unknown-sku"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "negative-is-atomic",
+    "steps": [
+      {
+        "stdin": "{\"stock\":{\"a\":5,\"b\":2},\"commands\":[{\"op\":\"batch\",\"changes\":[{\"sku\":\"a\",\"delta\":1},{\"sku\":\"b\",\"delta\":-3}]}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "stock": {
+              "a": 5,
+              "b": 2
+            },
+            "results": [
+              {
+                "error": "negative-stock"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "duplicate-net",
+    "steps": [
+      {
+        "stdin": "{\"stock\":{\"a\":3},\"commands\":[{\"op\":\"batch\",\"changes\":[{\"sku\":\"a\",\"delta\":-4},{\"sku\":\"a\",\"delta\":2}]}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "stock": {
+              "a": 1
+            },
+            "results": [
+              {
+                "ok": true
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "empty-batch",
+    "steps": [
+      {
+        "stdin": "{\"stock\":{\"a\":5},\"commands\":[{\"op\":\"batch\",\"changes\":[]}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "stock": {
+              "a": 5
+            },
+            "results": [
+              {
+                "ok": true
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "legacy-errors",
+    "steps": [
+      {
+        "stdin": "{\"stock\":{\"a\":5},\"commands\":[{\"op\":\"adjust\",\"sku\":\"missing\",\"delta\":1},{\"op\":\"adjust\",\"sku\":\"a\",\"delta\":true},{\"op\":\"other\"}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "stock": {
+              "a": 5
+            },
+            "results": [
+              {
+                "error": "unknown-sku"
+              },
+              {
+                "error": "invalid-delta"
+              },
+              {
+                "error": "unsupported-op"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "continue-after-failure",
+    "steps": [
+      {
+        "stdin": "{\"stock\": {\"a\": 5}, \"commands\": [{\"op\": \"batch\", \"changes\": [{\"sku\": \"a\", \"delta\": -2}, {\"sku\": \"missing\", \"delta\": 1}]}, {\"op\": \"adjust\", \"sku\": \"a\", \"delta\": 1}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_json": {
+            "stock": {
+              "a": 6
+            },
+            "results": [
+              {
+                "error": "unknown-sku"
+              },
+              {
+                "ok": true
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+]

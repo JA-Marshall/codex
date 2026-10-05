@@ -1,0 +1,163 @@
+[
+  {
+    "id": "comma",
+    "steps": [
+      {
+        "stdin": "{\"rows\":[{\"sku\":\"a\",\"label\":\"red, large\"}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_csv": [
+            [
+              "sku",
+              "label"
+            ],
+            [
+              "a",
+              "red, large"
+            ]
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "quote-and-newline",
+    "steps": [
+      {
+        "stdin": "{\"rows\":[{\"sku\":\"00042\",\"label\":\"He said \\\"yes\\\"\\nnext line\"}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_csv": [
+            [
+              "sku",
+              "label"
+            ],
+            [
+              "00042",
+              "He said \"yes\"\nnext line"
+            ]
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "opaque-identifiers",
+    "steps": [
+      {
+        "stdin": "{\"rows\":[{\"sku\":\"00042\",\"label\":\"first\"},{\"sku\":\" 0042 \",\"label\":\"second\"},{\"sku\":\"\u00d9\u00a1\u00d9\u00a2\",\"label\":\"third\"}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_csv": [
+            [
+              "sku",
+              "label"
+            ],
+            [
+              "00042",
+              "first"
+            ],
+            [
+              " 0042 ",
+              "second"
+            ],
+            [
+              "\u00d9\u00a1\u00d9\u00a2",
+              "third"
+            ]
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "legacy-simple",
+    "steps": [
+      {
+        "stdin": "{\"rows\":[{\"sku\":\"b\",\"label\":\"plain\"},{\"sku\":\"a\",\"label\":\"other\"}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_csv": [
+            [
+              "sku",
+              "label"
+            ],
+            [
+              "b",
+              "plain"
+            ],
+            [
+              "a",
+              "other"
+            ]
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "empty-fields",
+    "steps": [
+      {
+        "stdin": "{\"rows\":[{\"sku\":\"\",\"label\":\"\"},{\"sku\":\"x\",\"label\":\"line\\r\\nbreak\"}]}",
+        "expect": {
+          "exit": 0,
+          "stdout_csv": [
+            [
+              "sku",
+              "label"
+            ],
+            [
+              "",
+              ""
+            ],
+            [
+              "x",
+              "line\r\nbreak"
+            ]
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "header-only",
+    "steps": [
+      {
+        "stdin": "{\"rows\":[]}",
+        "expect": {
+          "exit": 0,
+          "stdout_csv": [
+            [
+              "sku",
+              "label"
+            ]
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "invalid-fields",
+    "steps": [
+      {
+        "stdin": "{\"rows\": [{\"sku\": 42, \"label\": \"ok\"}]}",
+        "expect": {
+          "exit": 2
+        }
+      },
+      {
+        "stdin": "{\"rows\": [{\"sku\": \"a\", \"label\": null}]}",
+        "expect": {
+          "exit": 2
+        }
+      },
+      {
+        "stdin": "{\"rows\": [{\"sku\": \"a\", \"label\": 42}]}",
+        "expect": {
+          "exit": 2
+        }
+      }
+    ]
+  }
+]

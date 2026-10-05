@@ -1,0 +1,41 @@
+{
+  "requirements": [
+    {
+      "id": "r-atomic",
+      "critical": true,
+      "cases": [
+        "unknown-is-atomic",
+        "negative-is-atomic",
+        "continue-after-failure"
+      ]
+    },
+    {
+      "id": "r-net",
+      "critical": true,
+      "cases": [
+        "basic-batch",
+        "duplicate-net",
+        "empty-batch"
+      ]
+    },
+    {
+      "id": "r-compat",
+      "critical": true,
+      "cases": [
+        "legacy-adjust",
+        "legacy-errors"
+      ]
+    }
+  ],
+  "owner_facts": [],
+  "milestones": [],
+  "changes": [],
+  "mutant_failures": {
+    "partial-commit": [
+      "r-atomic"
+    ],
+    "overwrite-duplicate": [
+      "r-net"
+    ]
+  }
+}

@@ -589,7 +589,13 @@ fn create_filesystem_args(
             .filter(|path| !unreadable_paths.contains(path))
             .filter(|path| !missing_auto_metadata_read_only_project_root_subpaths.contains(path))
             .collect();
-        let protected_metadata_names = writable_root.protected_metadata_names.clone();
+        // Only directories can contain protected metadata. Exact file grants
+        // must not create impossible mount targets such as file.txt/.git.
+        let protected_metadata_names = if fs::metadata(mount_root)?.is_dir() {
+            writable_root.protected_metadata_names.clone()
+        } else {
+            Vec::new()
+        };
         append_metadata_path_masks_for_writable_root(
             &mut read_only_subpaths,
             root,
@@ -1907,6 +1913,57 @@ mod tests {
             protected_create_target_paths(&args).is_empty(),
             "symlinked missing child .git should be mount protected before command execution",
         );
+    }
+
+    #[cfg(unix)]
+    #[test_case::test_case(false; "regular file")]
+    #[test_case::test_case(true; "symlinked file")]
+    fn file_writable_roots_do_not_create_metadata_descendants(symlinked: bool) {
+        let temp_dir = TempDir::new().expect("temp dir");
+        let file = temp_dir.path().join("allowed.txt");
+        std::fs::write(&file, "allowed").expect("create writable file");
+        let root = if symlinked {
+            let link = temp_dir.path().join("link.txt");
+            std::os::unix::fs::symlink(&file, &link).expect("create symlinked file");
+            link
+        } else {
+            file.clone()
+        };
+        let policy = FileSystemSandboxPolicy::restricted(vec![
+            FileSystemSandboxEntry::new(
+                FileSystemPath::Special {
+                    value: FileSystemSpecialPath::Root,
+                },
+                FileSystemAccessMode::Read,
+            ),
+            FileSystemSandboxEntry::new(
+                AbsolutePathBuf::try_from(root)
+                    .expect("absolute writable file")
+                    .into(),
+                FileSystemAccessMode::Write,
+            ),
+        ]);
+
+        let args =
+            create_filesystem_args(&policy, temp_dir.path(), NO_UNREADABLE_GLOB_SCAN_MAX_DEPTH)
+                .expect("filesystem args");
+        let writable_binds = args
+            .args
+            .windows(3)
+            .filter(|window| window[0] == "--bind")
+            .map(<[std::string::String]>::to_vec)
+            .collect::<Vec<_>>();
+
+        assert_eq!(
+            writable_binds,
+            vec![vec![
+                "--bind".to_string(),
+                path_to_string(&file),
+                path_to_string(&file),
+            ]]
+        );
+        assert_eq!(synthetic_mount_target_paths(&args), Vec::<PathBuf>::new());
+        assert_eq!(protected_create_target_paths(&args), Vec::<PathBuf>::new());
     }
 
     #[test]

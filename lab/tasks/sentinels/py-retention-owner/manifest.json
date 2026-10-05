@@ -1,0 +1,38 @@
+{
+  "schema_version": 2,
+  "id": "py-retention-owner",
+  "project_id": "retention-owner",
+  "family": "extension",
+  "language": "python",
+  "size": "small",
+  "split": "development",
+  "track": "A",
+  "pressure": "ambiguity",
+  "evaluation_group": "interaction-diagnostic-excluded-from-clear-intent-track-a",
+  "capabilities": [
+    "cli",
+    "owner-clarification"
+  ],
+  "write_paths": [
+    "src",
+    "tests"
+  ],
+  "command": [
+    "{python}",
+    "{repository}/src/main.py"
+  ],
+  "build": [],
+  "public_command": [
+    "{python}",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests"
+  ],
+  "mutants": [
+    "guess-seven-days",
+    "drop-legal-holds"
+  ],
+  "structural_checks": []
+}

@@ -149,6 +149,59 @@ async fn graceful_marker_does_not_replace_a_successful_shutdown_waiter() {
     assert!(result.unwrap_err().to_string().contains("waiter failed"));
 }
 
+#[tokio::test]
+async fn saturated_diagnostics_do_not_erase_shutdown_or_hide_errors() -> Result<()> {
+    for fail in [false, true] {
+        let marker = Event {
+            id: "shutdown".into(),
+            msg: EventMsg::ShutdownComplete,
+        };
+        let mut events = vec![marker.clone(); super::MAX_PHASE_EVENTS];
+        let mut queued = Vec::new();
+        if fail {
+            queued.push(Event {
+                id: "error".into(),
+                msg: EventMsg::Error(ErrorEvent {
+                    misalignment: None,
+                    message: "shutdown failed".into(),
+                    codex_error_info: None,
+                }),
+            });
+        }
+        queued.push(marker);
+        let result = shutdown_and_drain_events(
+            std::future::ready(Ok(())),
+            event_stream(queued),
+            &mut events,
+        )
+        .await;
+        if fail {
+            assert!(result.unwrap_err().to_string().contains("shutdown failed"));
+        } else {
+            assert!(result?);
+        }
+        assert_eq!(events.len(), super::MAX_PHASE_EVENTS);
+    }
+    Ok(())
+}
+
+#[test]
+fn byte_saturation_drops_diagnostics_without_growing_the_buffer() -> Result<()> {
+    let mut events = Vec::new();
+    let mut bytes = super::MAX_PHASE_EVENT_BYTES;
+    assert!(!super::retain_diagnostic(
+        Event {
+            id: "end".into(),
+            msg: EventMsg::ShutdownComplete
+        },
+        &mut events,
+        &mut bytes
+    )?);
+    assert!(events.is_empty());
+    assert_eq!(bytes, super::MAX_PHASE_EVENT_BYTES);
+    Ok(())
+}
+
 fn event_stream(
     events: Vec<Event>,
 ) -> impl FnMut() -> futures::future::BoxFuture<'static, Result<Event>> {
